@@ -75,6 +75,9 @@ export interface FfsResult {
 }
 
 // ── Weight ceilings — configurable; must sum to 100 ──────────────────────────
+// These ceilings define the maximum BASE score (0–100).
+// The SenSync™/HeartSync boost (+10–25 pts) is additive on top of the base
+// score; the final ffs_score is clamped to 0–100 in the service layer.
 // Changing these is a governance event (bump FFS_RULE_ID).
 
 export const FFS_WEIGHT_CEILINGS = {
