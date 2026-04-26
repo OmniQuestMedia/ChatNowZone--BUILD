@@ -518,7 +518,9 @@ model TokenBalance {
   organization_id     String
   tenant_id           String
   token_origin        String   @default("PURCHASED")
+  token_type          String   @default("CZT") @db.VarChar(10)
 
+  @@index([token_type])
   @@map("token_balances")
 }
 

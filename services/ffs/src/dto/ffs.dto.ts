@@ -1,4 +1,4 @@
-// WO-003 — Room-Heat Engine: DTOs (request validation shapes)
+// WO-003 — Flicker n'Flame Scoring (FFS): DTOs (request validation shapes)
 // All fields are typed; callers provide primitives — no class-validator
 // decorators used (consistent with the rest of the codebase style).
 

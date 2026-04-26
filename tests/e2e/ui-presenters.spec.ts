@@ -70,13 +70,12 @@ describe('Build config + SEO', () => {
 });
 
 describe('PublicWalletPresenter — token bundles', () => {
-  it('emits Tease Regular + ShowZone rows for a guest', () => {
+  it('emits Tease Regular rows for a guest', () => {
     const card = new PublicWalletPresenter().buildTokenBundleRateCard({
       tier: 'GUEST',
       now_utc: new Date('2026-04-25T00:00:00Z'),
     });
     expect(card.rows).toHaveLength(5);
-    expect(card.showzone_rows).toHaveLength(2);
     expect(card.rows[0].display_price_usd).toBe(card.rows[0].guest_price_usd);
   });
 
@@ -220,7 +219,6 @@ describe('DiamondConciergePresenter — full page render', () => {
     const render = renderTokensPage({ tier: 'GUEST' });
     expect(findByTestId(render.tree, 'tokens-page')).toBeDefined();
     expect(findByTestId(render.tree, 'tokens-tease-regular')).toBeDefined();
-    expect(findByTestId(render.tree, 'tokens-showzone')).toBeDefined();
   });
 
   it('renders the Diamond purchase page', () => {
