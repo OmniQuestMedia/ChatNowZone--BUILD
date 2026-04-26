@@ -25,9 +25,9 @@ export class CreatorRateDay61Job {
   /**
    * Run the Day 61 upgrade.
    *
-   * Finds all creators who have a current STANDARD tier row (no effective_until)
+   * Finds all creators who have a current STANDARD tier row (no effective_to)
    * and writes a new DAY61_UPGRADED row with the founding floor/ceiling rates.
-   * The previous STANDARD row is closed by setting effective_until to now.
+   * The previous STANDARD row is closed by setting effective_to to now.
    *
    * This method is idempotent: creators already on DAY61_UPGRADED or FOUNDING
    * tiers are skipped.
@@ -41,12 +41,12 @@ export class CreatorRateDay61Job {
     const now = new Date();
     const effectiveFrom = now;
 
-    // Find all STANDARD creators whose current row has no effective_until
+    // Find all STANDARD creators whose current row has no effective_to
     // (i.e. their rate has not yet been superseded).
     const standardRows = await this.prisma.creatorRateTier.findMany({
       where: {
         cohort:           'STANDARD',
-        effective_until:  null,
+        effective_to:  null,
       },
       select: { id: true, creator_id: true },
     });
@@ -64,7 +64,7 @@ export class CreatorRateDay61Job {
         // Close the existing STANDARD row.
         this.prisma.creatorRateTier.update({
           where: { id: row.id },
-          data:  { effective_until: now },
+          data:  { effective_to: now },
         }),
         // Insert the new DAY61_UPGRADED row.
         this.prisma.creatorRateTier.create({
@@ -74,7 +74,7 @@ export class CreatorRateDay61Job {
             rate_floor_usd:   GovernanceConfig.CREATOR_RATE_DAY61_FLOOR,
             rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_DAY61_CEILING,
             effective_from:   effectiveFrom,
-            effective_until:  null,
+            effective_to:  null,
             correlation_id:   correlationId,
             reason_code:      'DAY61_FLOOR_UPGRADE',
             rule_applied_id:  DAY61_RULE_ID,
