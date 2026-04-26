@@ -1,7 +1,6 @@
 // PAYLOAD 5 — Flicker n'Flame Scoring (FFS) Engine (foundation for CreatorControl + Cyrano)
-// PAYLOAD 5 — Room-Heat Engine (foundation for CreatorControl + Cyrano)
 // Business Plan B.4 — room-level telemetry that summarises tipper presence,
-// tip velocity and dwell into a single deterministic Heat Tier.
+// tip velocity and dwell into a single deterministic FFS tier.
 //
 // Doctrine:
 //   - Pure computation. No persistence here — callers decide whether to store.
