@@ -20,7 +20,6 @@ export interface TokenBundleRateRow {
   creator_payout_per_token: number;
   /** @deprecated TEASE_SHOWZONE is deprecated / legacy-only — new bundles are TEASE_REGULAR (CZT only). */
   bundle_tier: 'TEASE_REGULAR' | 'TEASE_SHOWZONE';
-  bundle_tier: 'TEASE_REGULAR';
   is_promoted: boolean; // highlight row on the rate card
   reason_code: 'REDBOOK_SECTION_3';
 }
@@ -29,8 +28,8 @@ export interface TokenBundleRateRow {
 export interface TokenBundleRateCard {
   tier: GuestTier;
   rows: TokenBundleRateRow[];
-  /** @deprecated showzone_rows is deprecated — ShowZone removed. Will be empty. */
-  showzone_rows: TokenBundleRateRow[];
+  /** @deprecated showzone_rows is deprecated — ShowZone removed. When present, it will be empty. */
+  showzone_rows?: TokenBundleRateRow[];
   generated_at_utc: string;
   rule_applied_id: string;
 }

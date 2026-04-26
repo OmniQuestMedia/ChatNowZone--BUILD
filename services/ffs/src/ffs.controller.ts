@@ -54,7 +54,7 @@ export class FfsController {
   getSessionScore(
     @Param('sessionId') sessionId: string,
   ): FfsScore {
-    const score = this.flickerNFlameScoringService.getSessionHeat(sessionId);
+    const score = this.ffsService.getSessionScore(sessionId);
     if (!score) {
       throw new NotFoundException(`Session not found or not yet active: ${sessionId}`);
     }
