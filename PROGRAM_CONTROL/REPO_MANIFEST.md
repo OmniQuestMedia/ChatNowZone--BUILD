@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-4-ambiguity-research-K2Iu3`
-**Commit:** `62d35b79a3899d4e55d6ee709df41e6e172612ba`
-**Generated:** 2026-04-26T16:40:08Z
+**Branch:** `claude/phase-3b-5-nats-producer-renames-K2Iu3`
+**Commit:** `1be8c5b52adac024472106be4623a538351cc061`
+**Generated:** 2026-04-26T16:50:04Z
 
 ## All Files
 
