@@ -32,16 +32,17 @@ export type ReasonCode =
   | 'REFUND';
 
 /**
- * Rate card tiers (REDBOOK §3). Tease Regular / ShowZone / Diamond Floor / VIP.
+ * Rate card tiers (REDBOOK §3). Tease Regular / Diamond Floor / VIP.
+ * Note: tease_showzone is deprecated — ShowZone service removed post-April 2026.
  */
 export type RateCardTier =
   | 'tease_regular'
-  | 'tease_showzone'
+  | 'tease_showzone'  // @deprecated — ShowZone service deprecated; use tease_regular
   | 'diamond_floor'
   | 'vip_baseline';
 
 /**
- * Heat levels — Room-Heat Engine output (PAY-001…005). Drives creator payout per
+ * Heat levels — Flicker n'Flame Scoring (FFS) output (PAY-001…005). Drives creator payout per
  * token via governance.config.GovernanceConfig.RATE_* bands.
  */
 export type HeatLevel = 'cold' | 'warm' | 'hot' | 'inferno';

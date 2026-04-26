@@ -1,8 +1,8 @@
-// FIZ: PAYLOAD-001 — Payout / Room-Heat Engine stub
+// FIZ: PAYLOAD-001 — Payout / Flicker n'Flame Scoring (FFS) stub
 // Settles a creator session at close: reads session CZT, resolves the
-// Room-Heat payout rate, and credits the creator wallet's `bonus` bucket
+// FFS payout rate, and credits the creator wallet's `bonus` bucket
 // with the computed USD-equivalent payout recorded in CZT.
-// Full Room-Heat scoring engine lands in HZ-002; this module provides the
+// Full FFS engine is in services/ffs/; this module provides the
 // deterministic plumbing those consumers will call into.
 
 import type { LedgerService } from './ledger.service';

@@ -29,7 +29,7 @@ export interface DiamondQuote {
 }
 
 /**
- * Maps a Room-Heat score (0–100) to the canonical creator payout rate band.
+ * Maps a Flicker n'Flame Scoring (FFS) score (0–100) to the canonical creator payout rate band.
  * Bands are LOCKED in GovernanceConfig (PAY-001…005) — never redefine locally.
  */
 function resolveHeatRate(heatScore: number): { level: HeatLevel; ratePerToken: number } {
@@ -120,7 +120,7 @@ export class RedbookRateCardService {
 
   /**
    * Resolve the live creator payout rate for a session close.
-   * Room-Heat wins unless the Diamond floor ($0.080) is higher.
+   * Flicker n'Flame Scoring (FFS) rate wins unless the Diamond floor ($0.080) is higher.
    */
   resolveCreatorPayoutRate(args: {
     heatScore: number;

@@ -2,9 +2,9 @@
 // Business Plan B.3 + Canonical Corpus Chapter 4 (Creator Success).
 //
 // Unified creator workstation (single-pane) — aggregates:
-//   • Broadcast Timing Copilot  — when to go live
-//   • Session Monitoring Copilot — real-time price nudges during broadcast
-//   • Room-Heat Engine           — the live-telemetry foundation
+//   • Broadcast Timing Copilot          — when to go live
+//   • Session Monitoring Copilot        — real-time price nudges during broadcast
+//   • Flicker n'Flame Scoring (FFS)     — the live-telemetry foundation
 //   • OBS plugin + chat aggregator stubs (services/obs-bridge)
 //
 // This service is a READ + SUGGEST surface. It never writes to the ledger
@@ -61,7 +61,7 @@ export class CreatorControlService {
   ) {}
 
   /**
-   * Ingest a room-heat sample from ShowZone/Bijou/HeartZone and fan the
+   * Ingest a Flicker n'Flame Scoring (FFS) sample from Bijou/HeartZone and fan the
    * resulting suggestion out to the creator's copilot panel.
    */
   ingestSample(sample: RoomHeatSample): { heat: HeatScore; nudge: PriceNudge } {

@@ -1210,6 +1210,7 @@ model CanonicalLedgerEntry {
   reason_code     String   // "PURCHASE" | "SPEND" | "PAYOUT" | "EXPIRY_RECOVERY" | "TOKEN_BRIDGE" | "THREE_FIFTHS_EXIT" | ...
   amount          Int      // signed: positive = credit, negative = debit
   bucket          String   // "purchased" | "membership" | "bonus"
+  token_type      String   @default("CZT") @db.VarChar(10) // CZT only — single-token economy enforced
   metadata        Json?
   hash_prev       String?
   hash_current    String
@@ -1220,6 +1221,7 @@ model CanonicalLedgerEntry {
   @@index([wallet_id, correlation_id])
   @@index([wallet_id, created_at])
   @@index([reason_code])
+  @@index([token_type])
   @@map("wallet_ledger_entries")
 }
 
@@ -1247,7 +1249,7 @@ model CanonicalRateCard {
   creator_payout  Decimal   @db.Decimal(6, 4)  // $0.065–$0.090 per token
   platform_margin Decimal   @db.Decimal(6, 4)
   min_volume      Int?
-  heat_level      String?   // for Room-Heat scaling: "cold" | "warm" | "hot" | "inferno"
+  heat_level      String?   // for Flicker n'Flame Scoring (FFS) scaling: "cold" | "warm" | "hot" | "inferno"
   valid_from      DateTime
   valid_to        DateTime?
 
@@ -1384,10 +1386,11 @@ model WormExportRecord {
   @@map("worm_export_records")
 }
 
-// ─── Room-Heat Engine (WO-003 — Business Plan B.4) ────────────────────────────
+// ─── Flicker n'Flame Scoring (FFS) (WO-003 — Business Plan B.4) ───────────────
 // Migration: 20260425000000_add_room_heat
+// DB tables retain room_heat_* names for backward compatibility with existing data.
 
-/// Time-series heat score snapshots — one row per ingest() call.
+/// Time-series FFS score snapshots — one row per ingest() call.
 /// Append-only by convention (no UPDATE/DELETE in service code).
 model RoomHeatSnapshot {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -1395,12 +1398,12 @@ model RoomHeatSnapshot {
   creator_id      String   @db.Uuid
   heat_score      Decimal  @db.Decimal(5, 2)
   heat_tier       String   @db.VarChar(20)
-  /// JSON object of HeatScoreComponents (all 13 component values).
+  /// JSON object of FfsScoreComponents (all 13 component values).
   components      Json
   correlation_id  String   @db.VarChar(128)
   reason_code     String   @db.VarChar(100)
   is_dual_flame   Boolean  @default(false)
-  rule_applied_id String   @default("ROOM_HEAT_ENGINE_v2") @db.VarChar(100)
+  rule_applied_id String   @default("FFS_ENGINE_v2") @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
 
   @@index([session_id, created_at])
@@ -1420,7 +1423,7 @@ model RoomHeatAdaptiveWeights {
   last_updated_at DateTime @default(now()) @db.Timestamptz
   correlation_id  String   @db.VarChar(128)
   reason_code     String   @default("ADAPTIVE_INIT") @db.VarChar(100)
-  rule_applied_id String   @default("ROOM_HEAT_ADAPTIVE_v1") @db.VarChar(100)
+  rule_applied_id String   @default("FFS_ADAPTIVE_v1") @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
 
   @@map("room_heat_adaptive_weights")

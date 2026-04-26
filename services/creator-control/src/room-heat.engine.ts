@@ -1,4 +1,4 @@
-// PAYLOAD 5 — Room-Heat Engine (foundation for CreatorControl + Cyrano)
+// PAYLOAD 5 — Flicker n'Flame Scoring (FFS) Engine (foundation for CreatorControl + Cyrano)
 // Business Plan B.4 — room-level telemetry that summarises tipper presence,
 // tip velocity and dwell into a single deterministic Heat Tier.
 //
@@ -6,13 +6,13 @@
 //   - Pure computation. No persistence here — callers decide whether to store.
 //   - Deterministic. Same inputs → same tier. No randomness.
 //   - Side-channel free. Does not talk to ledger or payments directly.
-//   - Emits via NATS (ROOM_HEAT_* topics) for downstream consumers.
+//   - Emits via NATS (FFS_SCORE_* topics) for downstream consumers.
 
 import { Injectable, Logger } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 
-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v1';
+export const ROOM_HEAT_RULE_ID = 'FFS_ENGINE_v1';
 
 export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
@@ -54,7 +54,7 @@ const TIER_THRESHOLDS: Array<{ min: number; tier: HeatTier }> = [
 @Injectable()
 export class RoomHeatEngine {
   private readonly logger = new Logger(RoomHeatEngine.name);
-  // Last-known tier per session — transition emits ROOM_HEAT_TIER_CHANGED.
+  // Last-known tier per session — transition emits FFS_SCORE_TIER_CHANGED.
   private readonly lastTier = new Map<string, HeatTier>();
 
   constructor(private readonly nats: NatsService) {}
@@ -89,18 +89,18 @@ export class RoomHeatEngine {
    */
   ingest(sample: RoomHeatSample): HeatScore {
     const score = this.computeScore(sample);
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SAMPLE, { ...score });
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, { ...score });
 
     const prev = this.lastTier.get(sample.session_id);
     if (prev !== score.tier) {
       this.lastTier.set(sample.session_id, score.tier);
-      this.logger.log('RoomHeatEngine: tier transition', {
+      this.logger.log('FfsEngine: tier transition', {
         session_id: sample.session_id,
         from: prev ?? 'UNKNOWN',
         to: score.tier,
         rule_applied_id: ROOM_HEAT_RULE_ID,
       });
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_TIER_CHANGED, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
         session_id: sample.session_id,
         creator_id: sample.creator_id,
         from: prev ?? null,
@@ -112,7 +112,7 @@ export class RoomHeatEngine {
     }
 
     if (score.tier === 'INFERNO') {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
         session_id: sample.session_id,
         creator_id: sample.creator_id,
         score: score.score,

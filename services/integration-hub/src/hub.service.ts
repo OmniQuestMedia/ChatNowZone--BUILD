@@ -14,7 +14,7 @@
 //   5. Recovery (Payload 2) ↔ Diamond Concierge bridge is emit-only — the
 //      Hub does not execute Recovery or Concierge logic directly.
 //   6. Cyrano latency budget (≤ 350 ms) must be respected when the Hub
-//      joins Room-Heat output into a Cyrano evaluate() call (Payload 5).
+//      joins Flicker n'Flame Scoring (FFS) output into a Cyrano evaluate() call (Payload 5).
 //   7. REDBOOK rate cards and RECOVERY_ENGINE constants are read-only
 //      references from `governance.config.ts` — never inlined.
 
