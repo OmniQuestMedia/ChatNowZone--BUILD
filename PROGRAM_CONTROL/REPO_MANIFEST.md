@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-ffs-score-and-tier`
-**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
-**Generated:** 2026-04-26T02:58:47Z
+**Branch:** `copilot/global-renames-and-cleanup`
+**Commit:** `744593cf12e9230cced91bcff7b7960755c81bf7`
+**Generated:** 2026-04-26T03:08:10Z
 
 ## All Files
 
@@ -326,6 +326,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
 - `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
+- `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
