@@ -38,6 +38,12 @@ export type ReasonCode =
 export type RateCardTier =
   | 'tease_regular'
   | 'tease_showzone'  // @deprecated — ShowZone service deprecated; use tease_regular
+ * Note: tease_showzone is @deprecated — ShowZone service removed (CNZ-WORK-001 Section 1).
+ * Retained in type union for backward compat with deprecated quoteTeaseShowzone().
+ */
+export type RateCardTier =
+  | 'tease_regular'
+  | 'tease_showzone'    // @deprecated — ShowZone service removed
   | 'diamond_floor'
   | 'vip_baseline';
 

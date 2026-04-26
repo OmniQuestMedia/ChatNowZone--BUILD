@@ -67,7 +67,7 @@ describe('RedbookRateCardService — Diamond Tier', () => {
   });
 });
 
-describe('RedbookRateCardService — Room-Heat payout resolution', () => {
+describe('RedbookRateCardService — FFS payout resolution', () => {
   it('returns Cold rate for heat score 0', () => {
     const rate = svc.resolveCreatorPayoutRate({ heatScore: 0, diamondFloorActive: false });
     expect(rate.level).toBe('cold');

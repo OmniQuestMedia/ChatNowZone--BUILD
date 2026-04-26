@@ -231,6 +231,21 @@ export const NATS_TOPICS = {
   HUB_PAYOUT_SCALING_APPLIED:        'hub.payout.scaling_applied',
   HUB_DIAMOND_CONCIERGE_HANDOFF:     'hub.diamond_concierge.handoff',
 
+  // ── VelocityZone (time-window payout boosts) ──────────────────────────────
+  VELOCITYZONE_EVENT_ACTIVE:         'velocityzone.event.active',
+  VELOCITYZONE_EVENT_ENDED:          'velocityzone.event.ended',
+  VELOCITYZONE_RATE_LOCKED:          'velocityzone.rate.locked',
+
+  // ── SenSync™ Biometric Layer ───────────────────────────────────────────────
+  SENSYNC_BIOMETRIC_DATA:            'sensync.biometric.data',
+  SENSYNC_CONSENT_GRANTED:           'sensync.consent.granted',
+  SENSYNC_CONSENT_REVOKED:           'sensync.consent.revoked',
+  SENSYNC_DEVICE_CONNECTED:          'sensync.device.connected',
+  SENSYNC_DEVICE_DISCONNECTED:       'sensync.device.disconnected',
+
+  // ── FFS periodic score broadcast (distinct from sample/tier topics) ────────
+  FFS_SCORE_UPDATE:                  'ffs.score.update',
+
   // ── Refund policy & CS extensions ─────────────────────────────────────────
   REFUND_POLICY_ACKNOWLEDGED:        'refund.policy.acknowledged',
   REFUND_EXTENSION_EXECUTED:         'refund.extension.executed',

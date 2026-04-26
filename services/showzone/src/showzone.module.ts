@@ -1,3 +1,4 @@
+// @deprecated — ShowZone service removed (see CNZ-WORK-001 Section 1). Retained for reference only.
 // services/showzone/src/showzone.module.ts
 // @deprecated SHOWZONE-DEPRECATED — ShowZone service is deprecated as of post-April 2026.
 // All ShowToken creation, conversion, and allotment logic is removed.

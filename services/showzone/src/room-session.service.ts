@@ -1,3 +1,4 @@
+// @deprecated — ShowZone service removed (see CNZ-WORK-001 Section 1). Retained for reference only.
 // services/showzone/src/room-session.service.ts
 // @deprecated SHOWZONE-DEPRECATED — ShowZone service is deprecated as of post-April 2026.
 // Legacy ShowToken pricing fields (pass_price_st / phase2_price_st) and dual-wallet
