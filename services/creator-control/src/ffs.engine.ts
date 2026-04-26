@@ -1,6 +1,8 @@
 // PAYLOAD 5 — Flicker n'Flame Scoring/FFS Engine (foundation for CreatorControl + Cyrano)
-// Business Plan B.4 — room-level telemetry that summarises tipper presence,
-// tip velocity and dwell into a single deterministic Heat Tier.
+// Business Plan B.4 — simplified 3-signal heat engine for CreatorControl + Cyrano.
+// Rule ID FFS_ENGINE_v1: this is the lightweight 3-signal engine (tipper pressure,
+// velocity, VIP presence). The full multi-signal engine in services/ffs/ uses
+// FFS_ENGINE_v2 and drives the leaderboard + NATS broadcast.
 //
 // Doctrine:
 //   - Pure computation. No persistence here — callers decide whether to store.

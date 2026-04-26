@@ -76,7 +76,7 @@ export class RedbookRateCardService {
    * Resolve a ShowZone Premium bundle quote. Premium is single-tier per REDBOOK —
    * same price for guests and members (entry is gated by a paid pass).
    */
-  quoteTeaseShowzone(tokens: number): BundleQuote {
+  quoteTeaseShowzone(tokens: number): Omit<BundleQuote, 'tier'> & { tier: string } {
     const row = REDBOOK_RATE_CARDS.TEASE_SHOWZONE.find((r) => r.tokens === tokens);
     if (!row) {
       throw new Error(
@@ -86,7 +86,7 @@ export class RedbookRateCardService {
     }
     const unit = row.usd / row.tokens;
     return {
-      tier: 'tease_showzone' as unknown as RateCardTier,
+      tier: 'tease_showzone',
       tokens: row.tokens,
       priceUsd: row.usd,
       creatorPayoutPerToken: row.creator_payout_per_token,

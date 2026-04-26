@@ -1,7 +1,7 @@
 # Flicker n'Flame Scoring (FFS) — ASSUMPTIONS
 
 **Work Order:** WO-003  
-**Rule ID:** `ROOM_HEAT_ENGINE_v2`
+**Rule ID:** `FFS_ENGINE_v2`
 
 This file documents design assumptions that cannot be verified purely from the
 codebase.  Any assumption challenged by a future CEO directive or governance

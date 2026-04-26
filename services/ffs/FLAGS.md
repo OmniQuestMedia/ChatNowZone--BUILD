@@ -3,7 +3,7 @@
 **Work Order:** WO-003  
 **Rule ID:** `FFS_ENGINE_v2`
 
-Feature flags and deferred capabilities for the Room-Heat Engine.
+Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS) service.
 
 ---
 
