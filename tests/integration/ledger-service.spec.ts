@@ -12,7 +12,6 @@ import {
   TokenOrigin,
   WalletBucket,
 } from '../../services/core-api/src/finance/ledger.service';
-import { TokenOrigin } from '../../services/core-api/src/finance/types/ledger.types';
 import { GovernanceConfigService } from '../../services/core-api/src/config/governance.config';
 import {
   loadWallets,
@@ -135,7 +134,7 @@ describe('LedgerService — recordEntry', () => {
     const result = await svc.recordEntry({
       userId: 'cu_001',
       amount: 100n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       tokenOrigin: TokenOrigin.PURCHASED,
       referenceId: 'ref_001',
       reasonCode: 'TOPUP',
@@ -152,7 +151,7 @@ describe('LedgerService — recordEntry', () => {
       svc.recordEntry({
         userId: 'cu_001',
         amount: 100 as any,
-        tokenType: TokenType.REGULAR,
+        tokenType: TokenType.CZT,
         tokenOrigin: TokenOrigin.PURCHASED,
         referenceId: 'ref_002',
         reasonCode: 'TOPUP',
@@ -166,7 +165,7 @@ describe('LedgerService — recordEntry', () => {
     await svc.recordEntry({
       userId: 'cu_001',
       amount: 50n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       tokenOrigin: TokenOrigin.PURCHASED,
       referenceId: 'ref_idem',
       reasonCode: 'TOPUP',
@@ -174,7 +173,7 @@ describe('LedgerService — recordEntry', () => {
     await svc.recordEntry({
       userId: 'cu_001',
       amount: 50n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       tokenOrigin: TokenOrigin.PURCHASED,
       referenceId: 'ref_idem',
       reasonCode: 'TOPUP',
@@ -188,7 +187,7 @@ describe('LedgerService — recordEntry', () => {
     await svc.recordEntry({
       userId: 'cu_002',
       amount: 10n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       tokenOrigin: TokenOrigin.PURCHASED,
       referenceId: 'ref_noRule',
       reasonCode: 'TOPUP',
@@ -207,7 +206,7 @@ describe('LedgerService — recordEntry', () => {
       await svc.recordEntry({
         userId: tx.customer_id,
         amount: BigInt(tx.gross_tokens),
-        tokenType: TokenType.REGULAR,
+        tokenType: TokenType.CZT,
         // Seed-data replay: positive credits representing user-purchased token
         // replays for scenario validation. Treated as PURCHASED. (Flagged in
         // TOK-006-FOLLOWUP report-back as context-inferred.)
@@ -226,27 +225,27 @@ describe('LedgerService — getBalance', () => {
   it('returns 0n for user with no entries', async () => {
     const store: LedgerRow[] = [];
     const svc = makeService(store);
-    const bal = await svc.getBalance('cu_999', TokenType.REGULAR);
+    const bal = await svc.getBalance('cu_999', TokenType.CZT);
     expect(bal).toBe(0n);
   });
 
   it('returns sum of all entries for a user + token type', async () => {
     const store: LedgerRow[] = [];
     const svc = makeService(store);
-    await svc.recordEntry({ userId: 'cu_010', amount: 200n, tokenType: TokenType.REGULAR, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r1', reasonCode: 'TOPUP' });
-    await svc.recordEntry({ userId: 'cu_010', amount: 50n, tokenType: TokenType.REGULAR, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r2', reasonCode: 'TOPUP' });
-    await svc.recordEntry({ userId: 'cu_010', amount: -30n, tokenType: TokenType.REGULAR, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r3', reasonCode: 'SPEND' });
-    const bal = await svc.getBalance('cu_010', TokenType.REGULAR);
+    await svc.recordEntry({ userId: 'cu_010', amount: 200n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r1', reasonCode: 'TOPUP' });
+    await svc.recordEntry({ userId: 'cu_010', amount: 50n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r2', reasonCode: 'TOPUP' });
+    await svc.recordEntry({ userId: 'cu_010', amount: -30n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'r3', reasonCode: 'SPEND' });
+    const bal = await svc.getBalance('cu_010', TokenType.CZT);
     expect(bal).toBe(220n);
   });
 
   it('isolates balances by token type', async () => {
     const store: LedgerRow[] = [];
     const svc = makeService(store);
-    await svc.recordEntry({ userId: 'cu_010', amount: 100n, tokenType: TokenType.REGULAR, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'reg1', reasonCode: 'TOPUP' });
-    await svc.recordEntry({ userId: 'cu_010', amount: 500n, tokenType: TokenType.BIJOU, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'bij1', reasonCode: 'TOPUP' });
-    const regBal = await svc.getBalance('cu_010', TokenType.REGULAR);
-    const bijBal = await svc.getBalance('cu_010', TokenType.BIJOU);
+    await svc.recordEntry({ userId: 'cu_010', amount: 100n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'reg1', reasonCode: 'TOPUP' });
+    await svc.recordEntry({ userId: 'cu_010', amount: 500n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'bij1', reasonCode: 'TOPUP' });
+    const regBal = await svc.getBalance('cu_010', TokenType.CZT);
+    const bijBal = await svc.getBalance('cu_010', TokenType.CZT);
     expect(regBal).toBe(100n);
     expect(bijBal).toBe(500n);
   });
@@ -287,7 +286,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_spend_order';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 50n,
       membership: 50n,
       purchased: 50n,
@@ -296,7 +295,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const { entries, total_debited } = await svc.debitWallet({
       userId,
       amountTokens: 30n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       referenceId: 'debit:spend_order_1',
       reasonCode: 'SESSION_CHARGE',
     });
@@ -313,7 +312,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_spill_1';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 20n,
       membership: 100n,
       purchased: 100n,
@@ -322,7 +321,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const { entries, total_debited } = await svc.debitWallet({
       userId,
       amountTokens: 50n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       referenceId: 'debit:spill_1',
       reasonCode: 'SESSION_CHARGE',
     });
@@ -341,7 +340,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_spill_all';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 10n,
       membership: 15n,
       purchased: 100n,
@@ -350,7 +349,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const { entries, total_debited } = await svc.debitWallet({
       userId,
       amountTokens: 40n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       referenceId: 'debit:spill_all',
       reasonCode: 'SESSION_CHARGE',
     });
@@ -372,7 +371,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_insufficient';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 5n,
       membership: 5n,
       purchased: 5n,
@@ -382,7 +381,7 @@ describe('LedgerService — WalletBucket spend order', () => {
       svc.debitWallet({
         userId,
         amountTokens: 100n,
-        tokenType: TokenType.REGULAR,
+        tokenType: TokenType.CZT,
         referenceId: 'debit:insufficient',
         reasonCode: 'SESSION_CHARGE',
       }),
@@ -394,7 +393,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_no_purchased';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 30n,
       membership: 30n,
       purchased: 200n,
@@ -403,7 +402,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     await svc.debitWallet({
       userId,
       amountTokens: 40n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       referenceId: 'debit:no_purchased',
       reasonCode: 'SESSION_CHARGE',
     });
@@ -428,7 +427,7 @@ describe('LedgerService — WalletBucket spend order', () => {
       if (bal > 0n) {
         (svc as any).ledgerRepo.save({
           user_id: wallet.owner_id,
-          token_type: TokenType.REGULAR,
+          token_type: TokenType.CZT,
           amount: bal.toString(),
           reference_id: `seed:${wallet.wallet_id}`,
           reason_code: 'SEED',
@@ -449,7 +448,7 @@ describe('LedgerService — WalletBucket spend order', () => {
       await svc.recordEntry({
         userId: customerId,
         amount: grossTokens,
-        tokenType: TokenType.REGULAR,
+        tokenType: TokenType.CZT,
         tokenOrigin: TokenOrigin.PURCHASED,
         referenceId: `topup:${scenario.scenario_id}`,
         reasonCode: 'TOPUP',
@@ -460,7 +459,7 @@ describe('LedgerService — WalletBucket spend order', () => {
       const { total_debited } = await svc.debitWallet({
         userId: customerId,
         amountTokens: grossTokens,
-        tokenType: TokenType.REGULAR,
+        tokenType: TokenType.CZT,
         referenceId: `spend:${scenario.scenario_id}`,
         reasonCode: 'TIP',
       });
@@ -474,7 +473,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     const svc = makeService(store);
     const userId = 'cu_test_priority_meta';
 
-    await seedThreeBuckets(svc, userId, TokenType.REGULAR, {
+    await seedThreeBuckets(svc, userId, TokenType.CZT, {
       promo: 5n,
       membership: 5n,
       purchased: 50n,
@@ -483,7 +482,7 @@ describe('LedgerService — WalletBucket spend order', () => {
     await svc.debitWallet({
       userId,
       amountTokens: 20n,
-      tokenType: TokenType.REGULAR,
+      tokenType: TokenType.CZT,
       referenceId: 'debit:priority_meta',
       reasonCode: 'CHARGE',
     });
