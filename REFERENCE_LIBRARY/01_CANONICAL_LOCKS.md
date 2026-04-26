@@ -1,6 +1,6 @@
 # OQMInc Canonical Locks
 Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
-Last updated: 2026-04-18
+Last updated: 2026-04-26
 Status: IMMUTABLE — changes require explicit CEO authorization
 
 ---
@@ -61,12 +61,20 @@ These are add-on products, not membership tiers:
 ## PAYOUT ENGINE
 
 **Canonical:** Flicker n'Flame Scoring (FFS)
-**Rate states (5 levels):**
+**Rate states (4 levels):**
 - RATE_COLD
 - RATE_WARM
 - RATE_HOT
-- RATE_BLAZING
 - RATE_INFERNO
+
+### RETIRED RATE STATES (NEVER USE)
+
+The following rate state was REMOVED and must NEVER be used as a tier
+value in any code, schema, or directive:
+
+- RATE_BLAZING (retired 2026-04-26 — collapsed into RATE_INFERNO per
+  PAYLOAD-10 alignment to GovernanceConfig.HEAT_BAND_* canonical bands;
+  see `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md`)
 
 ---
 
