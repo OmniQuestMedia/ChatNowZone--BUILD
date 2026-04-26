@@ -152,8 +152,8 @@ export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestro
     const score = this.calculateFfsScore(input);
 
     this.lastInput.set(input.session_id, input);
-    this.updateSessionState(input, score);
     this.emitScoreEvents(score, input);
+    this.updateSessionState(input, score);
     void this.persistSnapshot(score, input);
     this.ensureInterval(input.session_id);
 
