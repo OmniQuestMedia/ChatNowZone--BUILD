@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-2-prisma-schema-dedup-K2Iu3`
-**Commit:** `e48a1f3f7e929735dd9d9cb82211b8b4b918c65e`
-**Generated:** 2026-04-26T19:04:44Z
+**Branch:** `claude/phase-3b-8a-effective-until-rename-K2Iu3`
+**Commit:** `946a62cb29c8a74b28477260a54d74726e976a0e`
+**Generated:** 2026-04-26T19:11:39Z
 
 ## All Files
 
