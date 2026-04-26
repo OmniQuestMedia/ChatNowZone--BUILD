@@ -20,6 +20,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
+import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
@@ -37,12 +38,13 @@ import type {
 
 export const FFS_RULE_ID = 'FFS_ENGINE_v1';
 
-// ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
+// ── Tier thresholds — derived from GovernanceConfig.HEAT_BAND_* canonical constants ──
+// See governance.config.ts. Do NOT hardcode these values here.
 const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> = [
-  { min: 86, tier: 'INFERNO' },
-  { min: 61, tier: 'HOT' },
-  { min: 34, tier: 'WARM' },
-  { min: 0,  tier: 'COLD' },
+  { min: GovernanceConfig.HEAT_BAND_HOT_MAX + 1, tier: 'INFERNO' },
+  { min: GovernanceConfig.HEAT_BAND_WARM_MAX + 1, tier: 'HOT' },
+  { min: GovernanceConfig.HEAT_BAND_COLD_MAX + 1, tier: 'WARM' },
+  { min: 0, tier: 'COLD' },
 ];
 
 // ── Component weight ceilings (sum of all ceilings = 100) ────────────────────
