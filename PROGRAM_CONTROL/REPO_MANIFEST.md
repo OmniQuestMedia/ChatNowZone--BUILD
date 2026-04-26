@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/frontend-polish-concierge-ui-mlqrR`
-**Commit:** `a2e44772d6bc94e64510076b1ab6184a9d94e893`
-**Generated:** 2026-04-25T06:47:40Z
+**Branch:** `copilot/add-sensync-biometric-layer`
+**Commit:** `1ae0cd88aee5b2ee6ae4ee488b63f7a2775ebbfe`
+**Generated:** 2026-04-26T03:28:46Z
 
 ## All Files
 
@@ -538,6 +538,14 @@ Auto-generated on every push. Do not edit manually.
 - `services/room-heat/src/room-heat.module.ts`
 - `services/room-heat/src/room-heat.service.ts`
 - `services/room-heat/src/types/room-heat.types.ts`
+- `services/sensync/.env.example`
+- `services/sensync/ASSUMPTIONS.md`
+- `services/sensync/FLAGS.md`
+- `services/sensync/README.md`
+- `services/sensync/src/sensync.controller.ts`
+- `services/sensync/src/sensync.module.ts`
+- `services/sensync/src/sensync.service.ts`
+- `services/sensync/src/sensync.types.ts`
 - `services/showzone/src/room-session.service.d.ts`
 - `services/showzone/src/room-session.service.js`
 - `services/showzone/src/room-session.service.js.map`
