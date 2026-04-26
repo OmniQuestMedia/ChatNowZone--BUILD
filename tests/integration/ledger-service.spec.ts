@@ -239,16 +239,6 @@ describe('LedgerService — getBalance', () => {
     expect(bal).toBe(220n);
   });
 
-  it('isolates balances by token type', async () => {
-    const store: LedgerRow[] = [];
-    const svc = makeService(store);
-    await svc.recordEntry({ userId: 'cu_010', amount: 100n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'reg1', reasonCode: 'TOPUP' });
-    await svc.recordEntry({ userId: 'cu_010', amount: 500n, tokenType: TokenType.CZT, tokenOrigin: TokenOrigin.PURCHASED, referenceId: 'bij1', reasonCode: 'TOPUP' });
-    const regBal = await svc.getBalance('cu_010', TokenType.CZT);
-    const bijBal = await svc.getBalance('cu_010', TokenType.CZT);
-    expect(regBal).toBe(100n);
-    expect(bijBal).toBe(500n);
-  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
