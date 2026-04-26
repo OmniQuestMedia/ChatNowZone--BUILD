@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/fix-duplicate-property-types-Zag57`
-**Commit:** `4d28d3bca4aac8365afa153f034f3b513f346d38`
-**Generated:** 2026-04-26T11:07:36Z
+**Branch:** `copilot/global-renames-cleanup`
+**Commit:** `c44af1be52cfbc8b72c552be5f60caf12e65d209`
+**Generated:** 2026-04-26T11:19:44Z
 
 ## All Files
 
@@ -138,7 +138,6 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-004-SCHEMA-NEW-TABLES.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-PRICING-DECISIONS-2026-04-11.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GEO-001-GEO-FENCING-SERVICE.md`
-- `PROGRAM_CONTROL/REPORT_BACK/GLOBAL-RENAME-FFS-SENSYNC-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-001-GAME-ENGINE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-002-GAMES-MODULE-WIRING.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GOV-001-GEO-PRICING-SERVICE.md`
@@ -254,8 +253,6 @@ Auto-generated on every push. Do not edit manually.
 - `archive/LEGACY_CONFIGS_2026-04/HANDOFF.md`
 - `archive/LEGACY_CONFIGS_2026-04/package.json`
 - `archive/LEGACY_CONFIGS_2026-04/tsconfig.json`
-- `copilot-global-rename.bundle`
-- `copilot-global-rename.patch`
 - `docker-compose.yml`
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
@@ -325,11 +322,6 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
-- `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
-- `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
-- `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
-- `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
-- `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -360,7 +352,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/pass-pricing.service.js.map`
 - `services/bijou/src/pass-pricing.service.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
-- `services/core-api/src/analytics/ffs-score.service.ts`
+- `services/core-api/src/analytics/heat-score.service.ts`
 - `services/core-api/src/app.module.ts`
 - `services/core-api/src/audit/audit-bridge.service.ts`
 - `services/core-api/src/audit/audit-dashboard.controller.ts`
@@ -502,8 +494,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/README.md`
 - `services/guest-heat/src/cyrano-teleprompter.service.ts`
 - `services/guest-heat/src/dual-flame-pulse.service.ts`
-- `services/guest-heat/src/fan-fervor-score.service.ts`
-- `services/guest-heat/src/fan-fervor-score.types.ts`
 - `services/guest-heat/src/forecast.service.ts`
 - `services/guest-heat/src/gemstone.service.ts`
 - `services/guest-heat/src/guest-heat.controller.ts`
@@ -511,6 +501,14 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/src/guest-heat.service.ts`
 - `services/guest-heat/src/guest-heat.types.ts`
 - `services/guest-heat/src/performance-timer.service.ts`
+- `services/heartsync/.env.example`
+- `services/heartsync/ASSUMPTIONS.md`
+- `services/heartsync/FLAGS.md`
+- `services/heartsync/README.md`
+- `services/heartsync/src/heartsync.controller.ts`
+- `services/heartsync/src/heartsync.module.ts`
+- `services/heartsync/src/heartsync.service.ts`
+- `services/heartsync/src/heartsync.types.ts`
 - `services/integration-hub/src/hub.module.ts`
 - `services/integration-hub/src/hub.service.ts`
 - `services/ledger/index.ts`
@@ -540,29 +538,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
 - `services/risk-engine/src/risk.module.ts`
-- `services/sensync/.env.example`
-- `services/sensync/ASSUMPTIONS.md`
-- `services/sensync/FLAGS.md`
-- `services/sensync/README.md`
-- `services/sensync/src/sensync.controller.ts`
-- `services/sensync/src/sensync.module.ts`
-- `services/sensync/src/sensync.service.ts`
-- `services/sensync/src/sensync.types.ts`
-- `services/showzone/RETIRED.md`
-- `services/showzone/src/room-session.service.d.ts`
-- `services/showzone/src/room-session.service.js`
-- `services/showzone/src/room-session.service.js.map`
-- `services/showzone/src/room-session.service.ts`
-- `services/showzone/src/showzone.module.d.ts`
-- `services/showzone/src/showzone.module.js`
-- `services/showzone/src/showzone.module.js.map`
-- `services/showzone/src/showzone.module.ts`
-- `services/velocityzone/README.md`
-- `services/velocityzone/src/creator-rate-tier.service.ts`
-- `services/velocityzone/src/velocityzone.controller.ts`
-- `services/velocityzone/src/velocityzone.module.ts`
-- `services/velocityzone/src/velocityzone.service.ts`
-- `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
 - `services/zone-gpt/src/proposal.service.d.ts`
@@ -577,7 +552,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/zonebot-scheduler/ASSUMPTIONS.md`
 - `services/zonebot-scheduler/FLAGS.md`
 - `services/zonebot-scheduler/README.md`
-- `services/zonebot-scheduler/src/creator-rate-day61.job.ts`
 - `services/zonebot-scheduler/src/interfaces.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.controller.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.module.ts`
