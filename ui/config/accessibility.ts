@@ -12,7 +12,7 @@ export interface AccessibilityHint {
 
 /** Builds an ARIA label for a Heat-tier badge. */
 export function heatTierAriaLabel(
-  tier: 'COLD' | 'WARM' | 'HOT' | 'BLAZING',
+  tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO',
   score: number,
 ): string {
   return `Room heat ${tier.toLowerCase()}, score ${score} of 100`;

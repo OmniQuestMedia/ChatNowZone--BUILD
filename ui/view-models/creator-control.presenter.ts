@@ -27,7 +27,7 @@ const TIER_BOUNDS: Record<FfsTier, { min: number; max: number }> = {
   COLD: { min: 0, max: 25 },
   WARM: { min: 25, max: 50 },
   HOT: { min: 50, max: 75 },
-  BLAZING: { min: 75, max: 101 }, // max exclusive; 101 so 100 still lies inside
+  INFERNO: { min: 75, max: 101 }, // max exclusive; 101 so 100 still lies inside
 };
 
 /** Payout scaling table mirrors integration-hub PAYOUT_SCALING_PCT_BY_TIER. */
@@ -35,7 +35,7 @@ const PAYOUT_SCALING_BY_TIER: Record<FfsTier, number> = {
   COLD: 0.0,
   WARM: 0.0,
   HOT: 0.05,
-  BLAZING: 0.1,
+  INFERNO: 0.1,
 };
 
 export const REDBOOK_PAYOUT_FLOOR = 0.075;

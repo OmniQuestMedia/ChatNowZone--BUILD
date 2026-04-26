@@ -1,7 +1,7 @@
 // PAYLOAD 8 — End-to-end test: high-heat session → Cyrano → scaled payout.
 //
 // Verifies the integration-hub composition: telemetry sample produces a
-// BLAZING heat score, Cyrano emits a CAT_MONETIZATION suggestion at peak
+// INFERNO heat score, Cyrano emits a CAT_MONETIZATION suggestion at peak
 // weight, and the Integration Hub computes the +10% payout scaling per
 // PAYOUT_SCALING_PCT_BY_TIER.
 
@@ -73,7 +73,7 @@ const blazingFrame: Omit<CyranoInputFrame, 'heat'> = {
 };
 
 describe('PAYLOAD 8 — high-heat E2E flow', () => {
-  it('produces BLAZING heat → CAT_MONETIZATION → +10% payout scaling', async () => {
+  it('produces INFERNO heat → CAT_MONETIZATION → +10% payout scaling', async () => {
     const { hub, published } = buildHub();
     const result = await hub.processHighHeatSession({
       sample: blazingSample,
@@ -82,7 +82,7 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
       base_wallet_id: 'wallet-payload8',
     });
 
-    expect(result.heat.tier).toBe('BLAZING');
+    expect(result.heat.tier).toBe('INFERNO');
     expect(result.payout_scaling_pct).toBeCloseTo(0.1, 5);
     expect(result.scaled_payout_per_token_usd).toBeCloseTo(0.075 * 1.1, 5);
     expect(result.suggestion?.category).toBe('CAT_MONETIZATION');
@@ -93,7 +93,7 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
     expect(monetizationEmits.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('feeds the CreatorControl presenter with a BLAZING view-model', async () => {
+  it('feeds the CreatorControl presenter with a INFERNO view-model', async () => {
     const presenter = new CreatorControlPresenter();
     const view = presenter.buildCommandCenterView({
       creator_id: 'creator-payload8',
@@ -104,7 +104,7 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
       latest_heat: {
         session_id: 'sess-payload8',
         creator_id: 'creator-payload8',
-        tier: 'BLAZING',
+        tier: 'INFERNO',
         score: 92,
         components: {
           tipper_pressure: 38,
@@ -118,9 +118,9 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
         creator_id: 'creator-payload8',
         direction: 'RAISE',
         magnitude_pct: 0.15,
-        tier: 'BLAZING',
+        tier: 'INFERNO',
         ffs_score: 92,
-        reason_code: 'BLAZING_RAISE',
+        reason_code: 'INFERNO_RAISE',
         copy: 'Heat is at peak — push private show offer.',
         captured_at_utc: '2026-04-25T20:00:00Z',
       },
@@ -131,9 +131,9 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
           session_id: 'sess-payload8',
           category: 'CAT_MONETIZATION',
           weight: 95,
-          tier_context: 'BLAZING',
+          tier_context: 'INFERNO',
           copy: 'Offer the private show now.',
-          reason_codes: ['CAT_MONETIZATION', 'TIER_BLAZING'],
+          reason_codes: ['CAT_MONETIZATION', 'TIER_INFERNO'],
           emitted_at_utc: '2026-04-25T20:00:01Z',
           latency_ms: 120,
         },
@@ -154,6 +154,6 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
     expect(view.payout_rate.scaling_pct_applied).toBe(10);
     expect(view.payout_rate.current_rate_per_token_usd).toBeGreaterThan(0.08);
     expect(view.cyrano_panel.suggestions[0]?.category).toBe('CAT_MONETIZATION');
-    expect(view.heat_meter?.tier).toBe('BLAZING');
+    expect(view.heat_meter?.tier).toBe('INFERNO');
   });
 });

@@ -28,8 +28,8 @@ describe('THEME + accessibility primitives', () => {
   });
 
   it('resolves heat-tier colors', () => {
-    expect(heatColorFor('BLAZING')).toMatch(/^#/);
-    expect(heatColorFor('COLD')).not.toBe(heatColorFor('BLAZING'));
+    expect(heatColorFor('INFERNO')).toMatch(/^#/);
+    expect(heatColorFor('COLD')).not.toBe(heatColorFor('INFERNO'));
   });
 
   it('resolveBreakpoint maps known viewports', () => {
@@ -247,11 +247,11 @@ describe('DiamondConciergePresenter — full page render', () => {
 });
 
 describe('CreatorControlPresenter — payout scaling', () => {
-  it('applies +10% scaling at BLAZING tier', () => {
+  it('applies +10% scaling at INFERNO tier', () => {
     const view = new CreatorControlPresenter().buildPayoutRate(
       'creator-1',
       0.075,
-      'BLAZING',
+      'INFERNO',
       new Date('2026-04-25T00:00:00Z'),
     );
     expect(view.scaling_pct_applied).toBe(10);
@@ -263,7 +263,7 @@ describe('CreatorControlPresenter — payout scaling', () => {
     const view = new CreatorControlPresenter().buildPayoutRate(
       'creator-1',
       0.085,
-      'BLAZING',
+      'INFERNO',
       new Date('2026-04-25T00:00:00Z'),
     );
     // 0.085 * 1.10 = 0.0935 → clamped to 0.090

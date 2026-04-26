@@ -32,7 +32,7 @@ export interface ColorPalette {
   heat_cold: string;
   heat_warm: string;
   heat_hot: string;
-  heat_blazing: string;
+  heat_inferno: string;
 }
 
 const DARK_PALETTE: ColorPalette = {
@@ -55,7 +55,7 @@ const DARK_PALETTE: ColorPalette = {
   heat_cold: '#3a86ff',
   heat_warm: '#fcbf49',
   heat_hot: '#f77f00',
-  heat_blazing: '#d62828',
+  heat_inferno: '#d62828',
 };
 
 const LIGHT_PALETTE: ColorPalette = {
@@ -78,7 +78,7 @@ const LIGHT_PALETTE: ColorPalette = {
   heat_cold: '#1f5fcc',
   heat_warm: '#cc8e1f',
   heat_hot: '#bb5e0d',
-  heat_blazing: '#a01a1a',
+  heat_inferno: '#a01a1a',
 };
 
 export const THEME = {
@@ -124,7 +124,7 @@ export function paletteFor(mode: ThemeMode): ColorPalette {
  * Room-Heat meter component on /creator/control.
  */
 export function heatColorFor(
-  tier: 'COLD' | 'WARM' | 'HOT' | 'BLAZING',
+  tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO',
   mode: ThemeMode = THEME.default_mode,
 ): string {
   const p = paletteFor(mode);
@@ -135,7 +135,7 @@ export function heatColorFor(
       return p.heat_warm;
     case 'HOT':
       return p.heat_hot;
-    case 'BLAZING':
-      return p.heat_blazing;
+    case 'INFERNO':
+      return p.heat_inferno;
   }
 }

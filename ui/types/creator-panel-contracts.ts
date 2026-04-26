@@ -18,7 +18,7 @@ export interface PayoutRateIndicator {
   current_rate_per_token_usd: number;
   redbook_floor_per_token_usd: number; // 0.075
   redbook_ceiling_per_token_usd: number; // 0.090
-  scaling_pct_applied: number; // 0, 5, or 10 (HOT / BLAZING)
+  scaling_pct_applied: number; // 0, 5, or 10 (HOT / INFERNO)
   captured_at_utc: string;
   reason_code: 'PAYOUT_SCALING_APPLIED';
 }
