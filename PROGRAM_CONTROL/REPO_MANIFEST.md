@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/phase-3b-7-T3-creator-control-spec-K2Iu3`
 **Commit:** `326ef09ec90d303c76cd014bc880f44d1acd8414`
 **Generated:** 2026-04-26T18:31:03Z
+**Branch:** `claude/phase-3b-7-T5-delete-stale-dts-K2Iu3`
+**Commit:** `3f7702cdb2417ad21d39dc00be6149950e0dbd15`
+**Generated:** 2026-04-26T18:31:32Z
 
 ## All Files
 
@@ -519,7 +522,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/ledger/redbook-rate-card.service.ts`
 - `services/ledger/repository.ts`
 - `services/ledger/types.ts`
-- `services/nats/topics.registry.d.ts`
 - `services/nats/topics.registry.js`
 - `services/nats/topics.registry.js.map`
 - `services/nats/topics.registry.ts`
