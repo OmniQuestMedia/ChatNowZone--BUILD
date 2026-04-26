@@ -44,6 +44,9 @@ export const NATS_TOPICS = {
   SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
   SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
 
+  // ── Fan Fervor Score (FFS) — per-guest engagement score ──────────────
+  FFS_SCORED:                       'ffs.scored',
+
   // ── Guest-Heat intelligence layer ─────────────────────────────────────
   GUEST_HEAT_WHALE_SCORED:          'guest_heat.whale.scored',
   GUEST_HEAT_OFFER_TRIGGERED:       'guest_heat.offer.triggered',

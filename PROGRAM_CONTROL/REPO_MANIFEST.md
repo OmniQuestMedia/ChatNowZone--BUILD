@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/global-rename-room-heat-to-ffs`
-**Commit:** `5d2eb58f4ac8b4010aaa032372b962aeb0019899`
-**Generated:** 2026-04-26T00:09:46Z
+**Branch:** `copilot/add-ffs-score-and-tier`
+**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
+**Generated:** 2026-04-26T02:58:47Z
 
 ## All Files
 
@@ -325,6 +325,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
+- `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -497,6 +498,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/README.md`
 - `services/guest-heat/src/cyrano-teleprompter.service.ts`
 - `services/guest-heat/src/dual-flame-pulse.service.ts`
+- `services/guest-heat/src/fan-fervor-score.service.ts`
+- `services/guest-heat/src/fan-fervor-score.types.ts`
 - `services/guest-heat/src/forecast.service.ts`
 - `services/guest-heat/src/gemstone.service.ts`
 - `services/guest-heat/src/guest-heat.controller.ts`
