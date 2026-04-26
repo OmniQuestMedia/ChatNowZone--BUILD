@@ -25,7 +25,7 @@ export class IngestFfsDto implements FfsInput {
   heart_rate_baseline_bpm!: number;
   eye_tracking_score!: number;
   facial_excitement_score!: number;
-  /** Optional SenSync™ BPM from consented wearable. */
+  /** Optional SenSync™ BPM contribution (opt-in only; undefined if not consented or device unpaired). */
   sensync_bpm?: number;
 
   // Content / Behavioral

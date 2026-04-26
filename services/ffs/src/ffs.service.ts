@@ -12,7 +12,7 @@
 //   - Leaderboard: 10×10 grid, coolest slot at top (index 0).
 //   - Dual Flame: partner score contributes up to 5 bonus pts.
 //   - No ledger or payment mutations. No PII logged.
-//   - SenSync™ BPM is folded into heart_rate_bpm when consent is granted.
+//   - SenSync™ BPM takes precedence over heart_rate_bpm when consent is granted and device is paired.
 
 import {
   Injectable,
@@ -389,7 +389,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         WEIGHT_CEILINGS.private_spying * w('private_spying'),
     );
 
-    // SenSync™ BPM is folded into heart_rate_bpm when opt-in consent is granted.
+    // SenSync™ BPM takes precedence when available; falls back to heart_rate_bpm otherwise.
     const effectiveBpm = input.sensync_bpm ?? input.heart_rate_bpm;
     const hrDelta = Math.max(0, effectiveBpm - input.heart_rate_baseline_bpm);
     const heart_rate = Math.min(

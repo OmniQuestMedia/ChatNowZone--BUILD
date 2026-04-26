@@ -45,7 +45,7 @@ export interface FfsInput {
   eye_tracking_score: number;
   /** Excitement level 0-1 derived from facial expression model. */
   facial_excitement_score: number;
-  /** Optional SenSync™ BPM contribution (opt-in only; 0 if not consented). */
+  /** Optional SenSync™ BPM contribution (opt-in only; undefined if not consented or device unpaired). */
   sensync_bpm?: number;
 
   // ── Group 3: Content / Behavioral Signals ─────────────────────────────────
