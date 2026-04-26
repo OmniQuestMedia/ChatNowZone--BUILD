@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/frontend-polish-concierge-ui-mlqrR`
-**Commit:** `a2e44772d6bc94e64510076b1ab6184a9d94e893`
-**Generated:** 2026-04-25T06:47:40Z
+**Branch:** `copilot/update-creator-rate-tier-table`
+**Commit:** `354db41aa76ea181534c62aeeeab7d36cdfcd54b`
+**Generated:** 2026-04-26T03:20:53Z
 
 ## All Files
 
@@ -322,6 +322,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
+- `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -546,6 +547,12 @@ Auto-generated on every push. Do not edit manually.
 - `services/showzone/src/showzone.module.js`
 - `services/showzone/src/showzone.module.js.map`
 - `services/showzone/src/showzone.module.ts`
+- `services/velocityzone/README.md`
+- `services/velocityzone/src/creator-rate-tier.service.ts`
+- `services/velocityzone/src/velocityzone.controller.ts`
+- `services/velocityzone/src/velocityzone.module.ts`
+- `services/velocityzone/src/velocityzone.service.ts`
+- `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
 - `services/zone-gpt/src/proposal.service.d.ts`
@@ -560,6 +567,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/zonebot-scheduler/ASSUMPTIONS.md`
 - `services/zonebot-scheduler/FLAGS.md`
 - `services/zonebot-scheduler/README.md`
+- `services/zonebot-scheduler/src/creator-rate-day61.job.ts`
 - `services/zonebot-scheduler/src/interfaces.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.controller.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.module.ts`
