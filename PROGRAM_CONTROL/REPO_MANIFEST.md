@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/claudecleanup-legacy-code-k2iu3`
-**Commit:** `736e94d477592cf8306feba5853f02273d729f15`
-**Generated:** 2026-04-26T12:22:51Z
+**Commit:** `e2fb16f5db2b2837cc8fa48e1adef078299c4490`
+**Generated:** 2026-04-26T12:34:17Z
 
 ## All Files
 
@@ -36,7 +36,6 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierignore`
 - `.prettierrc`
 - `OQMI_SYSTEM_STATE.md`
-- `PROGRAM_CONTROL/DIRECTIVES/DONE/.gitkeep`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-NOTE-2026-04-10.md`
@@ -77,7 +76,6 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-RETIRE-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/IN_PROGRESS/.gitkeep`
-- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md`
@@ -88,7 +86,6 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md`
 - `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`
 - `PROGRAM_CONTROL/LAUNCH_READY.md`
-- `PROGRAM_CONTROL/REPORT_BACK/.gitkeep`
 - `PROGRAM_CONTROL/REPORT_BACK/ADD-CLEARANCE-CONFIRMATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/AUDIT-001-AUDIT-CHAIN-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/AUDIT-002-LEGAL-HOLD-SERVICE.md`
@@ -255,8 +252,6 @@ Auto-generated on every push. Do not edit manually.
 - `archive/LEGACY_CONFIGS_2026-04/HANDOFF.md`
 - `archive/LEGACY_CONFIGS_2026-04/package.json`
 - `archive/LEGACY_CONFIGS_2026-04/tsconfig.json`
-- `copilot-global-rename.bundle`
-- `copilot-global-rename.patch`
 - `docker-compose.yml`
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
@@ -269,7 +264,6 @@ Auto-generated on every push. Do not edit manually.
 - `docs/ROADMAP_MANIFEST.md`
 - `docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
-- `docs/doctrine/.gitkeep`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
 - `finance/audit-dashboard.service.ts`
 - `finance/batch-payout.service.ts`
@@ -312,7 +306,6 @@ Auto-generated on every push. Do not edit manually.
 - `gateguard/gateguard/welfare_engine.py`
 - `gateguard/gateguard_audit.db`
 - `gateguard/requirements.txt`
-- `governance/CLAUDE.stale.md`
 - `governance/Sovereign_Kernel.md.pdf`
 - `governance/pre-ship-audit.service.ts`
 - `infra/postgres/init-ledger.sql`
@@ -550,8 +543,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/sensync/src/sensync.service.ts`
 - `services/sensync/src/sensync.types.ts`
 - `services/showzone/RETIRED.md`
-- `services/showzone/src/room-session.service.ts`
-- `services/showzone/src/showzone.module.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`
 - `services/velocityzone/src/velocityzone.controller.ts`
@@ -608,7 +599,6 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/stat-holidays.spec.ts`
 - `tests/integration/three-bucket-spend-guard.spec.ts`
 - `tests/integration/zonebot-service.spec.ts`
-- `tests/seed_data/.gitkeep`
 - `tests/seed_data/admin_rules_TEST DATA.csv`
 - `tests/seed_data/channels_TEST DATA.csv`
 - `tests/seed_data/content_TEST DATA.csv`
