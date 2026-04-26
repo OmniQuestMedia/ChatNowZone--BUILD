@@ -51,6 +51,7 @@ export const NATS_TOPICS = {
   SENSYNC_HAPTIC_DISPATCHED:      'sensync.haptic.dispatched',
   SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
   SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
+  // ── SenSync™ device/hardware lifecycle ────────────────────────────────
   SENSYNC_DEVICE_CONNECTED:       'sensync.device.connected',
   SENSYNC_DEVICE_DISCONNECTED:    'sensync.device.disconnected',
   SENSYNC_PURGE_REQUESTED:        'sensync.purge.requested',
