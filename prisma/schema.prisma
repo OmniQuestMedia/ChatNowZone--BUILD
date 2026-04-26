@@ -1881,9 +1881,13 @@ model FfsAdaptiveWeights {
   @@map("ffs_adaptive_weights")
 }
 
-// ─── SenSync™ Biometric Layer ────────────────────────────────────────────────
-// Replaces HeartSync (services/heartsync/ → services/sensync/).
-// Consent-first, privacy-by-design per Quebec Law 25 / GDPR Article 9.
+// ── SenSync™ Biometric Layer (HZ — SenSync consent store) ────────────────────
+// Law 25 / GDPR / PIPEDA compliant. consent_granted_at is immutable once
+// recorded. Revocation is tracked by setting consent_revoked_at on the
+// existing consent row; the service does not create a separate revocation row.
+// The correlation_id column is overwritten with the revocation action's ID
+// for a complete audit trail.
+// Automatic purge on deletion request fires SENSYNC_PURGE_REQUESTED on NATS.
 // Rule authority: SENSYNC_v1
 
 /// Per-tier on/off toggle for SenSync™ biometric relay.
@@ -1907,44 +1911,62 @@ model SenSyncTierConfig {
   @@map("sensync_tier_configs")
 }
 
-/// Consent grant/revocation audit log — immutable.
-/// Raw biometric data is NEVER stored here; only metadata about consent.
-/// Required fields for Quebec Law 25 / GDPR Article 9 audit compliance.
 model SenSyncConsent {
-  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  consent_id         String    @unique @db.Uuid
-  session_id         String    @db.VarChar(200)
-  creator_id         String    @db.Uuid
-  guest_id           String?   @db.Uuid
-  /// Consent basis: 'EXPLICIT_OPT_IN'
-  basis              String    @db.VarChar(30)
-  /// Version of the consent disclosure text shown to the user.
-  consent_version    String    @db.VarChar(20)
-  /// Purpose scope: 'FFS_SCORING' | 'CYRANO' | 'HAPTIC_FEEDBACK' | 'ALL'
-  purpose_scope      String    @db.VarChar(30)
-  /// Non-biometric hardware IDs (not fingerprints; not persistent ID).
-  device_ids         String[]
-  /// SHA-256 hash of guest IP — never store raw IP.
-  ip_hash            String?   @db.VarChar(64)
-  device_fingerprint String?   @db.VarChar(255)
-  granted_at         DateTime  @db.Timestamptz
-  revoked_at         DateTime? @db.Timestamptz
-  correlation_id     String    @db.VarChar(128)
-  reason_code        String    @db.VarChar(100)
-  rule_applied_id    String    @default("SENSYNC_v1") @db.VarChar(100)
-  created_at         DateTime  @default(now()) @db.Timestamptz
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id              String    @db.Uuid
+  creator_id              String    @db.Uuid
+  guest_id                String    @db.Uuid
+  consent_version         String    @db.VarChar(20)          // e.g. "SENSYNC_CONSENT_v1"
+  basis                   String    @db.VarChar(50)          // EXPLICIT_OPT_IN | REVOKED
+  consent_granted_at      DateTime  @db.Timestamptz
+  consent_revoked_at      DateTime? @db.Timestamptz          // null until revoked
+  ip_hash                 String?   @db.Char(64)             // SHA-256 of guest IP — never raw
+  device_fingerprint      String?   @db.VarChar(255)
+  domain                  String    @default("ADULT_ENTERTAINMENT") @db.VarChar(50)
+  correlation_id          String    @db.VarChar(200)
+  reason_code             String    @db.VarChar(100)
+  rule_applied_id         String    @default("SENSYNC_v1") @db.VarChar(100)
+  purge_requested_at      DateTime? @db.Timestamptz          // Law 25 deletion request
+  purge_completed_at      DateTime? @db.Timestamptz
+  created_at              DateTime  @default(now()) @db.Timestamptz
 
-  @@index([session_id, created_at])
-  @@index([creator_id, granted_at])
-  @@index([guest_id, granted_at])
+  @@index([session_id])
+  @@index([creator_id, guest_id])
+  @@index([guest_id, consent_revoked_at])
   @@map("sensync_consents")
+}
+
+// ── Cyrano™ Persistent Session Memory ────────────────────────────────────────
+// Restart-safe memory store backing the in-memory SessionMemoryStore.
+// Rows are scaffolded for future persistence; upserted on fact/arc writes.
+// Soft-delete on guest purge.
+
+model CyranoSessionMemory {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id        String    @db.Uuid
+  guest_id          String    @db.Uuid
+  memory_type       String    @db.VarChar(10)        // FACT | ARC
+  memory_key        String    @db.VarChar(200)       // fact.key or arc_id
+  memory_value      Json                             // MemoryFact | SessionArc payload
+  confidence        Decimal?  @db.Decimal(4, 3)      // 0.000–1.000 (facts only)
+  last_touched_at   DateTime  @db.Timestamptz
+  is_purged         Boolean   @default(false)
+  correlation_id    String    @db.VarChar(200)
+  reason_code       String    @db.VarChar(100)
+  rule_applied_id   String    @default("CYRANO_MEMORY_v1") @db.VarChar(100)
+  created_at        DateTime  @default(now()) @db.Timestamptz
+  updated_at        DateTime  @updatedAt @db.Timestamptz
+
+  @@unique([creator_id, guest_id, memory_type, memory_key])
+  @@index([creator_id, guest_id])
+  @@map("cyrano_session_memory")
 }
 
 // ─── VelocityZone — Creator Payout Rate Engine ───────────────────────────────
 // Business Plan §3 — time-window payout rate events keyed to FFS score.
 // Rule authority: VELOCITYZONE_v1
 
-/// Per-creator payout rate tier.
+/// Per-creator payout rate tier audit trail.
 /// FIZ-scoped: any mutation requires REASON/IMPACT/CORRELATION_ID in commit.
 model CreatorRateTier {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

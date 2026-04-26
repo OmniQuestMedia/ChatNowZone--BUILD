@@ -300,6 +300,27 @@ export const NATS_TOPICS = {
   REFUND_EXTENSION_EXECUTED:         'refund.extension.executed',
   SERVICE_TO_SALE_TRIGGERED:         'refund.service_to_sale.triggered',
   FRIENDLY_FRAUD_SIGNAL_RAISED:      'risk.friendly_fraud.signal_raised',
+
+  // ── SenSync™ biometric layer (HZ — Diamond-tier opt-in) ───────────────────
+  SENSYNC_CONSENT_GRANTED:          'sensync.consent.granted',
+  SENSYNC_CONSENT_REVOKED:          'sensync.consent.revoked',
+  SENSYNC_BIOMETRIC_DATA:           'sensync.biometric.data',
+  SENSYNC_PLAUSIBILITY_REJECTED:    'sensync.plausibility.rejected',
+  SENSYNC_TIER_DISABLED:            'sensync.tier.disabled',
+  SENSYNC_PURGE_REQUESTED:          'sensync.purge.requested',
+  SENSYNC_PURGE_COMPLETED:          'sensync.purge.completed',
+  SENSYNC_HARDWARE_CONNECTED:       'sensync.hardware.connected',
+  SENSYNC_HARDWARE_DISCONNECTED:    'sensync.hardware.disconnected',
+
+  // ── FairPlay/FairPay Scoring (FFS) ─────────────────────────────────────────
+  FFS_SCORE_UPDATE:                 'ffs.score.update',
+
+  // ── VelocityZone surge events ──────────────────────────────────────────────
+  VELOCITYZONE_EVENT_ACTIVE:        'velocityzone.event.active',
+  VELOCITYZONE_EVENT_ENDED:         'velocityzone.event.ended',
+
+  // ── Cyrano extended telemetry ──────────────────────────────────────────────
+  CYRANO_FFS_FRAME_CONSUMED:        'cyrano.ffs_frame.consumed',
 } as const;
 
 export type NatsTopic = typeof NATS_TOPICS[keyof typeof NATS_TOPICS];

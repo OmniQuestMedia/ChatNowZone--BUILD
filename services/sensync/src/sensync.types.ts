@@ -1,110 +1,100 @@
-// SenSync™ — shared types
-// Business Plan §SenSync — consent-first biometric relay for consenting guests.
-// Exceeds Quebec Law 25, GDPR Article 9, CCPA/CPRA, and biometric privacy regs.
+// HZ: SenSync™ biometric layer — shared types
+// Business Plan §HZ — Diamond-tier biometric BPM pipeline with full consent
+// lifecycle, Quebec Law 25 / PIPEDA / GDPR compliance, and non-adult
+// extension points (teaching, coaching, first-responder, factory safety, medical).
+//
+// Contract:
+//   • Accepts raw BPM samples from Lovense SDK, generic WebUSB, or WebBluetooth.
+//   • Diamond-tier only for hardware features; lower tiers receive TIER_DISABLED.
+//   • Consent is persisted to Postgres (SenSyncConsent) — not in-memory only.
+//   • Normalized BPM is published to NATS sensync.biometric.data for FFS scoring.
+//   • Purge on deletion request satisfies Law 25 §28 / GDPR Art 17.
 
-/** All membership tiers supported by the platform. */
+/** Domains that SenSync™ serves (adult vs non-adult verticals). */
+export type SenSyncDomain =
+  | 'ADULT_ENTERTAINMENT'
+  | 'TEACHING'
+  | 'COACHING'
+  | 'FIRST_RESPONDER'
+  | 'FACTORY_SAFETY'
+  | 'MEDICAL';
+
+/** Hardware bridge backends. */
+export type SenSyncHardwareBridge =
+  | 'LOVENSE'        // Lovense SDK
+  | 'WEB_USB'        // Generic WebUSB device
+  | 'WEB_BLUETOOTH'  // Generic Web Bluetooth / GATT 0x180D
+  | 'PHONE_HAPTIC';  // Mobile fallback (no hardware BPM; phone only)
+
+/** Membership tiers (canonical six-value enum per DOMAIN_GLOSSARY.md). */
 export type MembershipTier =
   | 'GUEST'
   | 'VIP'
   | 'VIP_SILVER'
-  | 'VIP_SILVER_BULLET'
   | 'VIP_GOLD'
   | 'VIP_PLATINUM'
   | 'VIP_DIAMOND';
 
-/** SenSync™ relay transmission mode. */
-export type SenSyncMode =
-  | 'BIDIRECTIONAL'    // guest ↔ creator — each receives the other's BPM
-  | 'CREATOR_TO_GUEST' // only creator BPM flows to guest device
-  | 'GUEST_TO_CREATOR' // only guest BPM flows to creator device
-  | 'COMBINED';        // "feel as one" — BPM averaged, both feel the mean
+/** Consent basis codes — Law 25 / GDPR / PIPEDA. */
+export type SenSyncConsentBasis =
+  | 'EXPLICIT_OPT_IN'  // guest explicitly accepted via one-tap UI
+  | 'REVOKED';         // guest withdrew consent
 
-/** Haptic driver backend (Lovense primary per spec §5.2). */
-export type HapticDriver =
-  | 'LOVENSE'         // Lovense Connect SDK (WebSocket) — primary partner
-  | 'WEBUSB'          // Generic WebUSB bridge
-  | 'BLE'             // Generic Bluetooth Low Energy bridge
-  | 'BUTTPLUG_IO'     // Buttplug.io adapter
-  | 'HA_BUTTPLUG'     // HA-Buttplug adapter
-  | 'PHONE_HAPTIC';   // mobile fallback
-
-/** Consent basis codes — Law 25 / GDPR Article 9. */
-export type ConsentBasis =
-  | 'EXPLICIT_OPT_IN' // explicit one-tap consent with plain-language disclosure
-  | 'REVOKED';        // guest withdrew consent
-
-/** Consent purpose scope — what the data is used for. */
-export type ConsentPurposeScope =
-  | 'FFS_SCORING'     // feeds Flicker n'Flame score
-  | 'CYRANO'          // Cyrano™ suggestion weighting
-  | 'HAPTIC_FEEDBACK' // haptic command dispatch
-  | 'ALL';            // all of the above
-
-/** A single raw BPM sample from a device. */
+/** A single raw BPM sample from a hardware bridge. */
 export interface SenSyncSample {
   sample_id: string;
   session_id: string;
   creator_id: string;
   guest_id: string;
-  /** Source actor: 'CREATOR' or 'GUEST'. */
-  source: 'CREATOR' | 'GUEST';
+  /** Hardware bridge that supplied this sample. */
+  bridge: SenSyncHardwareBridge;
   bpm_raw: number;
   /** Millisecond epoch timestamp from the device clock. */
   captured_device_ms: number;
   /** Server-side ISO-8601 UTC receipt timestamp. */
   received_at_utc: string;
-  driver: HapticDriver;
   tier: MembershipTier;
+  domain: SenSyncDomain;
 }
 
-/** A BPM sample that has passed the plausibility filter (30–220 BPM). */
+/** A BPM sample that has passed the plausibility filter. */
 export interface SenSyncValidSample extends SenSyncSample {
-  bpm_filtered: number;
+  /** Plausibility-passed BPM; same value as raw, confirmed in [30..220]. */
+  bpm_normalized: number;
 }
 
-/** Relay event broadcast to participating devices. */
-export interface SenSyncRelayEvent {
-  relay_id: string;
-  session_id: string;
-  creator_id: string;
-  guest_id: string;
-  mode: SenSyncMode;
-  bpm_relayed: number;
-  driver: HapticDriver;
-  relayed_at_utc: string;
-  rule_applied_id: string;
-}
-
-/** Combined-mode BPM event — arithmetic mean of creator + guest. */
-export interface SenSyncCombinedBpm {
+/**
+ * NATS payload published to sensync.biometric.data.
+ * Consumed by FFS scoring (opt-in only).
+ */
+export interface SenSyncBiometricPayload {
   event_id: string;
   session_id: string;
   creator_id: string;
   guest_id: string;
-  bpm_creator: number;
-  bpm_guest: number;
-  bpm_combined: number;
-  combined_at_utc: string;
+  bpm_normalized: number;
+  bridge: SenSyncHardwareBridge;
+  domain: SenSyncDomain;
+  consent_version: string;
+  emitted_at_utc: string;
   rule_applied_id: string;
 }
 
-/**
- * Consent grant record — persisted to sensync_consents table.
- * Raw BPM data is NEVER persisted (ephemeral session-memory only).
- */
+/** Persisted consent record (mirrors the SenSyncConsent Prisma model). */
 export interface SenSyncConsentRecord {
   consent_id: string;
   session_id: string;
   creator_id: string;
-  guest_id?: string;          // null for creator self-pairing
-  basis: ConsentBasis;
-  consent_version: string;    // version of the consent disclosure text shown
-  purpose_scope: ConsentPurposeScope;
-  device_ids: string[];       // device identifiers (non-biometric hardware IDs)
-  ip_hash?: string;           // SHA-256 of guest IP — never raw IP
+  guest_id: string;
+  consent_version: string;
+  basis: SenSyncConsentBasis;
+  consent_granted_at: string;
+  consent_revoked_at?: string;
+  ip_hash?: string;             // SHA-256 of guest IP — never raw IP
   device_fingerprint?: string;
-  granted_at: string;         // ISO-8601 UTC
-  revoked_at?: string;        // ISO-8601 UTC; null until revoked
+  domain: SenSyncDomain;
+  correlation_id: string;
+  reason_code: string;
   rule_applied_id: string;
 }
 
@@ -113,60 +103,78 @@ export interface SenSyncPlausibilityRejection {
   rejection_id: string;
   session_id: string;
   guest_id: string;
-  source: 'CREATOR' | 'GUEST';
   bpm_raw: number;
   reason_code: 'BPM_BELOW_MIN' | 'BPM_ABOVE_MAX';
   rejected_at_utc: string;
   rule_applied_id: string;
 }
 
-/** Tier-disabled rejection audit record. */
+/** Tier-disabled audit record — emitted when a non-Diamond tier requests hardware. */
 export interface SenSyncTierDisabledEvent {
   event_id: string;
   session_id: string;
   guest_id: string;
   tier: MembershipTier;
-  reason_code: 'TIER_SENSYNC_DISABLED';
+  reason_code: 'TIER_SENSYNC_HARDWARE_DISABLED';
   occurred_at_utc: string;
   rule_applied_id: string;
 }
 
-/** In-session ephemeral state — never persisted to disk. */
+/** Law 25 / GDPR deletion purge request. */
+export interface SenSyncPurgeRequest {
+  purge_id: string;
+  guest_id: string;
+  requested_by: string;          // actor_id initiating the purge
+  requested_at_utc: string;
+  correlation_id: string;
+  reason_code: string;
+  rule_applied_id: string;
+}
+
+/** Purge completion confirmation. */
+export interface SenSyncPurgeCompleted {
+  purge_id: string;
+  guest_id: string;
+  rows_affected: number;
+  completed_at_utc: string;
+  rule_applied_id: string;
+}
+
+/** Hardware connection lifecycle event. */
+export interface SenSyncHardwareEvent {
+  event_id: string;
+  session_id: string;
+  creator_id: string;
+  guest_id: string;
+  bridge: SenSyncHardwareBridge;
+  event_type: 'CONNECTED' | 'DISCONNECTED';
+  occurred_at_utc: string;
+  rule_applied_id: string;
+}
+
+/** Ephemeral in-session state (cleared on closeSession). */
 export interface SenSyncSessionState {
   session_id: string;
   creator_id: string;
   guest_id: string;
-  mode: SenSyncMode;
-  consent_granted: boolean;
-  last_creator_bpm?: number;
-  last_guest_bpm?: number;
-  last_sample_at_utc?: string;
-  driver: HapticDriver;
   tier: MembershipTier;
-}
-
-/** Haptic dispatch command sent downstream to device drivers. */
-export interface SenSyncHapticCommand {
-  command_id: string;
-  session_id: string;
-  target: 'CREATOR' | 'GUEST';
-  guest_id: string;
-  creator_id: string;
-  bpm: number;
-  driver: HapticDriver;
-  dispatched_at_utc: string;
-  rule_applied_id: string;
+  domain: SenSyncDomain;
+  bridge: SenSyncHardwareBridge;
+  consent_granted: boolean;
+  last_bpm?: number;
+  last_sample_at_utc?: string;
 }
 
 /** BPM plausibility bounds — governance constant. */
 export const SENSYNC_BPM_MIN = 30;
 export const SENSYNC_BPM_MAX = 220;
 
-/** Consent version — bump when disclosure text changes. */
-export const SENSYNC_CONSENT_VERSION = '1.0';
+/** Tiers permitted to use hardware biometric features. */
+export const SENSYNC_HARDWARE_TIERS: readonly MembershipTier[] = [
+  'VIP_DIAMOND',
+] as const;
 
-/** Rule ID — bump on governance event. */
+/** Current consent version string (bumped when consent language changes). */
+export const SENSYNC_CONSENT_VERSION = 'SENSYNC_CONSENT_v1';
+
 export const SENSYNC_RULE_ID = 'SENSYNC_v1';
-
-/** Maximum revocation latency (ms) — per spec §5.3. */
-export const SENSYNC_MAX_REVOCATION_LATENCY_MS = 500;

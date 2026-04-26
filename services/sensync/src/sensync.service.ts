@@ -1,21 +1,19 @@
-// SenSync™ — biometric relay service
-// Business Plan §SenSync — consent-first biometric ingestion, normalization,
-// and publishing. Replaces services/heartsync/ as the primary biometric service.
+// HZ: SenSync™ biometric layer — core service
+// Business Plan §HZ — Diamond-tier opt-in BPM pipeline with persistent consent,
+// Law 25 / PIPEDA / GDPR compliance, and non-adult domain extension points.
 //
-// Privacy guarantees (§5.3):
-//   • Raw BPM data is NEVER persisted. It exists only in-memory during the
-//     active session and is deleted immediately on session end or consent revocation.
-//   • Consent stored in sensync_consents table with full audit trail.
-//   • Revocation stops publishing within < 500 ms and clears all buffers.
-//   • E2E encrypted NATS subjects for biometric data.
-//   • No secondary use — biometric data used exclusively for FFS, Cyrano™, haptics.
-//
-// Hardware support (§5.2):
-//   • Lovense Connect SDK (WebSocket) — primary partner
-//   • Generic WebUSB / BLE bridge — pluggable adapters
-//   • Exponential-backoff reconnection with graceful degradation to behavioral mode.
+// Contract:
+//   • openSession: validates tier, registers ephemeral session state.
+//   • grantConsent: persists SenSyncConsent to Postgres; emits NATS event.
+//   • revokeConsent: marks consent revoked in DB; clears session state.
+//   • submitSample: plausibility filter [30..220], normalize, publish
+//     sensync.biometric.data for FFS scoring (only if consent is active).
+//   • requestPurge: Law 25 §28 data deletion — writes purge_requested_at
+//     on all consent rows for the guest, emits SENSYNC_PURGE_REQUESTED.
+//   • Hardware tiers: only VIP_DIAMOND may use hardware bridges. Other tiers
+//     receive TIER_SENSYNC_HARDWARE_DISABLED and the session is rejected.
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
@@ -24,48 +22,33 @@ import {
   SENSYNC_BPM_MAX,
   SENSYNC_BPM_MIN,
   SENSYNC_CONSENT_VERSION,
+  SENSYNC_HARDWARE_TIERS,
   SENSYNC_RULE_ID,
-  type ConsentPurposeScope,
-  type HapticDriver,
-  type SenSyncCombinedBpm,
+  type MembershipTier,
+  type SenSyncBiometricPayload,
+  type SenSyncConsentBasis,
   type SenSyncConsentRecord,
-  type SenSyncHapticCommand,
-  type SenSyncMode,
+  type SenSyncDomain,
+  type SenSyncHardwareBridge,
+  type SenSyncHardwareEvent,
   type SenSyncPlausibilityRejection,
-  type SenSyncRelayEvent,
+  type SenSyncPurgeCompleted,
+  type SenSyncPurgeRequest,
   type SenSyncSample,
   type SenSyncSessionState,
   type SenSyncTierDisabledEvent,
   type SenSyncValidSample,
-  type MembershipTier,
 } from './sensync.types';
-
-/** Fallback driver priority when preferred driver is unavailable. */
-const DRIVER_FALLBACK_ORDER: HapticDriver[] = [
-  'LOVENSE',
-  'WEBUSB',
-  'BLE',
-  'BUTTPLUG_IO',
-  'HA_BUTTPLUG',
-  'PHONE_HAPTIC',
-];
 
 @Injectable()
 export class SenSyncService implements OnModuleInit {
   private readonly logger = new Logger(SenSyncService.name);
 
-  /** Ephemeral session state — NEVER persisted. Cleared on session end. */
+  /** Ephemeral in-session state — never persisted directly. */
   private readonly sessions = new Map<string, SenSyncSessionState>();
 
-  /** Per-tier enabled flags — refreshed from DB on init. */
-  private tierEnabled = new Map<MembershipTier, boolean>();
-  private tierCombinedAllowed = new Map<MembershipTier, boolean>();
-
-  /**
-   * Consent store — keyed by `${session_id}:${guest_id}`.
-   * Cleared immediately on revocation.
-   */
-  private readonly consentStore = new Map<string, boolean>();
+  /** Consent cache keyed by `${session_id}:${guest_id}`. */
+  private readonly consentCache = new Map<string, boolean>();
 
   constructor(
     private readonly nats: NatsService,
@@ -73,36 +56,29 @@ export class SenSyncService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.refreshTierConfig();
-    this.logger.log('SenSyncService: tier config loaded', {
-      rule_applied_id: SENSYNC_RULE_ID,
+    this.logger.log('SenSyncService: initialized', {
+      consent_version: SENSYNC_CONSENT_VERSION,
+      hardware_tiers: SENSYNC_HARDWARE_TIERS,
     });
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // ── Public API ──────────────────────────────────────────────────────────────
 
   /**
-   * Open a SenSync™ relay session.
-   * Must be called before any samples are submitted.
+   * Open a SenSync session. Hardware bridge sessions are Diamond-tier only.
+   * Returns the initial session state or null if tier is ineligible.
    */
   openSession(
     session_id: string,
     creator_id: string,
     guest_id: string,
     tier: MembershipTier,
-    mode: SenSyncMode,
-    driver: HapticDriver,
+    bridge: SenSyncHardwareBridge,
+    domain: SenSyncDomain = 'ADULT_ENTERTAINMENT',
   ): SenSyncSessionState | null {
-    if (!this.isTierEnabled(tier)) {
-      this.emitTierDisabled(session_id, guest_id, tier);
-      return null;
-    }
-
-    if (mode === 'COMBINED' && !this.isCombinedAllowed(tier)) {
-      this.logger.warn('SenSyncService: COMBINED mode not permitted for tier', {
-        tier,
-        session_id,
-      });
+    // Hardware bridges (Lovense, WebUSB, WebBluetooth) require VIP_DIAMOND.
+    const isHardware = bridge !== 'PHONE_HAPTIC';
+    if (isHardware && !this.isTierEligible(tier)) {
       this.emitTierDisabled(session_id, guest_id, tier);
       return null;
     }
@@ -111,131 +87,158 @@ export class SenSyncService implements OnModuleInit {
       session_id,
       creator_id,
       guest_id,
-      mode,
-      consent_granted: false,
-      driver: this.resolveDriver(driver),
       tier,
+      domain,
+      bridge,
+      consent_granted: false,
     };
 
     this.sessions.set(session_id, state);
-    this.logger.log('SenSyncService: session opened', { session_id, mode, tier });
+    this.logger.log('SenSyncService: session opened', { session_id, tier, bridge, domain });
     return state;
   }
 
   /**
-   * Record explicit opt-in consent.
-   * One-tap Diamond-tier UI flow — must confirm plain-language disclosure.
-   * Persists consent record to sensync_consents table.
+   * Grant SenSync consent for a session.
+   * Persists a SenSyncConsent row to Postgres.
+   * Emits SENSYNC_CONSENT_GRANTED on NATS.
    */
-  async grantConsent(
-    session_id: string,
-    guest_id: string,
-    creator_id: string,
-    purpose_scope: ConsentPurposeScope = 'ALL',
-    device_ids: string[] = [],
-    ip_hash?: string,
-    device_fingerprint?: string,
-  ): Promise<SenSyncConsentRecord> {
-    const key = `${session_id}:${guest_id}`;
-    this.consentStore.set(key, true);
+  async grantConsent(args: {
+    session_id: string;
+    creator_id: string;
+    guest_id: string;
+    domain?: SenSyncDomain;
+    ip_hash?: string;
+    device_fingerprint?: string;
+    correlation_id: string;
+  }): Promise<SenSyncConsentRecord> {
+    const now = new Date();
 
-    const consent: SenSyncConsentRecord = {
-      consent_id:       randomUUID(),
-      session_id,
-      guest_id,
-      creator_id,
-      basis:            'EXPLICIT_OPT_IN',
-      consent_version:  SENSYNC_CONSENT_VERSION,
-      purpose_scope,
-      device_ids,
-      ip_hash,
-      device_fingerprint,
-      granted_at:       new Date().toISOString(),
-      rule_applied_id:  SENSYNC_RULE_ID,
-    };
-
-    // Persist consent record (non-biometric — this is metadata only).
-    try {
-      await this.prisma.senSyncConsent.create({
-        data: {
-          consent_id:        consent.consent_id,
-          session_id,
-          creator_id,
-          guest_id,
-          basis:             consent.basis,
-          consent_version:   consent.consent_version,
-          purpose_scope:     consent.purpose_scope,
-          device_ids,
-          ip_hash:           ip_hash ?? null,
-          device_fingerprint: device_fingerprint ?? null,
-          granted_at:        new Date(consent.granted_at),
-          correlation_id:    `sensync-consent-${consent.consent_id}`,
-          reason_code:       'SENSYNC_CONSENT_GRANTED',
-          rule_applied_id:   SENSYNC_RULE_ID,
-        },
-      });
-    } catch (err) {
-      this.logger.error('SenSyncService: consent persist failed', err);
+    if (args.ip_hash !== undefined && !/^[0-9a-fA-F]{64}$/.test(args.ip_hash)) {
+      throw new BadRequestException(
+        'ip_hash must be a 64-character hex-encoded SHA-256 digest — never a raw IP address',
+      );
     }
 
+    const row = await this.prisma.senSyncConsent.create({
+      data: {
+        session_id: args.session_id,
+        creator_id: args.creator_id,
+        guest_id: args.guest_id,
+        consent_version: SENSYNC_CONSENT_VERSION,
+        basis: 'EXPLICIT_OPT_IN' satisfies SenSyncConsentBasis,
+        consent_granted_at: now,
+        ip_hash: args.ip_hash ?? null,
+        device_fingerprint: args.device_fingerprint ?? null,
+        domain: args.domain ?? 'ADULT_ENTERTAINMENT',
+        correlation_id: args.correlation_id,
+        reason_code: 'SENSYNC_CONSENT_GRANTED',
+        rule_applied_id: SENSYNC_RULE_ID,
+      },
+    });
+
+    // Update ephemeral session state.
+    const state = this.sessions.get(args.session_id);
+    if (state) state.consent_granted = true;
+    this.consentCache.set(`${args.session_id}:${args.guest_id}`, true);
+
+    const record: SenSyncConsentRecord = {
+      consent_id: row.id,
+      session_id: row.session_id,
+      creator_id: row.creator_id,
+      guest_id: row.guest_id,
+      consent_version: row.consent_version,
+      basis: row.basis as SenSyncConsentBasis,
+      consent_granted_at: row.consent_granted_at.toISOString(),
+      ip_hash: row.ip_hash ?? undefined,
+      device_fingerprint: row.device_fingerprint ?? undefined,
+      domain: row.domain as SenSyncDomain,
+      correlation_id: row.correlation_id,
+      reason_code: row.reason_code,
+      rule_applied_id: row.rule_applied_id,
+    };
+
     this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_GRANTED, {
-      ...consent,
+      ...record,
     } as unknown as Record<string, unknown>);
 
-    this.logger.log('SenSyncService: consent granted', { session_id, guest_id, purpose_scope });
-    return consent;
+    this.logger.log('SenSyncService: consent granted', {
+      session_id: args.session_id,
+      guest_id: args.guest_id,
+    });
+
+    return record;
   }
 
   /**
-   * Revoke consent immediately.
-   * Stops publishing within < 500 ms (synchronous). Clears all in-memory
-   * BPM buffers for the session. Updates the persisted consent record.
+   * Revoke SenSync consent.
+   * Stamps consent_revoked_at on all active consent rows for this session+guest.
+   * Clears ephemeral BPM state.
+   * Emits SENSYNC_CONSENT_REVOKED on NATS.
    */
-  async revokeConsent(
-    session_id: string,
-    guest_id: string,
-    creator_id: string,
-  ): Promise<void> {
-    const key = `${session_id}:${guest_id}`;
+  async revokeConsent(args: {
+    session_id: string;
+    creator_id: string;
+    guest_id: string;
+    correlation_id: string;
+  }): Promise<void> {
+    const now = new Date();
 
-    // Synchronous — consent is cleared before any async operations.
-    this.consentStore.set(key, false);
+    await this.prisma.senSyncConsent.updateMany({
+      where: {
+        session_id: args.session_id,
+        guest_id: args.guest_id,
+        consent_revoked_at: null,
+      },
+      data: {
+        consent_revoked_at: now,
+        basis: 'REVOKED' satisfies SenSyncConsentBasis,
+        reason_code: 'SENSYNC_CONSENT_REVOKED',
+        correlation_id: args.correlation_id,
+      },
+    });
 
-    const state = this.sessions.get(session_id);
+    // Clear ephemeral state.
+    const state = this.sessions.get(args.session_id);
     if (state) {
-      state.consent_granted   = false;
-      state.last_creator_bpm  = undefined;
-      state.last_guest_bpm    = undefined;
+      state.consent_granted = false;
+      state.last_bpm = undefined;
+      state.last_sample_at_utc = undefined;
     }
-
-    // Update DB record async (non-blocking; revocation is already effective above).
-    void this.persistRevocation(session_id, guest_id, creator_id);
+    this.consentCache.set(`${args.session_id}:${args.guest_id}`, false);
 
     this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, {
-      event_id:        randomUUID(),
-      session_id,
-      guest_id,
-      creator_id,
-      basis:           'REVOKED',
-      revoked_at_utc:  new Date().toISOString(),
+      event_id: randomUUID(),
+      session_id: args.session_id,
+      creator_id: args.creator_id,
+      guest_id: args.guest_id,
+      basis: 'REVOKED',
+      revoked_at_utc: now.toISOString(),
+      correlation_id: args.correlation_id,
+      reason_code: 'SENSYNC_CONSENT_REVOKED',
       rule_applied_id: SENSYNC_RULE_ID,
     } as unknown as Record<string, unknown>);
 
-    this.logger.log('SenSyncService: consent revoked — buffers cleared', {
-      session_id,
-      guest_id,
+    this.logger.log('SenSyncService: consent revoked', {
+      session_id: args.session_id,
+      guest_id: args.guest_id,
     });
   }
 
   /**
-   * Submit a raw BPM sample for relay processing.
-   * Returns the relay event(s) emitted, or null if sample was rejected or
-   * consent is absent.
+   * Submit a raw BPM sample.
+   * 1. Plausibility filter [30..220].
+   * 2. Consent check.
+   * 3. Normalize (BPM passthrough — extension point for future smoothing).
+   * 4. Publish sensync.biometric.data to NATS for FFS scoring.
+   * Returns the normalized payload or null if rejected.
    */
-  submitSample(
-    sample: SenSyncSample,
-  ): SenSyncRelayEvent | SenSyncCombinedBpm | null {
-    // Plausibility filter — hard bounds [30..220].
+  submitSample(sample: SenSyncSample): Promise<SenSyncBiometricPayload | null> {
+    return this._submitSample(sample);
+  }
+
+  private async _submitSample(sample: SenSyncSample): Promise<SenSyncBiometricPayload | null> {
+    // Plausibility filter.
     if (sample.bpm_raw < SENSYNC_BPM_MIN || sample.bpm_raw > SENSYNC_BPM_MAX) {
       this.rejectSample(sample);
       return null;
@@ -243,204 +246,222 @@ export class SenSyncService implements OnModuleInit {
 
     const state = this.sessions.get(sample.session_id);
     if (!state) {
-      this.logger.warn('SenSyncService: no active session for sample', {
-        session_id: sample.session_id,
-      });
+      this.logger.warn('SenSyncService: no active session', { session_id: sample.session_id });
       return null;
     }
 
-    // Consent check — synchronous, always current.
+    // Consent gate — check ephemeral cache first, then fall back to DB so that
+    // consent is honoured across process restarts and multiple service instances.
     const consentKey = `${sample.session_id}:${sample.guest_id}`;
-    if (!this.consentStore.get(consentKey)) {
+    let hasConsent = this.consentCache.get(consentKey);
+    if (!hasConsent) {
+      const dbConsent = await this.prisma.senSyncConsent.findFirst({
+        where: {
+          session_id: sample.session_id,
+          guest_id: sample.guest_id,
+          consent_revoked_at: null,
+          purge_requested_at: null,
+        },
+      });
+      hasConsent = dbConsent !== null;
+      this.consentCache.set(consentKey, hasConsent);
+    }
+    if (!hasConsent) {
       this.logger.warn('SenSyncService: sample rejected — no consent', {
         session_id: sample.session_id,
-        guest_id:   sample.guest_id,
+        guest_id: sample.guest_id,
       });
       return null;
     }
 
     const valid: SenSyncValidSample = {
       ...sample,
-      bpm_filtered: sample.bpm_raw,
+      bpm_normalized: sample.bpm_raw, // Extension point: smoothing/filtering here.
     };
 
-    // Update ephemeral session BPM state (not persisted).
-    if (valid.source === 'CREATOR') {
-      state.last_creator_bpm = valid.bpm_filtered;
-    } else {
-      state.last_guest_bpm = valid.bpm_filtered;
-    }
+    // Update ephemeral state.
+    state.last_bpm = valid.bpm_normalized;
     state.last_sample_at_utc = new Date().toISOString();
 
-    // Publish normalized sample (encrypted NATS subject).
+    const payload: SenSyncBiometricPayload = {
+      event_id: randomUUID(),
+      session_id: valid.session_id,
+      creator_id: valid.creator_id,
+      guest_id: valid.guest_id,
+      bpm_normalized: valid.bpm_normalized,
+      bridge: valid.bridge,
+      domain: valid.domain,
+      consent_version: SENSYNC_CONSENT_VERSION,
+      emitted_at_utc: state.last_sample_at_utc,
+      rule_applied_id: SENSYNC_RULE_ID,
+    };
+
     this.nats.publish(NATS_TOPICS.SENSYNC_BIOMETRIC_DATA, {
-      session_id:         valid.session_id,
-      creator_id:         valid.creator_id,
-      guest_id:           valid.guest_id,
-      source:             valid.source,
-      bpm:                valid.bpm_filtered,
-      received_at_utc:    valid.received_at_utc,
-      rule_applied_id:    SENSYNC_RULE_ID,
+      ...payload,
     } as unknown as Record<string, unknown>);
 
-    // Publish BPM update for FFS consumption (1 Hz downsampled by FFS consumer).
-    this.nats.publish(NATS_TOPICS.SENSYNC_BPM_UPDATE, {
-      session_id:   valid.session_id,
-      creator_id:   valid.creator_id,
-      bpm:          valid.bpm_filtered,
-      source:       valid.source,
-      received_at:  valid.received_at_utc,
-    } as unknown as Record<string, unknown>);
-
-    return this.relay(state, valid);
+    return payload;
   }
 
   /**
-   * Close a SenSync™ session — purges ALL ephemeral state immediately.
-   * No biometric data survives session close.
+   * Close a SenSync session — purges all ephemeral state.
    */
   closeSession(session_id: string): void {
     const state = this.sessions.get(session_id);
     if (state) {
-      // Purge all BPM data before deleting session.
-      state.last_creator_bpm = undefined;
-      state.last_guest_bpm   = undefined;
+      // Remove consent cache entries for this session.
+      this.consentCache.delete(`${session_id}:${state.guest_id}`);
     }
     this.sessions.delete(session_id);
-
-    // Clear consent entries for this session.
-    for (const key of [...this.consentStore.keys()]) {
-      if (key.startsWith(`${session_id}:`)) {
-        this.consentStore.delete(key);
-      }
-    }
-
-    this.logger.log('SenSyncService: session closed — all ephemeral data purged', {
-      session_id,
-    });
+    this.logger.log('SenSyncService: session closed', { session_id });
   }
 
   /**
-   * Return current ephemeral session state (read-only copy).
-   * Note: BPM values are not included in the returned copy (privacy-by-design).
+   * Return current ephemeral session state.
    */
-  getSessionState(session_id: string): Omit<SenSyncSessionState, 'last_creator_bpm' | 'last_guest_bpm'> | undefined {
-    const state = this.sessions.get(session_id);
-    if (!state) return undefined;
-    const { last_creator_bpm: _c, last_guest_bpm: _g, ...safe } = state;
-    return safe;
+  getSessionState(session_id: string): SenSyncSessionState | undefined {
+    return this.sessions.get(session_id);
   }
 
-  // ── Relay logic ───────────────────────────────────────────────────────────
-
-  private relay(
-    state: SenSyncSessionState,
-    sample: SenSyncValidSample,
-  ): SenSyncRelayEvent | SenSyncCombinedBpm | null {
-    const now = new Date().toISOString();
-
-    if (state.mode === 'COMBINED') {
-      return this.relayCombined(state, now);
-    }
-
-    const shouldRelay =
-      state.mode === 'BIDIRECTIONAL' ||
-      (state.mode === 'CREATOR_TO_GUEST' && sample.source === 'CREATOR') ||
-      (state.mode === 'GUEST_TO_CREATOR' && sample.source === 'GUEST');
-
-    if (!shouldRelay) return null;
-
-    const bpm_relayed = sample.bpm_filtered;
-    const target: 'CREATOR' | 'GUEST' =
-      sample.source === 'CREATOR' ? 'GUEST' : 'CREATOR';
-
-    const event: SenSyncRelayEvent = {
-      relay_id:        randomUUID(),
-      session_id:      state.session_id,
-      creator_id:      state.creator_id,
-      guest_id:        state.guest_id,
-      mode:            state.mode,
-      bpm_relayed,
-      driver:          state.driver,
-      relayed_at_utc:  now,
+  /**
+   * Record a hardware lifecycle event (connected/disconnected).
+   * Emits SENSYNC_HARDWARE_CONNECTED or SENSYNC_HARDWARE_DISCONNECTED on NATS.
+   */
+  recordHardwareEvent(args: {
+    session_id: string;
+    creator_id: string;
+    guest_id: string;
+    bridge: SenSyncHardwareBridge;
+    event_type: 'CONNECTED' | 'DISCONNECTED';
+  }): void {
+    const event: SenSyncHardwareEvent = {
+      event_id: randomUUID(),
+      session_id: args.session_id,
+      creator_id: args.creator_id,
+      guest_id: args.guest_id,
+      bridge: args.bridge,
+      event_type: args.event_type,
+      occurred_at_utc: new Date().toISOString(),
       rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.SENSYNC_RELAY_EMITTED, {
-      ...event,
-    } as unknown as Record<string, unknown>);
+    const topic =
+      args.event_type === 'CONNECTED'
+        ? NATS_TOPICS.SENSYNC_HARDWARE_CONNECTED
+        : NATS_TOPICS.SENSYNC_HARDWARE_DISCONNECTED;
 
-    this.dispatchHaptic(state, target, bpm_relayed, now);
-    return event;
+    this.nats.publish(topic, { ...event } as unknown as Record<string, unknown>);
   }
 
-  private relayCombined(
-    state: SenSyncSessionState,
-    now: string,
-  ): SenSyncCombinedBpm | null {
-    if (state.last_creator_bpm === undefined || state.last_guest_bpm === undefined) {
-      return null;
-    }
+  /**
+   * Request a Law 25 / GDPR Art. 17 data purge for a guest.
+   * Stamps purge_requested_at on all consent rows for the guest.
+   * Emits SENSYNC_PURGE_REQUESTED on NATS.
+   * Actual deletion of sensitive fields is completed asynchronously by a
+   * scheduled purge job that listens on SENSYNC_PURGE_REQUESTED.
+   */
+  async requestPurge(args: {
+    guest_id: string;
+    requested_by: string;
+    correlation_id: string;
+    reason_code: string;
+  }): Promise<SenSyncPurgeRequest> {
+    const now = new Date();
+    const purge_id = randomUUID();
 
-    const bpm_combined = Math.round(
-      (state.last_creator_bpm + state.last_guest_bpm) / 2,
-    );
+    await this.prisma.senSyncConsent.updateMany({
+      where: {
+        guest_id: args.guest_id,
+        purge_requested_at: null,
+      },
+      data: {
+        purge_requested_at: now,
+        reason_code: args.reason_code,
+      },
+    });
 
-    const combined: SenSyncCombinedBpm = {
-      event_id:        randomUUID(),
-      session_id:      state.session_id,
-      creator_id:      state.creator_id,
-      guest_id:        state.guest_id,
-      bpm_creator:     state.last_creator_bpm,
-      bpm_guest:       state.last_guest_bpm,
-      bpm_combined,
-      combined_at_utc: now,
+    const purgeRequest: SenSyncPurgeRequest = {
+      purge_id,
+      guest_id: args.guest_id,
+      requested_by: args.requested_by,
+      requested_at_utc: now.toISOString(),
+      correlation_id: args.correlation_id,
+      reason_code: args.reason_code,
       rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.SENSYNC_COMBINED_BPM, {
-      ...combined,
+    this.nats.publish(NATS_TOPICS.SENSYNC_PURGE_REQUESTED, {
+      ...purgeRequest,
     } as unknown as Record<string, unknown>);
 
-    this.dispatchHaptic(state, 'CREATOR', bpm_combined, now);
-    this.dispatchHaptic(state, 'GUEST', bpm_combined, now);
-    return combined;
+    this.logger.log('SenSyncService: purge requested', {
+      guest_id: args.guest_id,
+      purge_id,
+    });
+
+    return purgeRequest;
   }
 
-  private dispatchHaptic(
-    state: SenSyncSessionState,
-    target: 'CREATOR' | 'GUEST',
-    bpm: number,
-    now: string,
-  ): void {
-    const cmd: SenSyncHapticCommand = {
-      command_id:      randomUUID(),
-      session_id:      state.session_id,
-      target,
-      guest_id:        state.guest_id,
-      creator_id:      state.creator_id,
-      bpm,
-      driver:          state.driver,
-      dispatched_at_utc: now,
+  /**
+   * Complete a purge — called by the async purge job after data minimization.
+   * Stamps purge_completed_at and nullifies sensitive fields (ip_hash,
+   * device_fingerprint) on all pending purge rows for the guest.
+   * Emits SENSYNC_PURGE_COMPLETED on NATS.
+   */
+  async completePurge(args: {
+    purge_id: string;
+    guest_id: string;
+    correlation_id: string;
+  }): Promise<SenSyncPurgeCompleted> {
+    const now = new Date();
+
+    const result = await this.prisma.senSyncConsent.updateMany({
+      where: {
+        guest_id: args.guest_id,
+        purge_requested_at: { not: null },
+        purge_completed_at: null,
+      },
+      data: {
+        purge_completed_at: now,
+        ip_hash: null,
+        device_fingerprint: null,
+        reason_code: 'SENSYNC_PURGE_COMPLETED',
+      },
+    });
+
+    const purgeCompleted: SenSyncPurgeCompleted = {
+      purge_id: args.purge_id,
+      guest_id: args.guest_id,
+      rows_affected: result.count,
+      completed_at_utc: now.toISOString(),
       rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.SENSYNC_HAPTIC_DISPATCHED, {
-      ...cmd,
+    this.nats.publish(NATS_TOPICS.SENSYNC_PURGE_COMPLETED, {
+      ...purgeCompleted,
     } as unknown as Record<string, unknown>);
+
+    this.logger.log('SenSyncService: purge completed', {
+      guest_id: args.guest_id,
+      rows_affected: result.count,
+    });
+
+    return purgeCompleted;
   }
 
-  // ── Plausibility rejection ─────────────────────────────────────────────────
+  // ── Private helpers ─────────────────────────────────────────────────────────
+
+  private isTierEligible(tier: MembershipTier): boolean {
+    return (SENSYNC_HARDWARE_TIERS as readonly string[]).includes(tier);
+  }
 
   private rejectSample(sample: SenSyncSample): void {
     const rejection: SenSyncPlausibilityRejection = {
-      rejection_id:    randomUUID(),
-      session_id:      sample.session_id,
-      guest_id:        sample.guest_id,
-      source:          sample.source,
-      bpm_raw:         sample.bpm_raw,
-      reason_code:
-        sample.bpm_raw < SENSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
+      rejection_id: randomUUID(),
+      session_id: sample.session_id,
+      guest_id: sample.guest_id,
+      bpm_raw: sample.bpm_raw,
+      reason_code: sample.bpm_raw < SENSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
       rejected_at_utc: new Date().toISOString(),
       rule_applied_id: SENSYNC_RULE_ID,
     };
@@ -449,7 +470,7 @@ export class SenSyncService implements OnModuleInit {
       ...rejection,
     } as unknown as Record<string, unknown>);
 
-    this.logger.warn('SenSyncService: sample rejected', rejection);
+    this.logger.warn('SenSyncService: plausibility rejection', rejection);
   }
 
   private emitTierDisabled(
@@ -458,11 +479,11 @@ export class SenSyncService implements OnModuleInit {
     tier: MembershipTier,
   ): void {
     const event: SenSyncTierDisabledEvent = {
-      event_id:        randomUUID(),
+      event_id: randomUUID(),
       session_id,
       guest_id,
       tier,
-      reason_code:     'TIER_SENSYNC_DISABLED',
+      reason_code: 'TIER_SENSYNC_HARDWARE_DISABLED',
       occurred_at_utc: new Date().toISOString(),
       rule_applied_id: SENSYNC_RULE_ID,
     };
@@ -470,63 +491,5 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_TIER_DISABLED, {
       ...event,
     } as unknown as Record<string, unknown>);
-  }
-
-  // ── Driver resolution ─────────────────────────────────────────────────────
-
-  private resolveDriver(preferred: HapticDriver): HapticDriver {
-    if (DRIVER_FALLBACK_ORDER.includes(preferred)) return preferred;
-    return 'PHONE_HAPTIC';
-  }
-
-  // ── Tier config ────────────────────────────────────────────────────────────
-
-  private isTierEnabled(tier: MembershipTier): boolean {
-    return this.tierEnabled.get(tier) ?? false;
-  }
-
-  private isCombinedAllowed(tier: MembershipTier): boolean {
-    return this.tierCombinedAllowed.get(tier) ?? false;
-  }
-
-  /**
-   * Refresh tier enablement flags from Prisma.
-   * Called on module init. Can be called again without restart.
-   */
-  async refreshTierConfig(): Promise<void> {
-    const rows = await this.prisma.senSyncTierConfig.findMany();
-    this.tierEnabled.clear();
-    this.tierCombinedAllowed.clear();
-
-    for (const row of rows) {
-      this.tierEnabled.set(row.tier as MembershipTier, row.enabled);
-      this.tierCombinedAllowed.set(row.tier as MembershipTier, row.combined_mode);
-    }
-
-    this.logger.log('SenSyncService: tier config refreshed', { count: rows.length });
-  }
-
-  // ── Consent persistence helpers ────────────────────────────────────────────
-
-  private async persistRevocation(
-    session_id: string,
-    guest_id: string,
-    creator_id: string,
-  ): Promise<void> {
-    try {
-      await this.prisma.senSyncConsent.updateMany({
-        where: {
-          session_id,
-          guest_id,
-          creator_id,
-          revoked_at: null,
-        },
-        data: {
-          revoked_at: new Date(),
-        },
-      });
-    } catch (err) {
-      this.logger.error('SenSyncService: revocation persist failed', err);
-    }
   }
 }
