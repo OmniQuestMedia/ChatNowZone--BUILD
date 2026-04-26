@@ -5,3 +5,15 @@ out/
 *.env.local
 *.env.*.local
 .DS_Store
+
+# Preventive hygiene — added 2026-04-26 pre-ship hardening
+coverage/
+*.log
+.turbo/
+.cache/
+*.tsbuildinfo
+.env
+.env.*
+.idea/
+*.pem
+*.key
