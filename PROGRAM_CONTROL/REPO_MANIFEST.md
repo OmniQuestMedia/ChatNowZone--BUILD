@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/frontend-polish-concierge-ui-mlqrR`
-**Commit:** `a2e44772d6bc94e64510076b1ab6184a9d94e893`
-**Generated:** 2026-04-25T06:47:40Z
+**Branch:** `copilot/global-renames-and-cleanup`
+**Commit:** `2cacd082b13867ab5b8667d24779cc642de4e0d6`
+**Generated:** 2026-04-26T02:55:59Z
 
 ## All Files
 
@@ -322,6 +322,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
+- `prisma/migrations/20260426000000_czt_single_token_ffs_rename/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -471,6 +472,15 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/session-memory.store.ts`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
+- `services/ffs/.env.example`
+- `services/ffs/ASSUMPTIONS.md`
+- `services/ffs/FLAGS.md`
+- `services/ffs/README.md`
+- `services/ffs/src/dto/ffs.dto.ts`
+- `services/ffs/src/ffs.controller.ts`
+- `services/ffs/src/ffs.module.ts`
+- `services/ffs/src/ffs.service.ts`
+- `services/ffs/src/types/ffs.types.ts`
 - `services/fraud-prevention/src/AbuseDetector.ts`
 - `services/fraud-prevention/src/TokenExtensionTool.ts`
 - `services/fraud-prevention/src/events/ServiceToSaleEmitter.ts`
