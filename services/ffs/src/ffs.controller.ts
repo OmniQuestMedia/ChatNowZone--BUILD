@@ -1,8 +1,5 @@
 // WO-003 — Flicker n'Flame Scoring (FFS): controller
-// @deprecated — Use services/ffs/src/ffs.controller.ts (FfsController) instead.
 // REST surface for the Flicker n'Flame Scoring service.
-// WO-003 — Room-Heat Engine: controller
-// REST surface for the Room-Heat Engine service.
 // All endpoints are advisory / read-oriented; no ledger mutations here.
 import {
   Body,
