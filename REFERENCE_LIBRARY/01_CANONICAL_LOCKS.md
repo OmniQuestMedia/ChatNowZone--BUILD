@@ -60,7 +60,7 @@ These are add-on products, not membership tiers:
 
 ## PAYOUT ENGINE
 
-**Canonical:** Room-Heat Engine
+**Canonical:** Flicker n'Flame Scoring (FFS)
 **Rate states (5 levels):**
 - RATE_COLD
 - RATE_WARM

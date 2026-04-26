@@ -1,9 +1,9 @@
 // services/core-api/src/analytics/analytics.module.ts
 import { Module } from '@nestjs/common';
-import { HeatScoreService } from './heat-score.service';
+import { FfsScoreService } from './ffs-score.service';
 
 @Module({
-  providers: [HeatScoreService],
-  exports: [HeatScoreService],
+  providers: [FfsScoreService],
+  exports: [FfsScoreService],
 })
 export class AnalyticsModule {}

@@ -9,13 +9,13 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
 import { CyranoService } from '../../services/cyrano/src/cyrano.service';
 import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
 import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
-import { RoomHeatEngine } from '../../services/creator-control/src/room-heat.engine';
+import { FlickerNFlameScoringEngine } from '../../services/creator-control/src/ffs.engine';
 import { PersonaManager } from '../../services/cyrano/src/persona.manager';
 import { SessionMemoryStore } from '../../services/cyrano/src/session-memory.store';
 import { LEDGER_SPEND_ORDER } from '../../services/core-api/src/config/governance.config';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 import type { CyranoInputFrame } from '../../services/cyrano/src/cyrano.types';
-import type { RoomHeatSample } from '../../services/creator-control/src/room-heat.engine';
+import type { FfsSample } from '../../services/creator-control/src/ffs.engine';
 
 type Published = { topic: string; payload: Record<string, unknown> };
 
@@ -35,7 +35,7 @@ function makeHub(): {
 } {
   const { stub, published } = natsStub();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const heat = new RoomHeatEngine(stub as any);
+  const heat = new FlickerNFlameScoringEngine(stub as any);
   const timing = new BroadcastTimingCopilot();
   const monitoring = new SessionMonitoringCopilot();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,7 +47,7 @@ function makeHub(): {
   return { hub, published };
 }
 
-function blazingSample(): RoomHeatSample {
+function blazingSample(): FfsSample {
   return {
     session_id: 'sess-e2e',
     creator_id: 'creator-e2e',
@@ -108,7 +108,7 @@ describe('IntegrationHubService.processHighHeatSession — E2E flow', () => {
 
   it('COLD tier emits no monetization handoff and no payout scaling event', async () => {
     const { hub, published } = makeHub();
-    const coldSample: RoomHeatSample = {
+    const coldSample: FfsSample = {
       session_id: 'sess-e2e',
       creator_id: 'creator-e2e',
       tippers_online: 1,

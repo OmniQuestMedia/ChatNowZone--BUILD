@@ -4,13 +4,13 @@
 
 import type {
   LeaderboardCategory,
-  RoomHeatInput,
-} from '../types/room-heat.types';
+  FfsInput,
+} from '../types/ffs.types';
 
 // ── Ingest DTO ────────────────────────────────────────────────────────────────
-// Mirrors RoomHeatInput exactly but expressed as a plain class so NestJS
+// Mirrors FfsInput exactly but expressed as a plain class so NestJS
 // can deserialise the JSON body.
-export class IngestRoomHeatDto implements RoomHeatInput {
+export class IngestFfsDto implements FfsInput {
   session_id!: string;
   creator_id!: string;
   captured_at_utc!: string;
@@ -56,5 +56,5 @@ export class TipEventDto {
   /** CZT tokens tipped — used to record adaptive signal strength. */
   tokens!: number;
   /** Full heat input frame captured at tip moment. */
-  heat_context!: RoomHeatInput;
+  heat_context!: FfsInput;
 }
