@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-7-T8-ui-threshold-align-K2Iu3`
-**Commit:** `ce20ca1dabb5533468959b1a6e39ec465a6ec074`
-**Generated:** 2026-04-26T18:44:20Z
+**Branch:** `claude/canonical-lock-terminology-fix-K2Iu3`
+**Commit:** `f13a30881dda2ee5dcb647f564eaecea0e948411`
+**Generated:** 2026-04-26T18:56:30Z
 
 ## All Files
 
