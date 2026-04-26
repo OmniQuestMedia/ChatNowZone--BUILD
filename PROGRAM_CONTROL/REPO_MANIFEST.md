@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/global-renames-cleanup-again`
-**Commit:** `7e59fd43bdc1d0c04023c93f2f1dc7d5926085d8`
-**Generated:** 2026-04-26T03:16:40Z
+**Commit:** `6875d3dc9784c33d61a0060ee01793671397877d`
+**Generated:** 2026-04-26T09:57:43Z
 
 ## All Files
 
@@ -326,6 +326,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
 - `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
+- `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
