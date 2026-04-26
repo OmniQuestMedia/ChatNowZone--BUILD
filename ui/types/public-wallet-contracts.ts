@@ -18,8 +18,9 @@ export interface TokenBundleRateRow {
   discount_for_members_pct: number | null;
   per_token_usd: number;
   creator_payout_per_token: number;
-  /** @deprecated TEASE_SHOWZONE is deprecated / legacy-only — new bundles are TEASE_REGULAR (CZT only). */
-  bundle_tier: 'TEASE_REGULAR' | 'TEASE_SHOWZONE';
+  bundle_tier:
+    | 'TEASE_REGULAR'
+    | 'TEASE_SHOWZONE'; // @deprecated — ShowZone removed; retained for legacy payload back-compat only.
   is_promoted: boolean; // highlight row on the rate card
   reason_code: 'REDBOOK_SECTION_3';
 }
