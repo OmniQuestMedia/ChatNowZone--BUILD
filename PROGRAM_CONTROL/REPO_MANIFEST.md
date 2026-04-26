@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/global-renames-and-cleanup`
-**Commit:** `b093a335362bae2fbbc4f5988da571e848a5bf0b`
-**Generated:** 2026-04-26T11:01:01Z
+**Branch:** `claude/fix-duplicate-property-types-Zag57`
+**Commit:** `4d28d3bca4aac8365afa153f034f3b513f346d38`
+**Generated:** 2026-04-26T11:07:36Z
 
 ## All Files
 
