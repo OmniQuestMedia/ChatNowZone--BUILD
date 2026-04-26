@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-8b-cohort-rename-K2Iu3`
-**Commit:** `9238582a2d01d5c64e9c78124329b1ff55fd718b`
-**Generated:** 2026-04-26T19:15:40Z
+**Branch:** `claude/phase-3b-9-retire-dead-migration-K2Iu3`
+**Commit:** `deec5dcf6a2780c05fa58375e8f0cdc6b9df24b5`
+**Generated:** 2026-04-26T19:22:14Z
 
 ## All Files
 
@@ -328,7 +328,6 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
-- `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
