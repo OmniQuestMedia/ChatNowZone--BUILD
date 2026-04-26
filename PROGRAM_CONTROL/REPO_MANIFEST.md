@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/global-renames-and-cleanup-another-one`
-**Commit:** `1c848b63e973363d787799012508421a7ac099b7`
-**Generated:** 2026-04-26T10:49:09Z
+**Branch:** `claude/fix-nats-topics-duplicates-YcGQy`
+**Commit:** `5809d58798b68bc62d1c19d8ed7c44b1a74072cc`
+**Generated:** 2026-04-26T10:51:56Z
 
 ## All Files
 
