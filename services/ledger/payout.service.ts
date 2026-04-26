@@ -13,7 +13,7 @@ export interface SessionCloseInput {
   sessionId: string;                   // correlation_id root
   creatorWalletId: string;
   grossCzt: number;                    // total CZT earned this session (integer)
-  heatScore: number;                   // 0–100 — from Room-Heat scorer
+  heatScore: number;                   // 0–100 — from FFS scorer
   diamondFloorActive: boolean;         // true when creator has Diamond floor guarantee
 }
 
@@ -35,7 +35,7 @@ export class PayoutService {
 
   /**
    * Idempotent on `sessionId`: settles the creator share of a session into
-   * the creator wallet's bonus bucket. Room-Heat rate is resolved once at
+   * the creator wallet's bonus bucket. FFS payout rate is resolved once at
    * close-time and persisted in the ledger metadata for later audit.
    */
   async settleSessionClose(input: SessionCloseInput): Promise<SessionPayoutResult> {
