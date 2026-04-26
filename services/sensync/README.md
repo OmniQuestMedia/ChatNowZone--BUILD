@@ -1,100 +1,102 @@
-# SenSync™ — Biometric Relay Service
+# SenSync™ — `services/sensync/`
 
-**Service prefix:** `HZ:`  
-**Domain:** HeartZone / biometrics  
-**Path:** `services/sensync/`
+**Business Plan Reference:** §SenSync (§5)
+**Rule ID:** `SENSYNC_v1`
+**Status:** Active (replaces `services/heartsync/`)
+
+---
 
 ## Purpose
 
-SenSync™ is the real-time biometric relay layer for ChatNow.Zone. It
-receives raw BPM samples from connected haptic devices, validates them,
-and relays them between consenting creators and guests to enable
-synchronised haptic feedback.
+**SenSync™** is the primary biometric layer for ChatNow.Zone™. It is responsible for:
+- **Consent management** — explicit opt-in, granular, revocable at any time
+- **Data ingestion** — raw BPM from Lovense SDK, WebUSB, or BLE wearables
+- **Normalization** — plausibility filtering (30–220 BPM)
+- **Publishing** — normalized BPM to `sensync.biometric.data` (NATS, encrypted)
+- **Haptic feedback** — dispatching FFS-tier-mapped commands to connected devices
 
-## Supported Membership Tiers
+---
 
-| Tier | Default Enabled | Combined Mode |
-|------|----------------|--------------|
-| GUEST | ✗ | ✗ |
-| VIP | ✓ | ✗ |
-| VIP_SILVER | ✓ | ✗ |
-| VIP_SILVER_BULLET | ✓ | ✓ |
-| VIP_GOLD | ✓ | ✓ |
-| VIP_PLATINUM | ✓ | ✓ |
-| VIP_DIAMOND | ✓ | ✓ |
+## Privacy Architecture (§5.3)
 
-Per-tier flags are stored in `sensync_tier_configs` and can be toggled
-without a deployment. Call `POST /sensync/tier-config/refresh` after
-a DB change.
+SenSync™ is built consent-first, exceeding **Quebec Law 25**, **GDPR Article 9**,
+**CCPA/CPRA**, and upcoming biometric regulations.
 
-## Relay Modes
+| Principle | Implementation |
+|-----------|----------------|
+| Explicit opt-in | One-tap Diamond-tier UI with plain-language disclosure |
+| What is collected | Heart-rate BPM only |
+| How it is used | FFS scoring, Cyrano™ suggestions, haptic feedback |
+| Retention | Ephemeral — deleted at session end unless explicitly retained for licensing audit |
+| Right to revoke | Immediate: publishing stops < 500 ms, in-memory buffers cleared |
+| Data minimization | Raw BPM never persisted to disk; only anonymized aggregates (with additional consent) |
+| No secondary use | Never shared with third parties, never used for advertising/profiling |
+| Audit trail | Every consent event logged immutably with `correlation_id` + `reason_code` |
+| Technical safeguards | E2E encrypted NATS subjects; rate limiting; no biometric templates stored |
 
-| Mode | Description |
-|------|-------------|
-| `BIDIRECTIONAL` | Guest ↔ Creator — each receives the other's BPM |
-| `CREATOR_TO_GUEST` | Only creator BPM flows to guest device |
-| `GUEST_TO_CREATOR` | Only guest BPM flows to creator device |
-| `COMBINED` | "Feel as one" — arithmetic mean of both BPMs sent to both parties |
+---
 
-## Supported Haptic Drivers
+## Hardware Support (§5.2)
 
-1. **Lovense** — primary Bluetooth/USB driver
-2. **Buttplug.io** — cross-device protocol
-3. **ha-buttplug** — Home Assistant integration
-4. **Phone Haptic** — mobile fallback (vibration API)
+| Driver | Protocol | Notes |
+|--------|----------|-------|
+| `LOVENSE` | WebSocket (Lovense Connect SDK) | Primary partner |
+| `WEBUSB` | WebUSB API | Generic wearables, OQMInc™ wristbands |
+| `BLE` | Bluetooth Low Energy | Heart-rate monitors |
+| `BUTTPLUG_IO` | Buttplug.io | Legacy adapter |
+| `HA_BUTTPLUG` | HA-Buttplug | Legacy adapter |
+| `PHONE_HAPTIC` | Mobile OS API | Fallback |
 
-Driver is resolved per-session. If the preferred driver is unavailable,
-SenSync™Service falls back through the priority list to `PHONE_HAPTIC`.
+---
 
-## Plausibility Filter
+## NATS Topics
 
-BPM samples outside **30–220 BPM** are silently rejected:
-- Rejection emitted on `sensync.plausibility.rejected`
-- No relay dispatched
-- No error returned to caller — audit only
+| Topic constant | Subject | When emitted |
+|----------------|---------|--------------|
+| `SENSYNC_BIOMETRIC_DATA` | `sensync.biometric.data` | Each valid BPM sample (encrypted) |
+| `SENSYNC_BPM_UPDATE` | `sensync.bpm.update` | Normalized BPM for FFS consumption |
+| `SENSYNC_CONSENT_GRANTED` | `sensync.consent.granted` | Consent granted |
+| `SENSYNC_CONSENT_REVOKED` | `sensync.consent.revoked` | Consent revoked |
+| `SENSYNC_RELAY_EMITTED` | `sensync.relay.emitted` | Haptic relay dispatch |
+| `SENSYNC_COMBINED_BPM` | `sensync.combined.bpm` | Combined mode average |
+| `SENSYNC_HAPTIC_DISPATCHED` | `sensync.haptic.dispatched` | Haptic command sent |
+| `SENSYNC_PLAUSIBILITY_REJECTED` | `sensync.plausibility.rejected` | Out-of-range BPM |
+| `SENSYNC_TIER_DISABLED` | `sensync.tier.disabled` | Feature not available for tier |
 
-## Consent Model (Law 25 / GDPR)
-
-- Guest must call `POST /sensync/consent/grant` before any BPM relay.
-- `ip_hash` is SHA-256 of the guest IP — raw IP never stored.
-- Consent can be revoked at any time via `POST /sensync/consent/revoke`.
-- Revocation clears all ephemeral BPM state immediately.
-- Consent events emitted on `sensync.consent.granted` / `sensync.consent.revoked`.
+---
 
 ## REST Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/sensync/sessions` | Open a relay session |
-| DELETE | `/sensync/sessions/:id` | Close a relay session |
-| GET | `/sensync/sessions/:id` | Get ephemeral session state |
-| POST | `/sensync/consent/grant` | Grant biometric relay consent |
-| POST | `/sensync/consent/revoke` | Revoke consent |
-| POST | `/sensync/samples` | Submit a BPM sample |
-| POST | `/sensync/tier-config/refresh` | Reload tier config from DB |
+| `POST` | `/sensync/session` | Open a relay session |
+| `POST` | `/sensync/session/:id/consent` | Record explicit opt-in |
+| `DELETE` | `/sensync/session/:id/consent` | Revoke consent immediately |
+| `DELETE` | `/sensync/session/:id` | Close session + purge ephemeral data |
+| `GET` | `/sensync/session/:id` | Read session state (BPM excluded) |
 
-## NATS Topics Emitted
+---
 
-| Topic | When |
-|-------|------|
-| `sensync.sample.received` | Valid sample accepted |
-| `sensync.relay.emitted` | BPM relayed (non-combined modes) |
-| `sensync.combined.bpm` | Combined BPM computed |
-| `sensync.consent.granted` | Guest consented |
-| `sensync.consent.revoked` | Guest revoked consent |
-| `sensync.haptic.dispatched` | Haptic command sent |
-| `sensync.plausibility.rejected` | Sample out of 30–220 range |
-| `sensync.tier.disabled` | Session open rejected due to tier config |
-| `hz.haptic.trigger` | Mirrored on legacy HZ topic for downstream |
+## Database Tables
 
-## Ephemeral Data Only
+| Table | Purpose |
+|-------|---------|
+| `sensync_consents` | Immutable consent grant/revocation audit log |
+| `sensync_tier_configs` | Per-tier feature enablement |
 
-No BPM values are written to Postgres. `SenSync™SessionState` lives
-in-process memory and is purged on `closeSession()` or process restart.
-This is a deliberate privacy design decision (Law 25 / GDPR minimisation).
+---
 
-## Sampling Cadence
+## Resilience (§5.4)
 
-Sampling interval jitter (1.5–3 s) is enforced by the caller / device
-gateway, not by this service. SenSync™Service is stateless with respect
-to timing — it processes each sample as presented.
+- Exponential-backoff reconnection on hardware disconnect
+- Graceful degradation: FFS continues with behavioral signals only when BPM is absent
+- Prometheus metrics: connection success rate, latency, data quality
+
+---
+
+## Non-Adult Extension (§5.5)
+
+Same core service + domain-specific adapters for:
+- Teaching / coaching environments
+- First-responder and factory safety
+- Medical monitoring

@@ -547,6 +547,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/sensync/src/sensync.module.ts`
 - `services/sensync/src/sensync.service.ts`
 - `services/sensync/src/sensync.types.ts`
+- `services/showzone/RETIRED.md`
 - `services/showzone/src/room-session.service.d.ts`
 - `services/showzone/src/room-session.service.js`
 - `services/showzone/src/room-session.service.js.map`

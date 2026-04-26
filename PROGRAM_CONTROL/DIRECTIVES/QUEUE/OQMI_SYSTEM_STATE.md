@@ -75,6 +75,7 @@ Reverse-chronological list of completed work. Each entry one row. Pruning policy
 | 2026-04-23 | CNZ-WORK-001-A011 — Verify PROGRAM_CONTROL subdirectories | PR pending | claude-code | Both `DONE/` and `REPORT_BACK/` present with substantive content |
 | 2026-04-23 | CNZ-WORK-001-A013 — OQMI_GOVERNANCE.md path-reference reconciliation | PR pending | claude-code | Directive premise partly incorrect; OQMI_SYSTEM_STATE.md §11 "(this repo, root)" reference fixed; all CNZ docs verified to reference correct PROGRAM_CONTROL/DIRECTIVES/QUEUE/ paths |
 | 2026-04-23 | CNZ-WORK-001-A099 — WAVE A CLEANUP | PR pending | claude-code | Wave A complete (A001–A014 all DONE); SoT consistency verified; §7 RETIRED ITEMS updated; lint delegated to CI super-linter; Wave A rollup REPORT_BACK filed; Wave B opens once this PR merges |
+| 2026-04-26 | FFS + SenSync™ + VelocityZone + Single CZT — Phase 1 (feature/ffs-sensync-cyrano-upgrade-v2) | PR pending | copilot | Created services/ffs/, services/sensync/, services/velocityzone/; updated NATS registry; added token_type to TokenBalance; Prisma migration 20260426000000_ffs_sensync_velocityzone; ShowZone RETIRED |
 
 ---
 
@@ -137,6 +138,10 @@ Things that were in this repo, have been removed, and should not be reintroduced
 | 2026-04-23 | Root `README.md` | Single authoritative fact (Ghost Alpha provenance) preserved in §8 by CNZ-WORK-001-A004. Doctrine references in OQMI_GOVERNANCE.md §5.3/§8 to "repo root README.md" are now stale but non-blocking. CNZ-WORK-001-A003. |
 | 2026-04-23 | Root `OQMI_SYSTEM_STATE.md` (OQMI CODING DOCTRINE v2.0) | Old v2.0 doctrine version (March 28, 2026, 124 lines). Superseded by `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md` (state) and `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md` (doctrine). `.github/required-files.txt` updated to point at the QUEUE-path SoT. CNZ-WORK-001-A006. |
 | 2026-04-23 | Root `Sovereign_Kernel.md.pdf` (as authoritative source-of-truth) | RETIRED as authoritative; physical file moved to `archive/governance/Sovereign_Kernel.md.pdf` for historical reference. Old OQMI v2.0 enum and RRR-GOV-002 §3.5 commit-prefix enums also retired here for completeness. CNZ-WORK-001-A005 + CNZ-WORK-001-A012. |
+| 2026-04-26 | `services/showzone/` — ShowToken logic | Single CZT economy spec §2. ShowToken creation, conversion, allotments removed. NATS topics tombstoned. RETIRED.md added to service folder. feature/ffs-sensync-cyrano-upgrade-v2. |
+| 2026-04-26 | `services/heartsync/` — as primary biometric service | Superseded by `services/sensync/` (SenSync™). heartsync/ retained as historical reference; no new code should be added. NATS topics (heartsync.*) tombstoned. feature/ffs-sensync-cyrano-upgrade-v2. |
+| 2026-04-26 | `services/room-heat/` — Room-Heat Engine as primary FFS service | Superseded by `services/ffs/` (Flicker n'Flame Scoring). room-heat/ retained as historical reference; no new code should be added. NATS topics (room.heat.*) tombstoned. feature/ffs-sensync-cyrano-upgrade-v2. |
+| 2026-04-26 | NATS topics `heartsync.*`, `room.heat.*`, ShowZone topics | Replaced by `sensync.*`, `ffs.score.*`. Tombstones preserved in topics.registry.ts. feature/ffs-sensync-cyrano-upgrade-v2. |
 
 ---
 

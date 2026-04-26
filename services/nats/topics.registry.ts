@@ -18,10 +18,17 @@ export const NATS_TOPICS = {
   BIJOU_CAMERA_VIOLATION:   'bijou.camera.violation',
   BIJOU_EJECTION:           'bijou.ejection',
 
-  // ── ShowZone Theatre ───────────────────────────────────────────────────
+  // ── ShowZone Theatre — RETIRED (2026-04-26) — ShowToken removed ───────
+  // Topics kept as tombstones so existing consumers fail loudly.
+  // Do not publish new messages to these subjects.
+  // SHOWZONE_DWELL_TICK, SHOWZONE_SEAT_OPENED, SHOWZONE_PHASE2_TRIGGER, SHOWZONE_SHOW_ENDED
+  /** @deprecated RETIRED 2026-04-26. ShowToken removed. Do not use in new code. */
   SHOWZONE_DWELL_TICK:      'showzone.dwell.tick',
+  /** @deprecated RETIRED 2026-04-26. ShowToken removed. Do not use in new code. */
   SHOWZONE_SEAT_OPENED:     'showzone.seat.opened',
+  /** @deprecated RETIRED 2026-04-26. ShowToken removed. Do not use in new code. */
   SHOWZONE_PHASE2_TRIGGER:  'showzone.phase2.trigger',
+  /** @deprecated RETIRED 2026-04-26. ShowToken removed. Do not use in new code. */
   SHOWZONE_SHOW_ENDED:      'showzone.show.ended',
 
   // ── Chat aggregation (OBS multi-platform) ─────────────────────────────
@@ -29,13 +36,14 @@ export const NATS_TOPICS = {
   CHAT_RESPONSE_OUTBOUND:   'chat.response.outbound',
   CHAT_BROADCAST_STAGGERED: 'chat.broadcast.staggered',
 
-  // ── HeartZone biometrics ───────────────────────────────────────────────
+  // ── HeartZone biometrics — legacy Hz IoT layer ────────────────────────
   HZ_BPM_UPDATE:            'hz.bpm.update',
   HZ_HAPTIC_TRIGGER:        'hz.haptic.trigger',
   HZ_WISH_FULFILLED:        'hz.wish.fulfilled',
 
-  // ── SenSync™ biometric relay ──────────────────────────────────────────
-  SENSYNC_SAMPLE_RECEIVED:        'sensync.sample.received',
+  // ── SenSync™ biometric relay (replaces HeartSync) ─────────────────────
+  SENSYNC_BIOMETRIC_DATA:         'sensync.biometric.data',     // encrypted subject
+  SENSYNC_BPM_UPDATE:             'sensync.bpm.update',         // normalized BPM for FFS
   SENSYNC_RELAY_EMITTED:          'sensync.relay.emitted',
   SENSYNC_COMBINED_BPM:           'sensync.combined.bpm',
   SENSYNC_CONSENT_GRANTED:        'sensync.consent.granted',
@@ -44,8 +52,25 @@ export const NATS_TOPICS = {
   SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
   SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
 
-  // ── Fan Fervor Score (FFS) — per-guest engagement score ──────────────
-  FFS_SCORED:                       'ffs.scored',
+  // ── HeartSync topics — RETIRED (2026-04-26; superseded by SenSync™) ──
+  // Kept as deprecated constants to allow legacy heartsync/ service to compile.
+  // Do not use in new code.
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_* equivalents. */
+  HEARTSYNC_SAMPLE_RECEIVED:        'heartsync.sample.received',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_RELAY_EMITTED. */
+  HEARTSYNC_RELAY_EMITTED:          'heartsync.relay.emitted',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_COMBINED_BPM. */
+  HEARTSYNC_COMBINED_BPM:           'heartsync.combined.bpm',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_CONSENT_GRANTED. */
+  HEARTSYNC_CONSENT_GRANTED:        'heartsync.consent.granted',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_CONSENT_REVOKED. */
+  HEARTSYNC_CONSENT_REVOKED:        'heartsync.consent.revoked',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_HAPTIC_DISPATCHED. */
+  HEARTSYNC_HAPTIC_DISPATCHED:      'heartsync.haptic.dispatched',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_PLAUSIBILITY_REJECTED. */
+  HEARTSYNC_PLAUSIBILITY_REJECTED:  'heartsync.plausibility.rejected',
+  /** @deprecated RETIRED 2026-04-26. Use SENSYNC_TIER_DISABLED. */
+  HEARTSYNC_TIER_DISABLED:          'heartsync.tier.disabled',
 
   // ── Guest-Heat intelligence layer ─────────────────────────────────────
   GUEST_HEAT_WHALE_SCORED:          'guest_heat.whale.scored',
@@ -205,16 +230,42 @@ export const NATS_TOPICS = {
   GATEGUARD_FEDERATED_LOOKUP:        'gateguard.federated.lookup',
   GATEGUARD_HUMAN_CONTACT_ZONE:      'gateguard.human_contact_zone.escalated',
 
-  // ── Flicker n'Flame Scoring (FFS) — room-level telemetry ──────────
-  FFS_SCORE_SAMPLE:                  'ffs.score.sample',
-  FFS_SCORE_TIER_CHANGED:            'ffs.score.tier.changed',
-  FFS_SCORE_PEAK:                    'ffs.score.peak',
-  FFS_SCORE_LEADERBOARD_UPDATED:     'ffs.score.leaderboard.updated',
-  FFS_SCORE_HOT_AND_READY:           'ffs.score.hot_and_ready',
-  FFS_SCORE_DUAL_FLAME_PEAK:         'ffs.score.dual_flame.peak',
-  FFS_SCORE_SESSION_STARTED:         'ffs.score.session.started',
-  FFS_SCORE_SESSION_ENDED:           'ffs.score.session.ended',
-  FFS_SCORE_ADAPTIVE_UPDATED:        'ffs.score.adaptive.updated',
+  // ── Flicker n'Flame Scoring — FFS (replaces Room-Heat Engine) ────────
+  FFS_SCORE_UPDATE:               'ffs.score.update',
+  FFS_TIER_CHANGED:               'ffs.score.tier.changed',
+  FFS_PEAK:                       'ffs.score.peak',
+  FFS_LEADERBOARD_UPDATED:        'ffs.score.leaderboard.updated',
+  FFS_HOT_AND_READY:              'ffs.score.hot_and_ready',
+  FFS_DUAL_FLAME_PEAK:            'ffs.score.dual_flame.peak',
+  FFS_SESSION_STARTED:            'ffs.score.session.started',
+  FFS_SESSION_ENDED:              'ffs.score.session.ended',
+  FFS_ADAPTIVE_UPDATED:           'ffs.score.adaptive.updated',
+
+  // ── Room-Heat Engine topics — RETIRED (2026-04-26; superseded by FFS) ─
+  // Kept as deprecated constants to allow legacy room-heat/ service to compile.
+  // Do not use in new code.
+  /** @deprecated RETIRED 2026-04-26. Use FFS_SCORE_UPDATE. */
+  ROOM_HEAT_SAMPLE:                  'room.heat.sample',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_TIER_CHANGED. */
+  ROOM_HEAT_TIER_CHANGED:            'room.heat.tier.changed',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_PEAK. */
+  ROOM_HEAT_PEAK:                    'room.heat.peak',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_LEADERBOARD_UPDATED. */
+  ROOM_HEAT_LEADERBOARD_UPDATED:     'room.heat.leaderboard.updated',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_HOT_AND_READY. */
+  ROOM_HEAT_HOT_AND_READY:           'room.heat.hot_and_ready',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_DUAL_FLAME_PEAK. */
+  ROOM_HEAT_DUAL_FLAME_PEAK:         'room.heat.dual_flame.peak',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_SESSION_STARTED. */
+  ROOM_HEAT_SESSION_STARTED:         'room.heat.session.started',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_SESSION_ENDED. */
+  ROOM_HEAT_SESSION_ENDED:           'room.heat.session.ended',
+  /** @deprecated RETIRED 2026-04-26. Use FFS_ADAPTIVE_UPDATED. */
+  ROOM_HEAT_ADAPTIVE_UPDATED:        'room.heat.adaptive.updated',
+
+  // ── VelocityZone — payout rate events ─────────────────────────────────
+  VELOCITYZONE_EVENT_ACTIVE:      'velocityzone.event.active',
+  VELOCITYZONE_RATE_APPLIED:      'velocityzone.rate.applied',
 
   // ── CreatorControl.Zone (Business Plan B.3 — creator workstation) ────────
   CREATOR_CONTROL_BROADCAST_SUGGESTION: 'creator_control.broadcast.suggestion',
@@ -238,8 +289,6 @@ export const NATS_TOPICS = {
 
   // ── SenSync™ Biometric Layer ───────────────────────────────────────────────
   SENSYNC_BIOMETRIC_DATA:            'sensync.biometric.data',
-  SENSYNC_CONSENT_GRANTED:           'sensync.consent.granted',
-  SENSYNC_CONSENT_REVOKED:           'sensync.consent.revoked',
   SENSYNC_DEVICE_CONNECTED:          'sensync.device.connected',
   SENSYNC_DEVICE_DISCONNECTED:       'sensync.device.disconnected',
 

@@ -1,199 +1,294 @@
-// services/velocityzone/src/velocityzone.service.ts
-// VelocityZone — time-window payout boost engine.
+// VelocityZone — core service
+// Business Plan §3 — time-window events that map FFS score to exact payout rate.
 //
-// Contract:
-//   • On every tip, the payout engine calls resolveVelocityZoneRate() with the
-//     current FFS score and tip timestamp.
-//   • If a VelocityZone event is active at tip_time, the FFS score (0–100) is
-//     linearly interpolated to a rate in [rate_floor_usd, rate_ceil_usd].
-//   • Rate is locked at tip processing time — not retroactively adjustable.
-//   • Admin UI calls createEvent() to define new time-window events.
-//   • No ledger or balance mutations in this service. Payout engine owns writes.
+// On every tip:
+//   1. Check if a VelocityZone event is active for the creator.
+//   2. If active: map current FFS score (0–100) to exact rate (floor → ceiling).
+//   3. Rate is locked at tip processing time (immutable after tip).
 //
-// FIZ: Any payout rate resolution that flows through this service is FIZ-scoped.
-// CORRELATION_ID: passed through from the tip event to all NATS emissions.
+// Admin UI defines events (admin-gated). This service reads and evaluates.
 
-import { Injectable, Logger } from '@nestjs/common';
-import Decimal from 'decimal.js';
-import { PrismaService } from '../../core-api/src/prisma.service';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
+import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
-import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
 import {
+  FOUNDING_RATE_CEILING_USD,
+  FOUNDING_RATE_FLOOR_USD,
+  POST_DAY61_RATE_CEILING_USD,
+  POST_DAY61_RATE_FLOOR_USD,
+  STANDARD_RATE_CEILING_USD,
+  STANDARD_RATE_FLOOR_USD,
   VELOCITYZONE_RULE_ID,
-  type CreateVelocityZoneEventDto,
-  type VelocityZoneRateInput,
+  type CreatorRateTier,
+  type VelocityZoneEvent,
   type VelocityZoneRateResult,
 } from './velocityzone.types';
 
 @Injectable()
-export class VelocityZoneService {
+export class VelocityZoneService implements OnModuleInit {
   private readonly logger = new Logger(VelocityZoneService.name);
 
+  /** In-memory cache of active VelocityZone events; refreshed every 30 s. */
+  private activeEvents: VelocityZoneEvent[] = [];
+  private refreshTimer?: NodeJS.Timeout;
+
   constructor(
-    private readonly prisma: PrismaService,
     private readonly nats: NatsService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  /**
-   * Resolve the payout rate for a tip event under any active VelocityZone window.
-   * Returns { active: false } when no window is active at tip_time.
-   *
-   * Linear interpolation:  rate = floor + (ffs/100) * (ceil - floor)
-   *
-   * FIZ: Caller (payout engine) is responsible for persisting the returned rate
-   * alongside the ledger entry.  This service only resolves and emits NATS.
-   */
-  async resolveVelocityZoneRate(input: VelocityZoneRateInput): Promise<VelocityZoneRateResult> {
-    if (input.ffs_score < 0 || input.ffs_score > 100) {
-      throw new Error(`ffs_score must be 0–100 (got ${input.ffs_score})`);
-    }
-
-    const event = await this.prisma.velocityZoneEvent.findFirst({
-      where: {
-        is_active: true,
-        starts_at: { lte: input.tip_time },
-        ends_at:   { gt:  input.tip_time },
-      },
-      orderBy: { starts_at: 'desc' },
+  async onModuleInit(): Promise<void> {
+    await this.refreshActiveEvents();
+    // Refresh cache every 30 s so new events are picked up without restart.
+    this.refreshTimer = setInterval(() => {
+      void this.refreshActiveEvents();
+    }, 30_000);
+    this.logger.log('VelocityZoneService: initialised', {
+      rule_applied_id: VELOCITYZONE_RULE_ID,
     });
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
+  /**
+   * Evaluate the payout rate for a tip given the current FFS score.
+   * Rate is locked at evaluation time — call at tip processing time.
+   * Returns rate_usd = floor (7.5¢) when no VelocityZone event is active.
+   */
+  async evaluateRate(
+    creator_id: string,
+    ffs_score: number,
+    session_id: string,
+  ): Promise<VelocityZoneRateResult> {
+    const now   = new Date();
+    const event = this.findActiveEvent(creator_id, now);
 
     if (!event) {
-      return { active: false, event_id: null, rate_usd_per_czt: null, ffs_score: input.ffs_score };
+      // No active event — return base rate from creator_rate_tiers.
+      const baseRate = await this.getCreatorBaseRate(creator_id);
+      const result: VelocityZoneRateResult = {
+        active:          false,
+        ffs_score,
+        rate_usd:        baseRate.rate_floor_usd,
+        rule_applied_id: VELOCITYZONE_RULE_ID,
+      };
+      return result;
     }
 
-    const floor = new Decimal(event.rate_floor_usd.toString());
-    const ceil  = new Decimal(event.rate_ceil_usd.toString());
+    // Map FFS score linearly: 0 → floor, 100 → ceiling.
+    const clampedScore = Math.min(100, Math.max(0, ffs_score));
+    const rate_usd = +(
+      event.rate_floor_usd +
+      (clampedScore / 100) * (event.rate_ceiling_usd - event.rate_floor_usd)
+    ).toFixed(6);
 
-    // Guard: operator-defined rates must not exceed platform governance limits.
-    const govFloor = GovernanceConfig.VELOCITYZONE_RATE_FLOOR_MIN;
-    const govCeil  = GovernanceConfig.VELOCITYZONE_RATE_CEIL_MAX;
-    const effectiveFloor = Decimal.max(floor, govFloor);
-    const effectiveCeil  = Decimal.min(ceil,  govCeil);
-
-    const ratio      = new Decimal(input.ffs_score).div(100);
-    const rate       = effectiveFloor.plus(ratio.mul(effectiveCeil.minus(effectiveFloor)));
-    const rateNumber = rate.toDecimalPlaces(4).toNumber();
-
-    // Emit NATS: rate locked for this tip event.
-    await this.nats.publish(NATS_TOPICS.VELOCITYZONE_RATE_LOCKED, {
-      event_id:        event.id,
-      label:           event.label,
-      ffs_score:       input.ffs_score,
-      rate_usd_per_czt: rateNumber,
-      correlation_id:  input.correlation_id,
+    const result: VelocityZoneRateResult = {
+      active:          true,
+      event_id:        event.event_id,
+      ffs_score,
+      rate_usd,
       rule_applied_id: VELOCITYZONE_RULE_ID,
-      locked_at:       input.tip_time.toISOString(),
+    };
+
+    this.nats.publish(NATS_TOPICS.VELOCITYZONE_RATE_APPLIED, {
+      session_id,
+      creator_id,
+      event_id:        event.event_id,
+      ffs_score,
+      rate_usd,
+      evaluated_at:    now.toISOString(),
+      rule_applied_id: VELOCITYZONE_RULE_ID,
     });
 
-    this.logger.log('VelocityZone rate locked', {
-      event_id: event.id,
-      ffs_score: input.ffs_score,
-      rate_usd_per_czt: rateNumber,
-      correlation_id: input.correlation_id,
+    return result;
+  }
+
+  /**
+   * Seed the creator_rate_tier table for a new creator.
+   * Called during creator onboarding.
+   */
+  async seedCreatorRateTier(
+    creator_id: string,
+    is_founding: boolean,
+    correlation_id: string,
+  ): Promise<CreatorRateTier> {
+    const tier_name     = is_founding ? 'FOUNDING' : 'STANDARD';
+    const rate_floor    = is_founding ? FOUNDING_RATE_FLOOR_USD : STANDARD_RATE_FLOOR_USD;
+    const rate_ceiling  = is_founding ? FOUNDING_RATE_CEILING_USD : STANDARD_RATE_CEILING_USD;
+    const now           = new Date();
+
+    const row = await this.prisma.creatorRateTier.create({
+      data: {
+        tier_id:          randomUUID(),
+        creator_id,
+        tier_name,
+        rate_floor_usd:   rate_floor,
+        rate_ceiling_usd: rate_ceiling,
+        effective_from:   now,
+        correlation_id,
+        reason_code:      `CREATOR_RATE_SEED_${tier_name}`,
+        rule_applied_id:  VELOCITYZONE_RULE_ID,
+      },
+    });
+
+    this.logger.log('VelocityZoneService: creator rate tier seeded', {
+      creator_id,
+      tier_name,
+      rate_floor,
     });
 
     return {
-      active:           true,
-      event_id:         event.id,
-      rate_usd_per_czt: rateNumber,
-      ffs_score:        input.ffs_score,
+      tier_id:          row.tier_id,
+      creator_id:       row.creator_id,
+      tier_name:        row.tier_name,
+      rate_floor_usd:   Number(row.rate_floor_usd),
+      rate_ceiling_usd: Number(row.rate_ceiling_usd),
+      effective_from:   row.effective_from.toISOString(),
+      effective_to:     row.effective_to?.toISOString(),
+      correlation_id:   row.correlation_id,
+      reason_code:      row.reason_code,
+      rule_applied_id:  row.rule_applied_id,
+      created_at:       row.created_at.toISOString(),
     };
   }
 
   /**
-   * Create a new VelocityZone event window. Admin-only.
-   * Validates that rate_floor_usd ≥ governance min and rate_ceil_usd ≤ governance max.
+   * Day-61 scheduled job: promote all STANDARD creators to POST_DAY_61 floor.
+   * Called by the scheduler service on Day 61 post-launch.
    */
-  async createEvent(dto: CreateVelocityZoneEventDto): Promise<{ id: string }> {
-    const floor = new Decimal(dto.rate_floor_usd);
-    const ceil  = new Decimal(dto.rate_ceil_usd);
-
-    if (floor.lt(GovernanceConfig.VELOCITYZONE_RATE_FLOOR_MIN)) {
-      throw new Error(
-        `rate_floor_usd (${floor}) is below governance minimum ` +
-        `(${GovernanceConfig.VELOCITYZONE_RATE_FLOOR_MIN})`,
-      );
-    }
-    if (ceil.gt(GovernanceConfig.VELOCITYZONE_RATE_CEIL_MAX)) {
-      throw new Error(
-        `rate_ceil_usd (${ceil}) exceeds governance maximum ` +
-        `(${GovernanceConfig.VELOCITYZONE_RATE_CEIL_MAX})`,
-      );
-    }
-    if (floor.gte(ceil)) {
-      throw new Error(`rate_floor_usd must be strictly less than rate_ceil_usd`);
-    }
-
-    const startsAt = new Date(dto.starts_at);
-    const endsAt   = new Date(dto.ends_at);
-    if (endsAt <= startsAt) {
-      throw new Error(`ends_at must be after starts_at`);
-    }
-
-    const event = await this.prisma.velocityZoneEvent.create({
-      data: {
-        label:           dto.label,
-        starts_at:       startsAt,
-        ends_at:         endsAt,
-        rate_floor_usd:  floor,
-        rate_ceil_usd:   ceil,
-        is_active:       true,
-        correlation_id:  dto.correlation_id,
-        reason_code:     dto.reason_code,
-        rule_applied_id: VELOCITYZONE_RULE_ID,
-        created_by:      dto.created_by,
-      },
-    });
-
-    await this.nats.publish(NATS_TOPICS.VELOCITYZONE_EVENT_ACTIVE, {
-      event_id:       event.id,
-      label:          event.label,
-      starts_at:      event.starts_at.toISOString(),
-      ends_at:        event.ends_at.toISOString(),
-      rate_floor_usd: dto.rate_floor_usd,
-      rate_ceil_usd:  dto.rate_ceil_usd,
-      correlation_id: dto.correlation_id,
-    });
-
-    this.logger.log('VelocityZone event created', { id: event.id, label: event.label });
-    return { id: event.id };
-  }
-
-  /**
-   * Deactivate a VelocityZone event (admin-only, soft delete via is_active=false).
-   * Note: this is NOT append-only — it sets is_active = false.
-   * The event row is retained for audit. No financial data is modified.
-   */
-  async deactivateEvent(id: string, correlationId: string): Promise<void> {
-    await this.prisma.velocityZoneEvent.update({
-      where: { id },
-      data:  { is_active: false, updated_at: new Date() },
-    });
-
-    const endedAt = new Date().toISOString();
-
-    await this.nats.publish(NATS_TOPICS.VELOCITYZONE_EVENT_ENDED, {
-      event_id:        id,
-      correlation_id:  correlationId,
-      rule_applied_id: VELOCITYZONE_RULE_ID,
-      ended_at:        endedAt,
-      timestamp:       endedAt,
-    });
-
-    this.logger.log('VelocityZone event deactivated', { id, correlationId });
-  }
-
-  /**
-   * List all upcoming and currently active VelocityZone events (admin dashboard).
-   */
-  async listActiveAndUpcoming(): Promise<unknown[]> {
-    return this.prisma.velocityZoneEvent.findMany({
+  async promoteDay61Rates(correlation_id: string): Promise<{ updated: number }> {
+    const now     = new Date();
+    const result  = await this.prisma.creatorRateTier.updateMany({
       where: {
-        is_active: true,
-        ends_at:   { gt: new Date() },
+        tier_name:  'STANDARD',
+        effective_to: null,
       },
-      orderBy: { starts_at: 'asc' },
+      data: {
+        effective_to: now,
+      },
     });
+
+    // Insert new POST_DAY_61 rows for all affected creators.
+    const expiredRows = await this.prisma.creatorRateTier.findMany({
+      where: {
+        tier_name:   'STANDARD',
+        effective_to: now,
+      },
+    });
+
+    for (const row of expiredRows) {
+      await this.prisma.creatorRateTier.create({
+        data: {
+          tier_id:          randomUUID(),
+          creator_id:       row.creator_id,
+          tier_name:        'POST_DAY_61',
+          rate_floor_usd:   POST_DAY61_RATE_FLOOR_USD,
+          rate_ceiling_usd: POST_DAY61_RATE_CEILING_USD,
+          effective_from:   now,
+          correlation_id,
+          reason_code:      'DAY_61_RATE_PROMOTION',
+          rule_applied_id:  VELOCITYZONE_RULE_ID,
+        },
+      });
+    }
+
+    this.logger.log('VelocityZoneService: Day-61 rate promotion complete', {
+      updated: result.count,
+    });
+
+    return { updated: result.count };
+  }
+
+  // ── Private ────────────────────────────────────────────────────────────────
+
+  private findActiveEvent(
+    creator_id: string,
+    now: Date,
+  ): VelocityZoneEvent | undefined {
+    return this.activeEvents.find((evt) => {
+      const start  = new Date(evt.starts_at);
+      const end    = new Date(evt.ends_at);
+      const inTime = now >= start && now <= end;
+      const creatorMatch =
+        evt.creator_ids.length === 0 ||
+        evt.creator_ids.includes(creator_id);
+      return inTime && creatorMatch;
+    });
+  }
+
+  private async refreshActiveEvents(): Promise<void> {
+    try {
+      const now  = new Date();
+      const rows = await this.prisma.velocityZoneEvent.findMany({
+        where: {
+          status:    'ACTIVE',
+          starts_at: { lte: now },
+          ends_at:   { gte: now },
+        },
+      });
+
+      this.activeEvents = rows.map((row) => ({
+        event_id:         row.event_id,
+        name:             row.name,
+        starts_at:        row.starts_at.toISOString(),
+        ends_at:          row.ends_at.toISOString(),
+        rate_floor_usd:   Number(row.rate_floor_usd),
+        rate_ceiling_usd: Number(row.rate_ceiling_usd),
+        creator_ids:      row.creator_ids,
+        status:           row.status as 'ACTIVE',
+        created_by:       row.created_by,
+        rule_applied_id:  row.rule_applied_id,
+        correlation_id:   row.correlation_id,
+        reason_code:      row.reason_code,
+        created_at:       row.created_at.toISOString(),
+      }));
+
+      if (this.activeEvents.length > 0) {
+        this.nats.publish(NATS_TOPICS.VELOCITYZONE_EVENT_ACTIVE, {
+          active_count:    this.activeEvents.length,
+          event_ids:       this.activeEvents.map((e) => e.event_id),
+          rule_applied_id: VELOCITYZONE_RULE_ID,
+          refreshed_at:    now.toISOString(),
+        });
+      }
+    } catch (err) {
+      this.logger.warn('VelocityZoneService: active events refresh failed', {
+        error: String(err),
+      });
+    }
+  }
+
+  private async getCreatorBaseRate(
+    creator_id: string,
+  ): Promise<{ rate_floor_usd: number; rate_ceiling_usd: number }> {
+    try {
+      const row = await this.prisma.creatorRateTier.findFirst({
+        where: {
+          creator_id,
+          effective_to: null,
+        },
+        orderBy: { effective_from: 'desc' },
+      });
+
+      if (row) {
+        return {
+          rate_floor_usd:   Number(row.rate_floor_usd),
+          rate_ceiling_usd: Number(row.rate_ceiling_usd),
+        };
+      }
+    } catch (err) {
+      this.logger.warn('VelocityZoneService: base rate lookup failed', {
+        creator_id,
+        error: String(err),
+      });
+    }
+
+    // Fallback to founding rates if no DB row found.
+    return {
+      rate_floor_usd:   FOUNDING_RATE_FLOOR_USD,
+      rate_ceiling_usd: FOUNDING_RATE_CEILING_USD,
+    };
   }
 }
