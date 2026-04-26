@@ -1,7 +1,7 @@
-# Room-Heat Engine — FLAGS
+# Flicker n'Flame Scoring (FFS) — FLAGS
 
 **Work Order:** WO-003  
-**Rule ID:** `ROOM_HEAT_ENGINE_v2`
+**Rule ID:** `FFS_ENGINE_v2`
 
 Feature flags and deferred capabilities for the Room-Heat Engine.
 

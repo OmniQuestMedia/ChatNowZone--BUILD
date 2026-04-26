@@ -10,10 +10,15 @@ exports.NATS_TOPICS = {
     BIJOU_STANDBY_ALERT: 'bijou.standby.alert',
     BIJOU_CAMERA_VIOLATION: 'bijou.camera.violation',
     BIJOU_EJECTION: 'bijou.ejection',
-    
-    
-    
-    
+    FFS_SCORE_SAMPLE: 'ffs.score.sample',
+    FFS_SCORE_TIER_CHANGED: 'ffs.score.tier.changed',
+    FFS_SCORE_PEAK: 'ffs.score.peak',
+    FFS_SCORE_LEADERBOARD_UPDATED: 'ffs.score.leaderboard.updated',
+    FFS_SCORE_HOT_AND_READY: 'ffs.score.hot_and_ready',
+    FFS_SCORE_DUAL_FLAME_PEAK: 'ffs.score.dual_flame.peak',
+    FFS_SCORE_SESSION_STARTED: 'ffs.score.session.started',
+    FFS_SCORE_SESSION_ENDED: 'ffs.score.session.ended',
+    FFS_SCORE_ADAPTIVE_UPDATED: 'ffs.score.adaptive.updated',
     CHAT_INGEST_RAW: 'chat.ingest.raw',
     CHAT_RESPONSE_OUTBOUND: 'chat.response.outbound',
     CHAT_BROADCAST_STAGGERED: 'chat.broadcast.staggered',

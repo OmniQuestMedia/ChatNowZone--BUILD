@@ -2,7 +2,7 @@
 
 **Work Order:** WO-003  
 **Business Plan Reference:** B.4 — Room-level telemetry  
-**Rule ID:** `ROOM_HEAT_ENGINE_v2`  
+**Rule ID:** `FFS_ENGINE_v2`  
 **Status:** Active
 
 ---
@@ -32,9 +32,9 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
         ├─ dualFlameBonus()        ← up to +5 pts from partner
         ├─ resolveAntiFlickerTier() ← 3-tick confirmation rule
         │
-        ├─ NATS publish (ROOM_HEAT_SAMPLE, ROOM_HEAT_TIER_CHANGED,
-        │                ROOM_HEAT_PEAK, ROOM_HEAT_HOT_AND_READY,
-        │                ROOM_HEAT_DUAL_FLAME_PEAK)
+        ├─ NATS publish (FFS_SCORE_SAMPLE, FFS_SCORE_TIER_CHANGED,
+        │                FFS_SCORE_PEAK, FFS_SCORE_HOT_AND_READY,
+        │                FFS_SCORE_DUAL_FLAME_PEAK)
         │
         ├─ Prisma.roomHeatSnapshot.create()  (async)
         │
@@ -98,15 +98,15 @@ downstream consumers.
 
 | Topic constant | Subject | When emitted |
 |----------------|---------|--------------|
-| `ROOM_HEAT_SAMPLE` | `room.heat.sample` | Every ingest (and 1 Hz re-emit) |
-| `ROOM_HEAT_TIER_CHANGED` | `room.heat.tier.changed` | Tier crosses a band boundary |
-| `ROOM_HEAT_PEAK` | `room.heat.peak` | Score enters INFERNO |
-| `ROOM_HEAT_HOT_AND_READY` | `room.heat.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
-| `ROOM_HEAT_DUAL_FLAME_PEAK` | `room.heat.dual_flame.peak` | Dual Flame session hits INFERNO |
-| `ROOM_HEAT_LEADERBOARD_UPDATED` | `room.heat.leaderboard.updated` | ~every 10 s |
-| `ROOM_HEAT_SESSION_STARTED` | `room.heat.session.started` | `startSession()` called |
-| `ROOM_HEAT_SESSION_ENDED` | `room.heat.session.ended` | `endSession()` called |
-| `ROOM_HEAT_ADAPTIVE_UPDATED` | `room.heat.adaptive.updated` | Adaptive weights shift after tip |
+| `FFS_SCORE_SAMPLE` | `ffs.score.sample` | Every ingest (and 1 Hz re-emit) |
+| `FFS_SCORE_TIER_CHANGED` | `ffs.score.tier.changed` | Tier crosses a band boundary |
+| `FFS_SCORE_PEAK` | `ffs.score.peak` | Score enters INFERNO |
+| `FFS_SCORE_HOT_AND_READY` | `ffs.score.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
+| `FFS_SCORE_DUAL_FLAME_PEAK` | `ffs.score.dual_flame.peak` | Dual Flame session hits INFERNO |
+| `FFS_SCORE_LEADERBOARD_UPDATED` | `ffs.score.leaderboard.updated` | ~every 10 s |
+| `FFS_SCORE_SESSION_STARTED` | `ffs.score.session.started` | `startSession()` called |
+| `FFS_SCORE_SESSION_ENDED` | `ffs.score.session.ended` | `endSession()` called |
+| `FFS_SCORE_ADAPTIVE_UPDATED` | `ffs.score.adaptive.updated` | Adaptive weights shift after tip |
 
 ---
 
