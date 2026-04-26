@@ -253,6 +253,7 @@ export const NATS_TOPICS = {
   FFS_SESSION_STARTED:            'ffs.score.session.started',
   FFS_SESSION_ENDED:              'ffs.score.session.ended',
   FFS_ADAPTIVE_UPDATED:           'ffs.score.adaptive.updated',
+  FFS_GUEST_SCORED:               'ffs.score.guest.scored',
 
   // ── Room-Heat Engine topics — RETIRED (2026-04-26; superseded by FFS) ─
   // Kept as deprecated constants to allow legacy room-heat/ service to compile.
