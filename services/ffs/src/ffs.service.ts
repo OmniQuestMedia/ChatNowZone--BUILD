@@ -217,16 +217,17 @@ export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestro
 
     let changed = false;
     for (const key of Object.keys(weights)) {
+      const prev = weights[key];
       if (elevated.includes(key)) {
         weights[key] = +(
           Math.min(ADAPTIVE_MAX, weights[key] + ADAPTIVE_BOOST_ON_TIP)
         ).toFixed(4);
-        changed = true;
       } else {
         weights[key] = +(
           Math.max(ADAPTIVE_MIN, weights[key] - ADAPTIVE_DECAY_ON_TIP)
         ).toFixed(4);
       }
+      if (weights[key] !== prev) changed = true;
     }
 
     if (changed) {
@@ -751,8 +752,8 @@ export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestro
         captured_at_utc: new Date().toISOString(),
       };
       const score = this.calculateFfsScore(refreshed);
-      this.updateSessionState(refreshed, score);
       this.emitScoreEvents(score, refreshed);
+      this.updateSessionState(refreshed, score);
 
       // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;

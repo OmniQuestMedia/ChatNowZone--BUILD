@@ -101,7 +101,6 @@ export function renderTokensPage(args: {
           test_id: 'tokens-showzone',
           classes: ['cnz-panel', 'cnz-panel--deprecated'],
           aria: { 'aria-label': 'ShowZone Premium bundles (deprecated)' },
-          props: { hidden: true },
         },
         [
           el('h2', {}, ['ShowZone Premium (Deprecated)']),

@@ -1210,7 +1210,7 @@ model CanonicalLedgerEntry {
   reason_code     String   // "PURCHASE" | "SPEND" | "PAYOUT" | "EXPIRY_RECOVERY" | "TOKEN_BRIDGE" | "THREE_FIFTHS_EXIT" | ...
   amount          Int      // signed: positive = credit, negative = debit
   bucket          String   // "purchased" | "membership" | "bonus"
-  token_type      String   @default("CZT") @db.VarChar(10) // CZT only — single-token economy enforced
+  token_type      String   @default("CZT") @db.VarChar(10) // CZT only — single-token economy enforced at DB level
   metadata        Json?
   hash_prev       String?
   hash_current    String

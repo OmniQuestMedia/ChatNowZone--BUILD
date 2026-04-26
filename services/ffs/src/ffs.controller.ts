@@ -10,6 +10,7 @@ import {
   Delete,
   Get,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -60,10 +61,10 @@ export class FlickerNFlameScoringController {
   @Get('session/:sessionId')
   getSessionHeat(
     @Param('sessionId') sessionId: string,
-  ): FfsScore | { message: string; session_id: string } {
+  ): FfsScore {
     const score = this.flickerNFlameScoringService.getSessionHeat(sessionId);
     if (!score) {
-      return { message: 'Session not found or not yet active', session_id: sessionId };
+      throw new NotFoundException(`Session not found or not yet active: ${sessionId}`);
     }
     return score;
   }
