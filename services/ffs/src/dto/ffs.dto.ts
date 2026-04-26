@@ -1,16 +1,16 @@
-// WO-003 — Room-Heat Engine: DTOs (request validation shapes)
+// WO-003 — FFS: DTOs (request validation shapes)
 // All fields are typed; callers provide primitives — no class-validator
 // decorators used (consistent with the rest of the codebase style).
 
 import type {
   LeaderboardCategory,
   RoomHeatInput,
-} from '../types/room-heat.types';
+} from '../types/ffs.types';
 
 // ── Ingest DTO ────────────────────────────────────────────────────────────────
 // Mirrors RoomHeatInput exactly but expressed as a plain class so NestJS
 // can deserialise the JSON body.
-export class IngestRoomHeatDto implements RoomHeatInput {
+export class IngestFfsDto implements RoomHeatInput {
   session_id!: string;
   creator_id!: string;
   captured_at_utc!: string;

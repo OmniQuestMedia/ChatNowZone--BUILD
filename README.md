@@ -118,7 +118,7 @@ Eight payloads compose the canonical runtime:
 | 1 | Canonical Financial Ledger | Three-bucket wallet, REDBOOK rate cards, append-only triggers |
 | 2 | REDBOOK Recovery + Diamond Concierge | Extension / recovery / Token Bridge / 3/5ths Exit |
 | 3 | GateGuard Sentinel + Welfare Guardian Score | Pre-processor on every ledger touch |
-| 4 | OBS Streaming Bridge + Room-Heat Engine | Deterministic tier transitions, theatre + Bijou |
+| 4 | OBS Streaming Bridge + Flicker n'Flame Scoring (FFS) | Deterministic tier transitions, theatre + Bijou |
 | 5 | CreatorControl.Zone + Cyrano L1 + Integration Hub | Whisper copilot ≤ 350 ms, cross-Payload wiring |
 | 6 | Immutable Audit Architecture | Hash-chain + WORM export + Canonical Compliance Checklist |
 | 7 | RBAC Step-Up + Compliance Lockdown | Step-up challenge + Legal Hold model |

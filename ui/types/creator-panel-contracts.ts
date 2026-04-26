@@ -1,6 +1,6 @@
 // PAYLOAD 7 — Creator-facing UI contracts for /creator/control (Command Center).
 // Extends the Payload-5 creator-control-contracts.ts with view-model shapes
-// specific to the CreatorControl command pane: room-heat meter, Cyrano panel,
+// specific to the CreatorControl command pane: ffs meter, Cyrano panel,
 // broadcast timing copilot, persona switcher, payout rate indicator.
 
 import type {

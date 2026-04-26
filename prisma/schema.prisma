@@ -1210,6 +1210,7 @@ model CanonicalLedgerEntry {
   reason_code     String   // "PURCHASE" | "SPEND" | "PAYOUT" | "EXPIRY_RECOVERY" | "TOKEN_BRIDGE" | "THREE_FIFTHS_EXIT" | ...
   amount          Int      // signed: positive = credit, negative = debit
   bucket          String   // "purchased" | "membership" | "bonus"
+  token_type      String   @default("CZT") @db.VarChar(10)
   metadata        Json?
   hash_prev       String?
   hash_current    String
@@ -1220,6 +1221,7 @@ model CanonicalLedgerEntry {
   @@index([wallet_id, correlation_id])
   @@index([wallet_id, created_at])
   @@index([reason_code])
+  @@index([token_type])
   @@map("wallet_ledger_entries")
 }
 

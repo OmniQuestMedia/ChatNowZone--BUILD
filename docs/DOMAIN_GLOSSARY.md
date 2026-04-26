@@ -62,7 +62,7 @@ HOW TO USE:
 | Term | Definition | Code identifier |
 |------|------------|-----------------|
 | FairPay/FairPlay | Creator payout engine doctrine | FairPayFairPlay (class), FAIRPAY (prefix) |
-| Room-Heat Engine | Real-time composite score driving payout rate | RoomHeatEngine, room_heat_score |
+| Flicker n'Flame Scoring (FFS) | Real-time composite score driving payout rate | RoomHeatEngine, room_heat_score |
 | RATE_COLD | Heat 0-33 = $0.075/CZT payout rate | RATE_COLD |
 | RATE_WARM | Heat 34-60 = $0.080/CZT payout rate | RATE_WARM |
 | RATE_HOT | Heat 61-85 = $0.085/CZT payout rate | RATE_HOT |

@@ -18,7 +18,7 @@ import {
   type DualFlamePulseEvent,
   type MembershipTier,
 } from './guest-heat.types';
-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { HeatTier } from '../../creator-control/src/ffs.engine';
 
 /** Tiers eligible for Dual Flame Pulse (VIP and above). */
 const ELIGIBLE_TIERS: Set<MembershipTier> = new Set([

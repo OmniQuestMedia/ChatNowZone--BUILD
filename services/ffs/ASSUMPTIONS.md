@@ -1,4 +1,4 @@
-# Room-Heat Engine — ASSUMPTIONS
+# Flicker n'Flame Scoring (FFS) — ASSUMPTIONS
 
 **Work Order:** WO-003  
 **Rule ID:** `ROOM_HEAT_ENGINE_v2`
@@ -71,7 +71,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
 ## Dual Flame
 
 11. Dual Flame support assumes both sessions are independently scored.  The
-    partner score is an input provided by the caller — the Room-Heat Engine
+    partner score is an input provided by the caller — the Flicker n'Flame Scoring (FFS)
     does not look up the partner's score from its own state to avoid race
     conditions.
 

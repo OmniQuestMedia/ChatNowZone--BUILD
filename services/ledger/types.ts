@@ -36,12 +36,11 @@ export type ReasonCode =
  */
 export type RateCardTier =
   | 'tease_regular'
-  | 'tease_showzone'
   | 'diamond_floor'
   | 'vip_baseline';
 
 /**
- * Heat levels — Room-Heat Engine output (PAY-001…005). Drives creator payout per
+ * Heat levels — Flicker n'Flame Scoring (FFS) output (PAY-001…005). Drives creator payout per
  * token via governance.config.GovernanceConfig.RATE_* bands.
  */
 export type HeatLevel = 'cold' | 'warm' | 'hot' | 'inferno';

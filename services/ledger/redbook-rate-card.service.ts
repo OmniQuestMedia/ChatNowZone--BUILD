@@ -71,6 +71,8 @@ export class RedbookRateCardService {
   }
 
   /**
+   * @deprecated ShowZone has been removed. This method is retained for
+   * backward compatibility only and should not be called in new code.
    * Resolve a ShowZone Premium bundle quote. Premium is single-tier per REDBOOK —
    * same price for guests and members (entry is gated by a paid pass).
    */
@@ -84,7 +86,7 @@ export class RedbookRateCardService {
     }
     const unit = row.usd / row.tokens;
     return {
-      tier: 'tease_showzone',
+      tier: 'tease_showzone' as RateCardTier,
       tokens: row.tokens,
       priceUsd: row.usd,
       creatorPayoutPerToken: row.creator_payout_per_token,
@@ -135,6 +137,7 @@ export class RedbookRateCardService {
   }
 
   /**
+   * @deprecated ShowZone has been removed.
    * Compute a ShowZone pass price in CZT applying REDBOOK day/time/creator/advance
    * multipliers. Returns the integer CZT cost rounded up (partial tokens are not
    * issuable).

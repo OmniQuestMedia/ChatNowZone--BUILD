@@ -10,10 +10,10 @@ exports.NATS_TOPICS = {
     BIJOU_STANDBY_ALERT: 'bijou.standby.alert',
     BIJOU_CAMERA_VIOLATION: 'bijou.camera.violation',
     BIJOU_EJECTION: 'bijou.ejection',
-    SHOWZONE_DWELL_TICK: 'showzone.dwell.tick',
-    SHOWZONE_SEAT_OPENED: 'showzone.seat.opened',
-    SHOWZONE_PHASE2_TRIGGER: 'showzone.phase2.trigger',
-    SHOWZONE_SHOW_ENDED: 'showzone.show.ended',
+    
+    
+    
+    
     CHAT_INGEST_RAW: 'chat.ingest.raw',
     CHAT_RESPONSE_OUTBOUND: 'chat.response.outbound',
     CHAT_BROADCAST_STAGGERED: 'chat.broadcast.staggered',

@@ -7,10 +7,10 @@ export declare const NATS_TOPICS: {
     readonly BIJOU_STANDBY_ALERT: "bijou.standby.alert";
     readonly BIJOU_CAMERA_VIOLATION: "bijou.camera.violation";
     readonly BIJOU_EJECTION: "bijou.ejection";
-    readonly SHOWZONE_DWELL_TICK: "showzone.dwell.tick";
-    readonly SHOWZONE_SEAT_OPENED: "showzone.seat.opened";
-    readonly SHOWZONE_PHASE2_TRIGGER: "showzone.phase2.trigger";
-    readonly SHOWZONE_SHOW_ENDED: "showzone.show.ended";
+    
+    
+    
+    
     readonly CHAT_INGEST_RAW: "chat.ingest.raw";
     readonly CHAT_RESPONSE_OUTBOUND: "chat.response.outbound";
     readonly CHAT_BROADCAST_STAGGERED: "chat.broadcast.staggered";

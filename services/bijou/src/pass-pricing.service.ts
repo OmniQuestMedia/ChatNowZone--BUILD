@@ -13,7 +13,7 @@ export interface PassPriceInput {
   venue: VenueType;
   day_of_week: DayOfWeek;
   show_start_hour_toronto: number;  // 0–23 in America/Toronto
-  creator_tier: CreatorTier;        // ShowZone only; ignored for Bijou
+  creator_tier: CreatorTier;        // ShowZone deprecated; ignored
   days_until_show: number;
   vip_geo_tier: GeoTier;
 }

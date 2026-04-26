@@ -22,7 +22,7 @@ import type {
 
 export const CREATOR_PRESENTER_RULE_ID = 'CREATOR_CONTROL_UI_v1';
 
-/** Tier-boundary lookup mirrors the Room-Heat Engine TIER_THRESHOLDS. */
+/** Tier-boundary lookup mirrors the FFS Engine TIER_THRESHOLDS. */
 const TIER_BOUNDS: Record<HeatTier, { min: number; max: number }> = {
   COLD: { min: 0, max: 25 },
   WARM: { min: 25, max: 50 },

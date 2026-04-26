@@ -1,4 +1,4 @@
-// WO-003 — Room-Heat Engine: core service
+// WO-003 — FFS: core service
 // Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
 //
 // Doctrine (all from creator-control/src/room-heat.engine.ts, extended):
@@ -33,9 +33,9 @@ import type {
   RoomHeatLeaderboard,
   RoomHeatScore,
   SessionLiveState,
-} from './types/room-heat.types';
+} from './types/ffs.types';
 
-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v2';
+export const FFS_RULE_ID = 'FFS_ENGINE_v2';
 
 // ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
 const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
@@ -103,8 +103,8 @@ const ADAPTIVE_DECAY_ON_TIP   = 0.005;
 const ADAPTIVE_ELEVATION_THRESHOLD = 0.70;
 
 @Injectable()
-export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(RoomHeatService.name);
+export class FfsService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(FfsService.name);
 
   // ── In-memory state ──────────────────────────────────────────────────────
   private readonly antiFlicker  = new Map<string, AntiFlickerState>();
@@ -126,8 +126,8 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     this.subscribeNatsEvents();
-    this.logger.log('RoomHeatService: initialised', {
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+    this.logger.log('FfsService: initialised', {
+      rule_applied_id: FFS_RULE_ID,
     });
   }
 
@@ -136,7 +136,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       clearInterval(interval);
     }
     this.heatIntervals.clear();
-    this.logger.log('RoomHeatService: destroyed — all intervals cleared');
+    this.logger.log('FfsService: destroyed — all intervals cleared');
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -206,7 +206,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       anti_flicker_ticks:      ticks,
       is_dual_flame:           input.is_dual_flame,
       captured_at_utc:         input.captured_at_utc,
-      rule_applied_id:         ROOM_HEAT_RULE_ID,
+      rule_applied_id:         FFS_RULE_ID,
     };
   }
 
@@ -232,11 +232,11 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     if (changed) {
       this.adaptiveCache.set(input.creator_id, weights);
       void this.persistAdaptiveWeights(input.creator_id, weights);
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_ADAPTIVE_UPDATED, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_ADAPTIVE_UPDATED, {
         creator_id:      input.creator_id,
         elevated,
         weights_snapshot: weights,
-        rule_applied_id: ROOM_HEAT_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
         updated_at_utc:  new Date().toISOString(),
       });
     }
@@ -299,7 +299,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       entries,
       total:             filtered.length,
       generated_at_utc:  now.toISOString(),
-      rule_applied_id:   ROOM_HEAT_RULE_ID,
+      rule_applied_id:   FFS_RULE_ID,
     };
   }
 
@@ -326,7 +326,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         anti_flicker_ticks:       0,
         is_dual_flame:            isDualFlame,
         captured_at_utc:          now.toISOString(),
-        rule_applied_id:          ROOM_HEAT_RULE_ID,
+        rule_applied_id:          FFS_RULE_ID,
       };
       this.sessionState.set(sessionId, {
         currentScore:    initial,
@@ -334,18 +334,18 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         isDualFlame,
       });
     }
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_STARTED, {
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_STARTED, {
       session_id:      sessionId,
       creator_id:      creatorId,
       is_dual_flame:   isDualFlame,
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       started_at_utc:  new Date().toISOString(),
     });
   }
 
   /**
    * Tear down session state and stop the 1 Hz publisher for this session.
-   * Emits ROOM_HEAT_SESSION_ENDED.
+   * Emits FFS_SCORE_SESSION_ENDED.
    */
   endSession(sessionId: string): void {
     this.clearInterval(sessionId);
@@ -354,12 +354,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     this.antiFlicker.delete(sessionId);
     this.lastInput.delete(sessionId);
 
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_ENDED, {
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_ENDED, {
       session_id:      sessionId,
       creator_id:      state?.currentScore.creator_id ?? null,
       final_score:     state?.currentScore.score ?? 0,
       final_tier:      state?.currentScore.tier ?? 'COLD',
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       ended_at_utc:    new Date().toISOString(),
     });
   }
@@ -595,7 +595,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         this.adaptiveCache.set(creatorId, merged);
       }
     } catch (err) {
-      this.logger.warn('RoomHeatService: adaptive weights DB load failed', {
+      this.logger.warn('FfsService: adaptive weights DB load failed', {
         creator_id: creatorId,
         error:      String(err),
       });
@@ -628,12 +628,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
             tip_events_seen: 1,
             correlation_id:  `adaptive-init-${creatorId}-${Date.now()}`,
             reason_code:     'ADAPTIVE_INIT',
-            rule_applied_id: ROOM_HEAT_RULE_ID,
+            rule_applied_id: FFS_RULE_ID,
           },
         });
       }
     } catch (err) {
-      this.logger.error('RoomHeatService: adaptive weights persist failed', err, {
+      this.logger.error('FfsService: adaptive weights persist failed', err, {
         creator_id: creatorId,
       });
     }
@@ -664,12 +664,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       captured_at_utc:  score.captured_at_utc,
       rule_applied_id:  score.rule_applied_id,
     };
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SAMPLE, payload);
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, payload);
 
     // Tier transition
     const prev = this.previousTier(score.session_id);
     if (prev !== null && prev !== score.tier) {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_TIER_CHANGED, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
         from:            prev,
@@ -678,7 +678,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         captured_at_utc: score.captured_at_utc,
         rule_applied_id: score.rule_applied_id,
       });
-      this.logger.log('RoomHeatService: tier transition', {
+      this.logger.log('FfsService: tier transition', {
         session_id: score.session_id,
         from:       prev,
         to:         score.tier,
@@ -687,7 +687,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
     // INFERNO peak
     if (score.tier === 'INFERNO') {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
         score:           score.score,
@@ -698,7 +698,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
     // Dual Flame INFERNO peak
     if (score.tier === 'INFERNO' && score.is_dual_flame) {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_DUAL_FLAME_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_DUAL_FLAME_PEAK, {
         session_id:               score.session_id,
         creator_id:               score.creator_id,
         score:                    score.score,
@@ -717,7 +717,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         score.score >= HOT_AND_READY_MIN_SCORE &&
         dwell >= HOT_AND_READY_MIN_DWELL
       ) {
-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_HOT_AND_READY, {
+        this.nats.publish(NATS_TOPICS.FFS_SCORE_HOT_AND_READY, {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
           score:           score.score,
@@ -757,11 +757,11 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;
       this.tickCounters.set(sessionId, ticks);
-      if (ticks % RoomHeatService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
+      if (ticks % FfsService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
         const leaderboard = this.getLeaderboard('all');
-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_LEADERBOARD_UPDATED, {
+        this.nats.publish(NATS_TOPICS.FFS_SCORE_LEADERBOARD_UPDATED, {
           ...leaderboard,
-          rule_applied_id: ROOM_HEAT_RULE_ID,
+          rule_applied_id: FFS_RULE_ID,
         });
       }
     }, 1_000);
@@ -800,7 +800,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         },
       });
     } catch (err) {
-      this.logger.warn('RoomHeatService: snapshot persist failed', {
+      this.logger.warn('FfsService: snapshot persist failed', {
         session_id: score.session_id,
         error:      String(err),
       });
@@ -838,7 +838,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    this.logger.log('RoomHeatService: NATS subscriptions active', {
+    this.logger.log('FfsService: NATS subscriptions active', {
       topics: [NATS_TOPICS.HZ_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
     });
   }

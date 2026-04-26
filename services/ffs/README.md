@@ -1,4 +1,4 @@
-# Room-Heat Engine — `services/room-heat/`
+# Flicker n'Flame Scoring (FFS) — `services/ffs/`
 
 **Work Order:** WO-003  
 **Business Plan Reference:** B.4 — Room-level telemetry  
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-The Room-Heat Engine computes a real-time **composite heat score (0–100)** for every
+The Flicker n'Flame Scoring (FFS) computes a real-time **composite heat score (0–100)** for every
 live creator session.  The score is published to NATS at **1 Hz** and consumed by:
 
 - **CreatorControl.Zone** — session suggestions and price nudges  
@@ -114,13 +114,13 @@ downstream consumers.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/room-heat/leaderboard?category=all` | 10×10 leaderboard |
-| `GET` | `/room-heat/session/:id` | Current score for a session |
-| `POST` | `/room-heat/ingest` | Ingest a telemetry frame |
-| `POST` | `/room-heat/session/:id/start` | Pre-register a session |
-| `DELETE` | `/room-heat/session/:id` | End a session |
-| `POST` | `/room-heat/tip-event` | Trigger adaptive learning from a tip |
-| `GET` | `/room-heat/adaptive-weights/:creatorId` | Read creator adaptive multipliers |
+| `GET` | `/ffs/leaderboard?category=all` | 10×10 leaderboard |
+| `GET` | `/ffs/session/:id` | Current score for a session |
+| `POST` | `/ffs/ingest` | Ingest a telemetry frame |
+| `POST` | `/ffs/session/:id/start` | Pre-register a session |
+| `DELETE` | `/ffs/session/:id` | End a session |
+| `POST` | `/ffs/tip-event` | Trigger adaptive learning from a tip |
+| `GET` | `/ffs/adaptive-weights/:creatorId` | Read creator adaptive multipliers |
 
 ---
 

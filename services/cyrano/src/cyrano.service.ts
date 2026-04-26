@@ -234,7 +234,7 @@ export class CyranoService {
 // CYRANO_SUGGESTION_EMITTED.
 //
 // All major creator-facing systems (ledger, gateguard, recovery, diamond
-// concierge, room-heat, creator-control, cyrano, integration hub) are now
+// concierge, ffs, creator-control, cyrano, integration hub) are now
 // integrated.
 //
 // NEXT PRIORITY: Layer 2 — LLM-backed suggestion refinement + a Prisma-

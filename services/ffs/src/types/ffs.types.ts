@@ -1,6 +1,6 @@
-// WO-003 — Room-Heat Engine: canonical types
+// WO-003 — FFS: canonical types
 // Business Plan B.4 — real-time composite heat score (0-100) for all room-level telemetry.
-// Rule authority: ROOM_HEAT_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
+// Rule authority: FFS_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Flicker n'Flame Scoring (FFS)).
 
 // ── Tier thresholds (canonical — locked in GovernanceConfig.HEAT_BAND_*)
 // COLD 0-33 / WARM 34-60 / HOT 61-85 / INFERNO 86-100
@@ -36,8 +36,8 @@ export interface RoomHeatInput {
   /** Session runtime in minutes. */
   dwell_minutes: number;
 
-  // ── Group 2: Biometric Signals (HeartSync + vision-monitor) ───────────────
-  /** Current BPM from HeartSync band. 0 = signal absent / not paired. */
+  // ── Group 2: Biometric Signals (SenSync™ + vision-monitor) ───────────────
+  /** Current BPM from SenSync™ band. 0 = signal absent / not paired. */
   heart_rate_bpm: number;
   /** Creator's individual resting baseline BPM (from calibration). */
   heart_rate_baseline_bpm: number;

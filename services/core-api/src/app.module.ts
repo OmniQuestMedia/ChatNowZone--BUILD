@@ -19,7 +19,7 @@ import { SovereignCaCMiddleware } from './compliance/sovereign-cac.middleware';
 import { ZoneGptModule } from '../../zone-gpt/src/zone-gpt.module';
 import { BijouModule } from '../../bijou/src/bijou.module';
 import { AuthModule } from './auth/auth.module';
-import { ShowZoneModule } from '../../showzone/src/showzone.module';
+import { FfsModule } from '../../ffs/src/ffs.module';
 import { SchedulingModule } from './scheduling/scheduling.module';
 import { ZoneAccessModule } from './zone-access/zone-access.module';
 import { MembershipModule } from './membership/membership.module';
@@ -28,7 +28,6 @@ import { GateGuardMiddleware } from './gateguard/gateguard.middleware';
 import { AuditModule } from './audit/audit.module';
 import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-guard.middleware';
 import { RefundModule } from './refund/refund.module';
-import { RoomHeatModule } from '../../room-heat/src/room-heat.module';
 import { HeartSyncModule } from '../../heartsync/src/heartsync.module';
 import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
 
@@ -56,11 +55,10 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     ZoneGptModule,
     BijouModule,
     AuthModule,
-    ShowZoneModule,
+    FfsModule,
     SchedulingModule,
     MembershipModule,
     ZoneAccessModule,
-    RoomHeatModule,
     HeartSyncModule,
     GuestHeatModule,
   ],
