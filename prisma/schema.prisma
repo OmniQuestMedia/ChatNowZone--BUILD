@@ -1801,3 +1801,108 @@ model HczBudgetForecast {
   @@unique([week_start, department])
   @@map("hcz_budget_forecasts")
 }
+
+// ── SenSync™ Biometric Layer (HZ — SenSync consent store) ────────────────────
+// Law 25 / GDPR / PIPEDA compliant. Append-only: no UPDATE or DELETE on
+// consent_granted_at. Revocation is recorded via consent_revoked_at (new row
+// or nullable column update — service always writes a new row on revocation).
+// Automatic purge on deletion request fires SENSYNC_PURGE_REQUESTED on NATS.
+
+model SenSyncConsent {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id              String    @db.Uuid
+  creator_id              String    @db.Uuid
+  guest_id                String    @db.Uuid
+  consent_version         String    @db.VarChar(20)          // e.g. "SENSYNC_CONSENT_v1"
+  basis                   String    @db.VarChar(50)          // EXPLICIT_OPT_IN | REVOKED
+  consent_granted_at      DateTime  @db.Timestamptz
+  consent_revoked_at      DateTime? @db.Timestamptz          // null until revoked
+  ip_hash                 String?   @db.Char(64)             // SHA-256 of guest IP — never raw
+  device_fingerprint      String?   @db.VarChar(255)
+  domain                  String    @default("ADULT_ENTERTAINMENT") @db.VarChar(50)
+  correlation_id          String    @db.VarChar(200)
+  reason_code             String    @db.VarChar(100)
+  rule_applied_id         String    @default("SENSYNC_CONSENT_v1") @db.VarChar(100)
+  purge_requested_at      DateTime? @db.Timestamptz          // Law 25 deletion request
+  purge_completed_at      DateTime? @db.Timestamptz
+  created_at              DateTime  @default(now()) @db.Timestamptz
+
+  @@index([session_id])
+  @@index([creator_id, guest_id])
+  @@index([guest_id, consent_revoked_at])
+  @@map("sensync_consents")
+}
+
+// ── Cyrano™ Persistent Session Memory ────────────────────────────────────────
+// Restart-safe memory store backing the in-memory SessionMemoryStore.
+// Rows are upserted on fact/arc writes. Soft-delete on guest purge.
+
+model CyranoSessionMemory {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id        String    @db.Uuid
+  guest_id          String    @db.Uuid
+  memory_type       String    @db.VarChar(10)        // FACT | ARC
+  memory_key        String    @db.VarChar(200)       // fact.key or arc_id
+  memory_value      Json                             // MemoryFact | SessionArc payload
+  confidence        Decimal?  @db.Decimal(4, 3)      // 0.000–1.000 (facts only)
+  last_touched_at   DateTime  @db.Timestamptz
+  is_purged         Boolean   @default(false)
+  correlation_id    String    @db.VarChar(200)
+  reason_code       String    @db.VarChar(100)
+  rule_applied_id   String    @default("CYRANO_MEMORY_v1") @db.VarChar(100)
+  created_at        DateTime  @default(now()) @db.Timestamptz
+  updated_at        DateTime  @default(now()) @db.Timestamptz
+
+  @@unique([creator_id, guest_id, memory_type, memory_key])
+  @@index([creator_id, guest_id])
+  @@map("cyrano_session_memory")
+}
+
+// ── VelocityZone Surge Events ─────────────────────────────────────────────────
+// Tracks active and historical VelocityZone tip-surge windows per creator/room.
+// Append-only: start a new row per activation. ended_at null = currently active.
+
+model VelocityZoneEvent {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id          String    @db.Uuid
+  session_id          String?   @db.Uuid
+  trigger_source      String    @db.VarChar(50)      // ROOM_HEAT | MANUAL | SCHEDULER
+  heat_score_at_start Decimal?  @db.Decimal(5, 2)
+  velocity_multiplier Decimal   @db.Decimal(4, 3)    // e.g. 1.150 = +15% payout
+  started_at          DateTime  @db.Timestamptz
+  ended_at            DateTime? @db.Timestamptz      // null = active
+  end_reason          String?   @db.VarChar(50)      // EXPIRED | MANUAL_CLOSE | HEAT_DROP
+  correlation_id      String    @db.VarChar(200)
+  reason_code         String    @db.VarChar(100)
+  rule_applied_id     String    @default("VELOCITYZONE_v1") @db.VarChar(100)
+  created_at          DateTime  @default(now()) @db.Timestamptz
+
+  @@index([creator_id, ended_at])
+  @@index([started_at])
+  @@map("velocityzone_events")
+}
+
+// ── Creator Rate Tier (FFS — FairPlay/FairPay Scoring) ────────────────────────
+// Stores the resolved payout rate tier per creator at a point in time.
+// Append-only for audit. Current rate = latest row by resolved_at.
+
+model CreatorRateTier {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id          String   @db.Uuid
+  rate_state          String   @db.VarChar(20)        // TEASE | MIC_DROP | DAY_91_PARITY
+  heat_tier           String   @db.VarChar(10)        // COLD | WARM | HOT | INFERNO
+  rate_cents_per_czt  Int                             // e.g. 7 = $0.070/CZT (in 1/1000 cents)
+  pixel_legacy        Boolean  @default(false)
+  velocityzone_active Boolean  @default(false)
+  velocityzone_multiplier Decimal? @db.Decimal(4, 3)
+  effective_rate_cents_per_czt Int                    // after multiplier applied
+  ffs_score           Decimal? @db.Decimal(5, 2)      // composite 0..100 FFS input score
+  resolved_at         DateTime @db.Timestamptz
+  correlation_id      String   @db.VarChar(200)
+  reason_code         String   @db.VarChar(100)
+  rule_applied_id     String   @default("FFS_RATE_v1") @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamptz
+
+  @@index([creator_id, resolved_at])
+  @@map("creator_rate_tier")
+}

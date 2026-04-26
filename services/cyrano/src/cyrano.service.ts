@@ -18,6 +18,7 @@ import { NATS_TOPICS } from '../../nats/topics.registry';
 import {
   CYRANO_CATEGORIES,
   type CyranoCategory,
+  type CyranoDomain,
   type CyranoDropReason,
   type CyranoInputFrame,
   type CyranoSuggestion,
@@ -69,7 +70,8 @@ export class CyranoService {
    * Evaluate a telemetry frame and produce (and emit) a suggestion.
    * Returns null if:
    *   • no category matched (silence), OR
-   *   • latency exceeded the hard cutoff (silent discard, drop event).
+   *   • latency exceeded the hard cutoff (silent discard, drop event), OR
+   *   • non-adult domain blocks adult-only categories.
    */
   evaluate(frame: CyranoInputFrame, frameReceivedAtMs?: number): CyranoSuggestion | null {
     const t0 = frameReceivedAtMs ?? this.clock();
@@ -81,6 +83,19 @@ export class CyranoService {
         creator_id: frame.creator_id,
         category: 'UNKNOWN',
         reason_code: 'NO_CATEGORY_MATCH',
+        latency_ms: this.clock() - t0,
+        rule_applied_id: CYRANO_RULE_ID,
+      });
+      return null;
+    }
+
+    // Non-adult domain guard: block adult-only categories.
+    if (this.isAdultCategoryBlockedByDomain(category, frame.domain)) {
+      this.publishDrop({
+        session_id: frame.session_id,
+        creator_id: frame.creator_id,
+        category,
+        reason_code: 'DOMAIN_BLOCKED',
         latency_ms: this.clock() - t0,
         rule_applied_id: CYRANO_RULE_ID,
       });
@@ -119,9 +134,25 @@ export class CyranoService {
       latency_ms,
       emitted_at_utc: new Date().toISOString(),
       rule_applied_id: CYRANO_RULE_ID,
+      ffs_score: frame.ffs_score,
+      sensync_bpm: frame.sensync_consent_active ? frame.sensync_bpm : undefined,
+      domain: frame.domain,
     };
 
     this.nats.publish(NATS_TOPICS.CYRANO_SUGGESTION_EMITTED, { ...suggestion });
+
+    // Emit FFS frame consumed telemetry if FFS data was present.
+    if (frame.ffs_score !== undefined) {
+      this.nats.publish(NATS_TOPICS.CYRANO_FFS_FRAME_CONSUMED, {
+        suggestion_id: suggestion.suggestion_id,
+        session_id: frame.session_id,
+        creator_id: frame.creator_id,
+        ffs_score: frame.ffs_score,
+        sensync_bpm: suggestion.sensync_bpm ?? null,
+        emitted_at_utc: suggestion.emitted_at_utc,
+      } as unknown as Record<string, unknown>);
+    }
+
     return suggestion;
   }
 
@@ -178,19 +209,62 @@ export class CyranoService {
    *   • +10 if monetization + guest_has_tipped (warm lead)
    *   • +15 if recovery + silence_seconds >= 60
    *   • −20 if session_open emitted after dwell_minutes >= 5 (stale)
+   *   • +5  if ffs_score >= 75 (high-scoring room → boost monetization)
+   *   • +5  if sensync_bpm >= 90 (elevated BPM → boost escalation)
    */
   computeWeight(category: CyranoCategory, frame: CyranoInputFrame): number {
     let w = CATEGORY_TIER_WEIGHTS[category][frame.heat.tier];
     if (category === 'CAT_MONETIZATION' && frame.guest_has_tipped) w += 10;
     if (category === 'CAT_RECOVERY' && frame.silence_seconds >= 60) w += 15;
     if (category === 'CAT_SESSION_OPEN' && frame.dwell_minutes >= 5) w -= 20;
+
+    // FFS modulator: high-scoring room boosts monetization suggestions.
+    if (
+      category === 'CAT_MONETIZATION' &&
+      frame.ffs_score !== undefined &&
+      frame.ffs_score >= 75
+    ) {
+      w += 5;
+    }
+
+    // SenSync modulator: elevated guest BPM boosts escalation (opt-in only).
+    if (
+      category === 'CAT_ESCALATION' &&
+      frame.sensync_consent_active === true &&
+      frame.sensync_bpm !== undefined &&
+      frame.sensync_bpm >= 90
+    ) {
+      w += 5;
+    }
+
     return Math.max(0, Math.min(100, Math.round(w)));
+  }
+
+  /**
+   * Returns true if the category is adult-only and the domain is non-adult.
+   * Adult-only categories: ESCALATION, MONETIZATION (in non-adult contexts
+   * these are replaced by domain-neutral guidance or silenced).
+   */
+  private isAdultCategoryBlockedByDomain(
+    category: CyranoCategory,
+    domain?: CyranoDomain,
+  ): boolean {
+    if (!domain || domain === 'ADULT_ENTERTAINMENT') return false;
+    const adultOnlyCategories: CyranoCategory[] = ['CAT_ESCALATION', 'CAT_MONETIZATION'];
+    return adultOnlyCategories.includes(category);
   }
 
   private reasonCodes(category: CyranoCategory, frame: CyranoInputFrame): string[] {
     const codes: string[] = [`TIER_${frame.heat.tier}`, `PHASE_${frame.phase}`, `CAT_${category}`];
     if (!frame.guest_has_tipped) codes.push('GUEST_NO_TIP_YET');
     if (frame.silence_seconds >= 60) codes.push('SILENCE_HIGH');
+    if (frame.ffs_score !== undefined && frame.ffs_score >= 75) codes.push('FFS_SCORE_HIGH');
+    if (frame.sensync_consent_active && frame.sensync_bpm !== undefined && frame.sensync_bpm >= 90) {
+      codes.push('SENSYNC_BPM_ELEVATED');
+    }
+    if (frame.domain && frame.domain !== 'ADULT_ENTERTAINMENT') {
+      codes.push(`DOMAIN_${frame.domain}`);
+    }
     return codes;
   }
 
