@@ -1,10 +1,10 @@
 // PAYLOAD 7 — Creator-facing UI contracts for /creator/control (Command Center).
 // Extends the Payload-5 creator-control-contracts.ts with view-model shapes
-// specific to the CreatorControl command pane: room-heat meter, Cyrano panel,
+// specific to the CreatorControl command pane: FFS (Flicker n'Flame Scoring) meter, Cyrano panel,
 // broadcast timing copilot, persona switcher, payout rate indicator.
 
 import type {
-  HeatTier,
+  FfsTier,
   HeatMeterFrame,
   PriceNudgeCard,
   BroadcastWindowRow,
@@ -14,7 +14,7 @@ import type {
 /** Payout rate indicator — live creator revenue per token. */
 export interface PayoutRateIndicator {
   creator_id: string;
-  tier_context: HeatTier;
+  tier_context: FfsTier;
   current_rate_per_token_usd: number;
   redbook_floor_per_token_usd: number; // 0.075
   redbook_ceiling_per_token_usd: number; // 0.090
@@ -23,10 +23,10 @@ export interface PayoutRateIndicator {
   reason_code: 'PAYOUT_SCALING_APPLIED';
 }
 
-/** Room-Heat meter (visual gauge). */
-export interface RoomHeatMeter {
+/** Flicker n'Flame Scoring (FFS) meter (visual gauge). */
+export interface FfsMeter {
   session_id: string;
-  tier: HeatTier;
+  tier: FfsTier;
   score: number; // 0..100
   components: {
     tipper_pressure: number; // 0..40
@@ -79,7 +79,7 @@ export interface CreatorCommandCenterView {
   display_name: string;
   obs_ready: boolean;
   chat_aggregator_ready: boolean;
-  heat_meter: RoomHeatMeter | null;
+  heat_meter: FfsMeter | null;
   session_monitoring: SessionMonitoringPanel;
   broadcast_timing: BroadcastTimingDashboard;
   cyrano_panel: CyranoWhisperPanel;

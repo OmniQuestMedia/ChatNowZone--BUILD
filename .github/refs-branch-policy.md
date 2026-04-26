@@ -38,7 +38,7 @@ Add to directive CONTEXT section:
 | refs/oss/socketio-chat | CelaDaniel/nodejs-socketio-chat-application | OBS-001, CCZ-001 |
 | refs/oss/react-chat-app | CelaDaniel/React-Chat-App | CCZ-001/002 |
 | refs/oss/discussion-platform | CelaDaniel/next_discussion_platform | FC-001–006, OPS-004 |
-| refs/oss/live-polling | CelaDaniel/react-polling | OBS Room-Heat Engine |
+| refs/oss/live-polling | CelaDaniel/react-polling | OBS Flicker n'Flame Scoring (FFS) |
 | refs/oss/zoom-clone | CelaDaniel/zoom-clone | OBS Theatre UI |
 | refs/oss/loadbalancer-nginx | CelaDaniel/loadbalancer-nginx-docker-nodejs | Bijou SFU infra |
 | refs/oss/social-media-app | CelaDaniel/Social-media-react-app | FC-003, CCZ-003 |

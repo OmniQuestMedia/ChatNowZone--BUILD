@@ -12,7 +12,7 @@ import type {
   CyranoInputFrame,
   MemoryFact,
 } from '../../services/cyrano/src/cyrano.types';
-import type { HeatScore, HeatTier } from '../../services/creator-control/src/room-heat.engine';
+import type { FfsScore, FfsTier } from '../../services/creator-control/src/ffs.engine';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 
 type Published = { topic: string; payload: Record<string, unknown> };
@@ -27,7 +27,7 @@ function buildNatsStub(): { stub: { publish: jest.Mock }; published: Published[]
   return { stub, published };
 }
 
-function heat(tier: HeatTier, score = 60): HeatScore {
+function heat(tier: FfsTier, score = 60): FfsScore {
   return {
     session_id: 'sess-1',
     creator_id: 'creator-1',
@@ -35,7 +35,7 @@ function heat(tier: HeatTier, score = 60): HeatScore {
     score,
     components: { tipper_pressure: 20, velocity: 25, vip_presence: 15 },
     captured_at_utc: new Date('2026-04-24T12:00:00Z').toISOString(),
-    rule_applied_id: 'ROOM_HEAT_ENGINE_v1',
+    rule_applied_id: 'FFS_ENGINE_v1',
   };
 }
 

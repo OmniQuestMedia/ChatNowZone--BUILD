@@ -108,7 +108,7 @@ The 12 items are:
 
 1. R-CLARIFY-001: CreatorControl.Zone scope vs My Zone Manager
 1. R-CLARIFY-002: MyCrew.Zone — custom or Twenty CRM integration
-1. R-CLARIFY-003: Room-Heat Engine — standalone service or platform feature
+1. R-CLARIFY-003: Flicker n'Flame Scoring (FFS) — standalone service or platform feature
 1. R-CLARIFY-004: FairPay/FairPlay — inside Wallet or separate service
 1. R-CLARIFY-005: DFSP™ — define acronym and clarify scope
 1. R-CLARIFY-006: Human Contact Zone vs HeartZone — confirm separate, clarify HZ commit prefix

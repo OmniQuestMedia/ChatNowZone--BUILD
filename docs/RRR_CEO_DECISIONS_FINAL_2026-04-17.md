@@ -24,7 +24,7 @@ RRR points CAN be burned (applied) against a Diamond purchase.
 No earn event fires on Diamond Concierge transactions.
 RRR-P3-003 is REMOVED from build scope.
 
-## D4 — Room-Heat Inferno Bonus Multiplier: Configurable + Guardrails
+## D4 — Flicker n'Flame Scoring Inferno Bonus Multiplier: Configurable + Guardrails
 Inferno bonus earn multiplier is active when ALL THREE conditions are met:
 1. Guest has tipped during the session
 2. Guest remains in the room

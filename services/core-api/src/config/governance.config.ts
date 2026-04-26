@@ -369,7 +369,7 @@ export const PLATFORM_GLOBAL = {
 
 // ─── MERCHANDISE CONFIG (CEO-DECISIONS-2026-04-12) ────────────────────────────
 export const MERCHANDISE_CONFIG = {
-  ACCEPTED_TOKEN_TYPE: 'CZT', // ShowTokens rejected at checkout — no exceptions
+  ACCEPTED_TOKEN_TYPE: 'CZT', // Only CZT accepted — ShowTokens removed
   CREATOR_PAYOUT_PER_TOKEN_USD: 0.075, // $0.075 USD per ChatToken — locked 2026-04-12
   DISPUTE_HOLD_TRIGGER: 'IMMEDIATE', // Hold applied on ticket creation
   DISPUTE_CREATOR_WINDOW_HOURS: 72, // 72h (3 business days) to resolve

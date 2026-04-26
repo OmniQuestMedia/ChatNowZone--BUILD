@@ -518,7 +518,10 @@ model TokenBalance {
   organization_id     String
   tenant_id           String
   token_origin        String   @default("PURCHASED")
+  /// Single-token economy: always 'CZT'. Immutable default enforced by application layer.
+  token_type          String   @default("CZT") @db.VarChar(10)
 
+  @@index([token_type])
   @@map("token_balances")
 }
 
@@ -1210,6 +1213,7 @@ model CanonicalLedgerEntry {
   reason_code     String   // "PURCHASE" | "SPEND" | "PAYOUT" | "EXPIRY_RECOVERY" | "TOKEN_BRIDGE" | "THREE_FIFTHS_EXIT" | ...
   amount          Int      // signed: positive = credit, negative = debit
   bucket          String   // "purchased" | "membership" | "bonus"
+  token_type      String   @default("CZT") @db.VarChar(10) // CZT only — single-token economy enforced at DB level
   metadata        Json?
   hash_prev       String?
   hash_current    String
@@ -1220,6 +1224,7 @@ model CanonicalLedgerEntry {
   @@index([wallet_id, correlation_id])
   @@index([wallet_id, created_at])
   @@index([reason_code])
+  @@index([token_type])
   @@map("wallet_ledger_entries")
 }
 
@@ -1247,7 +1252,7 @@ model CanonicalRateCard {
   creator_payout  Decimal   @db.Decimal(6, 4)  // $0.065–$0.090 per token
   platform_margin Decimal   @db.Decimal(6, 4)
   min_volume      Int?
-  heat_level      String?   // for Room-Heat scaling: "cold" | "warm" | "hot" | "inferno"
+  heat_level      String?   // for Flicker n'Flame Scoring (FFS) scaling: "cold" | "warm" | "hot" | "inferno"
   valid_from      DateTime
   valid_to        DateTime?
 
@@ -1384,33 +1389,33 @@ model WormExportRecord {
   @@map("worm_export_records")
 }
 
-// ─── Room-Heat Engine (WO-003 — Business Plan B.4) ────────────────────────────
-// Migration: 20260425000000_add_room_heat
+// ─── Flicker n'Flame Scoring (FFS) Engine (WO-003 — Business Plan B.4) ────────────────────────────
+// Migration: 20260425000000_add_ffs_scoring
 
-/// Time-series heat score snapshots — one row per ingest() call.
+/// Time-series FFS score snapshots — one row per ingest() call.
 /// Append-only by convention (no UPDATE/DELETE in service code).
-model RoomHeatSnapshot {
+model FfsSnapshot {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   session_id      String   @db.VarChar(200)
   creator_id      String   @db.Uuid
-  heat_score      Decimal  @db.Decimal(5, 2)
-  heat_tier       String   @db.VarChar(20)
+  ffs_score      Decimal  @db.Decimal(5, 2)
+  ffs_tier       String   @db.VarChar(20)
   /// JSON object of HeatScoreComponents (all 13 component values).
   components      Json
   correlation_id  String   @db.VarChar(128)
   reason_code     String   @db.VarChar(100)
   is_dual_flame   Boolean  @default(false)
-  rule_applied_id String   @default("ROOM_HEAT_ENGINE_v2") @db.VarChar(100)
+  rule_applied_id String   @default("FFS_ENGINE_v2") @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
 
   @@index([session_id, created_at])
   @@index([creator_id, created_at])
-  @@map("room_heat_snapshots")
+  @@map("ffs_snapshots")
 }
 
 /// Per-creator adaptive weight multipliers, learned from tip events.
 /// One row per creator — updated in-place via increment-only tip_events_seen.
-model RoomHeatAdaptiveWeights {
+model FfsAdaptiveWeights {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   creator_id      String   @unique @db.Uuid
   /// JSON Record<string, number> — multipliers for each scoring component.
@@ -1420,21 +1425,21 @@ model RoomHeatAdaptiveWeights {
   last_updated_at DateTime @default(now()) @db.Timestamptz
   correlation_id  String   @db.VarChar(128)
   reason_code     String   @default("ADAPTIVE_INIT") @db.VarChar(100)
-  rule_applied_id String   @default("ROOM_HEAT_ADAPTIVE_v1") @db.VarChar(100)
+  rule_applied_id String   @default("FFS_ADAPTIVE_v1") @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
 
-  @@map("room_heat_adaptive_weights")
+  @@map("ffs_adaptive_weights")
 }
 
-// ── HeartSync + Guest-Heat models ────────────────────────────────────────
+// ── SenSync™ + Guest-Heat models ────────────────────────────────────────
 
-// Per-tier on/off toggle for HeartSync biometric relay.
+// Per-tier on/off toggle for SenSync™ biometric relay.
 // Managed by platform operators. Non-FIZ; no financial impact.
-model HeartSyncTierConfig {
+model SenSyncTierConfig {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // Membership tier this row governs.
   tier           String   @db.VarChar(40)
-  // Whether HeartSync relay is enabled for this tier.
+  // Whether SenSync™ relay is enabled for this tier.
   enabled        Boolean  @default(false)
   // Whether COMBINED ("feel as one") mode is permitted for this tier.
   combined_mode  Boolean  @default(false)
@@ -1446,7 +1451,7 @@ model HeartSyncTierConfig {
 
   @@unique([tier])
   @@index([tier, enabled])
-  @@map("heartsync_tier_configs")
+  @@map("sensync_tier_configs")
 }
 
 // Room-level visual/haptic effect config (e.g. dual-flame pulse).
@@ -1522,6 +1527,35 @@ model GemstoneAward {
   @@index([guest_id, status])
   @@index([session_id, status])
   @@map("gemstone_awards")
+}
+
+// ── Fan Fervor Score ──────────────────────────────────────────────────────────
+// Append-only per-guest engagement score. No UPDATE, no DELETE.
+// Consumers: payout engine, UI effects, Cyrano, GateGuard Welfare Score,
+//   VelocityZone (via NATS FFS_SCORED).
+
+model FanFervorScore {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guest_id           String   @db.Uuid
+  session_id         String   @db.VarChar(100)
+  // Composite Fan Fervor Score 0–100.
+  ffs_score          Int
+  // Resolved tier: COLD | WARM | HOT | INFERNO.
+  ffs_tier           String   @db.VarChar(10)
+  // Raw base score before SenSync™/HeartSync boost.
+  base_score         Int
+  // Points added by the HeartSync biometric boost (0 if not opted in).
+  heartsync_boost    Int      @default(0)
+  // Whether the guest had active HeartSync biometric consent for this score.
+  heartsync_opted_in Boolean  @default(false)
+  correlation_id     String   @db.VarChar(100)
+  rule_applied_id    String   @db.VarChar(100)
+  scored_at          DateTime @default(now()) @db.Timestamptz
+
+  @@index([guest_id, scored_at])
+  @@index([session_id, scored_at])
+  @@index([ffs_tier, scored_at])
+  @@map("fan_fervor_scores")
 }
 
 // ── Fraud Prevention Models ───────────────────────────────────────────────────
@@ -1622,6 +1656,8 @@ model FintracEvidencePackage {
   createdAt   DateTime @default(now())
 
   @@map("fintrac_evidence_packages")
+}
+
 // ─── WO-002: HCZ ZoneBot Zoey — Scheduling System ───────────────────────────
 // Standalone scheduler service (services/zonebot-scheduler).
 // All tables are append-only for audit integrity.
@@ -1802,6 +1838,49 @@ model HczBudgetForecast {
   @@map("hcz_budget_forecasts")
 }
 
+// ─── Flicker n'Flame Scoring (FFS) ──────────────────────────────────────────
+// Replaces Room-Heat Engine (services/room-heat/ → services/ffs/).
+// Rule authority: FFS_ENGINE_v1
+
+/// Time-series FFS score snapshots — one row per ingest() call.
+/// Append-only by convention (no UPDATE/DELETE in service code).
+model FfsSnapshot {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id      String   @db.VarChar(200)
+  creator_id      String   @db.Uuid
+  ffs_score       Decimal  @db.Decimal(5, 2)
+  ffs_tier        String   @db.VarChar(20)
+  /// JSON object of FfsScoreComponents (all 13 component values).
+  components      Json
+  correlation_id  String   @db.VarChar(128)
+  reason_code     String   @db.VarChar(100)
+  is_dual_flame   Boolean  @default(false)
+  rule_applied_id String   @default("FFS_ENGINE_v1") @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+
+  @@index([session_id, created_at])
+  @@index([creator_id, created_at])
+  @@map("ffs_snapshots")
+}
+
+/// Per-creator adaptive weight multipliers, learned from tip events.
+/// One row per creator — updated in-place via increment-only tip_events_seen.
+model FfsAdaptiveWeights {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id      String   @unique @db.Uuid
+  /// JSON Record<string, number> — multipliers for each FFS component.
+  weights         Json
+  /// Monotonic counter of tip events that have driven weight updates.
+  tip_events_seen Int      @default(0)
+  last_updated_at DateTime @default(now()) @db.Timestamptz
+  correlation_id  String   @db.VarChar(128)
+  reason_code     String   @default("FFS_ADAPTIVE_INIT") @db.VarChar(100)
+  rule_applied_id String   @default("FFS_ENGINE_v1") @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+
+  @@map("ffs_adaptive_weights")
+}
+
 // ── SenSync™ Biometric Layer (HZ — SenSync consent store) ────────────────────
 // Law 25 / GDPR / PIPEDA compliant. consent_granted_at is immutable once
 // recorded. Revocation is tracked by setting consent_revoked_at on the
@@ -1809,6 +1888,28 @@ model HczBudgetForecast {
 // The correlation_id column is overwritten with the revocation action's ID
 // for a complete audit trail.
 // Automatic purge on deletion request fires SENSYNC_PURGE_REQUESTED on NATS.
+// Rule authority: SENSYNC_v1
+
+/// Per-tier on/off toggle for SenSync™ biometric relay.
+/// Managed by platform operators. Non-FIZ; no financial impact.
+model SenSyncTierConfig {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Membership tier this row governs.
+  tier           String   @db.VarChar(40)
+  /// Whether SenSync™ relay is enabled for this tier.
+  enabled        Boolean  @default(false)
+  /// Whether COMBINED ("feel as one") mode is permitted for this tier.
+  combined_mode  Boolean  @default(false)
+  correlation_id String   @db.VarChar(100)
+  reason_code    String   @db.VarChar(100)
+  updated_by     String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @db.Timestamptz
+
+  @@unique([tier])
+  @@index([tier, enabled])
+  @@map("sensync_tier_configs")
+}
 
 model SenSyncConsent {
   id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -1837,7 +1938,8 @@ model SenSyncConsent {
 
 // ── Cyrano™ Persistent Session Memory ────────────────────────────────────────
 // Restart-safe memory store backing the in-memory SessionMemoryStore.
-// Rows are upserted on fact/arc writes. Soft-delete on guest purge.
+// Rows are scaffolded for future persistence; upserted on fact/arc writes.
+// Soft-delete on guest purge.
 
 model CyranoSessionMemory {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -1860,51 +1962,54 @@ model CyranoSessionMemory {
   @@map("cyrano_session_memory")
 }
 
-// ── VelocityZone Surge Events ─────────────────────────────────────────────────
-// Tracks active and historical VelocityZone tip-surge windows per creator/room.
-// Append-only: start a new row per activation. ended_at null = currently active.
+// ─── VelocityZone — Creator Payout Rate Engine ───────────────────────────────
+// Business Plan §3 — time-window payout rate events keyed to FFS score.
+// Rule authority: VELOCITYZONE_v1
 
-model VelocityZoneEvent {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  creator_id          String    @db.Uuid
-  session_id          String?   @db.Uuid
-  trigger_source      String    @db.VarChar(50)      // ROOM_HEAT | MANUAL | SCHEDULER
-  heat_score_at_start Decimal?  @db.Decimal(5, 2)
-  velocity_multiplier Decimal   @db.Decimal(4, 3)    // e.g. 1.150 = +15% payout
-  started_at          DateTime  @db.Timestamptz
-  ended_at            DateTime? @db.Timestamptz      // null = active
-  end_reason          String?   @db.VarChar(50)      // EXPIRED | MANUAL_CLOSE | HEAT_DROP
-  correlation_id      String    @db.VarChar(200)
-  reason_code         String    @db.VarChar(100)
-  rule_applied_id     String    @default("VELOCITYZONE_v1") @db.VarChar(100)
-  created_at          DateTime  @default(now()) @db.Timestamptz
+/// Per-creator payout rate tier audit trail.
+/// FIZ-scoped: any mutation requires REASON/IMPACT/CORRELATION_ID in commit.
+model CreatorRateTier {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tier_id          String   @unique @db.Uuid
+  creator_id       String   @db.Uuid
+  /// Tier name: 'FOUNDING' | 'STANDARD' | 'POST_DAY_61'
+  tier_name        String   @db.VarChar(30)
+  /// Minimum payout rate (USD per CZT).
+  rate_floor_usd   Decimal  @db.Decimal(8, 6)
+  /// Maximum payout rate (USD per CZT).
+  rate_ceiling_usd Decimal  @db.Decimal(8, 6)
+  effective_from   DateTime @db.Timestamptz
+  effective_to     DateTime? @db.Timestamptz
+  correlation_id   String   @db.VarChar(128)
+  reason_code      String   @db.VarChar(100)
+  rule_applied_id  String   @default("VELOCITYZONE_v1") @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamptz
 
-  @@index([creator_id, ended_at])
-  @@index([started_at])
-  @@map("velocityzone_events")
+  @@index([creator_id, effective_from])
+  @@index([tier_name])
+  @@map("creator_rate_tiers")
 }
 
-// ── Creator Rate Tier (FFS — FairPlay/FairPay Scoring) ────────────────────────
-// Stores the resolved payout rate tier per creator at a point in time.
-// Append-only for audit. Current rate = latest row by resolved_at.
+/// Admin-defined time-window VelocityZone event.
+/// Maps FFS score (0–100) to exact payout rate (floor → ceiling) during the window.
+model VelocityZoneEvent {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  event_id         String   @unique @db.Uuid
+  name             String   @db.VarChar(100)
+  starts_at        DateTime @db.Timestamptz
+  ends_at          DateTime @db.Timestamptz
+  rate_floor_usd   Decimal  @db.Decimal(8, 6)
+  rate_ceiling_usd Decimal  @db.Decimal(8, 6)
+  /// Empty = applies to all creators; non-empty = restricted to listed creator_ids.
+  creator_ids      String[]
+  /// 'SCHEDULED' | 'ACTIVE' | 'ENDED' | 'CANCELLED'
+  status           String   @default("SCHEDULED") @db.VarChar(20)
+  created_by       String   @db.Uuid
+  correlation_id   String   @db.VarChar(128)
+  reason_code      String   @db.VarChar(100)
+  rule_applied_id  String   @default("VELOCITYZONE_v1") @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamptz
 
-model CreatorRateTier {
-  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  creator_id          String   @db.Uuid
-  rate_state          String   @db.VarChar(20)        // TEASE | MIC_DROP | DAY_91_PARITY
-  heat_tier           String   @db.VarChar(10)        // COLD | WARM | HOT | INFERNO
-  rate_cents_per_czt  Int                             // e.g. 7 = $0.070/CZT (in 1/1000 cents)
-  pixel_legacy        Boolean  @default(false)
-  velocityzone_active Boolean  @default(false)
-  velocityzone_multiplier Decimal? @db.Decimal(4, 3)
-  effective_rate_cents_per_czt Int                    // after multiplier applied
-  ffs_score           Decimal? @db.Decimal(5, 2)      // composite 0..100 FFS input score
-  resolved_at         DateTime @db.Timestamptz
-  correlation_id      String   @db.VarChar(200)
-  reason_code         String   @db.VarChar(100)
-  rule_applied_id     String   @default("FFS_RATE_v1") @db.VarChar(100)
-  created_at          DateTime @default(now()) @db.Timestamptz
-
-  @@index([creator_id, resolved_at])
-  @@map("creator_rate_tier")
+  @@index([status, starts_at, ends_at])
+  @@map("velocityzone_events")
 }

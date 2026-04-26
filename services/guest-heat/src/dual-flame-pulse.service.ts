@@ -18,7 +18,7 @@ import {
   type DualFlamePulseEvent,
   type MembershipTier,
 } from './guest-heat.types';
-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { FfsTier } from '../../creator-control/src/ffs.engine';
 
 /** Tiers eligible for Dual Flame Pulse (VIP and above). */
 const ELIGIBLE_TIERS: Set<MembershipTier> = new Set([
@@ -31,7 +31,7 @@ const ELIGIBLE_TIERS: Set<MembershipTier> = new Set([
 ]);
 
 /** Heat tiers that qualify for Dual Flame Pulse. */
-const QUALIFYING_HEAT: Set<HeatTier> = new Set(['HOT', 'INFERNO']);
+const QUALIFYING_HEAT: Set<FfsTier> = new Set(['HOT', 'INFERNO']);
 
 /** Minimum interval between pulse events per session (milliseconds). */
 const PULSE_COOLDOWN_MS = 60_000;
@@ -64,7 +64,7 @@ export class DualFlamePulseService {
     creator_id: string,
     guest_id: string,
     tier: MembershipTier,
-    current_heat: HeatTier,
+    current_heat: FfsTier,
   ): DualFlamePulseEvent | null {
     if (!this.presence.has(session_id)) {
       this.presence.set(session_id, new Map());
@@ -99,10 +99,10 @@ export class DualFlamePulseService {
   /**
    * Update the heat tier for an active session and re-evaluate.
    */
-  onHeatTierChanged(
+  onFfsTierChanged(
     session_id: string,
     creator_id: string,
-    new_heat: HeatTier,
+    new_heat: FfsTier,
   ): DualFlamePulseEvent | null {
     const room = this.presence.get(session_id);
     if (!room) return null;
@@ -114,7 +114,7 @@ export class DualFlamePulseService {
   private evaluatePulse(
     session_id: string,
     creator_id: string,
-    heat: HeatTier,
+    heat: FfsTier,
     room: Map<string, RoomPresenceEntry>,
   ): DualFlamePulseEvent | null {
     if (!QUALIFYING_HEAT.has(heat)) return null;
@@ -138,7 +138,7 @@ export class DualFlamePulseService {
       creator_id,
       guest_a_id: a.guest_id,
       guest_b_id: b.guest_id,
-      heat_tier: heat as 'HOT' | 'INFERNO',
+      ffs_tier: heat as 'HOT' | 'INFERNO',
       triggered_at_utc: new Date().toISOString(),
       rule_applied_id: GUEST_HEAT_RULE_ID,
     };

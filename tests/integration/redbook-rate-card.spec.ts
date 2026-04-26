@@ -35,9 +35,9 @@ describe('RedbookRateCardService — Tease Regular bundles', () => {
   });
 });
 
-describe('RedbookRateCardService — ShowZone Premium', () => {
+describe('RedbookRateCardService — ShowZone Premium (deprecated)', () => {
   it.each(REDBOOK_RATE_CARDS.TEASE_SHOWZONE.map((r) => r.tokens))(
-    'quotes ShowZone price for %i-token bundle',
+    'quotes ShowZone price for %i-token bundle (deprecated)',
     (tokens) => {
       const quote = svc.quoteTeaseShowzone(tokens);
       const row = REDBOOK_RATE_CARDS.TEASE_SHOWZONE.find((r) => r.tokens === tokens)!;
@@ -67,7 +67,7 @@ describe('RedbookRateCardService — Diamond Tier', () => {
   });
 });
 
-describe('RedbookRateCardService — Room-Heat payout resolution', () => {
+describe('RedbookRateCardService — FFS payout resolution', () => {
   it('returns Cold rate for heat score 0', () => {
     const rate = svc.resolveCreatorPayoutRate({ heatScore: 0, diamondFloorActive: false });
     expect(rate.level).toBe('cold');

@@ -1,0 +1,4009 @@
+From c48038360cc08f14c163c85e434b48686079818c Mon Sep 17 00:00:00 2001
+From: "copilot-swe-agent[bot]" <198982749+Copilot@users.noreply.github.com>
+Date: Sat, 25 Apr 2026 23:50:14 +0000
+Subject: [PATCH 1/3] =?UTF-8?q?CHORE:=20Global=20rename=20Room-Heat?=
+ =?UTF-8?q?=E2=86=92FFS,=20HeartSync=E2=86=92SenSync=E2=84=A2?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Rename services/room-heat/ → services/ffs/
+- Rename services/heartsync/ → services/sensync/
+- Rename all Room-Heat identifiers to FlickerNFlameScoring/Ffs
+- Rename all HeartSync identifiers to SenSync
+- Update NATS topic constants and string values
+- Update Prisma schema table/field names
+- Update all import paths, decorators, REST routes
+- Update docs, README, DOMAIN_GLOSSARY, ARCHITECTURE_OVERVIEW
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+Co-authored-by: OmniQuestMediaInc <240893763+OmniQuestMediaInc@users.noreply.github.com>
+---
+ .github/refs-branch-policy.md                 |   2 +-
+ OQMI_SYSTEM_STATE.md                          |   4 +-
+ .../DIRECTIVES/DONE/PAY-RATES-001.md          |   4 +-
+ .../DIRECTIVES/DONE/TOK-RETIRE-001.md         |   4 +-
+ .../QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md          |   2 +-
+ .../QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md  |   2 +-
+ .../QUEUE/CNZ-WORK-001-AMEND-C007.md          |   8 +-
+ .../DIRECTIVES/QUEUE/CNZ-WORK-001.md          |   6 +-
+ .../DIRECTIVES/QUEUE/OSS-Lift-From-Index.md   |   2 +-
+ .../DIRECTIVES/QUEUE/OSS-Repo-Registry.md     |   2 +-
+ PROGRAM_CONTROL/LAUNCH_MANIFEST.md            |   2 +-
+ .../REPORT_BACK/CNZ-WORK-001-A010-report.md   |   2 +-
+ ...AYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md |   6 +-
+ .../REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md |  10 +-
+ ...YLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md |   2 +-
+ .../THREAD14-SCHEMA-INTEGRITY-AUDIT.md        |   2 +-
+ PROGRAM_CONTROL/REPO_MANIFEST.md              |  38 ++---
+ README.md                                     |   4 +-
+ REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md      |   4 +-
+ REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md       |   2 +-
+ .../refs-oss-live-polling/REFS_MANIFEST.md    |   4 +-
+ docker-compose.yml                            |   6 +-
+ docs/ARCHITECTURE_OVERVIEW.md                 |   6 +-
+ docs/DOMAIN_GLOSSARY.md                       |   2 +-
+ docs/PRE_LAUNCH_CHECKLIST.md                  |   2 +-
+ docs/REQUIREMENTS_MASTER.md                   |  12 +-
+ docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md    |   2 +-
+ prisma/schema.prisma                          |  22 +--
+ .../src/analytics/analytics.module.ts         |   6 +-
+ ...-score.service.ts => ffs-score.service.ts} |  16 +--
+ services/core-api/src/app.module.ts           |  10 +-
+ .../src/creator-control.module.ts             |   6 +-
+ .../src/creator-control.service.ts            |  20 +--
+ .../{room-heat.engine.ts => ffs.engine.ts}    |  44 +++---
+ .../src/session-monitoring.copilot.ts         |  18 +--
+ services/cyrano/ASSUMPTIONS.md                |   4 +-
+ services/cyrano/README.md                     |   2 +-
+ services/cyrano/src/cyrano.types.ts           |   6 +-
+ services/{room-heat => ffs}/.env.example      |   0
+ services/{room-heat => ffs}/ASSUMPTIONS.md    |   6 +-
+ services/{room-heat => ffs}/FLAGS.md          |   6 +-
+ services/{room-heat => ffs}/README.md         |  20 +--
+ .../src/dto/ffs.dto.ts}                       |  10 +-
+ .../src/ffs.controller.ts}                    |  56 ++++----
+ services/ffs/src/ffs.module.ts                |  13 ++
+ .../src/ffs.service.ts}                       | 122 ++++++++--------
+ .../src/types/ffs.types.ts}                   |  26 ++--
+ .../src/dual-flame-pulse.service.ts           |  14 +-
+ .../guest-heat/src/guest-heat.controller.ts   |   6 +-
+ services/guest-heat/src/guest-heat.types.ts   |   4 +-
+ services/heartsync/src/heartsync.module.ts    |  11 --
+ services/integration-hub/src/hub.service.ts   |  14 +-
+ services/ledger/payout.service.ts             |   2 +-
+ services/nats/topics.registry.ts              |  38 ++---
+ services/room-heat/src/room-heat.module.ts    |  13 --
+ services/{heartsync => sensync}/.env.example  |   0
+ .../{heartsync => sensync}/ASSUMPTIONS.md     |  18 +--
+ services/{heartsync => sensync}/FLAGS.md      |   8 +-
+ services/{heartsync => sensync}/README.md     |  54 +++----
+ .../src/sensync.controller.ts}                |  52 +++----
+ services/sensync/src/sensync.module.ts        |  11 ++
+ .../src/sensync.service.ts}                   | 134 +++++++++---------
+ .../src/sensync.types.ts}                     |  30 ++--
+ .../e2e/high-heat-cyrano-payout-flow.spec.ts  |  10 +-
+ .../creator-control-service.spec.ts           |  30 ++--
+ tests/integration/cyrano-service.spec.ts      |   6 +-
+ tests/integration/integration-hub.spec.ts     |  10 +-
+ ui/types/creator-control-contracts.ts         |  10 +-
+ ui/types/creator-panel-contracts.ts           |   6 +-
+ ui/view-models/creator-control.presenter.ts   |  20 +--
+ 70 files changed, 528 insertions(+), 528 deletions(-)
+ rename services/core-api/src/analytics/{heat-score.service.ts => ffs-score.service.ts} (88%)
+ rename services/creator-control/src/{room-heat.engine.ts => ffs.engine.ts} (79%)
+ rename services/{room-heat => ffs}/.env.example (100%)
+ rename services/{room-heat => ffs}/ASSUMPTIONS.md (93%)
+ rename services/{room-heat => ffs}/FLAGS.md (92%)
+ rename services/{room-heat => ffs}/README.md (86%)
+ rename services/{room-heat/src/dto/room-heat.dto.ts => ffs/src/dto/ffs.dto.ts} (89%)
+ rename services/{room-heat/src/room-heat.controller.ts => ffs/src/ffs.controller.ts} (63%)
+ create mode 100644 services/ffs/src/ffs.module.ts
+ rename services/{room-heat/src/room-heat.service.ts => ffs/src/ffs.service.ts} (91%)
+ rename services/{room-heat/src/types/room-heat.types.ts => ffs/src/types/ffs.types.ts} (92%)
+ delete mode 100644 services/heartsync/src/heartsync.module.ts
+ delete mode 100644 services/room-heat/src/room-heat.module.ts
+ rename services/{heartsync => sensync}/.env.example (100%)
+ rename services/{heartsync => sensync}/ASSUMPTIONS.md (72%)
+ rename services/{heartsync => sensync}/FLAGS.md (86%)
+ rename services/{heartsync => sensync}/README.md (54%)
+ rename services/{heartsync/src/heartsync.controller.ts => sensync/src/sensync.controller.ts} (72%)
+ create mode 100644 services/sensync/src/sensync.module.ts
+ rename services/{heartsync/src/heartsync.service.ts => sensync/src/sensync.service.ts} (75%)
+ rename services/{heartsync/src/heartsync.types.ts => sensync/src/sensync.types.ts} (86%)
+
+diff --git a/.github/refs-branch-policy.md b/.github/refs-branch-policy.md
+index 1dc1dfa..28dbb73 100644
+--- a/.github/refs-branch-policy.md
++++ b/.github/refs-branch-policy.md
+@@ -38,7 +38,7 @@ Add to directive CONTEXT section:
+ | refs/oss/socketio-chat | CelaDaniel/nodejs-socketio-chat-application | OBS-001, CCZ-001 |
+ | refs/oss/react-chat-app | CelaDaniel/React-Chat-App | CCZ-001/002 |
+ | refs/oss/discussion-platform | CelaDaniel/next_discussion_platform | FC-001–006, OPS-004 |
+-| refs/oss/live-polling | CelaDaniel/react-polling | OBS Room-Heat Engine |
++| refs/oss/live-polling | CelaDaniel/react-polling | OBS Flicker n'Flame Scoring (FFS) |
+ | refs/oss/zoom-clone | CelaDaniel/zoom-clone | OBS Theatre UI |
+ | refs/oss/loadbalancer-nginx | CelaDaniel/loadbalancer-nginx-docker-nodejs | Bijou SFU infra |
+ | refs/oss/social-media-app | CelaDaniel/Social-media-react-app | FC-003, CCZ-003 |
+diff --git a/OQMI_SYSTEM_STATE.md b/OQMI_SYSTEM_STATE.md
+index 24ecf46..6bcf0c4 100644
+--- a/OQMI_SYSTEM_STATE.md
++++ b/OQMI_SYSTEM_STATE.md
+@@ -94,10 +94,10 @@ H-LAUNCH-READY sign-off directive):
+ | RedBook                                    | E001         | NEEDS_DIRECTIVE                                                                                                                                                                   |
+ | Compliance Stack                           | D008         | NEEDS_DIRECTIVE                                                                                                                                                                   |
+ | GateGuard Sentinel                         | E003         | NEEDS_DIRECTIVE                                                                                                                                                                   |
+-| Room-Heat Engine                           | PAYLOAD 5    | DONE (scaffold) — deterministic tier computation + NATS emission, persistence NEEDS_DIRECTIVE                                                                                     |
++| Flicker n'Flame Scoring (FFS)                           | PAYLOAD 5    | DONE (scaffold) — deterministic tier computation + NATS emission, persistence NEEDS_DIRECTIVE                                                                                     |
+ | CreatorControl.Zone                        | PAYLOAD 5    | DONE (scaffold) — Broadcast Timing + Session Monitoring copilots, single-pane snapshot; frontend NEEDS_DIRECTIVE                                                                  |
+ | Cyrano Layer 1                             | PAYLOAD 5    | DONE (scaffold) — 8-category whisper engine, memory, personas, latency SLO; Layer 2 (LLM + Prisma memory) NEEDS_DIRECTIVE                                                         |
+-| Integration Hub                            | PAYLOAD 5    | DONE (scaffold) — Ledger↔GateGuard, Recovery↔Diamond Concierge, Room-Heat↔CreatorControl+Cyrano handoffs                                                                          |
++| Integration Hub                            | PAYLOAD 5    | DONE (scaffold) — Ledger↔GateGuard, Recovery↔Diamond Concierge, Flicker n'Flame Scoring↔CreatorControl+Cyrano handoffs                                                                          |
+ | Black-Glass Interface                      | G101+        | NEEDS_DIRECTIVE — visual treatment deferred to post-alpha (Payload 7 ships brand tokens + dark-mode default)                                                                      |
+ | Banned-entity residual purge               | C001 (§12)   | DONE — purge/redact sweep completed 2026-04-24                                                                                                                                    |
+ | Immutable Audit Architecture               | PAYLOAD-6    | DONE — hash-chain + WORM export + Canonical Compliance Checklist                                                                                                                  |
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md b/PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md
+index bb226b3..95ecb60 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md
+@@ -1,5 +1,5 @@
+ # DIRECTIVE: PAY-RATES-001
+-# Add Room-Heat Payout Rate Constants to GovernanceConfig
++# Add Flicker n'Flame Scoring Payout Rate Constants to GovernanceConfig
+ 
+ **Directive ID:** PAY-RATES-001
+ **Agent:** CLAUDE_CODE
+@@ -16,7 +16,7 @@
+ 
+ ## Objective
+ 
+-Add the five locked Room-Heat payout rate constants + three heat band
++Add the five locked Flicker n'Flame Scoring payout rate constants + three heat band
+ boundaries to `services/core-api/src/governance/governance.config.ts`.
+ Locked by CEO 2026-04-16. Not operator-configurable.
+ 
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-RETIRE-001.md b/PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-RETIRE-001.md
+index 7f1699e..69a4836 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-RETIRE-001.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-RETIRE-001.md
+@@ -1,5 +1,5 @@
+ # DIRECTIVE: TOK-RETIRE-001
+-# Retire ShowToken Types and Update Payout Logic to Room-Heat Rates
++# Retire ShowToken Types and Update Payout Logic to Flicker n'Flame Scoring Rates
+ 
+ **Directive ID:** TOK-RETIRE-001
+ **Agent:** CLAUDE_CODE
+@@ -16,7 +16,7 @@
+ 
+ ## Objective
+ 
+-Retire `TokenType.SHOW_THEATER` and `TokenType.BIJOU`; collapse `TokenType` to CZT-only. Replace binary `SHOW_THEATER`/`REGULAR` payout rate split with Room-Heat rate resolver. Remove `PAYOUT_RATE_SHOWTHEATER`/`PAYOUT_RATE_REGULAR` and `SHOWTOKEN_EXCHANGE` block. Rename `ST_` field names to `CZT_` in `SHOWZONE_PRICING` and `BIJOU_PRICING`. Update dependent services.
++Retire `TokenType.SHOW_THEATER` and `TokenType.BIJOU`; collapse `TokenType` to CZT-only. Replace binary `SHOW_THEATER`/`REGULAR` payout rate split with Flicker n'Flame Scoring rate resolver. Remove `PAYOUT_RATE_SHOWTHEATER`/`PAYOUT_RATE_REGULAR` and `SHOWTOKEN_EXCHANGE` block. Rename `ST_` field names to `CZT_` in `SHOWZONE_PRICING` and `BIJOU_PRICING`. Update dependent services.
+ 
+ ---
+ 
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md
+index 89aed4c..bb3f3c6 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md
+@@ -109,7 +109,7 @@ The 12 items are:
+ 
+ 1. R-CLARIFY-001: CreatorControl.Zone scope vs My Zone Manager
+ 1. R-CLARIFY-002: MyCrew.Zone — custom or Twenty CRM integration
+-1. R-CLARIFY-003: Room-Heat Engine — standalone service or platform feature
++1. R-CLARIFY-003: Flicker n'Flame Scoring (FFS) — standalone service or platform feature
+ 1. R-CLARIFY-004: FairPay/FairPlay — inside Wallet or separate service
+ 1. R-CLARIFY-005: DFSP™ — define acronym and clarify scope
+ 1. R-CLARIFY-006: Human Contact Zone vs HeartZone — confirm separate, clarify HZ commit prefix
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md
+index 0c6f638..ab4fd6e 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md
+@@ -108,7 +108,7 @@ The 12 items are:
+ 
+ 1. R-CLARIFY-001: CreatorControl.Zone scope vs My Zone Manager
+ 1. R-CLARIFY-002: MyCrew.Zone — custom or Twenty CRM integration
+-1. R-CLARIFY-003: Room-Heat Engine — standalone service or platform feature
++1. R-CLARIFY-003: Flicker n'Flame Scoring (FFS) — standalone service or platform feature
+ 1. R-CLARIFY-004: FairPay/FairPlay — inside Wallet or separate service
+ 1. R-CLARIFY-005: DFSP™ — define acronym and clarify scope
+ 1. R-CLARIFY-006: Human Contact Zone vs HeartZone — confirm separate, clarify HZ commit prefix
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md
+index b1189df..e58a1e4 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md
+@@ -77,14 +77,14 @@ Once decisions are recorded, a follow-up implementation PR will edit Business Pl
+ 
+ -----
+ 
+-### Claim 5 — HeartPleasure heart-rate-as-Room-Heat-input (§B.7.1)
++### Claim 5 — HeartPleasure heart-rate-as-Flicker n'Flame Scoring-input (§B.7.1)
+ 
+-**Discrepancy.** §B.7.1 names heart-rate telemetry as a Room-Heat input. The directive flags "no engineering pathway." The repo contains no heart-rate ingestion service, no wearable/device integration spec, no consent / health-data compliance posture (HIPAA / state-level health-data law applicability), and no signal-processing or anti-spoofing design. Health-derived inputs are also a regulatory surface (consumer-health under the FTC Health Breach Notification Rule and several state privacy laws); shipping a plan that names this without a pathway carries reputational and regulatory risk.
++**Discrepancy.** §B.7.1 names heart-rate telemetry as a Flicker n'Flame Scoring input. The directive flags "no engineering pathway." The repo contains no heart-rate ingestion service, no wearable/device integration spec, no consent / health-data compliance posture (HIPAA / state-level health-data law applicability), and no signal-processing or anti-spoofing design. Health-derived inputs are also a regulatory surface (consumer-health under the FTC Health Breach Notification Rule and several state privacy laws); shipping a plan that names this without a pathway carries reputational and regulatory risk.
+ 
+ **Proposed amendment options.**
+ 
+-- **(a) Cite.** Specify (i) the device / SDK family (Apple HealthKit, Google Health Connect, named wearable vendor), (ii) the consent model and explicit retention/deletion posture, (iii) the regulatory analysis (FTC HBNR, applicable state law), (iv) the anti-spoof / signal-quality logic, and (v) the Room-Heat weighting. Add a heart-rate-ingestion service to the Wave-D spine.
+-- **(b) Qualify.** Reword to: *"Heart-rate telemetry is a Phase-2 research direction subject to compliance review; v1 Room-Heat uses non-biometric inputs only. No biometric data is collected pre-launch."*
++- **(a) Cite.** Specify (i) the device / SDK family (Apple HealthKit, Google Health Connect, named wearable vendor), (ii) the consent model and explicit retention/deletion posture, (iii) the regulatory analysis (FTC HBNR, applicable state law), (iv) the anti-spoof / signal-quality logic, and (v) the Flicker n'Flame Scoring weighting. Add a heart-rate-ingestion service to the Wave-D spine.
++- **(b) Qualify.** Reword to: *"Heart-rate telemetry is a Phase-2 research direction subject to compliance review; v1 Flicker n'Flame Scoring uses non-biometric inputs only. No biometric data is collected pre-launch."*
+ - **(c) Strike.** Remove heart-rate language from §B.7.1; the feature does not appear in any investor-facing material until a compliance-cleared pathway exists.
+ 
+ **CEO DECISION:**
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md
+index 74d6077..a72148b 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md
+@@ -494,7 +494,7 @@ CEO_GATE: YES (per-claim sign-off)
+ FIZ: NO
+ Source: Deficit doc R-P0-007
+ Status: QUEUED
+-Directive: Cite or qualify each of: zk-SNARK production claim (§B.5.3 F4), federation-as-production claim (§B.5.3 F2), 72–85% precision/recall claim (§B.5.3 F1, currently uncited), 200ms latency budget (§B.5.1/§B.5.3, unanalyzed), HeartPleasure heart-rate-as-Room-Heat-input (§B.7.1, no engineering pathway). Required before next investor pass.
++Directive: Cite or qualify each of: zk-SNARK production claim (§B.5.3 F4), federation-as-production claim (§B.5.3 F2), 72–85% precision/recall claim (§B.5.3 F1, currently uncited), 200ms latency budget (§B.5.1/§B.5.3, unanalyzed), HeartPleasure heart-rate-as-Flicker n'Flame Scoring-input (§B.7.1, no engineering pathway). Required before next investor pass.
+ ```
+ 
+ ```
+@@ -750,7 +750,7 @@ Directive: BLOCKED until R-CLARIFY-002 resolved (custom service vs Twenty CRM in
+ ```
+ 
+ ```
+-CNZ-WORK-001-F003: R-005 — Room-Heat Engine
++CNZ-WORK-001-F003: R-005 — Flicker n'Flame Scoring (FFS)
+ Wave: F
+ Priority: P1
+ Scope: M
+@@ -1033,7 +1033,7 @@ Quick lookup. Every deficit doc row (Thread 18, 36 rows) maps to one or more tas
+ |R-002 Risk Toolkit                  |D002                |merged with R-102                         |
+ |R-003 CreatorControl.Zone           |F001                |clarify-blocked                           |
+ |R-004 MyCrew.Zone                   |F002                |clarify-blocked                           |
+-|R-005 Room-Heat Engine              |F003                |clarify-blocked                           |
++|R-005 Flicker n'Flame Scoring (FFS)              |F003                |clarify-blocked                           |
+ |R-006 FairPay/FairPlay              |D006                |clarify-blocked, FIZ                      |
+ |R-007 Compliance Stack              |D008                |merged with R-107                         |
+ |R-008 DFSP                          |F004                |clarify-blocked                           |
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md
+index 6cd1ab7..ef5f514 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md
+@@ -46,7 +46,7 @@ git show refs/oss/discussion-platform:components/Posts/PostItem.tsx
+ | 2 | `refs/oss/socketio-chat` | `CelaDaniel/nodejs-socketio-chat-application` | NONE DETECTED | 🔴 BLOCKED | OBS-001/002, CCZ-001, OPS-003 |
+ | 3 | `refs/oss/react-chat-app` | `CelaDaniel/React-Chat-App` | NONE DETECTED | 🔴 BLOCKED | CCZ-001/002, OBS-001 |
+ | 4 | `refs/oss/discussion-platform` | `CelaDaniel/next_discussion_platform` | **MIT** | 🟢 CLEAR | FC-001 → FC-006, OPS-004 |
+-| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Room-Heat Engine broadcast |
++| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Flicker n'Flame Scoring (FFS) broadcast |
+ | 6 | `refs/oss/zoom-clone` | `CelaDaniel/zoom-clone` | NONE DETECTED | 🔴 BLOCKED | OBS ShowZone Theatre UI, DISC |
+ | 7 | `refs/oss/loadbalancer-nginx` | `CelaDaniel/loadbalancer-nginx-docker-nodejs` | NONE DETECTED | 🔴 BLOCKED | Bijou SFU infra, OPS deployment |
+ | 8 | `refs/oss/social-media-app` | `CelaDaniel/Social-media-react-app` | NONE DETECTED | 🔴 BLOCKED | FC-003, CCZ-003, OPS-006 notifications |
+diff --git a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md
+index 6cd1ab7..ef5f514 100644
+--- a/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md
++++ b/PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md
+@@ -46,7 +46,7 @@ git show refs/oss/discussion-platform:components/Posts/PostItem.tsx
+ | 2 | `refs/oss/socketio-chat` | `CelaDaniel/nodejs-socketio-chat-application` | NONE DETECTED | 🔴 BLOCKED | OBS-001/002, CCZ-001, OPS-003 |
+ | 3 | `refs/oss/react-chat-app` | `CelaDaniel/React-Chat-App` | NONE DETECTED | 🔴 BLOCKED | CCZ-001/002, OBS-001 |
+ | 4 | `refs/oss/discussion-platform` | `CelaDaniel/next_discussion_platform` | **MIT** | 🟢 CLEAR | FC-001 → FC-006, OPS-004 |
+-| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Room-Heat Engine broadcast |
++| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Flicker n'Flame Scoring (FFS) broadcast |
+ | 6 | `refs/oss/zoom-clone` | `CelaDaniel/zoom-clone` | NONE DETECTED | 🔴 BLOCKED | OBS ShowZone Theatre UI, DISC |
+ | 7 | `refs/oss/loadbalancer-nginx` | `CelaDaniel/loadbalancer-nginx-docker-nodejs` | NONE DETECTED | 🔴 BLOCKED | Bijou SFU infra, OPS deployment |
+ | 8 | `refs/oss/social-media-app` | `CelaDaniel/Social-media-react-app` | NONE DETECTED | 🔴 BLOCKED | FC-003, CCZ-003, OPS-006 notifications |
+diff --git a/PROGRAM_CONTROL/LAUNCH_MANIFEST.md b/PROGRAM_CONTROL/LAUNCH_MANIFEST.md
+index dae7b89..28823b6 100644
+--- a/PROGRAM_CONTROL/LAUNCH_MANIFEST.md
++++ b/PROGRAM_CONTROL/LAUNCH_MANIFEST.md
+@@ -56,7 +56,7 @@ is owned by a single named operator who reports back into
+ 
+ ### Gates
+ - CEO sign-off on Mic Drop dry-run filed in `PROGRAM_CONTROL/CLEARANCES/`
+-- Observability dashboards green (Cyrano p95, GateGuard latency, Room-Heat tier transitions, Ledger throughput)
++- Observability dashboards green (Cyrano p95, GateGuard latency, Flicker n'Flame Scoring tier transitions, Ledger throughput)
+ 
+ ## 3. First 3,000 Creator Rate-Lock
+ 
+diff --git a/PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A010-report.md b/PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A010-report.md
+index d2ce706..1c1e3b6 100644
+--- a/PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A010-report.md
++++ b/PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A010-report.md
+@@ -22,7 +22,7 @@
+ - **D1** Slot Machine: RETIRED (slot machine + chance-based games removed; SLOT_MACHINE_BRIEFING.md and docs/specs/SLOT_MACHINE_SPEC_v1.0.md to archive/delete; archive/xxxchatnow-seed/ to remove).
+ - **D2** Primary Tenant: ChatNow.Zone (XXXChatNow.com prior name; merchant tenant 1; RedRoomPleasures and Cyrano onboard first Phase 1; ChatNow.Zone Phase 2).
+ - **D3** Diamond Concierge Earn: Zero Points (Diamond purchases earn 0 RRR points; discount built into Diamond pricing; RRR points CAN be burned against Diamond purchases; RRR-P3-003 REMOVED from build scope).
+-- **D4** Room-Heat Inferno Bonus Multiplier: Configurable + Guardrails (active when Guest tipped + remains in room + tip activity not idle 30+ min; merchant-configurable via `inferno_multiplier` on `EarnRateConfig`; not nullable at activation).
++- **D4** Flicker n'Flame Scoring Inferno Bonus Multiplier: Configurable + Guardrails (active when Guest tipped + remains in room + tip activity not idle 30+ min; merchant-configurable via `inferno_multiplier` on `EarnRateConfig`; not nullable at activation).
+ - **D5** GGS Integration: Deferred (RRR builds webhook-ready integration points; hold logic deferred until directed).
+ 
+ **Secondary decisions (B1–B?):** B1 Inferno Multiplier Value (merchant-configurable, no platform default), B2 Tier Structure: Dual Layer (merchant tier launch + RRR member tier future), and additional B-series decisions through line 115 covering tier structure, redemption mechanics, and merchant onboarding.
+diff --git a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md
+index dffb2d1..e9ccde6 100644
+--- a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md
++++ b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md
+@@ -6,7 +6,7 @@
+ 
+ ## Summary
+ 
+-Delivered a new canonical `services/ledger/` module housing a three-bucket wallet + hash-chained append-only ledger, REDBOOK rate-card resolver, Room-Heat payout hook, and Unified-CS Recovery Engine. The legacy `services/core-api/src/finance/ledger.service.ts` is preserved; the two layers coexist intentionally until a follow-up core-api wiring branch migrates consumers.
++Delivered a new canonical `services/ledger/` module housing a three-bucket wallet + hash-chained append-only ledger, REDBOOK rate-card resolver, Flicker n'Flame Scoring payout hook, and Unified-CS Recovery Engine. The legacy `services/core-api/src/finance/ledger.service.ts` is preserved; the two layers coexist intentionally until a follow-up core-api wiring branch migrates consumers.
+ 
+ ## Deliverables
+ 
+@@ -36,14 +36,14 @@ Delivered a new canonical `services/ledger/` module housing a three-bucket walle
+ - `repository.ts` — `LedgerRepository` interface + `InMemoryLedgerRepository` for tests. Production Prisma adapter lives alongside in the follow-up wiring branch.
+ - `redbook-rate-card.service.ts` — Tease Regular / ShowZone / Diamond quotes + `resolveCreatorPayoutRate` honouring the Diamond floor.
+ - `ledger.service.ts` — three-bucket spend (governance-sourced order), idempotent `record()` / `credit()` / `spend()`, SHA-256 hash chain with `verifyChain()` audit. `HANDOFF` block at file bottom.
+-- `payout.service.ts` — `settleSessionClose()` for Room-Heat-scored session payouts (credits creator `bonus` bucket, stamps rate in entry metadata).
++- `payout.service.ts` — `settleSessionClose()` for Flicker n'Flame Scoring-scored session payouts (credits creator `bonus` bucket, stamps rate in entry metadata).
+ - `recovery.service.ts` — `findExpirationsNeedingWarning`, `extendExpiration`, `recoverExpiration`, `tokenBridge`, `threeFifthsExit`, `redistributeExpired`.
+ - `index.ts` — barrel export.
+ 
+ ### Tests (`tests/integration/`)
+ 
+ - `canonical-ledger.spec.ts` — 17 tests: spend order across all permutations, idempotent replay, hash chain continuity + tamper detection, input validation.
+-- `redbook-rate-card.spec.ts` — 14 tests: guest/member Tease pricing, ShowZone bundles, Diamond volume + velocity brackets, Room-Heat rate bands, Diamond floor interaction.
++- `redbook-rate-card.spec.ts` — 14 tests: guest/member Tease pricing, ShowZone bundles, Diamond volume + velocity brackets, Flicker n'Flame Scoring rate bands, Diamond floor interaction.
+ - `recovery-engine.spec.ts` — 10 tests: 48-hour warning, extension fee + window, Token Bridge 20% + idempotency, 3/5ths Exit refund + lock, 70/30 redistribution.
+ - Total: **41 new tests, all green.**
+ 
+diff --git a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md
+index 53ce03f..7176024 100644
+--- a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md
++++ b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md
+@@ -3,7 +3,7 @@
+ **Branch:** `copilot/update-rebbook-business-plan`
+ **Authority:** OQMI_GOVERNANCE.md + DOMAIN_GLOSSARY.md (naming authority)
+ **Directive:** Ensure 100% fidelity across REDBOOK rate cards, recovery flows, Diamond pricing,
+-70/30 expiry, Token Bridge / 3/5ths logic, creator payout floors, Room-Heat tiers, Cyrano
++70/30 expiry, Token Bridge / 3/5ths logic, creator payout floors, Flicker n'Flame Scoring tiers, Cyrano
+ categories, and GateGuard pre-processor. Update every comment, constant, and test with
+ authoritative language.
+ 
+@@ -12,7 +12,7 @@ authoritative language.
+ ## Files Changed
+ 
+ ```
+-services/creator-control/src/room-heat.engine.ts           MODIFIED — HeatTier rename + threshold alignment
++services/creator-control/src/ffs.engine.ts           MODIFIED — HeatTier rename + threshold alignment
+ services/creator-control/src/session-monitoring.copilot.ts MODIFIED — BLAZING → INFERNO
+ services/integration-hub/src/hub.service.ts                MODIFIED — BLAZING → INFERNO
+ services/cyrano/src/cyrano.service.ts                      MODIFIED — BLAZING → INFERNO (all 8 weight keys + logic)
+@@ -27,9 +27,9 @@ PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md  NEW
+ 
+ ## Changes Applied
+ 
+-### 1 — Room-Heat Tier Naming: BLAZING → INFERNO
++### 1 — Flicker n'Flame Scoring Tier Naming: BLAZING → INFERNO
+ 
+-**File:** `services/creator-control/src/room-heat.engine.ts`
++**File:** `services/creator-control/src/ffs.engine.ts`
+ 
+ - `HeatTier` type: `'COLD' | 'WARM' | 'HOT' | 'BLAZING'` → `'COLD' | 'WARM' | 'HOT' | 'INFERNO'`
+ - `TIER_THRESHOLDS` aligned to canonical GovernanceConfig bands (locked per DOMAIN_GLOSSARY.md
+@@ -151,6 +151,6 @@ computation, then authorize a coordinated update across all six files above.
+ ## Result: SUCCESS
+ 
+ PAYLOAD 10 alignment sweep complete. All REDBOOK rates, recovery flows, Diamond pricing,
+-70/30 expiry, Token Bridge, 3/5ths logic, Room-Heat tiers, Cyrano categories, and GateGuard
++70/30 expiry, Token Bridge, 3/5ths logic, Flicker n'Flame Scoring tiers, Cyrano categories, and GateGuard
+ pre-processor constants are fidelity-verified or corrected to canonical authoritative language.
+ 293 tests pass. 0 new failures introduced.
+diff --git a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md
+index 1f8645e..93dc4ed 100644
+--- a/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md
++++ b/PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md
+@@ -189,7 +189,7 @@ unrelated to this payload).
+   - Federated intelligence adapter is a stub — `requestFederatedLookup()`
+     fires a NATS event; a subscriber that populates the federation list
+     has not been implemented in this payload.
+-  - Cyrano / Room-Heat welfare-signal consumption is downstream of the
++  - Cyrano / Flicker n'Flame Scoring welfare-signal consumption is downstream of the
+     `gateguard.welfare.signal` topic — that consumer lives in PAYLOAD 4.
+   - Prisma migration SQL (`prisma/migrations/*/migration.sql`) is not
+     generated here — run `yarn prisma:generate && yarn prisma:push` in a
+diff --git a/PROGRAM_CONTROL/REPORT_BACK/THREAD14-SCHEMA-INTEGRITY-AUDIT.md b/PROGRAM_CONTROL/REPORT_BACK/THREAD14-SCHEMA-INTEGRITY-AUDIT.md
+index 9e33910..81218a7 100644
+--- a/PROGRAM_CONTROL/REPORT_BACK/THREAD14-SCHEMA-INTEGRITY-AUDIT.md
++++ b/PROGRAM_CONTROL/REPORT_BACK/THREAD14-SCHEMA-INTEGRITY-AUDIT.md
+@@ -128,7 +128,7 @@ File present (5926 bytes).
+ | `TOKEN_EXTENSION` block | **NO** | no `TOKEN_EXTENSION` symbol |
+ | `DIAMOND_TIER.VOLUME_TIERS` | **NO** | no `DIAMOND_TIER` symbol |
+ 
+-DFSP governance currently holds only: integrity-hold parameters, purchase-window hours, risk scoring, diamond-token threshold, OTP settings, account-recovery hold, contract-offer expiry, voice-sample limits, PROC-001 webhook constants, Room-Heat payout rates (PAY-001..PAY-005), heat-band boundaries, DFSP_CONCIERGE block, BIJOU block. **Nothing tier-related.**
++DFSP governance currently holds only: integrity-hold parameters, purchase-window hours, risk scoring, diamond-token threshold, OTP settings, account-recovery hold, contract-offer expiry, voice-sample limits, PROC-001 webhook constants, Flicker n'Flame Scoring payout rates (PAY-001..PAY-005), heat-band boundaries, DFSP_CONCIERGE block, BIJOU block. **Nothing tier-related.**
+ 
+ ### 6.b `services/core-api/src/config/governance.config.ts` (platform)
+ 
+diff --git a/PROGRAM_CONTROL/REPO_MANIFEST.md b/PROGRAM_CONTROL/REPO_MANIFEST.md
+index 2e6573d..4c4fddd 100644
+--- a/PROGRAM_CONTROL/REPO_MANIFEST.md
++++ b/PROGRAM_CONTROL/REPO_MANIFEST.md
+@@ -321,7 +321,7 @@ Auto-generated on every push. Do not edit manually.
+ - `prisma/migrations/20260424120000_immutable_audit_architecture/migration.sql`
+ - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
+ - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
+-- `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
++- `prisma/migrations/20260425120000_add_sensync_guest_heat/migration.sql`
+ - `prisma/migrations/migration_lock.toml`
+ - `prisma/schema.prisma`
+ - `prisma/seed.test.ts`
+@@ -458,7 +458,7 @@ Auto-generated on every push. Do not edit manually.
+ - `services/creator-control/src/broadcast-timing.copilot.ts`
+ - `services/creator-control/src/creator-control.module.ts`
+ - `services/creator-control/src/creator-control.service.ts`
+-- `services/creator-control/src/room-heat.engine.ts`
++- `services/creator-control/src/ffs.engine.ts`
+ - `services/creator-control/src/session-monitoring.copilot.ts`
+ - `services/cyrano/.env.example`
+ - `services/cyrano/ASSUMPTIONS.md`
+@@ -492,14 +492,14 @@ Auto-generated on every push. Do not edit manually.
+ - `services/guest-heat/src/guest-heat.service.ts`
+ - `services/guest-heat/src/guest-heat.types.ts`
+ - `services/guest-heat/src/performance-timer.service.ts`
+-- `services/heartsync/.env.example`
+-- `services/heartsync/ASSUMPTIONS.md`
+-- `services/heartsync/FLAGS.md`
+-- `services/heartsync/README.md`
+-- `services/heartsync/src/heartsync.controller.ts`
+-- `services/heartsync/src/heartsync.module.ts`
+-- `services/heartsync/src/heartsync.service.ts`
+-- `services/heartsync/src/heartsync.types.ts`
++- `services/sensync/.env.example`
++- `services/sensync/ASSUMPTIONS.md`
++- `services/sensync/FLAGS.md`
++- `services/sensync/README.md`
++- `services/sensync/src/sensync.controller.ts`
++- `services/sensync/src/sensync.module.ts`
++- `services/sensync/src/sensync.service.ts`
++- `services/sensync/src/sensync.types.ts`
+ - `services/integration-hub/src/hub.module.ts`
+ - `services/integration-hub/src/hub.service.ts`
+ - `services/ledger/index.ts`
+@@ -529,15 +529,15 @@ Auto-generated on every push. Do not edit manually.
+ - `services/rewards-api/src/white-label/partner-config.schema.ts`
+ - `services/risk-engine/src/region-signal.service.ts`
+ - `services/risk-engine/src/risk.module.ts`
+-- `services/room-heat/.env.example`
+-- `services/room-heat/ASSUMPTIONS.md`
+-- `services/room-heat/FLAGS.md`
+-- `services/room-heat/README.md`
+-- `services/room-heat/src/dto/room-heat.dto.ts`
+-- `services/room-heat/src/room-heat.controller.ts`
+-- `services/room-heat/src/room-heat.module.ts`
+-- `services/room-heat/src/room-heat.service.ts`
+-- `services/room-heat/src/types/room-heat.types.ts`
++- `services/ffs/.env.example`
++- `services/ffs/ASSUMPTIONS.md`
++- `services/ffs/FLAGS.md`
++- `services/ffs/README.md`
++- `services/ffs/src/dto/ffs.dto.ts`
++- `services/ffs/src/ffs.controller.ts`
++- `services/ffs/src/ffs.module.ts`
++- `services/ffs/src/ffs.service.ts`
++- `services/ffs/src/types/ffs.types.ts`
+ - `services/showzone/src/room-session.service.d.ts`
+ - `services/showzone/src/room-session.service.js`
+ - `services/showzone/src/room-session.service.js.map`
+diff --git a/README.md b/README.md
+index 50ba2dc..e0afb7e 100644
+--- a/README.md
++++ b/README.md
+@@ -118,7 +118,7 @@ Eight payloads compose the canonical runtime:
+ | 1 | Canonical Financial Ledger | Three-bucket wallet, REDBOOK rate cards, append-only triggers |
+ | 2 | REDBOOK Recovery + Diamond Concierge | Extension / recovery / Token Bridge / 3/5ths Exit |
+ | 3 | GateGuard Sentinel + Welfare Guardian Score | Pre-processor on every ledger touch |
+-| 4 | OBS Streaming Bridge + Room-Heat Engine | Deterministic tier transitions, theatre + Bijou |
++| 4 | OBS Streaming Bridge + Flicker n'Flame Scoring (FFS) | Deterministic tier transitions, theatre + Bijou |
+ | 5 | CreatorControl.Zone + Cyrano L1 + Integration Hub | Whisper copilot ≤ 350 ms, cross-Payload wiring |
+ | 6 | Immutable Audit Architecture | Hash-chain + WORM export + Canonical Compliance Checklist |
+ | 7 | RBAC Step-Up + Compliance Lockdown | Step-up challenge + Legal Hold model |
+@@ -135,7 +135,7 @@ Snapshot at 2026-04-25 (Payload 7 + 8):
+ - **PAYLOAD 1 (Canonical Ledger)** — DONE. Three-bucket wallet + hash chain.
+ - **PAYLOAD 2 (Recovery Engine)** — DONE. REDBOOK §5 pillars wired.
+ - **PAYLOAD 3 (GateGuard)** — DONE (scaffold + middleware).
+-- **PAYLOAD 4 (OBS bridge / Room-Heat)** — DONE (scaffold).
++- **PAYLOAD 4 (OBS bridge / Flicker n'Flame Scoring)** — DONE (scaffold).
+ - **PAYLOAD 5 (CreatorControl + Cyrano L1)** — DONE.
+ - **PAYLOAD 6 (Immutable audit + RBAC + compliance)** — DONE.
+ - **PAYLOAD 7 (Frontend polish + Diamond Concierge UI)** — DONE.
+diff --git a/REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md b/REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md
+index 1aef0c2..cb622cc 100644
+--- a/REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md
++++ b/REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md
+@@ -94,7 +94,7 @@ Read any file: `git show {branch}:{filepath}`
+ | refs/oss/socketio-chat | OBS-001/002, CCZ-001, OPS-003 |
+ | refs/oss/react-chat-app | CCZ-001/002, OBS-001 |
+ | refs/oss/discussion-platform | FC-001–006, OPS-004 |
+-| refs/oss/live-polling | OBS Room-Heat Engine broadcast |
++| refs/oss/live-polling | OBS Flicker n'Flame Scoring (FFS) broadcast |
+ | refs/oss/zoom-clone | OBS ShowZone Theatre UI, DISC |
+ | refs/oss/loadbalancer-nginx | Bijou SFU infra, OPS deployment |
+ | refs/oss/social-media-app | FC-003, CCZ-003, OPS-006 notifications |
+@@ -119,7 +119,7 @@ DAY_PASS, ANNUAL (as tier), OMNIPASS_PLUS (as tier), standalone DIAMOND
+ 
+ **Platform name:** ChatNow.Zone / chatnow.zone
+ **Currency:** ChatZoneTokens (CZT)
+-**Payout engine:** Room-Heat Engine (RATE_COLD → RATE_INFERNO)
++**Payout engine:** Flicker n'Flame Scoring (FFS) (RATE_COLD → RATE_INFERNO)
+ **Video infra:** LiveKit OSS self-hosted (Bijou SFU)
+ 
+ ---
+diff --git a/REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md b/REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md
+index 4fc8fb1..28a70ad 100644
+--- a/REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md
++++ b/REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md
+@@ -60,7 +60,7 @@ These are add-on products, not membership tiers:
+ 
+ ## PAYOUT ENGINE
+ 
+-**Canonical:** Room-Heat Engine
++**Canonical:** Flicker n'Flame Scoring (FFS)
+ **Rate states (5 levels):**
+ - RATE_COLD
+ - RATE_WARM
+diff --git a/REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-live-polling/REFS_MANIFEST.md b/REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-live-polling/REFS_MANIFEST.md
+index 98a6a12..e4d3c54 100644
+--- a/REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-live-polling/REFS_MANIFEST.md
++++ b/REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-live-polling/REFS_MANIFEST.md
+@@ -3,7 +3,7 @@
+ **Branch:** `refs/oss/live-polling`
+ **Source Repository:** `CelaDaniel/react-polling`
+ **Source URL:** https://github.com/CelaDaniel/react-polling
+-**Primary Directive Series:** OBS Room-Heat Engine broadcast
++**Primary Directive Series:** OBS Flicker n'Flame Scoring (FFS) broadcast
+ **Harvest Date:** 2026-04-19
+ **Harvest Agent:** Copilot (THREAD15-OSS-HARVEST)
+ **Harvest Status:** MANIFEST-STUB (OSS source content pending internet access)
+@@ -16,7 +16,7 @@ Permanent read-only reference branch for OmniQuest Media Inc. ChatNow.Zone
+ build. Contains open-source reference material from `CelaDaniel/react-polling`
+ for use by agents when authoring directives.
+ 
+-React real-time polling library. Live vote/reaction broadcast patterns for the OBS Room-Heat Engine that drives audience engagement metrics.
++React real-time polling library. Live vote/reaction broadcast patterns for the OBS Flicker n'Flame Scoring (FFS) that drives audience engagement metrics.
+ 
+ ## HOW TO USE
+ 
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 613e4b8..d65edbe 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -3,7 +3,7 @@
+ #         No host port bindings for db or redis — internal traffic only.
+ # PAYLOAD-9: Env-var driven configuration only. No hard-coded secrets.
+ #            All Payload 1–8 services routed through the `api` process boundary:
+-#            GateGuard, Room-Heat, CreatorControl, Cyrano, Diamond Concierge,
++#            GateGuard, Flicker n'Flame Scoring (FFS), CreatorControl, Cyrano, Diamond Concierge,
+ #            Recovery, Immutable Audit, and Integration Hub are NestJS modules
+ #            mounted inside the `api` composite runtime (see
+ #            services/core-api/src/app.module.ts). A dedicated service row
+@@ -71,7 +71,7 @@ services:
+ 
+   api:
+     # Core API monolith — hosts all NestJS modules including:
+-    # GateGuard, Room-Heat, CreatorControl, Cyrano, Audit, Recovery,
++    # GateGuard, Flicker n'Flame Scoring (FFS), CreatorControl, Cyrano, Audit, Recovery,
+     # Integration Hub, Ledger, DFSP, Bijou, ShowZone, OBS-Bridge,
+     # Scheduling, Membership, Risk Engine, Geo, Games, Zone-GPT.
+     build:
+@@ -91,7 +91,7 @@ services:
+       GATEGUARD_ENABLED: ${GATEGUARD_ENABLED:-true}
+       RECOVERY_ENABLED: ${RECOVERY_ENABLED:-true}
+       DIAMOND_CONCIERGE_ENABLED: ${DIAMOND_CONCIERGE_ENABLED:-true}
+-      ROOM_HEAT_ENABLED: ${ROOM_HEAT_ENABLED:-true}
++      FFS_ENABLED: ${FFS_ENABLED:-true}
+       CREATOR_CONTROL_ENABLED: ${CREATOR_CONTROL_ENABLED:-true}
+       CYRANO_ENABLED: ${CYRANO_ENABLED:-true}
+       INTEGRATION_HUB_ENABLED: ${INTEGRATION_HUB_ENABLED:-true}
+diff --git a/docs/ARCHITECTURE_OVERVIEW.md b/docs/ARCHITECTURE_OVERVIEW.md
+index c9832c7..58163bd 100644
+--- a/docs/ARCHITECTURE_OVERVIEW.md
++++ b/docs/ARCHITECTURE_OVERVIEW.md
+@@ -24,10 +24,10 @@ For per-service detail, follow the links into `services/*/` and
+ | RBAC + step-up       | `services/core-api/src/auth/`                                | Role decision + audit + step-up coordination.                                                                                                                      |
+ | Compliance           | `services/core-api/src/compliance/`                          | Audit chain, geo fencing, sovereign CAC, legal hold, WORM export.                                                                                                  |
+ | Immutable audit      | `services/core-api/src/audit/`                               | Hash-chained ledger of every sensitive action; integrity verifier.                                                                                                 |
+-| Room-Heat            | `services/creator-control/src/room-heat.engine.ts`           | Deterministic tier computation from telemetry.                                                                                                                     |
++| Flicker n'Flame Scoring            | `services/creator-control/src/ffs.engine.ts`           | Deterministic tier computation from telemetry.                                                                                                                     |
+ | Creator Control      | `services/creator-control/`                                  | Broadcast Timing + Session Monitoring copilots, single-pane snapshot.                                                                                              |
+ | Cyrano Layer 1       | `services/cyrano/`                                           | 8-category whisper engine, persona memory, latency SLO.                                                                                                            |
+-| Integration Hub      | `services/integration-hub/`                                  | Wires Ledger ↔ GateGuard, Recovery ↔ Concierge, Room-Heat ↔ CreatorControl + Cyrano.                                                                               |
++| Integration Hub      | `services/integration-hub/`                                  | Wires Ledger ↔ GateGuard, Recovery ↔ Concierge, Flicker n'Flame Scoring ↔ CreatorControl + Cyrano.                                                                               |
+ | Notification         | `services/notification/`                                     | 48h warnings, personal-touch follow-ups, dispatcher abstraction.                                                                                                   |
+ | UI layer             | `ui/`                                                        | Type contracts + view-model presenters + page render plans for `/admin/diamond`, `/admin/recovery`, `/creator/control`, `/tokens`, `/diamond/purchase`, `/wallet`. |
+ | Tests                | `tests/integration/` + `tests/e2e/`                          | Jest integration suite + Payload-8 end-to-end flows.                                                                                                               |
+@@ -40,7 +40,7 @@ For per-service detail, follow the links into `services/*/` and
+ | 1       | Canonical Ledger         | Three-bucket wallet + hash-chain + idempotent writes.                                             |
+ | 2       | Recovery Engine          | REDBOOK §5 — Token Bridge, 3/5ths Exit, Expiration.                                               |
+ | 3       | GateGuard                | Welfare Guardian Score + middleware + decisioner.                                                 |
+-| 4       | OBS + Streaming          | Room-Heat sample contract + OBS bridge + chat aggregator stubs.                                   |
++| 4       | OBS + Streaming          | Flicker n'Flame Scoring sample contract + OBS bridge + chat aggregator stubs.                                   |
+ | 5       | Creator Control / Cyrano | Single-pane workstation + 8-category whisper engine.                                              |
+ | 6       | Immutable Audit          | Append-only hash-chain + WORM export + Canonical Compliance Checklist.                            |
+ | 7       | Frontend Polish          | Diamond Concierge UI + CreatorControl pages + guest rate cards + dark mode + SEO + accessibility. |
+diff --git a/docs/DOMAIN_GLOSSARY.md b/docs/DOMAIN_GLOSSARY.md
+index a59d229..b4d2c45 100644
+--- a/docs/DOMAIN_GLOSSARY.md
++++ b/docs/DOMAIN_GLOSSARY.md
+@@ -62,7 +62,7 @@ HOW TO USE:
+ | Term | Definition | Code identifier |
+ |------|------------|-----------------|
+ | FairPay/FairPlay | Creator payout engine doctrine | FairPayFairPlay (class), FAIRPAY (prefix) |
+-| Room-Heat Engine | Real-time composite score driving payout rate | RoomHeatEngine, room_heat_score |
++| Flicker n'Flame Scoring (FFS) | Real-time composite score driving payout rate | RoomHeatEngine, room_heat_score |
+ | RATE_COLD | Heat 0-33 = $0.075/CZT payout rate | RATE_COLD |
+ | RATE_WARM | Heat 34-60 = $0.080/CZT payout rate | RATE_WARM |
+ | RATE_HOT | Heat 61-85 = $0.085/CZT payout rate | RATE_HOT |
+diff --git a/docs/PRE_LAUNCH_CHECKLIST.md b/docs/PRE_LAUNCH_CHECKLIST.md
+index ad5811a..19d47b3 100644
+--- a/docs/PRE_LAUNCH_CHECKLIST.md
++++ b/docs/PRE_LAUNCH_CHECKLIST.md
+@@ -87,7 +87,7 @@ on intent alone.
+ - [ ] **CS Recovery Command Center** at `/admin/recovery` — open-case
+       table + audit trail + per-stage counts.
+ - [ ] **CreatorControl.Zone** at `/creator/control` — Broadcast Timing
+-      Copilot + Session Monitoring + Cyrano whisper panel + Room-Heat
++      Copilot + Session Monitoring + Cyrano whisper panel + Flicker n'Flame Scoring
+       meter + persona switcher + payout indicator.
+ - [ ] **Guest token bundles** at `/tokens` — REDBOOK §3 rate card
+       (Tease Regular + ShowZone Premium).
+diff --git a/docs/REQUIREMENTS_MASTER.md b/docs/REQUIREMENTS_MASTER.md
+index 27044f5..50781c4 100644
+--- a/docs/REQUIREMENTS_MASTER.md
++++ b/docs/REQUIREMENTS_MASTER.md
+@@ -49,7 +49,7 @@
+ 
+ ## SECTION 2 — CREATOR PAYOUT ENGINE (FairPay/FairPlay)
+ 
+-**Payout is performance-determined by Room-Heat Engine in real time.**
++**Payout is performance-determined by Flicker n'Flame Scoring (FFS) in real time.**
+ 
+ | ID | Requirement | Tag | Status | Directive | FIZ |
+ |----|-------------|-----|--------|-----------|-----|
+@@ -58,13 +58,13 @@
+ | PAY-003 | RATE_HOT: heat 61-85 = $0.085/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
+ | PAY-004 | RATE_INFERNO: heat 86-100 = $0.090/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
+ | PAY-005 | RATE_DIAMOND_FLOOR: $0.080 minimum on 10,000+ CZT bulk. Higher rate applies if heat warrants. | NET-NEW | QUEUED | PAY-RATES-001 | YES |
+-| PAY-006 | Purchase-moment lock: Room-Heat multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
++| PAY-006 | Purchase-moment lock: Flicker n'Flame Scoring multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+ | PAY-007 | Human-action only guardrail: block clipboard paste on all tip/CZT-spend UI. Keyboard and touch only. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | PAY-008 | Audio modulation check: rate escalation above RATE_COLD requires active audio signal. Silent room cannot accumulate heat above Cold. Enforce in OBS kernel. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+-| PAY-009 | Purchase-response correlation: guest CZT purchase events are dominant weight in Room-Heat composite. Passive presence does not elevate heat. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
++| PAY-009 | Purchase-response correlation: guest CZT purchase events are dominant weight in Flicker n'Flame Scoring composite. Passive presence does not elevate heat. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+ | PAY-010 | 100% tip pass-through: VERIFY platform_deduction = 0 on all tip transactions after CZT migration. Add test coverage. | VERIFY | VERIFY | — | YES |
+ | PAY-011 | Tip transaction record: add heat_score_at_tip (int) and payout_rate_applied (decimal) fields. | CHANGED | NEEDS_DIRECTIVE | — | YES |
+-| PAY-012 | Creator rate display: show live rate range ($0.075-$0.090), current Room-Heat tier, and active rate. Not a static number. | CHANGED | NEEDS_DIRECTIVE | — | NO |
++| PAY-012 | Creator rate display: show live rate range ($0.075-$0.090), current Flicker n'Flame Scoring tier, and active rate. Not a static number. | CHANGED | NEEDS_DIRECTIVE | — | NO |
+ | PAY-013 | Remove founding creator static rate assignment at registration. Superseded by Pixel Legacy + Tease rate. | SUPERSEDED | DONE | TOK-RETIRE-001 | YES |
+ 
+ ---
+@@ -109,7 +109,7 @@ Lives at services/cyrano/**
+ | ID | Requirement | Tag | Status | Directive | FIZ |
+ |----|-------------|-----|--------|-----------|-----|
+ | CYR-001 | Retire standalone Cyrano platform, subscription billing, separate accounts, parallel build workstream. | RETIRED | NEEDS_DIRECTIVE | — | NO |
+-| CYR-002 | L1 CNZ Creator Feature: LLM integration (Anthropic Claude API) consuming Room-Heat, tipping velocity, chat sentiment via NATS. Suggestion panel in CreatorControl.Zone UI. Latency under 2s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
++| CYR-002 | L1 CNZ Creator Feature: LLM integration (Anthropic Claude API) consuming Flicker n'Flame Scoring, tipping velocity, chat sentiment via NATS. Suggestion panel in CreatorControl.Zone UI. Latency under 2s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | CYR-003 | L2 Consumer Audio Platform: standalone audio session type within CNZ. Voice-native. Persona management. Gold/Diamond gating. Year 3+ standalone fork path preserved. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | CYR-004 | L3 HCZ Whisper Intelligence: RedBook scenario classifier feeds Cyrano prompt engine. Agent-facing overlay. No Guest surface. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | CYR-005 | L4 Enterprise B2B Whisper API: clean external API, key-gated, rate-limited. Year 3+. Architecture must support from launch. | DEFERRED | DEFERRED | — | NO |
+@@ -205,7 +205,7 @@ Zero prior code exists.**
+ | GGS-010 | Predictive Intervention Engine: soft nudge delivery, cool-down protocol, outcome learning feedback loop, webhook output (no PII in payload). | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | GGS-011 | Zero-Knowledge Compliance Oracle: zk-SNARKs (Groth16/PLONK via snarkjs). Proof attests: age verified, consent satisfied, welfare check passed, RedBook followed. zk_proof_hash on every response. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+ | GGS-012 | ZK proof archival: 7 years minimum. Separate from operational DB. Immutable. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+-| GGS-013 | Session-Heat Welfare Flywheel: Room-Heat to GGS feed via NATS. Heat spike + velocity hard rule (20+ point rise in 5min AND anomalous velocity = floor welfare score to 40). Max staleness 5s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
++| GGS-013 | Session-Heat Welfare Flywheel: Flicker n'Flame Scoring to GGS feed via NATS. Heat spike + velocity hard rule (20+ point rise in 5min AND anomalous velocity = floor welfare score to 40). Max staleness 5s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ | GGS-014 | Human-AI Hybrid Escalation (RedBook-as-a-Service): auto-routing at welfare_score 85+, HCZ ticket pre-populated with dual scores + RedBook playbook ID. Agent decision feedback loop. Standalone licensable. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+ 
+ ---
+diff --git a/docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md b/docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md
+index 3daeec7..9ce6ff9 100644
+--- a/docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md
++++ b/docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md
+@@ -24,7 +24,7 @@ RRR points CAN be burned (applied) against a Diamond purchase.
+ No earn event fires on Diamond Concierge transactions.
+ RRR-P3-003 is REMOVED from build scope.
+ 
+-## D4 — Room-Heat Inferno Bonus Multiplier: Configurable + Guardrails
++## D4 — Flicker n'Flame Scoring Inferno Bonus Multiplier: Configurable + Guardrails
+ Inferno bonus earn multiplier is active when ALL THREE conditions are met:
+ 1. Guest has tipped during the session
+ 2. Guest remains in the room
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index 18e9284..3a260e6 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -1247,7 +1247,7 @@ model CanonicalRateCard {
+   creator_payout  Decimal   @db.Decimal(6, 4)  // $0.065–$0.090 per token
+   platform_margin Decimal   @db.Decimal(6, 4)
+   min_volume      Int?
+-  heat_level      String?   // for Room-Heat scaling: "cold" | "warm" | "hot" | "inferno"
++  heat_level      String?   // for Flicker n'Flame Scoring (FFS) scaling: "cold" | "warm" | "hot" | "inferno"
+   valid_from      DateTime
+   valid_to        DateTime?
+ 
+@@ -1384,7 +1384,7 @@ model WormExportRecord {
+   @@map("worm_export_records")
+ }
+ 
+-// ─── Room-Heat Engine (WO-003 — Business Plan B.4) ────────────────────────────
++// ─── Flicker n'Flame Scoring (FFS) Engine (WO-003 — Business Plan B.4) ────────────────────────────
+ // Migration: 20260425000000_add_room_heat
+ 
+ /// Time-series heat score snapshots — one row per ingest() call.
+@@ -1393,8 +1393,8 @@ model RoomHeatSnapshot {
+   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+   session_id      String   @db.VarChar(200)
+   creator_id      String   @db.Uuid
+-  heat_score      Decimal  @db.Decimal(5, 2)
+-  heat_tier       String   @db.VarChar(20)
++  ffs_score      Decimal  @db.Decimal(5, 2)
++  ffs_tier       String   @db.VarChar(20)
+   /// JSON object of HeatScoreComponents (all 13 component values).
+   components      Json
+   correlation_id  String   @db.VarChar(128)
+@@ -1405,7 +1405,7 @@ model RoomHeatSnapshot {
+ 
+   @@index([session_id, created_at])
+   @@index([creator_id, created_at])
+-  @@map("room_heat_snapshots")
++  @@map("ffs_snapshots")
+ }
+ 
+ /// Per-creator adaptive weight multipliers, learned from tip events.
+@@ -1423,18 +1423,18 @@ model RoomHeatAdaptiveWeights {
+   rule_applied_id String   @default("ROOM_HEAT_ADAPTIVE_v1") @db.VarChar(100)
+   created_at      DateTime @default(now()) @db.Timestamptz
+ 
+-  @@map("room_heat_adaptive_weights")
++  @@map("ffs_adaptive_weights")
+ }
+ 
+-// ── HeartSync + Guest-Heat models ────────────────────────────────────────
++// ── SenSync™ + Guest-Heat models ────────────────────────────────────────
+ 
+-// Per-tier on/off toggle for HeartSync biometric relay.
++// Per-tier on/off toggle for SenSync™ biometric relay.
+ // Managed by platform operators. Non-FIZ; no financial impact.
+-model HeartSyncTierConfig {
++model SenSyncTierConfig {
+   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+   // Membership tier this row governs.
+   tier           String   @db.VarChar(40)
+-  // Whether HeartSync relay is enabled for this tier.
++  // Whether SenSync™ relay is enabled for this tier.
+   enabled        Boolean  @default(false)
+   // Whether COMBINED ("feel as one") mode is permitted for this tier.
+   combined_mode  Boolean  @default(false)
+@@ -1446,7 +1446,7 @@ model HeartSyncTierConfig {
+ 
+   @@unique([tier])
+   @@index([tier, enabled])
+-  @@map("heartsync_tier_configs")
++  @@map("sensync_tier_configs")
+ }
+ 
+ // Room-level visual/haptic effect config (e.g. dual-flame pulse).
+diff --git a/services/core-api/src/analytics/analytics.module.ts b/services/core-api/src/analytics/analytics.module.ts
+index 0506307..28ee792 100644
+--- a/services/core-api/src/analytics/analytics.module.ts
++++ b/services/core-api/src/analytics/analytics.module.ts
+@@ -1,9 +1,9 @@
+ // services/core-api/src/analytics/analytics.module.ts
+ import { Module } from '@nestjs/common';
+-import { HeatScoreService } from './heat-score.service';
++import { FfsScoreService } from './ffs-score.service';
+ 
+ @Module({
+-  providers: [HeatScoreService],
+-  exports: [HeatScoreService],
++  providers: [FfsScoreService],
++  exports: [FfsScoreService],
+ })
+ export class AnalyticsModule {}
+diff --git a/services/core-api/src/analytics/heat-score.service.ts b/services/core-api/src/analytics/ffs-score.service.ts
+similarity index 88%
+rename from services/core-api/src/analytics/heat-score.service.ts
+rename to services/core-api/src/analytics/ffs-score.service.ts
+index a9e60cf..4ee792e 100644
+--- a/services/core-api/src/analytics/heat-score.service.ts
++++ b/services/core-api/src/analytics/ffs-score.service.ts
+@@ -1,11 +1,11 @@
+-// services/core-api/src/analytics/heat-score.service.ts
+-// HZ: HeatScoreService — six-input behavioral HSV for HotZone / My Zone Manager
++// services/core-api/src/analytics/ffs-score.service.ts
++// HZ: FfsScoreService — six-input behavioral HSV for HotZone / My Zone Manager
+ // Corpus constraint: advisory only, non-gating, non-punitive. Ch.5 §6.
+ import { Injectable, Logger } from '@nestjs/common';
+ 
+ export type HeatBand = 'COLD' | 'COOL' | 'WARM' | 'HOT' | 'RED_ZONE';
+ 
+-export interface HeatScoreInput {
++export interface FfsScoreInput {
+   creator_id: string;
+   // HIGH weight
+   session_spend_tokens: number;
+@@ -21,7 +21,7 @@ export interface HeatScoreInput {
+   profile_ctr_pct: number;
+ }
+ 
+-export interface HeatScoreResult {
++export interface FfsScoreResult {
+   creator_id: string;
+   raw_score: number;
+   heat_band: HeatBand;
+@@ -48,10 +48,10 @@ const ADVISORY_DISCLAIMER =
+   'Canonical Corpus v10 Ch.5 §6.';
+ 
+ @Injectable()
+-export class HeatScoreService {
+-  private readonly logger = new Logger(HeatScoreService.name);
++export class FfsScoreService {
++  private readonly logger = new Logger(FfsScoreService.name);
+ 
+-  compute(input: HeatScoreInput): HeatScoreResult {
++  compute(input: FfsScoreInput): FfsScoreResult {
+     // Normalize each input to 0–100 range before weighting
+     const spend_norm = Math.min((input.session_spend_tokens / 500) * 100, 100);
+     const chat_norm = Math.min((input.chat_message_count / 100) * 100, 100);
+@@ -86,7 +86,7 @@ export class HeatScoreService {
+               ? 'COOL'
+               : 'COLD';
+ 
+-    this.logger.log('HeatScoreService: HSV computed', {
++    this.logger.log('FfsScoreService: HSV computed', {
+       creator_id: input.creator_id,
+       raw_score,
+       heat_band,
+diff --git a/services/core-api/src/app.module.ts b/services/core-api/src/app.module.ts
+index 0fbda6c..046fe88 100644
+--- a/services/core-api/src/app.module.ts
++++ b/services/core-api/src/app.module.ts
+@@ -2,7 +2,7 @@
+ // CHORE: HOUSE-001 — restore missing module registrations dropped in merge
+ // PAYLOAD 3: wire GateGuardModule + GateGuardMiddleware in front of
+ //            /purchase, /spend, /payout route trees.
+-// HZ: register HeartSyncModule + GuestHeatModule.
++// HZ: register SenSyncModule + GuestHeatModule.
+ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+ import { BullModule } from '@nestjs/bull';
+ import { CreatorModule } from './creator/creator.module';
+@@ -28,8 +28,8 @@ import { GateGuardMiddleware } from './gateguard/gateguard.middleware';
+ import { AuditModule } from './audit/audit.module';
+ import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-guard.middleware';
+ import { RefundModule } from './refund/refund.module';
+-import { RoomHeatModule } from '../../room-heat/src/room-heat.module';
+-import { HeartSyncModule } from '../../heartsync/src/heartsync.module';
++import { FlickerNFlameScoringModule } from '../../ffs/src/ffs.module';
++import { SenSyncModule } from '../../sensync/src/sensync.module';
+ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
+ 
+ @Module({
+@@ -60,8 +60,8 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
+     SchedulingModule,
+     MembershipModule,
+     ZoneAccessModule,
+-    RoomHeatModule,
+-    HeartSyncModule,
++    FlickerNFlameScoringModule,
++    SenSyncModule,
+     GuestHeatModule,
+   ],
+ })
+diff --git a/services/creator-control/src/creator-control.module.ts b/services/creator-control/src/creator-control.module.ts
+index b4f4936..1854397 100644
+--- a/services/creator-control/src/creator-control.module.ts
++++ b/services/creator-control/src/creator-control.module.ts
+@@ -3,19 +3,19 @@ import { Module } from '@nestjs/common';
+ import { NatsModule } from '../../core-api/src/nats/nats.module';
+ import { BroadcastTimingCopilot } from './broadcast-timing.copilot';
+ import { CreatorControlService } from './creator-control.service';
+-import { RoomHeatEngine } from './room-heat.engine';
++import { FlickerNFlameScoringEngine } from './ffs.engine';
+ import { SessionMonitoringCopilot } from './session-monitoring.copilot';
+ 
+ @Module({
+   imports: [NatsModule],
+   providers: [
+-    RoomHeatEngine,
++    FlickerNFlameScoringEngine,
+     BroadcastTimingCopilot,
+     SessionMonitoringCopilot,
+     CreatorControlService,
+   ],
+   exports: [
+-    RoomHeatEngine,
++    FlickerNFlameScoringEngine,
+     BroadcastTimingCopilot,
+     SessionMonitoringCopilot,
+     CreatorControlService,
+diff --git a/services/creator-control/src/creator-control.service.ts b/services/creator-control/src/creator-control.service.ts
+index 8c9ebed..0da8d9d 100644
+--- a/services/creator-control/src/creator-control.service.ts
++++ b/services/creator-control/src/creator-control.service.ts
+@@ -15,10 +15,10 @@ import { Injectable, Logger } from '@nestjs/common';
+ import { NatsService } from '../../core-api/src/nats/nats.service';
+ import { NATS_TOPICS } from '../../nats/topics.registry';
+ import {
+-  RoomHeatEngine,
+-  type HeatScore,
+-  type RoomHeatSample,
+-} from './room-heat.engine';
++  FlickerNFlameScoringEngine,
++  type FfsScore,
++  type FfsSample,
++} from './ffs.engine';
+ import {
+   BroadcastTimingCopilot,
+   type BroadcastWindowSuggestion,
+@@ -34,7 +34,7 @@ export const CREATOR_CONTROL_RULE_ID = 'CREATOR_CONTROL_ZONE_v1';
+ export interface CreatorWorkstationSnapshot {
+   creator_id: string;
+   active_session_id: string | null;
+-  latest_heat: HeatScore | null;
++  latest_heat: FfsScore | null;
+   latest_nudge: PriceNudge | null;
+   top_broadcast_slots: BroadcastWindowSuggestion[];
+   obs_ready: boolean;
+@@ -46,16 +46,16 @@ export interface CreatorWorkstationSnapshot {
+ @Injectable()
+ export class CreatorControlService {
+   private readonly logger = new Logger(CreatorControlService.name);
+-  // Per-creator cache of the most recent HeatScore / nudge — supports the
++  // Per-creator cache of the most recent FfsScore / nudge — supports the
+   // single-pane snapshot without forcing recomputation on every read.
+   private readonly latestByCreator = new Map<
+     string,
+-    { heat: HeatScore; nudge: PriceNudge }
++    { heat: FfsScore; nudge: PriceNudge }
+   >();
+ 
+   constructor(
+     private readonly nats: NatsService,
+-    private readonly heat: RoomHeatEngine,
++    private readonly heat: FlickerNFlameScoringEngine,
+     private readonly timing: BroadcastTimingCopilot,
+     private readonly monitoring: SessionMonitoringCopilot,
+   ) {}
+@@ -64,7 +64,7 @@ export class CreatorControlService {
+    * Ingest a room-heat sample from ShowZone/Bijou/HeartZone and fan the
+    * resulting suggestion out to the creator's copilot panel.
+    */
+-  ingestSample(sample: RoomHeatSample): { heat: HeatScore; nudge: PriceNudge } {
++  ingestSample(sample: FfsSample): { heat: FfsScore; nudge: PriceNudge } {
+     const heat = this.heat.ingest(sample);
+     const nudge = this.monitoring.suggestNudge(heat);
+     this.latestByCreator.set(sample.creator_id, { heat, nudge });
+@@ -87,7 +87,7 @@ export class CreatorControlService {
+         direction: nudge.direction,
+         magnitude_pct: nudge.magnitude_pct,
+         tier: nudge.tier,
+-        heat_score: nudge.heat_score,
++        ffs_score: nudge.ffs_score,
+         reason_code: nudge.reason_code,
+         rule_applied_id: CREATOR_CONTROL_RULE_ID,
+         captured_at_utc: nudge.captured_at_utc,
+diff --git a/services/creator-control/src/room-heat.engine.ts b/services/creator-control/src/ffs.engine.ts
+similarity index 79%
+rename from services/creator-control/src/room-heat.engine.ts
+rename to services/creator-control/src/ffs.engine.ts
+index 8737289..f4ab3a4 100644
+--- a/services/creator-control/src/room-heat.engine.ts
++++ b/services/creator-control/src/ffs.engine.ts
+@@ -12,11 +12,11 @@ import { Injectable, Logger } from '@nestjs/common';
+ import { NatsService } from '../../core-api/src/nats/nats.service';
+ import { NATS_TOPICS } from '../../nats/topics.registry';
+ 
+-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v1';
++export const FFS_RULE_ID = 'FFS_ENGINE_v1';
+ 
+-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
++export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+ 
+-export interface RoomHeatSample {
++export interface FfsSample {
+   session_id: string;
+   creator_id: string;
+   tippers_online: number;         // how many viewers are currently tip-capable
+@@ -27,10 +27,10 @@ export interface RoomHeatSample {
+   captured_at_utc: string;
+ }
+ 
+-export interface HeatScore {
++export interface FfsScore {
+   session_id: string;
+   creator_id: string;
+-  tier: HeatTier;
++  tier: FfsTier;
+   score: number;                  // 0..100 composite
+   components: {
+     tipper_pressure: number;      // 0..40
+@@ -44,7 +44,7 @@ export interface HeatScore {
+ // Tier thresholds — canonical bands locked in GovernanceConfig.HEAT_BAND_* constants.
+ // COLD 0–33, WARM 34–60, HOT 61–85, INFERNO 86–100.
+ // Source of truth: GovernanceConfig (governance.config.ts) + DOMAIN_GLOSSARY.md.
+-const TIER_THRESHOLDS: Array<{ min: number; tier: HeatTier }> = [
++const TIER_THRESHOLDS: Array<{ min: number; tier: FfsTier }> = [
+   { min: 86, tier: 'INFERNO' },
+   { min: 61, tier: 'HOT' },
+   { min: 34, tier: 'WARM' },
+@@ -52,15 +52,15 @@ const TIER_THRESHOLDS: Array<{ min: number; tier: HeatTier }> = [
+ ];
+ 
+ @Injectable()
+-export class RoomHeatEngine {
+-  private readonly logger = new Logger(RoomHeatEngine.name);
+-  // Last-known tier per session — transition emits ROOM_HEAT_TIER_CHANGED.
+-  private readonly lastTier = new Map<string, HeatTier>();
++export class FlickerNFlameScoringEngine {
++  private readonly logger = new Logger(FlickerNFlameScoringEngine.name);
++  // Last-known tier per session — transition emits FFS_SCORE_TIER_CHANGED.
++  private readonly lastTier = new Map<string, FfsTier>();
+ 
+   constructor(private readonly nats: NatsService) {}
+ 
+-  /** Compute a HeatScore from a sample. Pure; no side effects. */
+-  computeScore(sample: RoomHeatSample): HeatScore {
++  /** Compute a FfsScore from a sample. Pure; no side effects. */
++  computeScore(sample: FfsSample): FfsScore {
+     const tipperPressure = this.tipperPressure(sample.tippers_online);
+     const velocity = this.velocity(sample.tips_per_minute, sample.avg_tip_tokens);
+     const vipPresence = this.vipPresence(sample.diamond_guests_present);
+@@ -79,7 +79,7 @@ export class RoomHeatEngine {
+         vip_presence: vipPresence,
+       },
+       captured_at_utc: sample.captured_at_utc,
+-      rule_applied_id: ROOM_HEAT_RULE_ID,
++      rule_applied_id: FFS_RULE_ID,
+     };
+   }
+ 
+@@ -87,37 +87,37 @@ export class RoomHeatEngine {
+    * Ingest a sample: score it, publish to NATS, and emit a tier-changed
+    * signal when the tier crosses a band boundary.
+    */
+-  ingest(sample: RoomHeatSample): HeatScore {
++  ingest(sample: FfsSample): FfsScore {
+     const score = this.computeScore(sample);
+-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SAMPLE, { ...score });
++    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, { ...score });
+ 
+     const prev = this.lastTier.get(sample.session_id);
+     if (prev !== score.tier) {
+       this.lastTier.set(sample.session_id, score.tier);
+-      this.logger.log('RoomHeatEngine: tier transition', {
++      this.logger.log('FlickerNFlameScoringEngine: tier transition', {
+         session_id: sample.session_id,
+         from: prev ?? 'UNKNOWN',
+         to: score.tier,
+-        rule_applied_id: ROOM_HEAT_RULE_ID,
++        rule_applied_id: FFS_RULE_ID,
+       });
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_TIER_CHANGED, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
+         session_id: sample.session_id,
+         creator_id: sample.creator_id,
+         from: prev ?? null,
+         to: score.tier,
+         score: score.score,
+         captured_at_utc: score.captured_at_utc,
+-        rule_applied_id: ROOM_HEAT_RULE_ID,
++        rule_applied_id: FFS_RULE_ID,
+       });
+     }
+ 
+     if (score.tier === 'INFERNO') {
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_PEAK, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
+         session_id: sample.session_id,
+         creator_id: sample.creator_id,
+         score: score.score,
+         captured_at_utc: score.captured_at_utc,
+-        rule_applied_id: ROOM_HEAT_RULE_ID,
++        rule_applied_id: FFS_RULE_ID,
+       });
+     }
+ 
+@@ -146,7 +146,7 @@ export class RoomHeatEngine {
+     return Math.min(20, diamondGuests * 5);
+   }
+ 
+-  private resolveTier(score: number): HeatTier {
++  private resolveTier(score: number): FfsTier {
+     for (const band of TIER_THRESHOLDS) {
+       if (score >= band.min) return band.tier;
+     }
+diff --git a/services/creator-control/src/session-monitoring.copilot.ts b/services/creator-control/src/session-monitoring.copilot.ts
+index f9e83db..8e17108 100644
+--- a/services/creator-control/src/session-monitoring.copilot.ts
++++ b/services/creator-control/src/session-monitoring.copilot.ts
+@@ -1,13 +1,13 @@
+ // PAYLOAD 5 — Session Monitoring Copilot
+ // Real-time pricing push/pull suggestions during a live broadcast.
+-// Consumes HeatScore output from RoomHeatEngine and returns deterministic
++// Consumes FfsScore output from FlickerNFlameScoringEngine and returns deterministic
+ // price-nudge suggestions the creator can accept or ignore.
+ //
+ // No writes — this is a suggestion surface. The core-api/pricing service
+ // is the single writer of effective tip rates.
+ 
+ import { Injectable, Logger } from '@nestjs/common';
+-import type { HeatScore, HeatTier } from './room-heat.engine';
++import type { FfsScore, FfsTier } from './ffs.engine';
+ 
+ export const SESSION_MONITORING_RULE_ID = 'SESSION_MONITORING_COPILOT_v1';
+ 
+@@ -20,8 +20,8 @@ export interface PriceNudge {
+   /** Fractional change relative to the current base price (e.g. 0.10 = +10%). */
+   magnitude_pct: number;
+   /** Current tier snapshot that produced the suggestion. */
+-  tier: HeatTier;
+-  heat_score: number;
++  tier: FfsTier;
++  ffs_score: number;
+   /** Why — a canonical reason code. */
+   reason_code: string;
+   /** Human-readable prompt to show in the copilot panel. */
+@@ -34,7 +34,7 @@ export interface PriceNudge {
+  * Tier → nudge policy. Deterministic; any change is a governance edit.
+  * Magnitudes are conservative — the copilot nudges, it does not leap.
+  */
+-const NUDGE_POLICY: Record<HeatTier, { direction: NudgeDirection; magnitude: number; reason: string }> = {
++const NUDGE_POLICY: Record<FfsTier, { direction: NudgeDirection; magnitude: number; reason: string }> = {
+   INFERNO: { direction: 'RAISE', magnitude: 0.20, reason: 'HEAT_INFERNO_PRICE_PUSH' },
+   HOT:     { direction: 'RAISE', magnitude: 0.10, reason: 'HEAT_HOT_PRICE_PUSH' },
+   WARM:    { direction: 'HOLD',  magnitude: 0.00, reason: 'HEAT_WARM_STEADY' },
+@@ -46,10 +46,10 @@ export class SessionMonitoringCopilot {
+   private readonly logger = new Logger(SessionMonitoringCopilot.name);
+ 
+   /**
+-   * Convert a HeatScore into a PriceNudge. Pure function over the heat score;
++   * Convert a FfsScore into a PriceNudge. Pure function over the heat score;
+    * two identical scores always produce identical nudges.
+    */
+-  suggestNudge(score: HeatScore): PriceNudge {
++  suggestNudge(score: FfsScore): PriceNudge {
+     const policy = NUDGE_POLICY[score.tier];
+     const nudge: PriceNudge = {
+       session_id: score.session_id,
+@@ -57,7 +57,7 @@ export class SessionMonitoringCopilot {
+       direction: policy.direction,
+       magnitude_pct: policy.magnitude,
+       tier: score.tier,
+-      heat_score: score.score,
++      ffs_score: score.score,
+       reason_code: policy.reason,
+       copy: this.buildCopy(score.tier, policy.direction, policy.magnitude),
+       rule_applied_id: SESSION_MONITORING_RULE_ID,
+@@ -75,7 +75,7 @@ export class SessionMonitoringCopilot {
+     return nudge;
+   }
+ 
+-  private buildCopy(tier: HeatTier, dir: NudgeDirection, magnitude: number): string {
++  private buildCopy(tier: FfsTier, dir: NudgeDirection, magnitude: number): string {
+     if (dir === 'HOLD') return `Heat is ${tier}. Hold current price.`;
+     const pct = Math.round(magnitude * 100);
+     const verb = dir === 'RAISE' ? 'Raise' : 'Soft-drop';
+diff --git a/services/cyrano/ASSUMPTIONS.md b/services/cyrano/ASSUMPTIONS.md
+index e9b59fb..21cbf2d 100644
+--- a/services/cyrano/ASSUMPTIONS.md
++++ b/services/cyrano/ASSUMPTIONS.md
+@@ -28,9 +28,9 @@ Cyrano itself does not control UI rendering — the panel must never expose
+ suggestions to the guest-facing stream.
+ 
+ ## A006 — Heat Tier Is Caller-Provided
+-Cyrano does not subscribe to Room-Heat directly. The `CyranoInputFrame`
++Cyrano does not subscribe to Flicker n'Flame Scoring directly. The `CyranoInputFrame`
+ must include a valid `heat` object. In production, the Integration Hub
+-composes the frame from Room-Heat snapshots and session telemetry.
++composes the frame from Flicker n'Flame Scoring snapshots and session telemetry.
+ 
+ ## A007 — Category Weight Matrix Is Static
+ `CATEGORY_TIER_WEIGHTS` is a compile-time constant. Retuning requires a
+diff --git a/services/cyrano/README.md b/services/cyrano/README.md
+index a059dbf..6e28cde 100644
+--- a/services/cyrano/README.md
++++ b/services/cyrano/README.md
+@@ -72,7 +72,7 @@ In Layer 1, storage is in-process; Layer 2 will persist to Prisma.
+ ## Integration
+ 
+ Cyrano is consumed by the Integration Hub (`services/integration-hub/`),
+-which subscribes to room-heat and session events and forwards
++which subscribes to ffs and session events and forwards
+ `CyranoInputFrame` objects to `CyranoService.suggest()`.
+ 
+ Cyrano is **not** directly exposed via REST — suggestions flow exclusively
+diff --git a/services/cyrano/src/cyrano.types.ts b/services/cyrano/src/cyrano.types.ts
+index d0ad0bb..c59be8f 100644
+--- a/services/cyrano/src/cyrano.types.ts
++++ b/services/cyrano/src/cyrano.types.ts
+@@ -1,7 +1,7 @@
+ // PAYLOAD 5 — Cyrano Layer 1 shared types
+ // Business Plan B.3.5 — whisper copilot contract surface.
+ 
+-import type { HeatScore, HeatTier } from '../../creator-control/src/room-heat.engine';
++import type { FfsScore, FfsTier } from '../../creator-control/src/ffs.engine';
+ 
+ /** The eight canonical suggestion categories from Business Plan B.3.5. */
+ export type CyranoCategory =
+@@ -53,7 +53,7 @@ export interface CyranoInputFrame {
+   creator_id: string;
+   guest_id: string;
+   phase: SessionPhase;
+-  heat: HeatScore;
++  heat: FfsScore;
+   /** Seconds since the last guest message. */
+   silence_seconds: number;
+   /** Minutes since session start. */
+@@ -75,7 +75,7 @@ export interface CyranoSuggestion {
+   category: CyranoCategory;
+   /** 0..100 priority score — higher = more urgent. */
+   weight: number;
+-  tier_context: HeatTier;
++  tier_context: FfsTier;
+   copy: string;
+   reason_codes: string[];
+   persona_id: string | null;
+diff --git a/services/room-heat/.env.example b/services/ffs/.env.example
+similarity index 100%
+rename from services/room-heat/.env.example
+rename to services/ffs/.env.example
+diff --git a/services/room-heat/ASSUMPTIONS.md b/services/ffs/ASSUMPTIONS.md
+similarity index 93%
+rename from services/room-heat/ASSUMPTIONS.md
+rename to services/ffs/ASSUMPTIONS.md
+index be2b6fa..8926145 100644
+--- a/services/room-heat/ASSUMPTIONS.md
++++ b/services/ffs/ASSUMPTIONS.md
+@@ -1,4 +1,4 @@
+-# Room-Heat Engine — ASSUMPTIONS
++# Flicker n'Flame Scoring (FFS) — ASSUMPTIONS
+ 
+ **Work Order:** WO-003  
+ **Rule ID:** `ROOM_HEAT_ENGINE_v2`
+@@ -15,7 +15,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
+    the caller (creator-control or tip.service). The engine does not own this
+    aggregation.
+ 
+-2. **`heart_rate_bpm`** — provided by the HeartSync BPM update subscription
++2. **`heart_rate_bpm`** — provided by the SenSync™ BPM update subscription
+    (`HZ_BPM_UPDATE` NATS topic). If the creator's band is unpaired, callers
+    MUST set `heart_rate_bpm = heart_rate_baseline_bpm` to contribute zero
+    delta (i.e. pass `0` for both fields).
+@@ -71,7 +71,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
+ ## Dual Flame
+ 
+ 11. Dual Flame support assumes both sessions are independently scored.  The
+-    partner score is an input provided by the caller — the Room-Heat Engine
++    partner score is an input provided by the caller — the Flicker n'Flame Scoring (FFS)
+     does not look up the partner's score from its own state to avoid race
+     conditions.
+ 
+diff --git a/services/room-heat/FLAGS.md b/services/ffs/FLAGS.md
+similarity index 92%
+rename from services/room-heat/FLAGS.md
+rename to services/ffs/FLAGS.md
+index 22b1bf8..f705584 100644
+--- a/services/room-heat/FLAGS.md
++++ b/services/ffs/FLAGS.md
+@@ -1,9 +1,9 @@
+-# Room-Heat Engine — FLAGS
++# Flicker n'Flame Scoring (FFS) — FLAGS
+ 
+ **Work Order:** WO-003  
+ **Rule ID:** `ROOM_HEAT_ENGINE_v2`
+ 
+-Feature flags and deferred capabilities for the Room-Heat Engine.
++Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS).
+ 
+ ---
+ 
+@@ -31,5 +31,5 @@ Feature flags and deferred capabilities for the Room-Heat Engine.
+ | `ROOM_HEAT_PERSISTENT_LEADERBOARD` | Post-launch requirement | Persist leaderboard state to `room_heat_leaderboard_entries` DB table for restart-safety. |
+ | `ROOM_HEAT_REDIS_WINDOWS` | Volume scaling | Move rolling-window aggregations (tips/min, chat/min, hearts/min) from caller-provided inputs to Redis ZADD windows within the engine. |
+ | `ROOM_HEAT_CYRANO_DIRECT_INJECT` | Cyrano L2 integration | Allow the engine to directly call `CyranoService.evaluate()` instead of emitting via NATS + Hub. |
+-| `ROOM_HEAT_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export room_heat_snapshots to WORM storage on session end. |
++| `ROOM_HEAT_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export ffs_snapshots to WORM storage on session end. |
+ | `ROOM_HEAT_ML_WEIGHTS` | ML pipeline ready | Replace static adaptive weight learning with an ML-trained model inference call. |
+diff --git a/services/room-heat/README.md b/services/ffs/README.md
+similarity index 86%
+rename from services/room-heat/README.md
+rename to services/ffs/README.md
+index 3c29237..a00152a 100644
+--- a/services/room-heat/README.md
++++ b/services/ffs/README.md
+@@ -1,4 +1,4 @@
+-# Room-Heat Engine — `services/room-heat/`
++# Flicker n'Flame Scoring (FFS) — `services/ffs/`
+ 
+ **Work Order:** WO-003  
+ **Business Plan Reference:** B.4 — Room-level telemetry  
+@@ -9,7 +9,7 @@
+ 
+ ## Purpose
+ 
+-The Room-Heat Engine computes a real-time **composite heat score (0–100)** for every
++The Flicker n'Flame Scoring (FFS) computes a real-time **composite heat score (0–100)** for every
+ live creator session.  The score is published to NATS at **1 Hz** and consumed by:
+ 
+ - **CreatorControl.Zone** — session suggestions and price nudges  
+@@ -114,13 +114,13 @@ downstream consumers.
+ 
+ | Method | Path | Description |
+ |--------|------|-------------|
+-| `GET` | `/room-heat/leaderboard?category=all` | 10×10 leaderboard |
+-| `GET` | `/room-heat/session/:id` | Current score for a session |
+-| `POST` | `/room-heat/ingest` | Ingest a telemetry frame |
+-| `POST` | `/room-heat/session/:id/start` | Pre-register a session |
+-| `DELETE` | `/room-heat/session/:id` | End a session |
+-| `POST` | `/room-heat/tip-event` | Trigger adaptive learning from a tip |
+-| `GET` | `/room-heat/adaptive-weights/:creatorId` | Read creator adaptive multipliers |
++| `GET` | `/ffs/leaderboard?category=all` | 10×10 leaderboard |
++| `GET` | `/ffs/session/:id` | Current score for a session |
++| `POST` | `/ffs/ingest` | Ingest a telemetry frame |
++| `POST` | `/ffs/session/:id/start` | Pre-register a session |
++| `DELETE` | `/ffs/session/:id` | End a session |
++| `POST` | `/ffs/tip-event` | Trigger adaptive learning from a tip |
++| `GET` | `/ffs/adaptive-weights/:creatorId` | Read creator adaptive multipliers |
+ 
+ ---
+ 
+@@ -140,7 +140,7 @@ Multipliers are persisted to `room_heat_adaptive_weights` and cached in-memory.
+ 
+ | Table | Purpose |
+ |-------|---------|
+-| `room_heat_snapshots` | Append-only time-series of every heat score computed |
++| `ffs_snapshots` | Append-only time-series of every heat score computed |
+ | `room_heat_adaptive_weights` | One row per creator — learned component multipliers |
+ 
+ ---
+diff --git a/services/room-heat/src/dto/room-heat.dto.ts b/services/ffs/src/dto/ffs.dto.ts
+similarity index 89%
+rename from services/room-heat/src/dto/room-heat.dto.ts
+rename to services/ffs/src/dto/ffs.dto.ts
+index 4313b96..5ec9299 100644
+--- a/services/room-heat/src/dto/room-heat.dto.ts
++++ b/services/ffs/src/dto/ffs.dto.ts
+@@ -4,13 +4,13 @@
+ 
+ import type {
+   LeaderboardCategory,
+-  RoomHeatInput,
+-} from '../types/room-heat.types';
++  FfsInput,
++} from '../types/ffs.types';
+ 
+ // ── Ingest DTO ────────────────────────────────────────────────────────────────
+-// Mirrors RoomHeatInput exactly but expressed as a plain class so NestJS
++// Mirrors FfsInput exactly but expressed as a plain class so NestJS
+ // can deserialise the JSON body.
+-export class IngestRoomHeatDto implements RoomHeatInput {
++export class IngestFfsDto implements FfsInput {
+   session_id!: string;
+   creator_id!: string;
+   captured_at_utc!: string;
+@@ -56,5 +56,5 @@ export class TipEventDto {
+   /** CZT tokens tipped — used to record adaptive signal strength. */
+   tokens!: number;
+   /** Full heat input frame captured at tip moment. */
+-  heat_context!: RoomHeatInput;
++  heat_context!: FfsInput;
+ }
+diff --git a/services/room-heat/src/room-heat.controller.ts b/services/ffs/src/ffs.controller.ts
+similarity index 63%
+rename from services/room-heat/src/room-heat.controller.ts
+rename to services/ffs/src/ffs.controller.ts
+index ccbfe80..4e41a05 100644
+--- a/services/room-heat/src/room-heat.controller.ts
++++ b/services/ffs/src/ffs.controller.ts
+@@ -11,19 +11,19 @@ import {
+   Post,
+   Query,
+ } from '@nestjs/common';
+-import type { LeaderboardCategory } from './types/room-heat.types';
+-import type { RoomHeatLeaderboard, RoomHeatScore } from './types/room-heat.types';
+-import { IngestRoomHeatDto, TipEventDto } from './dto/room-heat.dto';
+-import { RoomHeatService } from './room-heat.service';
++import type { LeaderboardCategory } from './types/ffs.types';
++import type { FfsLeaderboard, FfsScore } from './types/ffs.types';
++import { IngestFfsDto, TipEventDto } from './dto/ffs.dto';
++import { FlickerNFlameScoringService } from './ffs.service';
+ 
+-@Controller('room-heat')
+-export class RoomHeatController {
+-  private readonly logger = new Logger(RoomHeatController.name);
++@Controller('ffs')
++export class FlickerNFlameScoringController {
++  private readonly logger = new Logger(FlickerNFlameScoringController.name);
+ 
+-  constructor(private readonly roomHeatService: RoomHeatService) {}
++  constructor(private readonly flickerNFlameScoringService: FlickerNFlameScoringService) {}
+ 
+   /**
+-   * GET /room-heat/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
++   * GET /ffs/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
+    *
+    * Returns the 10×10 leaderboard grid.
+    * Coolest sessions appear at the top (rank 0); hottest at the bottom (rank 99).
+@@ -31,7 +31,7 @@ export class RoomHeatController {
+   @Get('leaderboard')
+   getLeaderboard(
+     @Query('category') category?: string,
+-  ): RoomHeatLeaderboard {
++  ): FfsLeaderboard {
+     const validCategories: LeaderboardCategory[] = [
+       'all',
+       'standard',
+@@ -45,20 +45,20 @@ export class RoomHeatController {
+       ? (category as LeaderboardCategory)
+       : 'all';
+ 
+-    this.logger.log('RoomHeatController.getLeaderboard', { category: cat });
+-    return this.roomHeatService.getLeaderboard(cat);
++    this.logger.log('FlickerNFlameScoringController.getLeaderboard', { category: cat });
++    return this.flickerNFlameScoringService.getLeaderboard(cat);
+   }
+ 
+   /**
+-   * GET /room-heat/session/:sessionId
++   * GET /ffs/session/:sessionId
+    *
+    * Returns the current heat score for a live session, or 404 if unknown.
+    */
+   @Get('session/:sessionId')
+   getSessionHeat(
+     @Param('sessionId') sessionId: string,
+-  ): RoomHeatScore | { message: string; session_id: string } {
+-    const score = this.roomHeatService.getSessionHeat(sessionId);
++  ): FfsScore | { message: string; session_id: string } {
++    const score = this.flickerNFlameScoringService.getSessionHeat(sessionId);
+     if (!score) {
+       return { message: 'Session not found or not yet active', session_id: sessionId };
+     }
+@@ -66,22 +66,22 @@ export class RoomHeatController {
+   }
+ 
+   /**
+-   * POST /room-heat/ingest
++   * POST /ffs/ingest
+    *
+    * Ingest a full telemetry frame. Returns the computed heat score.
+    * Used by the creator-control surface and integration tests.
+    */
+   @Post('ingest')
+-  ingestSample(@Body() dto: IngestRoomHeatDto): RoomHeatScore {
+-    this.logger.log('RoomHeatController.ingestSample', {
++  ingestSample(@Body() dto: IngestFfsDto): FfsScore {
++    this.logger.log('FlickerNFlameScoringController.ingestSample', {
+       session_id: dto.session_id,
+       creator_id: dto.creator_id,
+     });
+-    return this.roomHeatService.ingest(dto);
++    return this.flickerNFlameScoringService.ingest(dto);
+   }
+ 
+   /**
+-   * POST /room-heat/session/:sessionId/start
++   * POST /ffs/session/:sessionId/start
+    *
+    * Pre-register a session before the first telemetry frame.
+    * Callers may omit this — the session is auto-registered on first ingest.
+@@ -91,7 +91,7 @@ export class RoomHeatController {
+     @Param('sessionId') sessionId: string,
+     @Body() body: { creator_id: string; is_dual_flame?: boolean },
+   ): { session_id: string; started: boolean } {
+-    this.roomHeatService.startSession(
++    this.flickerNFlameScoringService.startSession(
+       sessionId,
+       body.creator_id,
+       body.is_dual_flame ?? false,
+@@ -100,7 +100,7 @@ export class RoomHeatController {
+   }
+ 
+   /**
+-   * DELETE /room-heat/session/:sessionId
++   * DELETE /ffs/session/:sessionId
+    *
+    * Teardown session heat state and stop the 1 Hz publisher.
+    * Call this when a broadcast ends.
+@@ -109,29 +109,29 @@ export class RoomHeatController {
+   endSession(
+     @Param('sessionId') sessionId: string,
+   ): { session_id: string; ended: boolean } {
+-    this.roomHeatService.endSession(sessionId);
++    this.flickerNFlameScoringService.endSession(sessionId);
+     return { session_id: sessionId, ended: true };
+   }
+ 
+   /**
+-   * POST /room-heat/tip-event
++   * POST /ffs/tip-event
+    *
+    * Trigger adaptive weight learning from a tip event.
+    * Called by the tip service whenever a tip is completed.
+    */
+   @Post('tip-event')
+   recordTipEvent(@Body() dto: TipEventDto): { learned: boolean } {
+-    this.logger.log('RoomHeatController.recordTipEvent', {
++    this.logger.log('FlickerNFlameScoringController.recordTipEvent', {
+       session_id: dto.session_id,
+       creator_id: dto.creator_id,
+       tokens:     dto.tokens,
+     });
+-    this.roomHeatService.learnFromTipEvent(dto.heat_context);
++    this.flickerNFlameScoringService.learnFromTipEvent(dto.heat_context);
+     return { learned: true };
+   }
+ 
+   /**
+-   * GET /room-heat/adaptive-weights/:creatorId
++   * GET /ffs/adaptive-weights/:creatorId
+    *
+    * Returns the adaptive weight multipliers for a creator (advisory / debug).
+    */
+@@ -139,6 +139,6 @@ export class RoomHeatController {
+   getAdaptiveWeights(
+     @Param('creatorId') creatorId: string,
+   ) {
+-    return this.roomHeatService.getAdaptiveWeightsPublic(creatorId);
++    return this.flickerNFlameScoringService.getAdaptiveWeightsPublic(creatorId);
+   }
+ }
+diff --git a/services/ffs/src/ffs.module.ts b/services/ffs/src/ffs.module.ts
+new file mode 100644
+index 0000000..0a3226a
+--- /dev/null
++++ b/services/ffs/src/ffs.module.ts
+@@ -0,0 +1,13 @@
++// WO-003 — Room-Heat Engine: module
++// Business Plan B.4 — real-time composite heat score service.
++// NatsModule and PrismaModule are global — no local import needed.
++import { Module } from '@nestjs/common';
++import { FlickerNFlameScoringController } from './ffs.controller';
++import { FlickerNFlameScoringService } from './ffs.service';
++
++@Module({
++  controllers: [FlickerNFlameScoringController],
++  providers:   [FlickerNFlameScoringService],
++  exports:     [FlickerNFlameScoringService],
++})
++export class FlickerNFlameScoringModule {}
+diff --git a/services/room-heat/src/room-heat.service.ts b/services/ffs/src/ffs.service.ts
+similarity index 91%
+rename from services/room-heat/src/room-heat.service.ts
+rename to services/ffs/src/ffs.service.ts
+index ace8fec..a042b81 100644
+--- a/services/room-heat/src/room-heat.service.ts
++++ b/services/ffs/src/ffs.service.ts
+@@ -1,7 +1,7 @@
+ // WO-003 — Room-Heat Engine: core service
+ // Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
+ //
+-// Doctrine (all from creator-control/src/room-heat.engine.ts, extended):
++// Doctrine (all from creator-control/src/ffs.engine.ts, extended):
+ //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
+ //     only source of per-creator variance.
+ //   - Anti-flicker (3-tick rule): tier transitions take effect only after
+@@ -26,19 +26,19 @@ import { NATS_TOPICS } from '../../nats/topics.registry';
+ import type {
+   AdaptiveWeights,
+   AntiFlickerState,
+-  HeatScoreComponents,
+-  HeatTier,
++  FfsComponents,
++  FfsTier,
+   LeaderboardCategory,
+-  RoomHeatInput,
+-  RoomHeatLeaderboard,
+-  RoomHeatScore,
++  FfsInput,
++  FfsLeaderboard,
++  FfsScore,
+   SessionLiveState,
+-} from './types/room-heat.types';
++} from './types/ffs.types';
+ 
+-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v2';
++export const FFS_RULE_ID = 'FFS_ENGINE_v2';
+ 
+ // ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
+-const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
++const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> = [
+   { min: 86, tier: 'INFERNO' },
+   { min: 61, tier: 'HOT' },
+   { min: 34, tier: 'WARM' },
+@@ -103,8 +103,8 @@ const ADAPTIVE_DECAY_ON_TIP   = 0.005;
+ const ADAPTIVE_ELEVATION_THRESHOLD = 0.70;
+ 
+ @Injectable()
+-export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+-  private readonly logger = new Logger(RoomHeatService.name);
++export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestroy {
++  private readonly logger = new Logger(FlickerNFlameScoringService.name);
+ 
+   // ── In-memory state ──────────────────────────────────────────────────────
+   private readonly antiFlicker  = new Map<string, AntiFlickerState>();
+@@ -113,7 +113,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   // 1 Hz publish intervals: session_id → interval handle
+   private readonly heatIntervals = new Map<string, NodeJS.Timeout>();
+   // Most-recent input frames: session_id → last input (for 1 Hz re-emit)
+-  private readonly lastInput = new Map<string, RoomHeatInput>();
++  private readonly lastInput = new Map<string, FfsInput>();
+   // Per-session 1 Hz tick counters — used to throttle leaderboard broadcasts
+   private readonly tickCounters = new Map<string, number>();
+   /** Emit leaderboard broadcast every N ticks (default: every 10 s at 1 Hz). */
+@@ -126,8 +126,8 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+ 
+   async onModuleInit(): Promise<void> {
+     this.subscribeNatsEvents();
+-    this.logger.log('RoomHeatService: initialised', {
+-      rule_applied_id: ROOM_HEAT_RULE_ID,
++    this.logger.log('FlickerNFlameScoringService: initialised', {
++      rule_applied_id: FFS_RULE_ID,
+     });
+   }
+ 
+@@ -136,7 +136,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+       clearInterval(interval);
+     }
+     this.heatIntervals.clear();
+-    this.logger.log('RoomHeatService: destroyed — all intervals cleared');
++    this.logger.log('FlickerNFlameScoringService: destroyed — all intervals cleared');
+   }
+ 
+   // ══════════════════════════════════════════════════════════════════════════
+@@ -148,8 +148,8 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+    * Calculates the heat score, updates in-memory state, emits NATS events,
+    * persists a snapshot (async), and arms the 1 Hz publisher for the session.
+    */
+-  ingest(input: RoomHeatInput): RoomHeatScore {
+-    const score = this.calculateHeatScore(input);
++  ingest(input: FfsInput): FfsScore {
++    const score = this.calculateFfsScore(input);
+ 
+     this.lastInput.set(input.session_id, input);
+     this.updateSessionState(input, score);
+@@ -164,7 +164,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+    * Pure computation — calculates heat score without side effects.
+    * Same inputs always produce the same raw score.
+    */
+-  calculateHeatScore(input: RoomHeatInput): RoomHeatScore {
++  calculateFfsScore(input: FfsInput): FfsScore {
+     const adaptiveWeights = this.getAdaptiveWeights(input.creator_id);
+     const components      = this.calculateComponents(input, adaptiveWeights);
+ 
+@@ -206,12 +206,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+       anti_flicker_ticks:      ticks,
+       is_dual_flame:           input.is_dual_flame,
+       captured_at_utc:         input.captured_at_utc,
+-      rule_applied_id:         ROOM_HEAT_RULE_ID,
++      rule_applied_id:         FFS_RULE_ID,
+     };
+   }
+ 
+   /** Called by tip service when a tip event fires — updates adaptive weights. */
+-  learnFromTipEvent(input: RoomHeatInput): void {
++  learnFromTipEvent(input: FfsInput): void {
+     const weights = this.getAdaptiveWeights(input.creator_id);
+     const elevated = this.identifyElevatedSignals(input);
+ 
+@@ -232,18 +232,18 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+     if (changed) {
+       this.adaptiveCache.set(input.creator_id, weights);
+       void this.persistAdaptiveWeights(input.creator_id, weights);
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_ADAPTIVE_UPDATED, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_ADAPTIVE_UPDATED, {
+         creator_id:      input.creator_id,
+         elevated,
+         weights_snapshot: weights,
+-        rule_applied_id: ROOM_HEAT_RULE_ID,
++        rule_applied_id: FFS_RULE_ID,
+         updated_at_utc:  new Date().toISOString(),
+       });
+     }
+   }
+ 
+   /** Returns the current heat score for a session, or null if unknown. */
+-  getSessionHeat(sessionId: string): RoomHeatScore | null {
++  getSessionHeat(sessionId: string): FfsScore | null {
+     return this.sessionState.get(sessionId)?.currentScore ?? null;
+   }
+ 
+@@ -252,7 +252,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+    * Grid: 10×10, coolest session at rank 0 (top-left), hottest at rank 99
+    * (bottom-right).
+    */
+-  getLeaderboard(category: LeaderboardCategory = 'all'): RoomHeatLeaderboard {
++  getLeaderboard(category: LeaderboardCategory = 'all'): FfsLeaderboard {
+     const now    = new Date();
+     const nowMs  = now.getTime();
+     const states = [...this.sessionState.entries()];
+@@ -299,7 +299,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+       entries,
+       total:             filtered.length,
+       generated_at_utc:  now.toISOString(),
+-      rule_applied_id:   ROOM_HEAT_RULE_ID,
++      rule_applied_id:   FFS_RULE_ID,
+     };
+   }
+ 
+@@ -315,7 +315,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   ): void {
+     if (!this.sessionState.has(sessionId)) {
+       const now    = new Date();
+-      const initial: RoomHeatScore = {
++      const initial: FfsScore = {
+         session_id:               sessionId,
+         creator_id:               creatorId,
+         score:                    0,
+@@ -326,7 +326,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         anti_flicker_ticks:       0,
+         is_dual_flame:            isDualFlame,
+         captured_at_utc:          now.toISOString(),
+-        rule_applied_id:          ROOM_HEAT_RULE_ID,
++        rule_applied_id:          FFS_RULE_ID,
+       };
+       this.sessionState.set(sessionId, {
+         currentScore:    initial,
+@@ -334,18 +334,18 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         isDualFlame,
+       });
+     }
+-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_STARTED, {
++    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_STARTED, {
+       session_id:      sessionId,
+       creator_id:      creatorId,
+       is_dual_flame:   isDualFlame,
+-      rule_applied_id: ROOM_HEAT_RULE_ID,
++      rule_applied_id: FFS_RULE_ID,
+       started_at_utc:  new Date().toISOString(),
+     });
+   }
+ 
+   /**
+    * Tear down session state and stop the 1 Hz publisher for this session.
+-   * Emits ROOM_HEAT_SESSION_ENDED.
++   * Emits FFS_SCORE_SESSION_ENDED.
+    */
+   endSession(sessionId: string): void {
+     this.clearInterval(sessionId);
+@@ -354,12 +354,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+     this.antiFlicker.delete(sessionId);
+     this.lastInput.delete(sessionId);
+ 
+-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_ENDED, {
++    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_ENDED, {
+       session_id:      sessionId,
+       creator_id:      state?.currentScore.creator_id ?? null,
+       final_score:     state?.currentScore.score ?? 0,
+       final_tier:      state?.currentScore.tier ?? 'COLD',
+-      rule_applied_id: ROOM_HEAT_RULE_ID,
++      rule_applied_id: FFS_RULE_ID,
+       ended_at_utc:    new Date().toISOString(),
+     });
+   }
+@@ -375,9 +375,9 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   }
+ 
+   private calculateComponents(
+-    input: RoomHeatInput,
++    input: FfsInput,
+     weights: Record<string, number>,
+-  ): HeatScoreComponents {
++  ): FfsComponents {
+     const w = (key: string): number => weights[key] ?? ADAPTIVE_DEFAULT_WEIGHT;
+ 
+     const tip_pressure = Math.min(
+@@ -482,7 +482,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   private resolveAntiFlickerTier(
+     sessionId: string,
+     score: number,
+-  ): { tier: HeatTier; pendingTier: HeatTier | null; ticks: number } {
++  ): { tier: FfsTier; pendingTier: FfsTier | null; ticks: number } {
+     const rawTier = this.scoreToBand(score);
+ 
+     let state = this.antiFlicker.get(sessionId);
+@@ -524,7 +524,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+     };
+   }
+ 
+-  private scoreToBand(score: number): HeatTier {
++  private scoreToBand(score: number): FfsTier {
+     for (const band of TIER_THRESHOLDS) {
+       if (score >= band.min) return band.tier;
+     }
+@@ -558,7 +558,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+     return Math.round(mean * 10000) / 10000;
+   }
+ 
+-  private identifyElevatedSignals(input: RoomHeatInput): string[] {
++  private identifyElevatedSignals(input: FfsInput): string[] {
+     const elevated: string[] = [];
+     const T = ADAPTIVE_ELEVATION_THRESHOLD;
+ 
+@@ -595,7 +595,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         this.adaptiveCache.set(creatorId, merged);
+       }
+     } catch (err) {
+-      this.logger.warn('RoomHeatService: adaptive weights DB load failed', {
++      this.logger.warn('FlickerNFlameScoringService: adaptive weights DB load failed', {
+         creator_id: creatorId,
+         error:      String(err),
+       });
+@@ -628,12 +628,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+             tip_events_seen: 1,
+             correlation_id:  `adaptive-init-${creatorId}-${Date.now()}`,
+             reason_code:     'ADAPTIVE_INIT',
+-            rule_applied_id: ROOM_HEAT_RULE_ID,
++            rule_applied_id: FFS_RULE_ID,
+           },
+         });
+       }
+     } catch (err) {
+-      this.logger.error('RoomHeatService: adaptive weights persist failed', err, {
++      this.logger.error('FlickerNFlameScoringService: adaptive weights persist failed', err, {
+         creator_id: creatorId,
+       });
+     }
+@@ -643,7 +643,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   // PRIVATE — SESSION STATE & NATS EVENTS
+   // ══════════════════════════════════════════════════════════════════════════
+ 
+-  private updateSessionState(input: RoomHeatInput, score: RoomHeatScore): void {
++  private updateSessionState(input: FfsInput, score: FfsScore): void {
+     const existing = this.sessionState.get(input.session_id);
+     this.sessionState.set(input.session_id, {
+       currentScore:    score,
+@@ -652,7 +652,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+     });
+   }
+ 
+-  private emitScoreEvents(score: RoomHeatScore, input: RoomHeatInput): void {
++  private emitScoreEvents(score: FfsScore, input: FfsInput): void {
+     const payload = {
+       session_id:       score.session_id,
+       creator_id:       score.creator_id,
+@@ -664,12 +664,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+       captured_at_utc:  score.captured_at_utc,
+       rule_applied_id:  score.rule_applied_id,
+     };
+-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SAMPLE, payload);
++    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, payload);
+ 
+     // Tier transition
+     const prev = this.previousTier(score.session_id);
+     if (prev !== null && prev !== score.tier) {
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_TIER_CHANGED, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
+         session_id:      score.session_id,
+         creator_id:      score.creator_id,
+         from:            prev,
+@@ -678,7 +678,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         captured_at_utc: score.captured_at_utc,
+         rule_applied_id: score.rule_applied_id,
+       });
+-      this.logger.log('RoomHeatService: tier transition', {
++      this.logger.log('FlickerNFlameScoringService: tier transition', {
+         session_id: score.session_id,
+         from:       prev,
+         to:         score.tier,
+@@ -687,7 +687,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+ 
+     // INFERNO peak
+     if (score.tier === 'INFERNO') {
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_PEAK, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
+         session_id:      score.session_id,
+         creator_id:      score.creator_id,
+         score:           score.score,
+@@ -698,7 +698,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+ 
+     // Dual Flame INFERNO peak
+     if (score.tier === 'INFERNO' && score.is_dual_flame) {
+-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_DUAL_FLAME_PEAK, {
++      this.nats.publish(NATS_TOPICS.FFS_SCORE_DUAL_FLAME_PEAK, {
+         session_id:               score.session_id,
+         creator_id:               score.creator_id,
+         score:                    score.score,
+@@ -717,7 +717,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         score.score >= HOT_AND_READY_MIN_SCORE &&
+         dwell >= HOT_AND_READY_MIN_DWELL
+       ) {
+-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_HOT_AND_READY, {
++        this.nats.publish(NATS_TOPICS.FFS_SCORE_HOT_AND_READY, {
+           session_id:      score.session_id,
+           creator_id:      score.creator_id,
+           score:           score.score,
+@@ -730,7 +730,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   }
+ 
+   /** Returns the last confirmed tier for the session (before this tick). */
+-  private previousTier(sessionId: string): HeatTier | null {
++  private previousTier(sessionId: string): FfsTier | null {
+     return this.sessionState.get(sessionId)?.currentScore.tier ?? null;
+   }
+ 
+@@ -746,22 +746,22 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         this.clearInterval(sessionId);
+         return;
+       }
+-      const refreshed: RoomHeatInput = {
++      const refreshed: FfsInput = {
+         ...input,
+         captured_at_utc: new Date().toISOString(),
+       };
+-      const score = this.calculateHeatScore(refreshed);
++      const score = this.calculateFfsScore(refreshed);
+       this.updateSessionState(refreshed, score);
+       this.emitScoreEvents(score, refreshed);
+ 
+       // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
+       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;
+       this.tickCounters.set(sessionId, ticks);
+-      if (ticks % RoomHeatService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
++      if (ticks % FlickerNFlameScoringService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
+         const leaderboard = this.getLeaderboard('all');
+-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_LEADERBOARD_UPDATED, {
++        this.nats.publish(NATS_TOPICS.FFS_SCORE_LEADERBOARD_UPDATED, {
+           ...leaderboard,
+-          rule_applied_id: ROOM_HEAT_RULE_ID,
++          rule_applied_id: FFS_RULE_ID,
+         });
+       }
+     }, 1_000);
+@@ -782,16 +782,16 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   // ══════════════════════════════════════════════════════════════════════════
+ 
+   private async persistSnapshot(
+-    score: RoomHeatScore,
+-    _input: RoomHeatInput,
++    score: FfsScore,
++    _input: FfsInput,
+   ): Promise<void> {
+     try {
+       await this.prisma.roomHeatSnapshot.create({
+         data: {
+           session_id:      score.session_id,
+           creator_id:      score.creator_id,
+-          heat_score:      score.score,
+-          heat_tier:       score.tier,
++          ffs_score:      score.score,
++          ffs_tier:       score.tier,
+           components:      score.components as object,
+           correlation_id:  `rh-${score.session_id}-${Date.now()}`,
+           reason_code:     `HEAT_SAMPLE_${score.tier}`,
+@@ -800,7 +800,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+         },
+       });
+     } catch (err) {
+-      this.logger.warn('RoomHeatService: snapshot persist failed', {
++      this.logger.warn('FlickerNFlameScoringService: snapshot persist failed', {
+         session_id: score.session_id,
+         error:      String(err),
+       });
+@@ -838,7 +838,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+       }
+     });
+ 
+-    this.logger.log('RoomHeatService: NATS subscriptions active', {
++    this.logger.log('FlickerNFlameScoringService: NATS subscriptions active', {
+       topics: [NATS_TOPICS.HZ_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
+     });
+   }
+@@ -847,7 +847,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
+   // PRIVATE — HELPERS
+   // ══════════════════════════════════════════════════════════════════════════
+ 
+-  private zeroComponents(): HeatScoreComponents {
++  private zeroComponents(): FfsComponents {
+     return {
+       tip_pressure:      0,
+       chat_velocity:     0,
+diff --git a/services/room-heat/src/types/room-heat.types.ts b/services/ffs/src/types/ffs.types.ts
+similarity index 92%
+rename from services/room-heat/src/types/room-heat.types.ts
+rename to services/ffs/src/types/ffs.types.ts
+index 6728bf4..8e39acd 100644
+--- a/services/room-heat/src/types/room-heat.types.ts
++++ b/services/ffs/src/types/ffs.types.ts
+@@ -1,10 +1,10 @@
+ // WO-003 — Room-Heat Engine: canonical types
+ // Business Plan B.4 — real-time composite heat score (0-100) for all room-level telemetry.
+-// Rule authority: ROOM_HEAT_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
++// Rule authority: FFS_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
+ 
+ // ── Tier thresholds (canonical — locked in GovernanceConfig.HEAT_BAND_*)
+ // COLD 0-33 / WARM 34-60 / HOT 61-85 / INFERNO 86-100
+-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
++export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+ 
+ export type LeaderboardCategory =
+   | 'all'
+@@ -14,7 +14,7 @@ export type LeaderboardCategory =
+   | 'new_flames';
+ 
+ // ── Full input frame — all signals fed into the composite score ───────────────
+-export interface RoomHeatInput {
++export interface FfsInput {
+   // Identity
+   session_id: string;
+   creator_id: string;
+@@ -68,7 +68,7 @@ export interface RoomHeatInput {
+ }
+ 
+ // ── Per-component breakdown (maps to weight-max values in calculateComponents) ─
+-export interface HeatScoreComponents {
++export interface FfsComponents {
+   /** Tip pressure — max 15. */
+   tip_pressure: number;
+   /** Chat velocity — max 8. */
+@@ -98,18 +98,18 @@ export interface HeatScoreComponents {
+ }
+ 
+ // ── Full heat score output ────────────────────────────────────────────────────
+-export interface RoomHeatScore {
++export interface FfsScore {
+   session_id: string;
+   creator_id: string;
+   /** Composite score 0-100 after anti-flicker and guardrails. */
+   score: number;
+   /** Resolved tier (anti-flicker applied). */
+-  tier: HeatTier;
+-  components: HeatScoreComponents;
++  tier: FfsTier;
++  components: FfsComponents;
+   /** Per-creator learned multiplier — default 1.0, range 0.80-1.20. */
+   adaptive_multiplier: number;
+   /** Tier being evaluated for the 3-tick anti-flicker rule. */
+-  anti_flicker_pending_tier: HeatTier | null;
++  anti_flicker_pending_tier: FfsTier | null;
+   /** Consecutive ticks consistent with the pending tier (0-2 before promotion). */
+   anti_flicker_ticks: number;
+   is_dual_flame: boolean;
+@@ -122,7 +122,7 @@ export interface LeaderboardEntry {
+   session_id: string;
+   creator_id: string;
+   score: number;
+-  tier: HeatTier;
++  tier: FfsTier;
+   /** 0-indexed rank in the filtered set. Rank 0 = coolest (lowest score); higher rank = hotter session. */
+   rank: number;
+   /** Row in the 10×10 grid. Row 0 = top row (coolest), row 9 = bottom row (hottest). */
+@@ -135,7 +135,7 @@ export interface LeaderboardEntry {
+   session_started_at: string;
+ }
+ 
+-export interface RoomHeatLeaderboard {
++export interface FfsLeaderboard {
+   entries: LeaderboardEntry[];
+   total: number;
+   generated_at_utc: string;
+@@ -153,15 +153,15 @@ export interface AdaptiveWeights {
+ 
+ // ── In-memory session state ───────────────────────────────────────────────────
+ export interface SessionLiveState {
+-  currentScore: RoomHeatScore;
++  currentScore: FfsScore;
+   sessionStartedAt: Date;
+   isDualFlame: boolean;
+ }
+ 
+ // ── Anti-flicker state (per session) ─────────────────────────────────────────
+ export interface AntiFlickerState {
+-  confirmedTier: HeatTier;
+-  pendingTier: HeatTier;
++  confirmedTier: FfsTier;
++  pendingTier: FfsTier;
+   /** Ticks elapsed since pendingTier was first seen. Resets on confirm. */
+   ticks: number;
+ }
+diff --git a/services/guest-heat/src/dual-flame-pulse.service.ts b/services/guest-heat/src/dual-flame-pulse.service.ts
+index bfcc6cc..349c7a3 100644
+--- a/services/guest-heat/src/dual-flame-pulse.service.ts
++++ b/services/guest-heat/src/dual-flame-pulse.service.ts
+@@ -18,7 +18,7 @@ import {
+   type DualFlamePulseEvent,
+   type MembershipTier,
+ } from './guest-heat.types';
+-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
++import type { FfsTier } from '../../creator-control/src/ffs.engine';
+ 
+ /** Tiers eligible for Dual Flame Pulse (VIP and above). */
+ const ELIGIBLE_TIERS: Set<MembershipTier> = new Set([
+@@ -31,7 +31,7 @@ const ELIGIBLE_TIERS: Set<MembershipTier> = new Set([
+ ]);
+ 
+ /** Heat tiers that qualify for Dual Flame Pulse. */
+-const QUALIFYING_HEAT: Set<HeatTier> = new Set(['HOT', 'INFERNO']);
++const QUALIFYING_HEAT: Set<FfsTier> = new Set(['HOT', 'INFERNO']);
+ 
+ /** Minimum interval between pulse events per session (milliseconds). */
+ const PULSE_COOLDOWN_MS = 60_000;
+@@ -64,7 +64,7 @@ export class DualFlamePulseService {
+     creator_id: string,
+     guest_id: string,
+     tier: MembershipTier,
+-    current_heat: HeatTier,
++    current_heat: FfsTier,
+   ): DualFlamePulseEvent | null {
+     if (!this.presence.has(session_id)) {
+       this.presence.set(session_id, new Map());
+@@ -99,10 +99,10 @@ export class DualFlamePulseService {
+   /**
+    * Update the heat tier for an active session and re-evaluate.
+    */
+-  onHeatTierChanged(
++  onFfsTierChanged(
+     session_id: string,
+     creator_id: string,
+-    new_heat: HeatTier,
++    new_heat: FfsTier,
+   ): DualFlamePulseEvent | null {
+     const room = this.presence.get(session_id);
+     if (!room) return null;
+@@ -114,7 +114,7 @@ export class DualFlamePulseService {
+   private evaluatePulse(
+     session_id: string,
+     creator_id: string,
+-    heat: HeatTier,
++    heat: FfsTier,
+     room: Map<string, RoomPresenceEntry>,
+   ): DualFlamePulseEvent | null {
+     if (!QUALIFYING_HEAT.has(heat)) return null;
+@@ -138,7 +138,7 @@ export class DualFlamePulseService {
+       creator_id,
+       guest_a_id: a.guest_id,
+       guest_b_id: b.guest_id,
+-      heat_tier: heat as 'HOT' | 'INFERNO',
++      ffs_tier: heat as 'HOT' | 'INFERNO',
+       triggered_at_utc: new Date().toISOString(),
+       rule_applied_id: GUEST_HEAT_RULE_ID,
+     };
+diff --git a/services/guest-heat/src/guest-heat.controller.ts b/services/guest-heat/src/guest-heat.controller.ts
+index 567c0ea..6c692a8 100644
+--- a/services/guest-heat/src/guest-heat.controller.ts
++++ b/services/guest-heat/src/guest-heat.controller.ts
+@@ -18,10 +18,10 @@ import {
+   type SpendWindows,
+   type WhaleProfileRecord,
+ } from './guest-heat.types';
+-// HeatTier is imported from creator-control following the established pattern
++// FfsTier is imported from creator-control following the established pattern
+ // already used by cyrano.service and cyrano.types. When creator-control is
+ // extracted to a shared package this import will be updated accordingly.
+-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
++import type { FfsTier } from '../../creator-control/src/ffs.engine';
+ 
+ // ── REST DTOs ─────────────────────────────────────────────────────────────────
+ 
+@@ -62,7 +62,7 @@ export interface RegisterPresenceDto {
+   creator_id: string;
+   guest_id: string;
+   tier: MembershipTier;
+-  current_heat: HeatTier;
++  current_heat: FfsTier;
+ }
+ 
+ export interface GenerateForecastDto {
+diff --git a/services/guest-heat/src/guest-heat.types.ts b/services/guest-heat/src/guest-heat.types.ts
+index 147f309..085f899 100644
+--- a/services/guest-heat/src/guest-heat.types.ts
++++ b/services/guest-heat/src/guest-heat.types.ts
+@@ -42,7 +42,7 @@ export interface PreferenceVector {
+   /** Preferred session duration in minutes. */
+   preferred_dwell_minutes: number;
+   /** Preferred room heat tier at tip time. */
+-  preferred_heat_tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
++  preferred_ffs_tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+   /** Gemstone acceptance rate (0..1). */
+   gemstone_accept_rate: number;
+   /** Sensitivity to seasonal events. */
+@@ -172,7 +172,7 @@ export interface DualFlamePulseEvent {
+   /** The two guest IDs whose co-presence triggered the pulse. */
+   guest_a_id: string;
+   guest_b_id: string;
+-  heat_tier: 'HOT' | 'INFERNO';
++  ffs_tier: 'HOT' | 'INFERNO';
+   triggered_at_utc: string;
+   rule_applied_id: string;
+ }
+diff --git a/services/heartsync/src/heartsync.module.ts b/services/heartsync/src/heartsync.module.ts
+deleted file mode 100644
+index c6e2315..0000000
+--- a/services/heartsync/src/heartsync.module.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-// HZ: HeartSync module
+-import { Module } from '@nestjs/common';
+-import { HeartSyncController } from './heartsync.controller';
+-import { HeartSyncService } from './heartsync.service';
+-
+-@Module({
+-  controllers: [HeartSyncController],
+-  providers: [HeartSyncService],
+-  exports: [HeartSyncService],
+-})
+-export class HeartSyncModule {}
+diff --git a/services/integration-hub/src/hub.service.ts b/services/integration-hub/src/hub.service.ts
+index cc9d518..1c6e4cd 100644
+--- a/services/integration-hub/src/hub.service.ts
++++ b/services/integration-hub/src/hub.service.ts
+@@ -26,7 +26,7 @@ import {
+   RECOVERY_ENGINE,
+   REDBOOK_RATE_CARDS,
+ } from '../../core-api/src/config/governance.config';
+-import type { HeatScore, HeatTier, RoomHeatSample } from '../../creator-control/src/room-heat.engine';
++import type { FfsScore, FfsTier, FfsSample } from '../../creator-control/src/ffs.engine';
+ import type { CyranoInputFrame, CyranoSuggestion } from '../../cyrano/src/cyrano.types';
+ import type { CreatorControlService } from '../../creator-control/src/creator-control.service';
+ import type { CyranoService } from '../../cyrano/src/cyrano.service';
+@@ -86,7 +86,7 @@ export interface GuardedLedgerDecision {
+  * the ledger — it publishes HUB_PAYOUT_SCALING_APPLIED so the payout
+  * service can enrich the next statement cycle.
+  */
+-const PAYOUT_SCALING_PCT_BY_TIER: Record<HeatTier, number> = {
++const PAYOUT_SCALING_PCT_BY_TIER: Record<FfsTier, number> = {
+   COLD:    0.00,
+   WARM:    0.00,
+   HOT:     0.05,
+@@ -94,11 +94,11 @@ const PAYOUT_SCALING_PCT_BY_TIER: Record<HeatTier, number> = {
+ };
+ 
+ /** Minimum heat tier that triggers a monetization handoff to Cyrano. */
+-const MONETIZATION_TRIGGER_TIERS: ReadonlySet<HeatTier> = new Set(['HOT', 'INFERNO']);
++const MONETIZATION_TRIGGER_TIERS: ReadonlySet<FfsTier> = new Set(['HOT', 'INFERNO']);
+ 
+ export interface HighHeatFlowInput {
+   /** Telemetry sample — CreatorControl is the authoritative scorer. */
+-  sample: RoomHeatSample;
++  sample: FfsSample;
+   /** Cyrano frame, less the heat score which is injected post-scoring. */
+   frame: Omit<CyranoInputFrame, 'heat'>;
+   creator_payout_rate_per_token_usd: number;
+@@ -106,7 +106,7 @@ export interface HighHeatFlowInput {
+ }
+ 
+ export interface HighHeatFlowResult {
+-  heat: HeatScore;
++  heat: FfsScore;
+   suggestion: CyranoSuggestion | null;
+   payout_scaling_pct: number;
+   scaled_payout_per_token_usd: number;
+@@ -142,7 +142,7 @@ export class IntegrationHubService {
+     const suggestion = this.cyrano.evaluate({ ...input.frame, heat });
+ 
+     const capturedAt = new Date().toISOString();
+-    const tier: HeatTier = heat.tier;
++    const tier: FfsTier = heat.tier;
+     const scalingPct = PAYOUT_SCALING_PCT_BY_TIER[tier];
+     const scaledRate = +(
+       input.creator_payout_rate_per_token_usd * (1 + scalingPct)
+@@ -154,7 +154,7 @@ export class IntegrationHubService {
+         creator_id: input.frame.creator_id,
+         guest_id: input.frame.guest_id,
+         tier,
+-        heat_score: heat.score,
++        ffs_score: heat.score,
+         suggested_category: suggestion?.category ?? null,
+         suggestion_id: suggestion?.suggestion_id ?? null,
+         captured_at_utc: capturedAt,
+diff --git a/services/ledger/payout.service.ts b/services/ledger/payout.service.ts
+index afb7b97..7817bf9 100644
+--- a/services/ledger/payout.service.ts
++++ b/services/ledger/payout.service.ts
+@@ -67,7 +67,7 @@ export class PayoutService {
+         reasonCode: 'PAYOUT',
+         metadata: {
+           session_id: input.sessionId,
+-          heat_score: input.heatScore,
++          ffs_score: input.heatScore,
+           heat_level: rate.level,
+           rate_per_token: rate.ratePerToken,
+           applied_diamond_floor: rate.appliedFloor,
+diff --git a/services/nats/topics.registry.ts b/services/nats/topics.registry.ts
+index 6f3ecba..47c2b8b 100644
+--- a/services/nats/topics.registry.ts
++++ b/services/nats/topics.registry.ts
+@@ -34,15 +34,15 @@ export const NATS_TOPICS = {
+   HZ_HAPTIC_TRIGGER:        'hz.haptic.trigger',
+   HZ_WISH_FULFILLED:        'hz.wish.fulfilled',
+ 
+-  // ── HeartSync biometric relay ──────────────────────────────────────────
+-  HEARTSYNC_SAMPLE_RECEIVED:        'heartsync.sample.received',
+-  HEARTSYNC_RELAY_EMITTED:          'heartsync.relay.emitted',
+-  HEARTSYNC_COMBINED_BPM:           'heartsync.combined.bpm',
+-  HEARTSYNC_CONSENT_GRANTED:        'heartsync.consent.granted',
+-  HEARTSYNC_CONSENT_REVOKED:        'heartsync.consent.revoked',
+-  HEARTSYNC_HAPTIC_DISPATCHED:      'heartsync.haptic.dispatched',
+-  HEARTSYNC_PLAUSIBILITY_REJECTED:  'heartsync.plausibility.rejected',
+-  HEARTSYNC_TIER_DISABLED:          'heartsync.tier.disabled',
++  // ── SenSync™ biometric relay ──────────────────────────────────────────
++  SENSYNC_SAMPLE_RECEIVED:        'sensync.sample.received',
++  SENSYNC_RELAY_EMITTED:          'sensync.relay.emitted',
++  SENSYNC_COMBINED_BPM:           'sensync.combined.bpm',
++  SENSYNC_CONSENT_GRANTED:        'sensync.consent.granted',
++  SENSYNC_CONSENT_REVOKED:        'sensync.consent.revoked',
++  SENSYNC_HAPTIC_DISPATCHED:      'sensync.haptic.dispatched',
++  SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
++  SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
+ 
+   // ── Guest-Heat intelligence layer ─────────────────────────────────────
+   GUEST_HEAT_WHALE_SCORED:          'guest_heat.whale.scored',
+@@ -202,16 +202,16 @@ export const NATS_TOPICS = {
+   GATEGUARD_FEDERATED_LOOKUP:        'gateguard.federated.lookup',
+   GATEGUARD_HUMAN_CONTACT_ZONE:      'gateguard.human_contact_zone.escalated',
+ 
+-  // ── Room-Heat Engine (Business Plan B.4 — room-level telemetry) ──────────
+-  ROOM_HEAT_SAMPLE:                  'room.heat.sample',
+-  ROOM_HEAT_TIER_CHANGED:            'room.heat.tier.changed',
+-  ROOM_HEAT_PEAK:                    'room.heat.peak',
+-  ROOM_HEAT_LEADERBOARD_UPDATED:     'room.heat.leaderboard.updated',
+-  ROOM_HEAT_HOT_AND_READY:           'room.heat.hot_and_ready',
+-  ROOM_HEAT_DUAL_FLAME_PEAK:         'room.heat.dual_flame.peak',
+-  ROOM_HEAT_SESSION_STARTED:         'room.heat.session.started',
+-  ROOM_HEAT_SESSION_ENDED:           'room.heat.session.ended',
+-  ROOM_HEAT_ADAPTIVE_UPDATED:        'room.heat.adaptive.updated',
++  // ── Flicker n'Flame Scoring (FFS) — room-level telemetry ──────────
++  FFS_SCORE_SAMPLE:                  'ffs.score.sample',
++  FFS_SCORE_TIER_CHANGED:            'ffs.score.tier.changed',
++  FFS_SCORE_PEAK:                    'ffs.score.peak',
++  FFS_SCORE_LEADERBOARD_UPDATED:     'ffs.score.leaderboard.updated',
++  FFS_SCORE_HOT_AND_READY:           'ffs.score.hot_and_ready',
++  FFS_SCORE_DUAL_FLAME_PEAK:         'ffs.score.dual_flame.peak',
++  FFS_SCORE_SESSION_STARTED:         'ffs.score.session.started',
++  FFS_SCORE_SESSION_ENDED:           'ffs.score.session.ended',
++  FFS_SCORE_ADAPTIVE_UPDATED:        'ffs.score.adaptive.updated',
+ 
+   // ── CreatorControl.Zone (Business Plan B.3 — creator workstation) ────────
+   CREATOR_CONTROL_BROADCAST_SUGGESTION: 'creator_control.broadcast.suggestion',
+diff --git a/services/room-heat/src/room-heat.module.ts b/services/room-heat/src/room-heat.module.ts
+deleted file mode 100644
+index 9ed8ade..0000000
+--- a/services/room-heat/src/room-heat.module.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-// WO-003 — Room-Heat Engine: module
+-// Business Plan B.4 — real-time composite heat score service.
+-// NatsModule and PrismaModule are global — no local import needed.
+-import { Module } from '@nestjs/common';
+-import { RoomHeatController } from './room-heat.controller';
+-import { RoomHeatService } from './room-heat.service';
+-
+-@Module({
+-  controllers: [RoomHeatController],
+-  providers:   [RoomHeatService],
+-  exports:     [RoomHeatService],
+-})
+-export class RoomHeatModule {}
+diff --git a/services/heartsync/.env.example b/services/sensync/.env.example
+similarity index 100%
+rename from services/heartsync/.env.example
+rename to services/sensync/.env.example
+diff --git a/services/heartsync/ASSUMPTIONS.md b/services/sensync/ASSUMPTIONS.md
+similarity index 72%
+rename from services/heartsync/ASSUMPTIONS.md
+rename to services/sensync/ASSUMPTIONS.md
+index 5a8bfdf..bad8c77 100644
+--- a/services/heartsync/ASSUMPTIONS.md
++++ b/services/sensync/ASSUMPTIONS.md
+@@ -1,29 +1,29 @@
+-# HeartSync — ASSUMPTIONS.md
++# SenSync™ — ASSUMPTIONS.md
+ 
+ ## A001 — Tier Config Seeded in DB
+-Assumes `heartsync_tier_configs` rows exist for all seven tiers before
++Assumes `sensync_tier_configs` rows exist for all seven tiers before
+ `onModuleInit` is called. If the table is empty, all tiers default to
+ `disabled`. Operators must seed the table post-migration.
+ 
+ ## A002 — Caller Enforces Sampling Interval Jitter
+-HeartSyncService does not enforce the 1.5–3 s random sampling cadence.
++SenSync™Service does not enforce the 1.5–3 s random sampling cadence.
+ This is delegated to the device gateway or calling service. The service
+ processes each submitted sample as presented.
+ 
+ ## A003 — Single Session Per session_id
+-Each `session_id` maps to exactly one HeartSync relay session. If the
++Each `session_id` maps to exactly one SenSync™ relay session. If the
+ same `session_id` is reopened without closing, the prior state is
+ overwritten. Callers must close sessions cleanly.
+ 
+ ## A004 — Driver Availability Is Caller-Managed
+-HeartSyncService resolves the driver by name only; it does not perform
++SenSync™Service resolves the driver by name only; it does not perform
+ device-level capability negotiation. The integration layer (Lovense API,
+ Buttplug.io WebSocket, etc.) is managed by downstream consumers of the
+-`heartsync.haptic.dispatched` NATS event.
++`sensync.haptic.dispatched` NATS event.
+ 
+ ## A005 — IP Hash Is Pre-Computed by Caller
+ The `ip_hash` field in `GrantConsentDto` must be a SHA-256 hex digest
+-computed by the API gateway or middleware layer. HeartSyncService never
++computed by the API gateway or middleware layer. SenSync™Service never
+ receives or stores raw IP addresses.
+ 
+ ## A006 — COMBINED Mode Requires Both BPMs
+@@ -33,12 +33,12 @@ Until both sides have submitted at least one valid sample, the
+ `relayCombined` call is a no-op.
+ 
+ ## A007 — Process-Restart Clears All Session State
+-HeartSyncService uses in-process Map for ephemeral state. A process
++SenSync™Service uses in-process Map for ephemeral state. A process
+ restart clears all open sessions. Callers must handle reconnection and
+ re-open sessions after restart.
+ 
+ ## A008 — Tier Config Cache Is Not Distributed
+ `tierEnabled` and `tierCombinedAllowed` Maps are local to each process
+ instance. In a horizontally-scaled deployment, call
+-`POST /heartsync/tier-config/refresh` on all instances after a DB change,
++`POST /sensync/tier-config/refresh` on all instances after a DB change,
+ or implement a NATS fanout for config invalidation.
+diff --git a/services/heartsync/FLAGS.md b/services/sensync/FLAGS.md
+similarity index 86%
+rename from services/heartsync/FLAGS.md
+rename to services/sensync/FLAGS.md
+index e81a40a..5145da4 100644
+--- a/services/heartsync/FLAGS.md
++++ b/services/sensync/FLAGS.md
+@@ -1,21 +1,21 @@
+-# HeartSync — FLAGS.md
++# SenSync™ — FLAGS.md
+ 
+ ## FLAG-001: COMBINED_MODE_DEFAULT_OFF
+ **Default:** `combined_mode = false` for all tiers.  
+ **Intent:** "Feel as one" is an opt-in premium feature; operators must
+-explicitly enable it per tier via `heartsync_tier_configs`.
++explicitly enable it per tier via `sensync_tier_configs`.
+ 
+ ## FLAG-002: GUEST_TIER_DEFAULT_DISABLED
+ **Default:** `enabled = false` for GUEST tier.  
+ **Intent:** Biometric relay requires at minimum a VIP membership. Guests
+-(unauthenticated or free-tier) cannot participate in HeartSync.
++(unauthenticated or free-tier) cannot participate in SenSync™.
+ 
+ ## FLAG-003: PLAUSIBILITY_BOUNDS_30_220
+ **Values:** min = 30 BPM, max = 220 BPM.  
+ **Intent:** Medical-grade resting/peak range. Samples outside this window
+ are considered device error or spoofed data and are silently discarded.
+ To adjust, update `HEARTSYNC_BPM_MIN` and `HEARTSYNC_BPM_MAX` in
+-`heartsync.types.ts` and redeploy.
++`sensync.types.ts` and redeploy.
+ 
+ ## FLAG-004: CONSENT_REQUIRED_BEFORE_RELAY
+ **Default:** Enforced always.  
+diff --git a/services/heartsync/README.md b/services/sensync/README.md
+similarity index 54%
+rename from services/heartsync/README.md
+rename to services/sensync/README.md
+index 66ec6bf..9de72c7 100644
+--- a/services/heartsync/README.md
++++ b/services/sensync/README.md
+@@ -1,12 +1,12 @@
+-# HeartSync — Biometric Relay Service
++# SenSync™ — Biometric Relay Service
+ 
+ **Service prefix:** `HZ:`  
+ **Domain:** HeartZone / biometrics  
+-**Path:** `services/heartsync/`
++**Path:** `services/sensync/`
+ 
+ ## Purpose
+ 
+-HeartSync is the real-time biometric relay layer for ChatNow.Zone. It
++SenSync™ is the real-time biometric relay layer for ChatNow.Zone. It
+ receives raw BPM samples from connected haptic devices, validates them,
+ and relays them between consenting creators and guests to enable
+ synchronised haptic feedback.
+@@ -23,8 +23,8 @@ synchronised haptic feedback.
+ | VIP_PLATINUM | ✓ | ✓ |
+ | VIP_DIAMOND | ✓ | ✓ |
+ 
+-Per-tier flags are stored in `heartsync_tier_configs` and can be toggled
+-without a deployment. Call `POST /heartsync/tier-config/refresh` after
++Per-tier flags are stored in `sensync_tier_configs` and can be toggled
++without a deployment. Call `POST /sensync/tier-config/refresh` after
+ a DB change.
+ 
+ ## Relay Modes
+@@ -44,57 +44,57 @@ a DB change.
+ 4. **Phone Haptic** — mobile fallback (vibration API)
+ 
+ Driver is resolved per-session. If the preferred driver is unavailable,
+-HeartSyncService falls back through the priority list to `PHONE_HAPTIC`.
++SenSync™Service falls back through the priority list to `PHONE_HAPTIC`.
+ 
+ ## Plausibility Filter
+ 
+ BPM samples outside **30–220 BPM** are silently rejected:
+-- Rejection emitted on `heartsync.plausibility.rejected`
++- Rejection emitted on `sensync.plausibility.rejected`
+ - No relay dispatched
+ - No error returned to caller — audit only
+ 
+ ## Consent Model (Law 25 / GDPR)
+ 
+-- Guest must call `POST /heartsync/consent/grant` before any BPM relay.
++- Guest must call `POST /sensync/consent/grant` before any BPM relay.
+ - `ip_hash` is SHA-256 of the guest IP — raw IP never stored.
+-- Consent can be revoked at any time via `POST /heartsync/consent/revoke`.
++- Consent can be revoked at any time via `POST /sensync/consent/revoke`.
+ - Revocation clears all ephemeral BPM state immediately.
+-- Consent events emitted on `heartsync.consent.granted` / `heartsync.consent.revoked`.
++- Consent events emitted on `sensync.consent.granted` / `sensync.consent.revoked`.
+ 
+ ## REST Endpoints
+ 
+ | Method | Path | Description |
+ |--------|------|-------------|
+-| POST | `/heartsync/sessions` | Open a relay session |
+-| DELETE | `/heartsync/sessions/:id` | Close a relay session |
+-| GET | `/heartsync/sessions/:id` | Get ephemeral session state |
+-| POST | `/heartsync/consent/grant` | Grant biometric relay consent |
+-| POST | `/heartsync/consent/revoke` | Revoke consent |
+-| POST | `/heartsync/samples` | Submit a BPM sample |
+-| POST | `/heartsync/tier-config/refresh` | Reload tier config from DB |
++| POST | `/sensync/sessions` | Open a relay session |
++| DELETE | `/sensync/sessions/:id` | Close a relay session |
++| GET | `/sensync/sessions/:id` | Get ephemeral session state |
++| POST | `/sensync/consent/grant` | Grant biometric relay consent |
++| POST | `/sensync/consent/revoke` | Revoke consent |
++| POST | `/sensync/samples` | Submit a BPM sample |
++| POST | `/sensync/tier-config/refresh` | Reload tier config from DB |
+ 
+ ## NATS Topics Emitted
+ 
+ | Topic | When |
+ |-------|------|
+-| `heartsync.sample.received` | Valid sample accepted |
+-| `heartsync.relay.emitted` | BPM relayed (non-combined modes) |
+-| `heartsync.combined.bpm` | Combined BPM computed |
+-| `heartsync.consent.granted` | Guest consented |
+-| `heartsync.consent.revoked` | Guest revoked consent |
+-| `heartsync.haptic.dispatched` | Haptic command sent |
+-| `heartsync.plausibility.rejected` | Sample out of 30–220 range |
+-| `heartsync.tier.disabled` | Session open rejected due to tier config |
++| `sensync.sample.received` | Valid sample accepted |
++| `sensync.relay.emitted` | BPM relayed (non-combined modes) |
++| `sensync.combined.bpm` | Combined BPM computed |
++| `sensync.consent.granted` | Guest consented |
++| `sensync.consent.revoked` | Guest revoked consent |
++| `sensync.haptic.dispatched` | Haptic command sent |
++| `sensync.plausibility.rejected` | Sample out of 30–220 range |
++| `sensync.tier.disabled` | Session open rejected due to tier config |
+ | `hz.haptic.trigger` | Mirrored on legacy HZ topic for downstream |
+ 
+ ## Ephemeral Data Only
+ 
+-No BPM values are written to Postgres. `HeartSyncSessionState` lives
++No BPM values are written to Postgres. `SenSync™SessionState` lives
+ in-process memory and is purged on `closeSession()` or process restart.
+ This is a deliberate privacy design decision (Law 25 / GDPR minimisation).
+ 
+ ## Sampling Cadence
+ 
+ Sampling interval jitter (1.5–3 s) is enforced by the caller / device
+-gateway, not by this service. HeartSyncService is stateless with respect
++gateway, not by this service. SenSync™Service is stateless with respect
+ to timing — it processes each sample as presented.
+diff --git a/services/heartsync/src/heartsync.controller.ts b/services/sensync/src/sensync.controller.ts
+similarity index 72%
+rename from services/heartsync/src/heartsync.controller.ts
+rename to services/sensync/src/sensync.controller.ts
+index 2f8b72b..4772b5c 100644
+--- a/services/heartsync/src/heartsync.controller.ts
++++ b/services/sensync/src/sensync.controller.ts
+@@ -9,17 +9,17 @@ import {
+   Post,
+ } from '@nestjs/common';
+ import { randomUUID } from 'crypto';
+-import { HeartSyncService } from './heartsync.service';
++import { SenSyncService } from './sensync.service';
+ import type {
+   HapticDriver,
+-  HeartSyncCombinedBpm,
+-  HeartSyncConsent,
+-  HeartSyncMode,
+-  HeartSyncRelayEvent,
+-  HeartSyncSample,
+-  HeartSyncSessionState,
++  SenSyncCombinedBpm,
++  SenSyncConsent,
++  SenSyncMode,
++  SenSyncRelayEvent,
++  SenSyncSample,
++  SenSyncSessionState,
+   MembershipTier,
+-} from './heartsync.types';
++} from './sensync.types';
+ 
+ // ── REST DTOs ─────────────────────────────────────────────────────────────────
+ 
+@@ -28,7 +28,7 @@ export interface OpenSessionDto {
+   creator_id: string;
+   guest_id: string;
+   tier: MembershipTier;
+-  mode: HeartSyncMode;
++  mode: SenSyncMode;
+   driver: HapticDriver;
+ }
+ 
+@@ -63,15 +63,15 @@ export interface RefreshTierConfigDto {
+ 
+ // ── Controller ────────────────────────────────────────────────────────────────
+ 
+-@Controller('heartsync')
+-export class HeartSyncController {
+-  private readonly logger = new Logger(HeartSyncController.name);
++@Controller('sensync')
++export class SenSyncController {
++  private readonly logger = new Logger(SenSyncController.name);
+ 
+-  constructor(private readonly heartSync: HeartSyncService) {}
++  constructor(private readonly heartSync: SenSyncService) {}
+ 
+-  /** POST /heartsync/sessions */
++  /** POST /sensync/sessions */
+   @Post('sessions')
+-  openSession(@Body() dto: OpenSessionDto): HeartSyncSessionState | { error: string } {
++  openSession(@Body() dto: OpenSessionDto): SenSyncSessionState | { error: string } {
+     const state = this.heartSync.openSession(
+       dto.session_id,
+       dto.creator_id,
+@@ -81,14 +81,14 @@ export class HeartSyncController {
+       dto.driver,
+     );
+     if (!state) {
+-      return { error: 'HEARTSYNC_TIER_DISABLED_OR_COMBINED_NOT_PERMITTED' };
++      return { error: 'SENSYNC_TIER_DISABLED_OR_COMBINED_NOT_PERMITTED' };
+     }
+     return state;
+   }
+ 
+-  /** POST /heartsync/consent/grant */
++  /** POST /sensync/consent/grant */
+   @Post('consent/grant')
+-  grantConsent(@Body() dto: GrantConsentDto): HeartSyncConsent {
++  grantConsent(@Body() dto: GrantConsentDto): SenSyncConsent {
+     return this.heartSync.grantConsent(
+       dto.session_id,
+       dto.guest_id,
+@@ -98,17 +98,17 @@ export class HeartSyncController {
+     );
+   }
+ 
+-  /** POST /heartsync/consent/revoke */
++  /** POST /sensync/consent/revoke */
+   @Post('consent/revoke')
+   revokeConsent(@Body() dto: RevokeConsentDto): { ok: true } {
+     this.heartSync.revokeConsent(dto.session_id, dto.guest_id, dto.creator_id);
+     return { ok: true };
+   }
+ 
+-  /** POST /heartsync/samples */
++  /** POST /sensync/samples */
+   @Post('samples')
+-  submitSample(@Body() dto: SubmitSampleDto): HeartSyncRelayEvent | HeartSyncCombinedBpm | { ok: false; reason: string } {
+-    const sample: HeartSyncSample = {
++  submitSample(@Body() dto: SubmitSampleDto): SenSyncRelayEvent | SenSyncCombinedBpm | { ok: false; reason: string } {
++    const sample: SenSyncSample = {
+       sample_id: randomUUID(),
+       session_id: dto.session_id,
+       creator_id: dto.creator_id,
+@@ -128,16 +128,16 @@ export class HeartSyncController {
+     return result;
+   }
+ 
+-  /** DELETE /heartsync/sessions/:session_id */
++  /** DELETE /sensync/sessions/:session_id */
+   @Delete('sessions/:session_id')
+   closeSession(@Param('session_id') session_id: string): { ok: true } {
+     this.heartSync.closeSession(session_id);
+     return { ok: true };
+   }
+ 
+-  /** GET /heartsync/sessions/:session_id */
++  /** GET /sensync/sessions/:session_id */
+   @Get('sessions/:session_id')
+-  getSession(@Param('session_id') session_id: string): HeartSyncSessionState | { error: string } {
++  getSession(@Param('session_id') session_id: string): SenSyncSessionState | { error: string } {
+     const state = this.heartSync.getSessionState(session_id);
+     if (!state) {
+       return { error: 'SESSION_NOT_FOUND' };
+@@ -145,7 +145,7 @@ export class HeartSyncController {
+     return state;
+   }
+ 
+-  /** POST /heartsync/tier-config/refresh */
++  /** POST /sensync/tier-config/refresh */
+   @Post('tier-config/refresh')
+   async refreshTierConfig(@Body() _dto: RefreshTierConfigDto): Promise<{ ok: true }> {
+     await this.heartSync.refreshTierConfig();
+diff --git a/services/sensync/src/sensync.module.ts b/services/sensync/src/sensync.module.ts
+new file mode 100644
+index 0000000..db06368
+--- /dev/null
++++ b/services/sensync/src/sensync.module.ts
+@@ -0,0 +1,11 @@
++// HZ: HeartSync module
++import { Module } from '@nestjs/common';
++import { SenSyncController } from './sensync.controller';
++import { SenSyncService } from './sensync.service';
++
++@Module({
++  controllers: [SenSyncController],
++  providers: [SenSyncService],
++  exports: [SenSyncService],
++})
++export class SenSyncModule {}
+diff --git a/services/heartsync/src/heartsync.service.ts b/services/sensync/src/sensync.service.ts
+similarity index 75%
+rename from services/heartsync/src/heartsync.service.ts
+rename to services/sensync/src/sensync.service.ts
+index 873be89..636922e 100644
+--- a/services/heartsync/src/heartsync.service.ts
++++ b/services/sensync/src/sensync.service.ts
+@@ -6,7 +6,7 @@
+ //     phone haptic drivers.
+ //   • Applies plausibility filter (30–220 BPM). Out-of-range samples are
+ //     rejected with an audit-only NATS event.
+-//   • Per-tier enablement checked against HeartSyncTierConfig (in-memory
++//   • Per-tier enablement checked against SenSyncTierConfig (in-memory
+ //     cache; refreshed on module init).
+ //   • Three relay modes: BIDIRECTIONAL, CREATOR_TO_GUEST, GUEST_TO_CREATOR.
+ //     COMBINED mode averages both BPMs ("feel as one").
+@@ -20,22 +20,22 @@ import { NatsService } from '../../core-api/src/nats/nats.service';
+ import { PrismaService } from '../../core-api/src/prisma.service';
+ import { NATS_TOPICS } from '../../nats/topics.registry';
+ import {
+-  HEARTSYNC_BPM_MAX,
+-  HEARTSYNC_BPM_MIN,
+-  HEARTSYNC_RULE_ID,
++  SENSYNC_BPM_MAX,
++  SENSYNC_BPM_MIN,
++  SENSYNC_RULE_ID,
+   type HapticDriver,
+-  type HeartSyncCombinedBpm,
+-  type HeartSyncConsent,
+-  type HeartSyncHapticCommand,
+-  type HeartSyncMode,
+-  type HeartSyncPlausibilityRejection,
+-  type HeartSyncRelayEvent,
+-  type HeartSyncSample,
+-  type HeartSyncSessionState,
+-  type HeartSyncTierDisabledEvent,
+-  type HeartSyncValidSample,
++  type SenSyncCombinedBpm,
++  type SenSyncConsent,
++  type SenSyncHapticCommand,
++  type SenSyncMode,
++  type SenSyncPlausibilityRejection,
++  type SenSyncRelayEvent,
++  type SenSyncSample,
++  type SenSyncSessionState,
++  type SenSyncTierDisabledEvent,
++  type SenSyncValidSample,
+   type MembershipTier,
+-} from './heartsync.types';
++} from './sensync.types';
+ 
+ /** Fallback driver priority when preferred driver is unavailable. */
+ const DRIVER_FALLBACK_ORDER: HapticDriver[] = [
+@@ -46,11 +46,11 @@ const DRIVER_FALLBACK_ORDER: HapticDriver[] = [
+ ];
+ 
+ @Injectable()
+-export class HeartSyncService implements OnModuleInit {
+-  private readonly logger = new Logger(HeartSyncService.name);
++export class SenSyncService implements OnModuleInit {
++  private readonly logger = new Logger(SenSyncService.name);
+ 
+   /** Ephemeral session state — never persisted. Cleared on session end. */
+-  private readonly sessions = new Map<string, HeartSyncSessionState>();
++  private readonly sessions = new Map<string, SenSyncSessionState>();
+ 
+   /** Per-tier enabled flags — refreshed from DB on init. */
+   private tierEnabled = new Map<MembershipTier, boolean>();
+@@ -66,7 +66,7 @@ export class HeartSyncService implements OnModuleInit {
+ 
+   async onModuleInit(): Promise<void> {
+     await this.refreshTierConfig();
+-    this.logger.log('HeartSyncService: tier config loaded');
++    this.logger.log('SenSyncService: tier config loaded');
+   }
+ 
+   // ── Public API ────────────────────────────────────────────────────────────
+@@ -81,21 +81,21 @@ export class HeartSyncService implements OnModuleInit {
+     creator_id: string,
+     guest_id: string,
+     tier: MembershipTier,
+-    mode: HeartSyncMode,
++    mode: SenSyncMode,
+     driver: HapticDriver,
+-  ): HeartSyncSessionState | null {
++  ): SenSyncSessionState | null {
+     if (!this.isTierEnabled(tier)) {
+       this.emitTierDisabled(session_id, guest_id, tier);
+       return null;
+     }
+ 
+     if (mode === 'COMBINED' && !this.isCombinedAllowed(tier)) {
+-      this.logger.warn('HeartSyncService: COMBINED mode not permitted for tier', { tier, session_id });
++      this.logger.warn('SenSyncService: COMBINED mode not permitted for tier', { tier, session_id });
+       this.emitTierDisabled(session_id, guest_id, tier);
+       return null;
+     }
+ 
+-    const state: HeartSyncSessionState = {
++    const state: SenSyncSessionState = {
+       session_id,
+       creator_id,
+       guest_id,
+@@ -106,14 +106,14 @@ export class HeartSyncService implements OnModuleInit {
+     };
+ 
+     this.sessions.set(session_id, state);
+-    this.logger.log('HeartSyncService: session opened', { session_id, mode, tier });
++    this.logger.log('SenSyncService: session opened', { session_id, mode, tier });
+     return state;
+   }
+ 
+   /**
+    * Record guest consent for biometric relay.
+    * Must be called before samples are relayed.
+-   * Emits HEARTSYNC_CONSENT_GRANTED on NATS.
++   * Emits SENSYNC_CONSENT_GRANTED on NATS.
+    */
+   grantConsent(
+     session_id: string,
+@@ -121,11 +121,11 @@ export class HeartSyncService implements OnModuleInit {
+     creator_id: string,
+     ip_hash?: string,
+     device_fingerprint?: string,
+-  ): HeartSyncConsent {
++  ): SenSyncConsent {
+     const key = `${session_id}:${guest_id}`;
+     this.consentStore.set(key, true);
+ 
+-    const consent: HeartSyncConsent = {
++    const consent: SenSyncConsent = {
+       consent_id: randomUUID(),
+       session_id,
+       guest_id,
+@@ -134,21 +134,21 @@ export class HeartSyncService implements OnModuleInit {
+       ip_hash,
+       device_fingerprint,
+       issued_at_utc: new Date().toISOString(),
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_CONSENT_GRANTED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_GRANTED, {
+       ...consent,
+     } as unknown as Record<string, unknown>);
+ 
+-    this.logger.log('HeartSyncService: consent granted', { session_id, guest_id });
++    this.logger.log('SenSyncService: consent granted', { session_id, guest_id });
+     return consent;
+   }
+ 
+   /**
+    * Revoke guest consent for biometric relay.
+    * Clears all buffered BPM state for the session.
+-   * Emits HEARTSYNC_CONSENT_REVOKED on NATS.
++   * Emits SENSYNC_CONSENT_REVOKED on NATS.
+    */
+   revokeConsent(session_id: string, guest_id: string, creator_id: string): void {
+     const key = `${session_id}:${guest_id}`;
+@@ -161,33 +161,33 @@ export class HeartSyncService implements OnModuleInit {
+       state.last_guest_bpm = undefined;
+     }
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_CONSENT_REVOKED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, {
+       event_id: randomUUID(),
+       session_id,
+       guest_id,
+       creator_id,
+       basis: 'REVOKED',
+       revoked_at_utc: new Date().toISOString(),
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     } as unknown as Record<string, unknown>);
+ 
+-    this.logger.log('HeartSyncService: consent revoked', { session_id, guest_id });
++    this.logger.log('SenSyncService: consent revoked', { session_id, guest_id });
+   }
+ 
+   /**
+    * Submit a raw BPM sample for relay processing.
+    * Returns the relay event(s) emitted, or null if sample was rejected.
+    */
+-  submitSample(sample: HeartSyncSample): HeartSyncRelayEvent | HeartSyncCombinedBpm | null {
++  submitSample(sample: SenSyncSample): SenSyncRelayEvent | SenSyncCombinedBpm | null {
+     // Plausibility filter — hard bounds [30..220].
+-    if (sample.bpm_raw < HEARTSYNC_BPM_MIN || sample.bpm_raw > HEARTSYNC_BPM_MAX) {
++    if (sample.bpm_raw < SENSYNC_BPM_MIN || sample.bpm_raw > SENSYNC_BPM_MAX) {
+       this.rejectSample(sample);
+       return null;
+     }
+ 
+     const state = this.sessions.get(sample.session_id);
+     if (!state) {
+-      this.logger.warn('HeartSyncService: no active session for sample', {
++      this.logger.warn('SenSyncService: no active session for sample', {
+         session_id: sample.session_id,
+       });
+       return null;
+@@ -196,14 +196,14 @@ export class HeartSyncService implements OnModuleInit {
+     // Consent check.
+     const consentKey = `${sample.session_id}:${sample.guest_id}`;
+     if (!this.consentStore.get(consentKey)) {
+-      this.logger.warn('HeartSyncService: sample rejected — no consent', {
++      this.logger.warn('SenSyncService: sample rejected — no consent', {
+         session_id: sample.session_id,
+         guest_id: sample.guest_id,
+       });
+       return null;
+     }
+ 
+-    const valid: HeartSyncValidSample = {
++    const valid: SenSyncValidSample = {
+       ...sample,
+       bpm_filtered: sample.bpm_raw,
+     };
+@@ -217,7 +217,7 @@ export class HeartSyncService implements OnModuleInit {
+     state.last_sample_at_utc = new Date().toISOString();
+ 
+     // Emit sample-received event.
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_SAMPLE_RECEIVED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_SAMPLE_RECEIVED, {
+       ...valid,
+     } as unknown as Record<string, unknown>);
+ 
+@@ -229,22 +229,22 @@ export class HeartSyncService implements OnModuleInit {
+    */
+   closeSession(session_id: string): void {
+     this.sessions.delete(session_id);
+-    this.logger.log('HeartSyncService: session closed', { session_id });
++    this.logger.log('SenSyncService: session closed', { session_id });
+   }
+ 
+   /**
+    * Return current ephemeral session state (read-only copy).
+    */
+-  getSessionState(session_id: string): HeartSyncSessionState | undefined {
++  getSessionState(session_id: string): SenSyncSessionState | undefined {
+     return this.sessions.get(session_id);
+   }
+ 
+   // ── Relay logic ───────────────────────────────────────────────────────────
+ 
+   private relay(
+-    state: HeartSyncSessionState,
+-    sample: HeartSyncValidSample,
+-  ): HeartSyncRelayEvent | HeartSyncCombinedBpm | null {
++    state: SenSyncSessionState,
++    sample: SenSyncValidSample,
++  ): SenSyncRelayEvent | SenSyncCombinedBpm | null {
+     const now = new Date().toISOString();
+ 
+     if (state.mode === 'COMBINED') {
+@@ -263,7 +263,7 @@ export class HeartSyncService implements OnModuleInit {
+     const target: 'CREATOR' | 'GUEST' =
+       sample.source === 'CREATOR' ? 'GUEST' : 'CREATOR';
+ 
+-    const event: HeartSyncRelayEvent = {
++    const event: SenSyncRelayEvent = {
+       relay_id: randomUUID(),
+       session_id: state.session_id,
+       creator_id: state.creator_id,
+@@ -272,10 +272,10 @@ export class HeartSyncService implements OnModuleInit {
+       bpm_relayed,
+       driver: state.driver,
+       relayed_at_utc: now,
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_RELAY_EMITTED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_RELAY_EMITTED, {
+       ...event,
+     } as unknown as Record<string, unknown>);
+ 
+@@ -284,9 +284,9 @@ export class HeartSyncService implements OnModuleInit {
+   }
+ 
+   private relayCombined(
+-    state: HeartSyncSessionState,
++    state: SenSyncSessionState,
+     now: string,
+-  ): HeartSyncCombinedBpm | null {
++  ): SenSyncCombinedBpm | null {
+     if (state.last_creator_bpm === undefined || state.last_guest_bpm === undefined) {
+       // Not enough data for combined mode yet.
+       return null;
+@@ -296,7 +296,7 @@ export class HeartSyncService implements OnModuleInit {
+       (state.last_creator_bpm + state.last_guest_bpm) / 2,
+     );
+ 
+-    const combined: HeartSyncCombinedBpm = {
++    const combined: SenSyncCombinedBpm = {
+       event_id: randomUUID(),
+       session_id: state.session_id,
+       creator_id: state.creator_id,
+@@ -305,10 +305,10 @@ export class HeartSyncService implements OnModuleInit {
+       bpm_guest: state.last_guest_bpm,
+       bpm_combined,
+       combined_at_utc: now,
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_COMBINED_BPM, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_COMBINED_BPM, {
+       ...combined,
+     } as unknown as Record<string, unknown>);
+ 
+@@ -319,12 +319,12 @@ export class HeartSyncService implements OnModuleInit {
+   }
+ 
+   private dispatchHaptic(
+-    state: HeartSyncSessionState,
++    state: SenSyncSessionState,
+     target: 'CREATOR' | 'GUEST',
+     bpm: number,
+     now: string,
+   ): void {
+-    const cmd: HeartSyncHapticCommand = {
++    const cmd: SenSyncHapticCommand = {
+       command_id: randomUUID(),
+       session_id: state.session_id,
+       target,
+@@ -333,10 +333,10 @@ export class HeartSyncService implements OnModuleInit {
+       bpm,
+       driver: state.driver,
+       dispatched_at_utc: now,
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_HAPTIC_DISPATCHED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_HAPTIC_DISPATCHED, {
+       ...cmd,
+     } as unknown as Record<string, unknown>);
+ 
+@@ -347,24 +347,24 @@ export class HeartSyncService implements OnModuleInit {
+ 
+   // ── Plausibility rejection ─────────────────────────────────────────────────
+ 
+-  private rejectSample(sample: HeartSyncSample): void {
+-    const rejection: HeartSyncPlausibilityRejection = {
++  private rejectSample(sample: SenSyncSample): void {
++    const rejection: SenSyncPlausibilityRejection = {
+       rejection_id: randomUUID(),
+       session_id: sample.session_id,
+       guest_id: sample.guest_id,
+       source: sample.source,
+       bpm_raw: sample.bpm_raw,
+       reason_code:
+-        sample.bpm_raw < HEARTSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
++        sample.bpm_raw < SENSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
+       rejected_at_utc: new Date().toISOString(),
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_PLAUSIBILITY_REJECTED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_PLAUSIBILITY_REJECTED, {
+       ...rejection,
+     } as unknown as Record<string, unknown>);
+ 
+-    this.logger.warn('HeartSyncService: sample rejected', rejection);
++    this.logger.warn('SenSyncService: sample rejected', rejection);
+   }
+ 
+   private emitTierDisabled(
+@@ -372,17 +372,17 @@ export class HeartSyncService implements OnModuleInit {
+     guest_id: string,
+     tier: MembershipTier,
+   ): void {
+-    const event: HeartSyncTierDisabledEvent = {
++    const event: SenSyncTierDisabledEvent = {
+       event_id: randomUUID(),
+       session_id,
+       guest_id,
+       tier,
+       reason_code: 'TIER_HEARTSYNC_DISABLED',
+       occurred_at_utc: new Date().toISOString(),
+-      rule_applied_id: HEARTSYNC_RULE_ID,
++      rule_applied_id: SENSYNC_RULE_ID,
+     };
+ 
+-    this.nats.publish(NATS_TOPICS.HEARTSYNC_TIER_DISABLED, {
++    this.nats.publish(NATS_TOPICS.SENSYNC_TIER_DISABLED, {
+       ...event,
+     } as unknown as Record<string, unknown>);
+   }
+@@ -421,7 +421,7 @@ export class HeartSyncService implements OnModuleInit {
+       this.tierCombinedAllowed.set(row.tier as MembershipTier, row.combined_mode);
+     }
+ 
+-    this.logger.log('HeartSyncService: tier config refreshed', {
++    this.logger.log('SenSyncService: tier config refreshed', {
+       count: rows.length,
+     });
+   }
+diff --git a/services/heartsync/src/heartsync.types.ts b/services/sensync/src/sensync.types.ts
+similarity index 86%
+rename from services/heartsync/src/heartsync.types.ts
+rename to services/sensync/src/sensync.types.ts
+index 135963a..1fa5ee3 100644
+--- a/services/heartsync/src/heartsync.types.ts
++++ b/services/sensync/src/sensync.types.ts
+@@ -12,7 +12,7 @@ export type MembershipTier =
+   | 'VIP_DIAMOND';
+ 
+ /** HeartSync relay transmission mode. */
+-export type HeartSyncMode =
++export type SenSyncMode =
+   | 'BIDIRECTIONAL' // guest ↔ creator — each receives the other's BPM
+   | 'CREATOR_TO_GUEST' // only creator BPM flows to guest device
+   | 'GUEST_TO_CREATOR'  // only guest BPM flows to creator device
+@@ -31,7 +31,7 @@ export type ConsentBasis =
+   | 'REVOKED';          // guest withdrew consent
+ 
+ /** A single raw BPM sample from a device. */
+-export interface HeartSyncSample {
++export interface SenSyncSample {
+   sample_id: string;
+   session_id: string;
+   creator_id: string;
+@@ -48,17 +48,17 @@ export interface HeartSyncSample {
+ }
+ 
+ /** A BPM sample that has passed the plausibility filter. */
+-export interface HeartSyncValidSample extends HeartSyncSample {
++export interface SenSyncValidSample extends SenSyncSample {
+   bpm_filtered: number; // same as raw, confirmed in [30..220]
+ }
+ 
+ /** Relay event broadcast to participating devices. */
+-export interface HeartSyncRelayEvent {
++export interface SenSyncRelayEvent {
+   relay_id: string;
+   session_id: string;
+   creator_id: string;
+   guest_id: string;
+-  mode: HeartSyncMode;
++  mode: SenSyncMode;
+   /** BPM value relayed to the remote party. */
+   bpm_relayed: number;
+   /** Driver selected for this relay. */
+@@ -69,7 +69,7 @@ export interface HeartSyncRelayEvent {
+ }
+ 
+ /** Combined-mode BPM event — arithmetic mean of creator + guest samples. */
+-export interface HeartSyncCombinedBpm {
++export interface SenSyncCombinedBpm {
+   event_id: string;
+   session_id: string;
+   creator_id: string;
+@@ -82,7 +82,7 @@ export interface HeartSyncCombinedBpm {
+ }
+ 
+ /** Consent grant or revocation record. */
+-export interface HeartSyncConsent {
++export interface SenSyncConsent {
+   consent_id: string;
+   session_id: string;
+   guest_id: string;
+@@ -95,7 +95,7 @@ export interface HeartSyncConsent {
+ }
+ 
+ /** Plausibility rejection audit record. */
+-export interface HeartSyncPlausibilityRejection {
++export interface SenSyncPlausibilityRejection {
+   rejection_id: string;
+   session_id: string;
+   guest_id: string;
+@@ -107,7 +107,7 @@ export interface HeartSyncPlausibilityRejection {
+ }
+ 
+ /** Tier-disabled rejection audit record. */
+-export interface HeartSyncTierDisabledEvent {
++export interface SenSyncTierDisabledEvent {
+   event_id: string;
+   session_id: string;
+   guest_id: string;
+@@ -118,11 +118,11 @@ export interface HeartSyncTierDisabledEvent {
+ }
+ 
+ /** In-session state tracked ephemerally per session. */
+-export interface HeartSyncSessionState {
++export interface SenSyncSessionState {
+   session_id: string;
+   creator_id: string;
+   guest_id: string;
+-  mode: HeartSyncMode;
++  mode: SenSyncMode;
+   consent_granted: boolean;
+   last_creator_bpm?: number;
+   last_guest_bpm?: number;
+@@ -132,7 +132,7 @@ export interface HeartSyncSessionState {
+ }
+ 
+ /** Haptic dispatch command sent downstream. */
+-export interface HeartSyncHapticCommand {
++export interface SenSyncHapticCommand {
+   command_id: string;
+   session_id: string;
+   target: 'CREATOR' | 'GUEST';
+@@ -145,11 +145,11 @@ export interface HeartSyncHapticCommand {
+ }
+ 
+ /** BPM plausibility bounds — governance constant. */
+-export const HEARTSYNC_BPM_MIN = 30;
+-export const HEARTSYNC_BPM_MAX = 220;
++export const SENSYNC_BPM_MIN = 30;
++export const SENSYNC_BPM_MAX = 220;
+ 
+ /** Random sampling interval bounds (milliseconds). */
+ export const HEARTSYNC_SAMPLE_INTERVAL_MIN_MS = 1_500;
+ export const HEARTSYNC_SAMPLE_INTERVAL_MAX_MS = 3_000;
+ 
+-export const HEARTSYNC_RULE_ID = 'HEARTSYNC_v1';
++export const SENSYNC_RULE_ID = 'HEARTSYNC_v1';
+diff --git a/tests/e2e/high-heat-cyrano-payout-flow.spec.ts b/tests/e2e/high-heat-cyrano-payout-flow.spec.ts
+index 254c52e..e0298de 100644
+--- a/tests/e2e/high-heat-cyrano-payout-flow.spec.ts
++++ b/tests/e2e/high-heat-cyrano-payout-flow.spec.ts
+@@ -10,12 +10,12 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
+ import { CyranoService } from '../../services/cyrano/src/cyrano.service';
+ import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
+ import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
+-import { RoomHeatEngine } from '../../services/creator-control/src/room-heat.engine';
++import { FlickerNFlameScoringEngine } from '../../services/creator-control/src/ffs.engine';
+ import { PersonaManager } from '../../services/cyrano/src/persona.manager';
+ import { SessionMemoryStore } from '../../services/cyrano/src/session-memory.store';
+ import { CreatorControlPresenter } from '../../ui/view-models/creator-control.presenter';
+ import { NATS_TOPICS } from '../../services/nats/topics.registry';
+-import type { RoomHeatSample } from '../../services/creator-control/src/room-heat.engine';
++import type { FfsSample } from '../../services/creator-control/src/ffs.engine';
+ import type { CyranoInputFrame } from '../../services/cyrano/src/cyrano.types';
+ 
+ type Published = { topic: string; payload: Record<string, unknown> };
+@@ -28,7 +28,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
+     ),
+   };
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-  const heat = new RoomHeatEngine(stub as any);
++  const heat = new FlickerNFlameScoringEngine(stub as any);
+   const timing = new BroadcastTimingCopilot();
+   const monitoring = new SessionMonitoringCopilot();
+   const creatorControl = new CreatorControlService(
+@@ -49,7 +49,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
+   return { hub, published };
+ }
+ 
+-const blazingSample: RoomHeatSample = {
++const blazingSample: FfsSample = {
+   session_id: 'sess-payload8',
+   creator_id: 'creator-payload8',
+   tippers_online: 60,
+@@ -119,7 +119,7 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
+         direction: 'RAISE',
+         magnitude_pct: 0.15,
+         tier: 'BLAZING',
+-        heat_score: 92,
++        ffs_score: 92,
+         reason_code: 'BLAZING_RAISE',
+         copy: 'Heat is at peak — push private show offer.',
+         captured_at_utc: '2026-04-25T20:00:00Z',
+diff --git a/tests/integration/creator-control-service.spec.ts b/tests/integration/creator-control-service.spec.ts
+index eb4c439..af7f424 100644
+--- a/tests/integration/creator-control-service.spec.ts
++++ b/tests/integration/creator-control-service.spec.ts
+@@ -4,9 +4,9 @@
+  * copilots. Hermetic tests, no broker connection required.
+  */
+ import {
+-  RoomHeatEngine,
+-  type RoomHeatSample,
+-} from '../../services/creator-control/src/room-heat.engine';
++  FlickerNFlameScoringEngine,
++  type FfsSample,
++} from '../../services/creator-control/src/ffs.engine';
+ import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
+ import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
+ import { CreatorControlService } from '../../services/creator-control/src/creator-control.service';
+@@ -24,7 +24,7 @@ function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
+   return { stub, published };
+ }
+ 
+-function sample(overrides: Partial<RoomHeatSample> = {}): RoomHeatSample {
++function sample(overrides: Partial<FfsSample> = {}): FfsSample {
+   return {
+     session_id: 'sess-1',
+     creator_id: 'creator-1',
+@@ -38,11 +38,11 @@ function sample(overrides: Partial<RoomHeatSample> = {}): RoomHeatSample {
+   };
+ }
+ 
+-describe('RoomHeatEngine — tier resolution', () => {
++describe('FlickerNFlameScoringEngine — tier resolution', () => {
+   it('computes COLD when no tippers and no velocity', () => {
+     const { stub } = natsStub();
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    const engine = new RoomHeatEngine(stub as any);
++    const engine = new FlickerNFlameScoringEngine(stub as any);
+     const score = engine.computeScore(
+       sample({ tippers_online: 0, tips_per_minute: 0, diamond_guests_present: 0, avg_tip_tokens: 0 }),
+     );
+@@ -53,7 +53,7 @@ describe('RoomHeatEngine — tier resolution', () => {
+   it('computes INFERNO when pressure + velocity + VIPs all saturate', () => {
+     const { stub } = natsStub();
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    const engine = new RoomHeatEngine(stub as any);
++    const engine = new FlickerNFlameScoringEngine(stub as any);
+     const score = engine.computeScore(
+       sample({
+         tippers_online: 50,          // → 40 (capped)
+@@ -69,11 +69,11 @@ describe('RoomHeatEngine — tier resolution', () => {
+   it('publishes TIER_CHANGED only when the tier crosses a band boundary', () => {
+     const { stub, published } = natsStub();
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    const engine = new RoomHeatEngine(stub as any);
++    const engine = new FlickerNFlameScoringEngine(stub as any);
+     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // COLD
+     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // still COLD
+     engine.ingest(sample({ tippers_online: 40, tips_per_minute: 5, avg_tip_tokens: 4, diamond_guests_present: 1 })); // WARM+
+-    const tierEvents = published.filter((p) => p.topic === NATS_TOPICS.ROOM_HEAT_TIER_CHANGED);
++    const tierEvents = published.filter((p) => p.topic === NATS_TOPICS.FFS_SCORE_TIER_CHANGED);
+     // One transition COLD→X (initial set), then WARM (or higher) shift. Duplicates suppressed.
+     expect(tierEvents.length).toBeGreaterThanOrEqual(1);
+     expect(tierEvents.length).toBeLessThanOrEqual(2);
+@@ -131,7 +131,7 @@ describe('SessionMonitoringCopilot', () => {
+       score: 90,
+       components: { tipper_pressure: 40, velocity: 40, vip_presence: 10 },
+       captured_at_utc: 't',
+-      rule_applied_id: 'ROOM_HEAT_ENGINE_v1',
++      rule_applied_id: 'FFS_ENGINE_v1',
+     });
+     expect(nudge.direction).toBe('RAISE');
+     expect(nudge.magnitude_pct).toBe(0.2);
+@@ -146,7 +146,7 @@ describe('SessionMonitoringCopilot', () => {
+       score: 30,
+       components: { tipper_pressure: 15, velocity: 10, vip_presence: 5 },
+       captured_at_utc: 't',
+-      rule_applied_id: 'ROOM_HEAT_ENGINE_v1',
++      rule_applied_id: 'FFS_ENGINE_v1',
+     });
+     expect(nudge.direction).toBe('HOLD');
+     expect(nudge.magnitude_pct).toBe(0);
+@@ -161,7 +161,7 @@ describe('SessionMonitoringCopilot', () => {
+       score: 5,
+       components: { tipper_pressure: 2, velocity: 3, vip_presence: 0 },
+       captured_at_utc: 't',
+-      rule_applied_id: 'ROOM_HEAT_ENGINE_v1',
++      rule_applied_id: 'FFS_ENGINE_v1',
+     });
+     expect(nudge.direction).toBe('LOWER');
+     expect(nudge.magnitude_pct).toBe(0.1);
+@@ -176,7 +176,7 @@ describe('CreatorControlService — workstation orchestration', () => {
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       stub as any,
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-      new RoomHeatEngine(stub as any),
++      new FlickerNFlameScoringEngine(stub as any),
+       new BroadcastTimingCopilot(),
+       new SessionMonitoringCopilot(),
+     );
+@@ -197,7 +197,7 @@ describe('CreatorControlService — workstation orchestration', () => {
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       stub as any,
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-      new RoomHeatEngine(stub as any),
++      new FlickerNFlameScoringEngine(stub as any),
+       new BroadcastTimingCopilot(),
+       new SessionMonitoringCopilot(),
+     );
+@@ -214,7 +214,7 @@ describe('CreatorControlService — workstation orchestration', () => {
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       stub as any,
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-      new RoomHeatEngine(stub as any),
++      new FlickerNFlameScoringEngine(stub as any),
+       new BroadcastTimingCopilot(),
+       new SessionMonitoringCopilot(),
+     );
+diff --git a/tests/integration/cyrano-service.spec.ts b/tests/integration/cyrano-service.spec.ts
+index 807fd7c..ac2d3ce 100644
+--- a/tests/integration/cyrano-service.spec.ts
++++ b/tests/integration/cyrano-service.spec.ts
+@@ -12,7 +12,7 @@ import type {
+   CyranoInputFrame,
+   MemoryFact,
+ } from '../../services/cyrano/src/cyrano.types';
+-import type { HeatScore, HeatTier } from '../../services/creator-control/src/room-heat.engine';
++import type { FfsScore, FfsTier } from '../../services/creator-control/src/ffs.engine';
+ import { NATS_TOPICS } from '../../services/nats/topics.registry';
+ 
+ type Published = { topic: string; payload: Record<string, unknown> };
+@@ -27,7 +27,7 @@ function buildNatsStub(): { stub: { publish: jest.Mock }; published: Published[]
+   return { stub, published };
+ }
+ 
+-function heat(tier: HeatTier, score = 60): HeatScore {
++function heat(tier: FfsTier, score = 60): FfsScore {
+   return {
+     session_id: 'sess-1',
+     creator_id: 'creator-1',
+@@ -35,7 +35,7 @@ function heat(tier: HeatTier, score = 60): HeatScore {
+     score,
+     components: { tipper_pressure: 20, velocity: 25, vip_presence: 15 },
+     captured_at_utc: new Date('2026-04-24T12:00:00Z').toISOString(),
+-    rule_applied_id: 'ROOM_HEAT_ENGINE_v1',
++    rule_applied_id: 'FFS_ENGINE_v1',
+   };
+ }
+ 
+diff --git a/tests/integration/integration-hub.spec.ts b/tests/integration/integration-hub.spec.ts
+index d66ac14..a97890f 100644
+--- a/tests/integration/integration-hub.spec.ts
++++ b/tests/integration/integration-hub.spec.ts
+@@ -9,13 +9,13 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
+ import { CyranoService } from '../../services/cyrano/src/cyrano.service';
+ import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
+ import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
+-import { RoomHeatEngine } from '../../services/creator-control/src/room-heat.engine';
++import { FlickerNFlameScoringEngine } from '../../services/creator-control/src/ffs.engine';
+ import { PersonaManager } from '../../services/cyrano/src/persona.manager';
+ import { SessionMemoryStore } from '../../services/cyrano/src/session-memory.store';
+ import { LEDGER_SPEND_ORDER } from '../../services/core-api/src/config/governance.config';
+ import { NATS_TOPICS } from '../../services/nats/topics.registry';
+ import type { CyranoInputFrame } from '../../services/cyrano/src/cyrano.types';
+-import type { RoomHeatSample } from '../../services/creator-control/src/room-heat.engine';
++import type { FfsSample } from '../../services/creator-control/src/ffs.engine';
+ 
+ type Published = { topic: string; payload: Record<string, unknown> };
+ 
+@@ -35,7 +35,7 @@ function makeHub(): {
+ } {
+   const { stub, published } = natsStub();
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-  const heat = new RoomHeatEngine(stub as any);
++  const heat = new FlickerNFlameScoringEngine(stub as any);
+   const timing = new BroadcastTimingCopilot();
+   const monitoring = new SessionMonitoringCopilot();
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+@@ -47,7 +47,7 @@ function makeHub(): {
+   return { hub, published };
+ }
+ 
+-function blazingSample(): RoomHeatSample {
++function blazingSample(): FfsSample {
+   return {
+     session_id: 'sess-e2e',
+     creator_id: 'creator-e2e',
+@@ -108,7 +108,7 @@ describe('IntegrationHubService.processHighHeatSession — E2E flow', () => {
+ 
+   it('COLD tier emits no monetization handoff and no payout scaling event', async () => {
+     const { hub, published } = makeHub();
+-    const coldSample: RoomHeatSample = {
++    const coldSample: FfsSample = {
+       session_id: 'sess-e2e',
+       creator_id: 'creator-e2e',
+       tippers_online: 1,
+diff --git a/ui/types/creator-control-contracts.ts b/ui/types/creator-control-contracts.ts
+index 268de42..858d1c4 100644
+--- a/ui/types/creator-control-contracts.ts
++++ b/ui/types/creator-control-contracts.ts
+@@ -3,7 +3,7 @@
+ // bind without re-deriving field names. The live Next.js app is not yet
+ // bootstrapped — these contracts keep the frontend integration gap narrow.
+ 
+-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'BLAZING';
++export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'BLAZING';
+ 
+ export type CyranoCategory =
+   | 'CAT_SESSION_OPEN'
+@@ -18,7 +18,7 @@ export type CyranoCategory =
+ /** Feed element rendered on the real-time heat meter for /creator/control. */
+ export interface HeatMeterFrame {
+   session_id: string;
+-  tier: HeatTier;
++  tier: FfsTier;
+   score: number;                      // 0..100
+   captured_at_utc: string;
+ }
+@@ -28,8 +28,8 @@ export interface PriceNudgeCard {
+   session_id: string;
+   direction: 'HOLD' | 'RAISE' | 'LOWER';
+   magnitude_pct: number;
+-  tier: HeatTier;
+-  heat_score: number;
++  tier: FfsTier;
++  ffs_score: number;
+   reason_code: string;
+   copy: string;
+ }
+@@ -61,7 +61,7 @@ export interface CyranoPanelSuggestion {
+   session_id: string;
+   category: CyranoCategory;
+   weight: number;                     // 0..100
+-  tier_context: HeatTier;
++  tier_context: FfsTier;
+   copy: string;
+   reason_codes: string[];
+   emitted_at_utc: string;
+diff --git a/ui/types/creator-panel-contracts.ts b/ui/types/creator-panel-contracts.ts
+index da98c3a..f635a3d 100644
+--- a/ui/types/creator-panel-contracts.ts
++++ b/ui/types/creator-panel-contracts.ts
+@@ -4,7 +4,7 @@
+ // broadcast timing copilot, persona switcher, payout rate indicator.
+ 
+ import type {
+-  HeatTier,
++  FfsTier,
+   HeatMeterFrame,
+   PriceNudgeCard,
+   BroadcastWindowRow,
+@@ -14,7 +14,7 @@ import type {
+ /** Payout rate indicator — live creator revenue per token. */
+ export interface PayoutRateIndicator {
+   creator_id: string;
+-  tier_context: HeatTier;
++  tier_context: FfsTier;
+   current_rate_per_token_usd: number;
+   redbook_floor_per_token_usd: number; // 0.075
+   redbook_ceiling_per_token_usd: number; // 0.090
+@@ -26,7 +26,7 @@ export interface PayoutRateIndicator {
+ /** Room-Heat meter (visual gauge). */
+ export interface RoomHeatMeter {
+   session_id: string;
+-  tier: HeatTier;
++  tier: FfsTier;
+   score: number; // 0..100
+   components: {
+     tipper_pressure: number; // 0..40
+diff --git a/ui/view-models/creator-control.presenter.ts b/ui/view-models/creator-control.presenter.ts
+index ae06e41..d9c7824 100644
+--- a/ui/view-models/creator-control.presenter.ts
++++ b/ui/view-models/creator-control.presenter.ts
+@@ -1,11 +1,11 @@
+ // PAYLOAD 7 — CreatorControl.Zone command center presenter.
+-// Composes HeatScore + nudge + broadcast windows + Cyrano panel into a single
++// Composes FfsScore + nudge + broadcast windows + Cyrano panel into a single
+ // CreatorCommandCenterView consumed by /creator/control. Pure TypeScript —
+ // no NestJS dependencies, so the UI layer can be built / shipped independently
+ // of the service bootstrap graph.
+ 
+ import type {
+-  HeatTier,
++  FfsTier,
+   HeatMeterFrame,
+   PriceNudgeCard,
+   BroadcastWindowRow,
+@@ -23,7 +23,7 @@ import type {
+ export const CREATOR_PRESENTER_RULE_ID = 'CREATOR_CONTROL_UI_v1';
+ 
+ /** Tier-boundary lookup mirrors the Room-Heat Engine TIER_THRESHOLDS. */
+-const TIER_BOUNDS: Record<HeatTier, { min: number; max: number }> = {
++const TIER_BOUNDS: Record<FfsTier, { min: number; max: number }> = {
+   COLD: { min: 0, max: 25 },
+   WARM: { min: 25, max: 50 },
+   HOT: { min: 50, max: 75 },
+@@ -31,7 +31,7 @@ const TIER_BOUNDS: Record<HeatTier, { min: number; max: number }> = {
+ };
+ 
+ /** Payout scaling table mirrors integration-hub PAYOUT_SCALING_PCT_BY_TIER. */
+-const PAYOUT_SCALING_BY_TIER: Record<HeatTier, number> = {
++const PAYOUT_SCALING_BY_TIER: Record<FfsTier, number> = {
+   COLD: 0.0,
+   WARM: 0.0,
+   HOT: 0.05,
+@@ -44,7 +44,7 @@ export const REDBOOK_PAYOUT_CEILING = 0.09;
+ export interface HeatSampleInput {
+   session_id: string;
+   creator_id: string;
+-  tier: HeatTier;
++  tier: FfsTier;
+   score: number;
+   components: {
+     tipper_pressure: number;
+@@ -59,8 +59,8 @@ export interface PriceNudgeInput {
+   creator_id: string;
+   direction: 'HOLD' | 'RAISE' | 'LOWER';
+   magnitude_pct: number;
+-  tier: HeatTier;
+-  heat_score: number;
++  tier: FfsTier;
++  ffs_score: number;
+   reason_code: string;
+   copy: string;
+   captured_at_utc: string;
+@@ -79,7 +79,7 @@ export interface CyranoSuggestionInput {
+   session_id: string;
+   category: string;
+   weight: number;
+-  tier_context: HeatTier;
++  tier_context: FfsTier;
+   copy: string;
+   reason_codes: string[];
+   emitted_at_utc: string;
+@@ -193,7 +193,7 @@ export class CreatorControlPresenter {
+           direction: nudge.direction,
+           magnitude_pct: nudge.magnitude_pct,
+           tier: nudge.tier,
+-          heat_score: nudge.heat_score,
++          ffs_score: nudge.ffs_score,
+           reason_code: nudge.reason_code,
+           copy: nudge.copy,
+         }
+@@ -275,7 +275,7 @@ export class CreatorControlPresenter {
+   buildPayoutRate(
+     creator_id: string,
+     base_rate: number,
+-    tier: HeatTier,
++    tier: FfsTier,
+     now: Date,
+   ): PayoutRateIndicator {
+     const scaling = PAYOUT_SCALING_BY_TIER[tier];
+-- 
+2.53.0
+
+
+From 8268c46017d3bb03ca76586552e22ded2d82c297 Mon Sep 17 00:00:00 2001
+From: "copilot-swe-agent[bot]" <198982749+Copilot@users.noreply.github.com>
+Date: Sat, 25 Apr 2026 23:52:19 +0000
+Subject: [PATCH 2/3] CHORE: Fix remaining HeartSync/RoomHeat refs missed in
+ global rename
+
+- sensync.types.ts: update header comment, SENSYNC_SAMPLE_INTERVAL
+  constants, SENSYNC_v1 rule ID value, TIER_SENSYNC_DISABLED reason code
+- sensync.service.ts: update inline comments and reason_code string
+- sensync.controller.ts: rename heartSync local var to senSync
+- sensync.module.ts / sensync.controller.ts: update HZ header comments
+- ffs/README.md: update NATS topic constant names and route strings
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+Co-authored-by: OmniQuestMediaInc <240893763+OmniQuestMediaInc@users.noreply.github.com>
+---
+ services/ffs/README.md                     | 26 +++++++++++-----------
+ services/sensync/src/sensync.controller.ts | 18 +++++++--------
+ services/sensync/src/sensync.module.ts     |  2 +-
+ services/sensync/src/sensync.service.ts    | 10 ++++-----
+ services/sensync/src/sensync.types.ts      | 12 +++++-----
+ 5 files changed, 34 insertions(+), 34 deletions(-)
+
+diff --git a/services/ffs/README.md b/services/ffs/README.md
+index a00152a..d7c331d 100644
+--- a/services/ffs/README.md
++++ b/services/ffs/README.md
+@@ -2,7 +2,7 @@
+ 
+ **Work Order:** WO-003  
+ **Business Plan Reference:** B.4 — Room-level telemetry  
+-**Rule ID:** `ROOM_HEAT_ENGINE_v2`  
++**Rule ID:** `FFS_ENGINE_v2`  
+ **Status:** Active
+ 
+ ---
+@@ -32,9 +32,9 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
+         ├─ dualFlameBonus()        ← up to +5 pts from partner
+         ├─ resolveAntiFlickerTier() ← 3-tick confirmation rule
+         │
+-        ├─ NATS publish (ROOM_HEAT_SAMPLE, ROOM_HEAT_TIER_CHANGED,
+-        │                ROOM_HEAT_PEAK, ROOM_HEAT_HOT_AND_READY,
+-        │                ROOM_HEAT_DUAL_FLAME_PEAK)
++        ├─ NATS publish (FFS_SCORE_SAMPLE, FFS_SCORE_TIER_CHANGED,
++        │                FFS_SCORE_PEAK, FFS_SCORE_HOT_AND_READY,
++        │                FFS_SCORE_DUAL_FLAME_PEAK)
+         │
+         ├─ Prisma.roomHeatSnapshot.create()  (async)
+         │
+@@ -98,15 +98,15 @@ downstream consumers.
+ 
+ | Topic constant | Subject | When emitted |
+ |----------------|---------|--------------|
+-| `ROOM_HEAT_SAMPLE` | `room.heat.sample` | Every ingest (and 1 Hz re-emit) |
+-| `ROOM_HEAT_TIER_CHANGED` | `room.heat.tier.changed` | Tier crosses a band boundary |
+-| `ROOM_HEAT_PEAK` | `room.heat.peak` | Score enters INFERNO |
+-| `ROOM_HEAT_HOT_AND_READY` | `room.heat.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
+-| `ROOM_HEAT_DUAL_FLAME_PEAK` | `room.heat.dual_flame.peak` | Dual Flame session hits INFERNO |
+-| `ROOM_HEAT_LEADERBOARD_UPDATED` | `room.heat.leaderboard.updated` | ~every 10 s |
+-| `ROOM_HEAT_SESSION_STARTED` | `room.heat.session.started` | `startSession()` called |
+-| `ROOM_HEAT_SESSION_ENDED` | `room.heat.session.ended` | `endSession()` called |
+-| `ROOM_HEAT_ADAPTIVE_UPDATED` | `room.heat.adaptive.updated` | Adaptive weights shift after tip |
++| `FFS_SCORE_SAMPLE` | `ffs.score.sample` | Every ingest (and 1 Hz re-emit) |
++| `FFS_SCORE_TIER_CHANGED` | `ffs.score.tier.changed` | Tier crosses a band boundary |
++| `FFS_SCORE_PEAK` | `ffs.score.peak` | Score enters INFERNO |
++| `FFS_SCORE_HOT_AND_READY` | `ffs.score.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
++| `FFS_SCORE_DUAL_FLAME_PEAK` | `ffs.score.dual_flame.peak` | Dual Flame session hits INFERNO |
++| `FFS_SCORE_LEADERBOARD_UPDATED` | `ffs.score.leaderboard.updated` | ~every 10 s |
++| `FFS_SCORE_SESSION_STARTED` | `ffs.score.session.started` | `startSession()` called |
++| `FFS_SCORE_SESSION_ENDED` | `ffs.score.session.ended` | `endSession()` called |
++| `FFS_SCORE_ADAPTIVE_UPDATED` | `ffs.score.adaptive.updated` | Adaptive weights shift after tip |
+ 
+ ---
+ 
+diff --git a/services/sensync/src/sensync.controller.ts b/services/sensync/src/sensync.controller.ts
+index 4772b5c..7adf7d7 100644
+--- a/services/sensync/src/sensync.controller.ts
++++ b/services/sensync/src/sensync.controller.ts
+@@ -1,4 +1,4 @@
+-// HZ: HeartSync REST controller — session management + consent endpoints
++// HZ: SenSync™ REST controller — session management + consent endpoints
+ import {
+   Body,
+   Controller,
+@@ -67,12 +67,12 @@ export interface RefreshTierConfigDto {
+ export class SenSyncController {
+   private readonly logger = new Logger(SenSyncController.name);
+ 
+-  constructor(private readonly heartSync: SenSyncService) {}
++  constructor(private readonly senSync: SenSyncService) {}
+ 
+   /** POST /sensync/sessions */
+   @Post('sessions')
+   openSession(@Body() dto: OpenSessionDto): SenSyncSessionState | { error: string } {
+-    const state = this.heartSync.openSession(
++    const state = this.senSync.openSession(
+       dto.session_id,
+       dto.creator_id,
+       dto.guest_id,
+@@ -89,7 +89,7 @@ export class SenSyncController {
+   /** POST /sensync/consent/grant */
+   @Post('consent/grant')
+   grantConsent(@Body() dto: GrantConsentDto): SenSyncConsent {
+-    return this.heartSync.grantConsent(
++    return this.senSync.grantConsent(
+       dto.session_id,
+       dto.guest_id,
+       dto.creator_id,
+@@ -101,7 +101,7 @@ export class SenSyncController {
+   /** POST /sensync/consent/revoke */
+   @Post('consent/revoke')
+   revokeConsent(@Body() dto: RevokeConsentDto): { ok: true } {
+-    this.heartSync.revokeConsent(dto.session_id, dto.guest_id, dto.creator_id);
++    this.senSync.revokeConsent(dto.session_id, dto.guest_id, dto.creator_id);
+     return { ok: true };
+   }
+ 
+@@ -121,7 +121,7 @@ export class SenSyncController {
+       tier: dto.tier,
+     };
+ 
+-    const result = this.heartSync.submitSample(sample);
++    const result = this.senSync.submitSample(sample);
+     if (!result) {
+       return { ok: false, reason: 'SAMPLE_REJECTED_OR_NO_SESSION' };
+     }
+@@ -131,14 +131,14 @@ export class SenSyncController {
+   /** DELETE /sensync/sessions/:session_id */
+   @Delete('sessions/:session_id')
+   closeSession(@Param('session_id') session_id: string): { ok: true } {
+-    this.heartSync.closeSession(session_id);
++    this.senSync.closeSession(session_id);
+     return { ok: true };
+   }
+ 
+   /** GET /sensync/sessions/:session_id */
+   @Get('sessions/:session_id')
+   getSession(@Param('session_id') session_id: string): SenSyncSessionState | { error: string } {
+-    const state = this.heartSync.getSessionState(session_id);
++    const state = this.senSync.getSessionState(session_id);
+     if (!state) {
+       return { error: 'SESSION_NOT_FOUND' };
+     }
+@@ -148,7 +148,7 @@ export class SenSyncController {
+   /** POST /sensync/tier-config/refresh */
+   @Post('tier-config/refresh')
+   async refreshTierConfig(@Body() _dto: RefreshTierConfigDto): Promise<{ ok: true }> {
+-    await this.heartSync.refreshTierConfig();
++    await this.senSync.refreshTierConfig();
+     return { ok: true };
+   }
+ }
+diff --git a/services/sensync/src/sensync.module.ts b/services/sensync/src/sensync.module.ts
+index db06368..1f1197d 100644
+--- a/services/sensync/src/sensync.module.ts
++++ b/services/sensync/src/sensync.module.ts
+@@ -1,4 +1,4 @@
+-// HZ: HeartSync module
++// HZ: SenSync™ module
+ import { Module } from '@nestjs/common';
+ import { SenSyncController } from './sensync.controller';
+ import { SenSyncService } from './sensync.service';
+diff --git a/services/sensync/src/sensync.service.ts b/services/sensync/src/sensync.service.ts
+index 636922e..6343b9a 100644
+--- a/services/sensync/src/sensync.service.ts
++++ b/services/sensync/src/sensync.service.ts
+@@ -1,4 +1,4 @@
+-// HZ: HeartSync biometric relay service
++// HZ: SenSync™ biometric relay service
+ // Business Plan §HZ — bidirectional haptic + BPM relay for consenting guests.
+ //
+ // Contract:
+@@ -72,7 +72,7 @@ export class SenSyncService implements OnModuleInit {
+   // ── Public API ────────────────────────────────────────────────────────────
+ 
+   /**
+-   * Open a HeartSync relay session.
++   * Open a SenSync™ relay session.
+    * Must be called before any samples are submitted.
+    * Returns the initial session state.
+    */
+@@ -225,7 +225,7 @@ export class SenSyncService implements OnModuleInit {
+   }
+ 
+   /**
+-   * Close a HeartSync session — purges all ephemeral state.
++   * Close a SenSync™ session — purges all ephemeral state.
+    */
+   closeSession(session_id: string): void {
+     this.sessions.delete(session_id);
+@@ -377,7 +377,7 @@ export class SenSyncService implements OnModuleInit {
+       session_id,
+       guest_id,
+       tier,
+-      reason_code: 'TIER_HEARTSYNC_DISABLED',
++      reason_code: 'TIER_SENSYNC_DISABLED',
+       occurred_at_utc: new Date().toISOString(),
+       rule_applied_id: SENSYNC_RULE_ID,
+     };
+@@ -412,7 +412,7 @@ export class SenSyncService implements OnModuleInit {
+    * Called on module init. Can be called again by operators without restart.
+    */
+   async refreshTierConfig(): Promise<void> {
+-    const rows = await this.prisma.heartSyncTierConfig.findMany();
++    const rows = await this.prisma.senSyncTierConfig.findMany();
+     this.tierEnabled.clear();
+     this.tierCombinedAllowed.clear();
+ 
+diff --git a/services/sensync/src/sensync.types.ts b/services/sensync/src/sensync.types.ts
+index 1fa5ee3..a814e1a 100644
+--- a/services/sensync/src/sensync.types.ts
++++ b/services/sensync/src/sensync.types.ts
+@@ -1,4 +1,4 @@
+-// HZ: HeartSync biometric relay — shared types
++// HZ: SenSync™ biometric relay — shared types
+ // Business Plan §HZ — bidirectional haptic + BPM relay for consenting guests.
+ 
+ /** All membership tiers supported by the platform. */
+@@ -11,7 +11,7 @@ export type MembershipTier =
+   | 'VIP_PLATINUM'
+   | 'VIP_DIAMOND';
+ 
+-/** HeartSync relay transmission mode. */
++/** SenSync™ relay transmission mode. */
+ export type SenSyncMode =
+   | 'BIDIRECTIONAL' // guest ↔ creator — each receives the other's BPM
+   | 'CREATOR_TO_GUEST' // only creator BPM flows to guest device
+@@ -112,7 +112,7 @@ export interface SenSyncTierDisabledEvent {
+   session_id: string;
+   guest_id: string;
+   tier: MembershipTier;
+-  reason_code: 'TIER_HEARTSYNC_DISABLED';
++  reason_code: 'TIER_SENSYNC_DISABLED';
+   occurred_at_utc: string;
+   rule_applied_id: string;
+ }
+@@ -149,7 +149,7 @@ export const SENSYNC_BPM_MIN = 30;
+ export const SENSYNC_BPM_MAX = 220;
+ 
+ /** Random sampling interval bounds (milliseconds). */
+-export const HEARTSYNC_SAMPLE_INTERVAL_MIN_MS = 1_500;
+-export const HEARTSYNC_SAMPLE_INTERVAL_MAX_MS = 3_000;
++export const SENSYNC_SAMPLE_INTERVAL_MIN_MS = 1_500;
++export const SENSYNC_SAMPLE_INTERVAL_MAX_MS = 3_000;
+ 
+-export const SENSYNC_RULE_ID = 'HEARTSYNC_v1';
++export const SENSYNC_RULE_ID = 'SENSYNC_v1';
+-- 
+2.53.0
+
+
+From a05f24add963c1587a651f4d18a154548bf79df1 Mon Sep 17 00:00:00 2001
+From: "copilot-swe-agent[bot]" <198982749+Copilot@users.noreply.github.com>
+Date: Sat, 25 Apr 2026 23:55:00 +0000
+Subject: [PATCH 3/3] =?UTF-8?q?CHORE:=20Fix=20code=20review=20issues=20?=
+ =?UTF-8?q?=E2=80=94=20update=20FFS=20flag=20names,=20SenSync=20env=20head?=
+ =?UTF-8?q?er?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- services/ffs/FLAGS.md: ROOM_HEAT_ENGINE_v2 → FFS_ENGINE_v2, all ROOM_HEAT_ flag prefixes → FFS_
+- services/ffs/ASSUMPTIONS.md: ROOM_HEAT_ENGINE_v2 → FFS_ENGINE_v2
+- services/sensync/.env.example: HeartSync header → SenSync™
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+Co-authored-by: OmniQuestMediaInc <240893763+OmniQuestMediaInc@users.noreply.github.com>
+---
+ services/ffs/ASSUMPTIONS.md   |  2 +-
+ services/ffs/FLAGS.md         | 32 ++++++++++++++++----------------
+ services/sensync/.env.example |  2 +-
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/services/ffs/ASSUMPTIONS.md b/services/ffs/ASSUMPTIONS.md
+index 8926145..73414ec 100644
+--- a/services/ffs/ASSUMPTIONS.md
++++ b/services/ffs/ASSUMPTIONS.md
+@@ -1,7 +1,7 @@
+ # Flicker n'Flame Scoring (FFS) — ASSUMPTIONS
+ 
+ **Work Order:** WO-003  
+-**Rule ID:** `ROOM_HEAT_ENGINE_v2`
++**Rule ID:** `FFS_ENGINE_v2`
+ 
+ This file documents design assumptions that cannot be verified purely from the
+ codebase.  Any assumption challenged by a future CEO directive or governance
+diff --git a/services/ffs/FLAGS.md b/services/ffs/FLAGS.md
+index f705584..7eafd72 100644
+--- a/services/ffs/FLAGS.md
++++ b/services/ffs/FLAGS.md
+@@ -1,7 +1,7 @@
+ # Flicker n'Flame Scoring (FFS) — FLAGS
+ 
+ **Work Order:** WO-003  
+-**Rule ID:** `ROOM_HEAT_ENGINE_v2`
++**Rule ID:** `FFS_ENGINE_v2`
+ 
+ Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS).
+ 
+@@ -11,16 +11,16 @@ Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS).
+ 
+ | Flag | Default | Description |
+ |------|---------|-------------|
+-| `ROOM_HEAT_ANTI_FLICKER_TICKS` | `3` | Ticks required to confirm a tier change. Hard-coded constant — change requires rule_applied_id bump. |
+-| `ROOM_HEAT_EARLY_PHASE_MINUTES` | `5` | Session age threshold for the early-phase generosity boost. |
+-| `ROOM_HEAT_EARLY_PHASE_BOOST` | `1.10` | Multiplier applied during the early phase (10 % boost). |
+-| `ROOM_HEAT_DUAL_FLAME_PARTNER_MAX_BONUS` | `5` | Maximum pts contributed by partner's score in a Dual Flame session. |
+-| `ROOM_HEAT_HOT_AND_READY_MIN_SCORE` | `70` | Minimum score to qualify for the Hot and Ready leaderboard slot. |
+-| `ROOM_HEAT_HOT_AND_READY_MIN_DWELL` | `10` | Minimum dwell (minutes) to qualify for Hot and Ready. |
+-| `ROOM_HEAT_NEW_FLAMES_MAX_DWELL` | `15` | Maximum dwell (minutes) for New Flames category. |
+-| `ROOM_HEAT_ADAPTIVE_BOOST_ON_TIP` | `0.02` | Per-tip weight boost for elevated signals (+2 %). |
+-| `ROOM_HEAT_ADAPTIVE_DECAY_ON_TIP` | `0.005` | Per-tip weight decay for non-elevated signals (−0.5 %). |
+-| `ROOM_HEAT_ADAPTIVE_ELEVATION_THRESHOLD` | `0.70` | Signal elevation threshold at tip moment (70 % of normalised max). |
++| `FFS_ANTI_FLICKER_TICKS` | `3` | Ticks required to confirm a tier change. Hard-coded constant — change requires rule_applied_id bump. |
++| `FFS_EARLY_PHASE_MINUTES` | `5` | Session age threshold for the early-phase generosity boost. |
++| `FFS_EARLY_PHASE_BOOST` | `1.10` | Multiplier applied during the early phase (10 % boost). |
++| `FFS_DUAL_FLAME_PARTNER_MAX_BONUS` | `5` | Maximum pts contributed by partner's score in a Dual Flame session. |
++| `FFS_HOT_AND_READY_MIN_SCORE` | `70` | Minimum score to qualify for the Hot and Ready leaderboard slot. |
++| `FFS_HOT_AND_READY_MIN_DWELL` | `10` | Minimum dwell (minutes) to qualify for Hot and Ready. |
++| `FFS_NEW_FLAMES_MAX_DWELL` | `15` | Maximum dwell (minutes) for New Flames category. |
++| `FFS_ADAPTIVE_BOOST_ON_TIP` | `0.02` | Per-tip weight boost for elevated signals (+2 %). |
++| `FFS_ADAPTIVE_DECAY_ON_TIP` | `0.005` | Per-tip weight decay for non-elevated signals (−0.5 %). |
++| `FFS_ADAPTIVE_ELEVATION_THRESHOLD` | `0.70` | Signal elevation threshold at tip moment (70 % of normalised max). |
+ 
+ ---
+ 
+@@ -28,8 +28,8 @@ Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS).
+ 
+ | Flag | Trigger condition | Description |
+ |------|-------------------|-------------|
+-| `ROOM_HEAT_PERSISTENT_LEADERBOARD` | Post-launch requirement | Persist leaderboard state to `room_heat_leaderboard_entries` DB table for restart-safety. |
+-| `ROOM_HEAT_REDIS_WINDOWS` | Volume scaling | Move rolling-window aggregations (tips/min, chat/min, hearts/min) from caller-provided inputs to Redis ZADD windows within the engine. |
+-| `ROOM_HEAT_CYRANO_DIRECT_INJECT` | Cyrano L2 integration | Allow the engine to directly call `CyranoService.evaluate()` instead of emitting via NATS + Hub. |
+-| `ROOM_HEAT_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export ffs_snapshots to WORM storage on session end. |
+-| `ROOM_HEAT_ML_WEIGHTS` | ML pipeline ready | Replace static adaptive weight learning with an ML-trained model inference call. |
++| `FFS_PERSISTENT_LEADERBOARD` | Post-launch requirement | Persist leaderboard state to `room_heat_leaderboard_entries` DB table for restart-safety. |
++| `FFS_REDIS_WINDOWS` | Volume scaling | Move rolling-window aggregations (tips/min, chat/min, hearts/min) from caller-provided inputs to Redis ZADD windows within the engine. |
++| `FFS_CYRANO_DIRECT_INJECT` | Cyrano L2 integration | Allow the engine to directly call `CyranoService.evaluate()` instead of emitting via NATS + Hub. |
++| `FFS_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export ffs_snapshots to WORM storage on session end. |
++| `FFS_ML_WEIGHTS` | ML pipeline ready | Replace static adaptive weight learning with an ML-trained model inference call. |
+diff --git a/services/sensync/.env.example b/services/sensync/.env.example
+index 2e5000d..f166376 100644
+--- a/services/sensync/.env.example
++++ b/services/sensync/.env.example
+@@ -1,4 +1,4 @@
+-# HeartSync — Environment Variables
++# SenSync™ — Environment Variables
+ 
+ # NATS broker URL (required)
+ NATS_URL=nats://localhost:4222
+-- 
+2.53.0
+

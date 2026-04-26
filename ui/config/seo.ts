@@ -40,7 +40,7 @@ export const SEO: Record<string, SeoMetadata> = {
   tokens: {
     title: 'Token Bundles · ChatNow.Zone',
     description:
-      'REDBOOK-locked token bundles, ShowZone Premium, and the Diamond Tier velocity quote — see exact pricing before you purchase.',
+      'REDBOOK-locked token bundles and the Diamond Tier velocity quote — see exact pricing before you purchase.',
     canonical_url: `https://${PRIMARY_DOMAIN}/tokens`,
     og_image: `https://${PRIMARY_DOMAIN}/og/tokens.png`,
     twitter_card: 'summary_large_image',
