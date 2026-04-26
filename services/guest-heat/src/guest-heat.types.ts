@@ -42,7 +42,7 @@ export interface PreferenceVector {
   /** Preferred session duration in minutes. */
   preferred_dwell_minutes: number;
   /** Preferred room heat tier at tip time. */
-  preferred_heat_tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+  preferred_ffs_tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
   /** Gemstone acceptance rate (0..1). */
   gemstone_accept_rate: number;
   /** Sensitivity to seasonal events. */
@@ -172,7 +172,7 @@ export interface DualFlamePulseEvent {
   /** The two guest IDs whose co-presence triggered the pulse. */
   guest_a_id: string;
   guest_b_id: string;
-  heat_tier: 'HOT' | 'INFERNO';
+  ffs_tier: 'HOT' | 'INFERNO';
   triggered_at_utc: string;
   rule_applied_id: string;
 }

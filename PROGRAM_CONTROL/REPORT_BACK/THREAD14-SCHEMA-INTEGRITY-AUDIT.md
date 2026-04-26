@@ -128,7 +128,7 @@ File present (5926 bytes).
 | `TOKEN_EXTENSION` block | **NO** | no `TOKEN_EXTENSION` symbol |
 | `DIAMOND_TIER.VOLUME_TIERS` | **NO** | no `DIAMOND_TIER` symbol |
 
-DFSP governance currently holds only: integrity-hold parameters, purchase-window hours, risk scoring, diamond-token threshold, OTP settings, account-recovery hold, contract-offer expiry, voice-sample limits, PROC-001 webhook constants, Room-Heat payout rates (PAY-001..PAY-005), heat-band boundaries, DFSP_CONCIERGE block, BIJOU block. **Nothing tier-related.**
+DFSP governance currently holds only: integrity-hold parameters, purchase-window hours, risk scoring, diamond-token threshold, OTP settings, account-recovery hold, contract-offer expiry, voice-sample limits, PROC-001 webhook constants, Flicker n'Flame Scoring payout rates (PAY-001..PAY-005), heat-band boundaries, DFSP_CONCIERGE block, BIJOU block. **Nothing tier-related.**
 
 ### 6.b `services/core-api/src/config/governance.config.ts` (platform)
 

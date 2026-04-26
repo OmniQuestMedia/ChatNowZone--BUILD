@@ -5,6 +5,15 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/global-renames-and-cleanup-another-one`
 **Commit:** `eda4999509da7c3b5b1b96457eb107e768e6d742`
 **Generated:** 2026-04-26T03:18:04Z
+**Branch:** `copilot/global-renames-cleanup-again`
+**Commit:** `6875d3dc9784c33d61a0060ee01793671397877d`
+**Generated:** 2026-04-26T09:57:43Z
+**Branch:** `copilot/update-creator-rate-tier-table`
+**Commit:** `331e01330fb616052be539cb43c2b8a5d42becd5`
+**Generated:** 2026-04-26T10:04:45Z
+**Branch:** `copilot/add-ffs-score-and-tier`
+**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
+**Generated:** 2026-04-26T02:58:47Z
 
 ## All Files
 
@@ -138,6 +147,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-004-SCHEMA-NEW-TABLES.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-PRICING-DECISIONS-2026-04-11.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GEO-001-GEO-FENCING-SERVICE.md`
+- `PROGRAM_CONTROL/REPORT_BACK/GLOBAL-RENAME-FFS-SENSYNC-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-001-GAME-ENGINE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-002-GAMES-MODULE-WIRING.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GOV-001-GEO-PRICING-SERVICE.md`
@@ -253,6 +263,8 @@ Auto-generated on every push. Do not edit manually.
 - `archive/LEGACY_CONFIGS_2026-04/HANDOFF.md`
 - `archive/LEGACY_CONFIGS_2026-04/package.json`
 - `archive/LEGACY_CONFIGS_2026-04/tsconfig.json`
+- `copilot-global-rename.bundle`
+- `copilot-global-rename.patch`
 - `docker-compose.yml`
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
@@ -353,7 +365,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/pass-pricing.service.js.map`
 - `services/bijou/src/pass-pricing.service.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
-- `services/core-api/src/analytics/heat-score.service.ts`
+- `services/core-api/src/analytics/ffs-score.service.ts`
 - `services/core-api/src/app.module.ts`
 - `services/core-api/src/audit/audit-bridge.service.ts`
 - `services/core-api/src/audit/audit-dashboard.controller.ts`
@@ -459,7 +471,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/creator-control/src/broadcast-timing.copilot.ts`
 - `services/creator-control/src/creator-control.module.ts`
 - `services/creator-control/src/creator-control.service.ts`
-- `services/creator-control/src/room-heat.engine.ts`
+- `services/creator-control/src/ffs.engine.ts`
 - `services/creator-control/src/session-monitoring.copilot.ts`
 - `services/cyrano/.env.example`
 - `services/cyrano/ASSUMPTIONS.md`
@@ -493,6 +505,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/README.md`
 - `services/guest-heat/src/cyrano-teleprompter.service.ts`
 - `services/guest-heat/src/dual-flame-pulse.service.ts`
+- `services/guest-heat/src/fan-fervor-score.service.ts`
+- `services/guest-heat/src/fan-fervor-score.types.ts`
 - `services/guest-heat/src/forecast.service.ts`
 - `services/guest-heat/src/gemstone.service.ts`
 - `services/guest-heat/src/guest-heat.controller.ts`
@@ -500,14 +514,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/src/guest-heat.service.ts`
 - `services/guest-heat/src/guest-heat.types.ts`
 - `services/guest-heat/src/performance-timer.service.ts`
-- `services/heartsync/.env.example`
-- `services/heartsync/ASSUMPTIONS.md`
-- `services/heartsync/FLAGS.md`
-- `services/heartsync/README.md`
-- `services/heartsync/src/heartsync.controller.ts`
-- `services/heartsync/src/heartsync.module.ts`
-- `services/heartsync/src/heartsync.service.ts`
-- `services/heartsync/src/heartsync.types.ts`
 - `services/integration-hub/src/hub.module.ts`
 - `services/integration-hub/src/hub.service.ts`
 - `services/ledger/index.ts`
@@ -580,6 +586,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/zonebot-scheduler/ASSUMPTIONS.md`
 - `services/zonebot-scheduler/FLAGS.md`
 - `services/zonebot-scheduler/README.md`
+- `services/zonebot-scheduler/src/creator-rate-day61.job.ts`
 - `services/zonebot-scheduler/src/interfaces.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.controller.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.module.ts`

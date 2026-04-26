@@ -107,4 +107,31 @@ export const GovernanceConfig = {
     DWELL_CREDIT_PER_INTERVAL: 5,
     BIJOU_CREATOR_SPLIT: 0.65,
   },
+
+  // ── Creator Payout Rate Tiers (Mic Drop Strategy — FIZ) ──────────────────
+  // CEO-AUTHORIZED 2026-04-26.
+  // REASON: Implement founding creator rate guarantee + Day 61 floor upgrade.
+  // IMPACT: Controls payout floor/ceiling written to creator_rate_tiers table.
+  // CORRELATION_ID: CNZ-WORK-001-CREATOR-RATE-TIER
+
+  // Founding creators: 7.5¢ floor from Day 1.
+  CREATOR_RATE_FOUNDING_FLOOR: new Decimal('0.075'),
+  // Founding creators: 9¢ ceiling from Day 1.
+  CREATOR_RATE_FOUNDING_CEILING: new Decimal('0.090'),
+  // Standard (non-founding) creators: 6.5¢ floor until Day 61.
+  CREATOR_RATE_STANDARD_FLOOR: new Decimal('0.065'),
+  // Standard (non-founding) creators: 8¢ ceiling until Day 61.
+  CREATOR_RATE_STANDARD_CEILING: new Decimal('0.080'),
+  // After Day 61, all creators share the founding floor/ceiling.
+  CREATOR_RATE_DAY61_FLOOR: new Decimal('0.075'),
+  CREATOR_RATE_DAY61_CEILING: new Decimal('0.090'),
+  // Day 61 is the number of days after platform launch when the rate upgrade fires.
+  CREATOR_RATE_DAY61_THRESHOLD: 61,
+
+  // ── VelocityZone Payout Interpolation (FIZ) ──────────────────────────────
+  // FFS score 0 → rate_floor_usd; FFS score 100 → rate_ceil_usd.
+  // Per-event floor/ceiling are stored in velocityzone_events table.
+  // The canonical default limits (operator may not exceed these via admin UI).
+  VELOCITYZONE_RATE_FLOOR_MIN: new Decimal('0.075'),
+  VELOCITYZONE_RATE_CEIL_MAX:  new Decimal('0.090'),
 } as const;

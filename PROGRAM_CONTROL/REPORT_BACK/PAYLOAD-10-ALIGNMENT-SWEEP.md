@@ -3,7 +3,7 @@
 **Branch:** `copilot/update-rebbook-business-plan`
 **Authority:** OQMI_GOVERNANCE.md + DOMAIN_GLOSSARY.md (naming authority)
 **Directive:** Ensure 100% fidelity across REDBOOK rate cards, recovery flows, Diamond pricing,
-70/30 expiry, Token Bridge / 3/5ths logic, creator payout floors, Room-Heat tiers, Cyrano
+70/30 expiry, Token Bridge / 3/5ths logic, creator payout floors, Flicker n'Flame Scoring tiers, Cyrano
 categories, and GateGuard pre-processor. Update every comment, constant, and test with
 authoritative language.
 
@@ -12,7 +12,7 @@ authoritative language.
 ## Files Changed
 
 ```
-services/creator-control/src/room-heat.engine.ts           MODIFIED — HeatTier rename + threshold alignment
+services/creator-control/src/ffs.engine.ts           MODIFIED — HeatTier rename + threshold alignment
 services/creator-control/src/session-monitoring.copilot.ts MODIFIED — BLAZING → INFERNO
 services/integration-hub/src/hub.service.ts                MODIFIED — BLAZING → INFERNO
 services/cyrano/src/cyrano.service.ts                      MODIFIED — BLAZING → INFERNO (all 8 weight keys + logic)
@@ -27,9 +27,9 @@ PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md  NEW
 
 ## Changes Applied
 
-### 1 — Room-Heat Tier Naming: BLAZING → INFERNO
+### 1 — Flicker n'Flame Scoring Tier Naming: BLAZING → INFERNO
 
-**File:** `services/creator-control/src/room-heat.engine.ts`
+**File:** `services/creator-control/src/ffs.engine.ts`
 
 - `HeatTier` type: `'COLD' | 'WARM' | 'HOT' | 'BLAZING'` → `'COLD' | 'WARM' | 'HOT' | 'INFERNO'`
 - `TIER_THRESHOLDS` aligned to canonical GovernanceConfig bands (locked per DOMAIN_GLOSSARY.md
@@ -151,6 +151,6 @@ computation, then authorize a coordinated update across all six files above.
 ## Result: SUCCESS
 
 PAYLOAD 10 alignment sweep complete. All REDBOOK rates, recovery flows, Diamond pricing,
-70/30 expiry, Token Bridge, 3/5ths logic, Room-Heat tiers, Cyrano categories, and GateGuard
+70/30 expiry, Token Bridge, 3/5ths logic, Flicker n'Flame Scoring tiers, Cyrano categories, and GateGuard
 pre-processor constants are fidelity-verified or corrected to canonical authoritative language.
 293 tests pass. 0 new failures introduced.

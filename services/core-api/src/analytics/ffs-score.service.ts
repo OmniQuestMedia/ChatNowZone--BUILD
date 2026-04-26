@@ -1,11 +1,11 @@
-// services/core-api/src/analytics/heat-score.service.ts
-// HZ: HeatScoreService — six-input behavioral HSV for HotZone / My Zone Manager
+// services/core-api/src/analytics/ffs-score.service.ts
+// HZ: FfsScoreService — six-input behavioral HSV for HotZone / My Zone Manager
 // Corpus constraint: advisory only, non-gating, non-punitive. Ch.5 §6.
 import { Injectable, Logger } from '@nestjs/common';
 
 export type HeatBand = 'COLD' | 'COOL' | 'WARM' | 'HOT' | 'RED_ZONE';
 
-export interface HeatScoreInput {
+export interface FfsScoreInput {
   creator_id: string;
   // HIGH weight
   session_spend_tokens: number;
@@ -21,7 +21,7 @@ export interface HeatScoreInput {
   profile_ctr_pct: number;
 }
 
-export interface HeatScoreResult {
+export interface FfsScoreResult {
   creator_id: string;
   raw_score: number;
   heat_band: HeatBand;
@@ -48,10 +48,10 @@ const ADVISORY_DISCLAIMER =
   'Canonical Corpus v10 Ch.5 §6.';
 
 @Injectable()
-export class HeatScoreService {
-  private readonly logger = new Logger(HeatScoreService.name);
+export class FfsScoreService {
+  private readonly logger = new Logger(FfsScoreService.name);
 
-  compute(input: HeatScoreInput): HeatScoreResult {
+  compute(input: FfsScoreInput): FfsScoreResult {
     // Normalize each input to 0–100 range before weighting
     const spend_norm = Math.min((input.session_spend_tokens / 500) * 100, 100);
     const chat_norm = Math.min((input.chat_message_count / 100) * 100, 100);
@@ -86,7 +86,7 @@ export class HeatScoreService {
               ? 'COOL'
               : 'COLD';
 
-    this.logger.log('HeatScoreService: HSV computed', {
+    this.logger.log('FfsScoreService: HSV computed', {
       creator_id: input.creator_id,
       raw_score,
       heat_band,

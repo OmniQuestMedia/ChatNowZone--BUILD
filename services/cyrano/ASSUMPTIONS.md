@@ -28,9 +28,9 @@ Cyrano itself does not control UI rendering — the panel must never expose
 suggestions to the guest-facing stream.
 
 ## A006 — Heat Tier Is Caller-Provided
-Cyrano does not subscribe to Room-Heat directly. The `CyranoInputFrame`
+Cyrano does not subscribe to Flicker n'Flame Scoring directly. The `CyranoInputFrame`
 must include a valid `heat` object. In production, the Integration Hub
-composes the frame from Room-Heat snapshots and session telemetry.
+composes the frame from Flicker n'Flame Scoring snapshots and session telemetry.
 
 ## A007 — Category Weight Matrix Is Static
 `CATEGORY_TIER_WEIGHTS` is a compile-time constant. Retuning requires a

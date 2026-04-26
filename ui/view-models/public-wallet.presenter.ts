@@ -33,11 +33,6 @@ export interface TeaseRegularRow {
   member_usd: number;
   creator_payout_per_token: number;
 }
-export interface ShowzoneRow {
-  tokens: number;
-  usd: number;
-  creator_payout_per_token: number;
-}
 export interface DiamondVolumeTier {
   min_tokens: number;
   max_tokens: number;
@@ -53,7 +48,6 @@ export interface DiamondVelocityMultipliers {
 
 export interface GovernanceSnapshot {
   tease_regular: readonly TeaseRegularRow[];
-  tease_showzone: readonly ShowzoneRow[];
   diamond_volume_tiers: readonly DiamondVolumeTier[];
   diamond_velocity_multipliers: DiamondVelocityMultipliers;
   diamond_platform_floor_per_token_usd: number;
@@ -81,10 +75,6 @@ export const DEFAULT_GOVERNANCE_SNAPSHOT: GovernanceSnapshot = {
     { tokens: 1_000, guest_usd: 119.99, member_usd: 107.99, creator_payout_per_token: 0.075 },
     { tokens: 5_000, guest_usd: 549.99, member_usd: 494.99, creator_payout_per_token: 0.08 },
     { tokens: 10_000, guest_usd: 999.99, member_usd: 899.99, creator_payout_per_token: 0.082 },
-  ],
-  tease_showzone: [
-    { tokens: 300, usd: 48.0, creator_payout_per_token: 0.08 },
-    { tokens: 1_000, usd: 145.0, creator_payout_per_token: 0.082 },
   ],
   diamond_volume_tiers: [
     { min_tokens: 10_000, max_tokens: 27_499, base_rate: 0.095 },
@@ -142,23 +132,9 @@ export class PublicWalletPresenter {
       };
     });
 
-    const showzone_rows: TokenBundleRateRow[] = gov.tease_showzone.map((r) => ({
-      tokens: r.tokens,
-      display_price_usd: r.usd,
-      guest_price_usd: r.usd,
-      member_price_usd: r.usd,
-      discount_for_members_pct: null,
-      per_token_usd: Math.round((r.usd / r.tokens) * 10_000) / 10_000,
-      creator_payout_per_token: r.creator_payout_per_token,
-      bundle_tier: 'TEASE_SHOWZONE',
-      is_promoted: false,
-      reason_code: 'REDBOOK_SECTION_3',
-    }));
-
     return {
       tier: args.tier,
       rows,
-      showzone_rows,
       generated_at_utc: now.toISOString(),
       rule_applied_id: this.RULE_ID,
     };
@@ -275,7 +251,7 @@ export class PublicWalletPresenter {
     const labels: Record<WalletBucket, { label: string; description: string }> = {
       purchased: {
         label: 'Purchased',
-        description: 'Tokens bought via Tease Regular / ShowZone / Diamond bundles. Drained first.',
+        description: 'Tokens bought via Tease Regular / Diamond bundles. Drained first.',
       },
       membership: {
         label: 'Membership',
