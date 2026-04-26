@@ -15,7 +15,6 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import Decimal from 'decimal.js';
-import { randomUUID } from 'crypto';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
