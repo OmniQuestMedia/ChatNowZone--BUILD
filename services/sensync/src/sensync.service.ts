@@ -351,7 +351,7 @@ export class SenSyncService implements OnModuleInit {
       },
       data: {
         purge_requested_at: now,
-        reason_code: 'SENSYNC_PURGE_REQUESTED',
+        reason_code: args.reason_code,
       },
     });
 
