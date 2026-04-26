@@ -160,6 +160,7 @@ export class CyranoService {
         ffs_score: frame.ffs_score,
         sensync_bpm: suggestion.sensync_bpm ?? null,
         emitted_at_utc: suggestion.emitted_at_utc,
+        rule_applied_id: suggestion.rule_applied_id,
       } as unknown as Record<string, unknown>);
     }
 
