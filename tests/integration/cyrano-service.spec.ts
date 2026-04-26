@@ -12,7 +12,7 @@ import type {
   CyranoInputFrame,
   MemoryFact,
 } from '../../services/cyrano/src/cyrano.types';
-import type { HeatScore, HeatTier } from '../../services/creator-control/src/ffs.engine';
+import type { FfsScore, FfsTier } from '../../services/creator-control/src/ffs.engine';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 
 type Published = { topic: string; payload: Record<string, unknown> };
@@ -27,7 +27,7 @@ function buildNatsStub(): { stub: { publish: jest.Mock }; published: Published[]
   return { stub, published };
 }
 
-function heat(tier: HeatTier, score = 60): HeatScore {
+function heat(tier: FfsTier, score = 60): FfsScore {
   return {
     session_id: 'sess-1',
     creator_id: 'creator-1',

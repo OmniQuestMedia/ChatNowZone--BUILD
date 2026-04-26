@@ -135,7 +135,7 @@ Snapshot at 2026-04-25 (Payload 7 + 8):
 - **PAYLOAD 1 (Canonical Ledger)** — DONE. Three-bucket wallet + hash chain.
 - **PAYLOAD 2 (Recovery Engine)** — DONE. REDBOOK §5 pillars wired.
 - **PAYLOAD 3 (GateGuard)** — DONE (scaffold + middleware).
-- **PAYLOAD 4 (OBS bridge / Room-Heat)** — DONE (scaffold).
+- **PAYLOAD 4 (OBS bridge / Flicker n'Flame Scoring)** — DONE (scaffold).
 - **PAYLOAD 5 (CreatorControl + Cyrano L1)** — DONE.
 - **PAYLOAD 6 (Immutable audit + RBAC + compliance)** — DONE.
 - **PAYLOAD 7 (Frontend polish + Diamond Concierge UI)** — DONE.

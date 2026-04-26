@@ -46,7 +46,7 @@ git show refs/oss/discussion-platform:components/Posts/PostItem.tsx
 | 2 | `refs/oss/socketio-chat` | `CelaDaniel/nodejs-socketio-chat-application` | NONE DETECTED | 🔴 BLOCKED | OBS-001/002, CCZ-001, OPS-003 |
 | 3 | `refs/oss/react-chat-app` | `CelaDaniel/React-Chat-App` | NONE DETECTED | 🔴 BLOCKED | CCZ-001/002, OBS-001 |
 | 4 | `refs/oss/discussion-platform` | `CelaDaniel/next_discussion_platform` | **MIT** | 🟢 CLEAR | FC-001 → FC-006, OPS-004 |
-| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Room-Heat Engine broadcast |
+| 5 | `refs/oss/live-polling` | `CelaDaniel/react-polling` | NONE DETECTED | 🔴 BLOCKED | OBS Flicker n'Flame Scoring (FFS) broadcast |
 | 6 | `refs/oss/zoom-clone` | `CelaDaniel/zoom-clone` | NONE DETECTED | 🔴 BLOCKED | OBS ShowZone Theatre UI, DISC |
 | 7 | `refs/oss/loadbalancer-nginx` | `CelaDaniel/loadbalancer-nginx-docker-nodejs` | NONE DETECTED | 🔴 BLOCKED | Bijou SFU infra, OPS deployment |
 | 8 | `refs/oss/social-media-app` | `CelaDaniel/Social-media-react-app` | NONE DETECTED | 🔴 BLOCKED | FC-003, CCZ-003, OPS-006 notifications |

@@ -1,20 +1,21 @@
-# Flicker n'Flame Scoring (FFS) — `services/ffs/`
+# Flicker n'Flame Scoring — `services/ffs/`
 
-**Work Order:** WO-003  
-**Business Plan Reference:** B.4 — Room-level telemetry  
-**Rule ID:** `FFS_ENGINE_v2`  
-**Status:** Active
+**Business Plan Reference:** B.4 — Room-level telemetry
+**Rule ID:** `FFS_ENGINE_v1`
+**Status:** Active (renamed from `services/room-heat/`)
 
 ---
 
 ## Purpose
 
-The Flicker n'Flame Scoring (FFS) computes a real-time **composite heat score (0–100)** for every
-live creator session.  The score is published to NATS at **1 Hz** and consumed by:
+The **Flicker n'Flame Scoring (FFS)** engine computes a real-time **composite score (0–100)** for every
+live creator session. The score is published to NATS on subject `ffs.score.update` every 1 Hz and consumed by:
 
-- **CreatorControl.Zone** — session suggestions and price nudges  
-- **Cyrano** — suggestion weighting and category selection  
-- **Integration Hub** — payout scaling and Diamond Concierge handoffs  
+- **CreatorControl.Zone** — session suggestions and price nudges
+- **Cyrano™** — suggestion weighting and category selection
+- **Integration Hub** — payout scaling and Diamond Concierge handoffs
+- **VelocityZone** — maps FFS score to exact payout rate during timed events
+- **GateGuard Welfare Score** — welfare signal weighting
 - **Leaderboard surface** — 10 × 10 grid sorted coolest-to-hottest
 
 ---
@@ -22,21 +23,21 @@ live creator session.  The score is published to NATS at **1 Hz** and consumed b
 ## Architecture
 
 ```
-NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
+NATS (SENSYNC_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
         │
         ▼
- RoomHeatService.ingest(RoomHeatInput)
+ FfsService.ingest(FfsInput)
         │
-        ├─ calculateComponents()   ← 13 weighted signals
-        ├─ earlyPhaseBoost()       ← +10 % if dwell < 5 min
-        ├─ dualFlameBonus()        ← up to +5 pts from partner
+        ├─ calculateComponents()    ← 13 weighted signals
+        ├─ earlyPhaseBoost()        ← +10 % if dwell < 5 min
+        ├─ dualFlameBonus()         ← up to +5 pts from partner
         ├─ resolveAntiFlickerTier() ← 3-tick confirmation rule
         │
-        ├─ NATS publish (FFS_SCORE_SAMPLE, FFS_SCORE_TIER_CHANGED,
-        │                FFS_SCORE_PEAK, FFS_SCORE_HOT_AND_READY,
-        │                FFS_SCORE_DUAL_FLAME_PEAK)
+        ├─ NATS publish (FFS_SCORE_UPDATE, FFS_TIER_CHANGED,
+        │                FFS_PEAK, FFS_HOT_AND_READY,
+        │                FFS_DUAL_FLAME_PEAK)
         │
-        ├─ Prisma.roomHeatSnapshot.create()  (async)
+        ├─ Prisma.ffsSnapshot.create()  (async)
         │
         └─ 1 Hz interval → re-emit with refreshed timestamp
 ```
@@ -52,7 +53,7 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
 | Dwell | 5 | `dwell_minutes` |
 | Heart reactions | 8 | `heart_reactions_per_min` |
 | Private/spy viewers | 5 | `private_spy_count` |
-| Heart rate delta | 12 | `heart_rate_bpm − heart_rate_baseline_bpm` |
+| Heart rate delta (SenSync™ or raw) | 12 | `sensync_bpm ?? heart_rate_bpm − baseline` |
 | Eye tracking | 6 | `eye_tracking_score` (0–1) |
 | Facial excitement | 7 | `facial_excitement_score` (0–1) |
 | Skin exposure | 5 | `skin_exposure_score` (0–1) |
@@ -66,8 +67,8 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
 
 ## Tier Bands (canonical — DOMAIN_GLOSSARY.md)
 
-| Tier | Score range | Payout rate |
-|------|-------------|-------------|
+| Tier | Score range | VelocityZone payout floor |
+|------|-------------|--------------------------|
 | COLD | 0–33 | $0.075 / CZT |
 | WARM | 34–60 | $0.080 / CZT |
 | HOT | 61–85 | $0.085 / CZT |
@@ -77,20 +78,19 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
 
 ## Anti-Flicker Rule
 
-A tier transition is only confirmed after **3 consecutive ticks** agree on the new
-tier.  This prevents rapid oscillation around a band boundary from thrashing
-downstream consumers.
+A tier transition is only confirmed after **3 consecutive ticks** agree on the new tier.
 
 ---
 
-## Leaderboard Grid (10 × 10)
+## SenSync™ Integration
 
-- Rank 0 (top-left) = **coolest** active session  
-- Rank 99 (bottom-right) = **hottest** active session  
-- Up to 100 concurrent sessions rendered  
-- Categories: `all`, `standard`, `dual_flame`, `hot_and_ready`, `new_flames`  
-- **Hot and Ready**: score ≥ 70 **and** dwell ≥ 10 min  
-- **New Flames**: session started < 15 min ago
+When a SenSync™ wearable is paired and consent is granted, the FFS engine
+receives `SENSYNC_BPM_UPDATE` events and folds the live BPM into the
+`sensync_bpm` field of the input frame. The heart-rate component uses
+`sensync_bpm` over `heart_rate_bpm` when present.
+
+If the device disconnects or consent is revoked, the engine automatically
+falls back to behavioral signals only (graceful degradation).
 
 ---
 
@@ -98,15 +98,15 @@ downstream consumers.
 
 | Topic constant | Subject | When emitted |
 |----------------|---------|--------------|
-| `FFS_SCORE_SAMPLE` | `ffs.score.sample` | Every ingest (and 1 Hz re-emit) |
-| `FFS_SCORE_TIER_CHANGED` | `ffs.score.tier.changed` | Tier crosses a band boundary |
-| `FFS_SCORE_PEAK` | `ffs.score.peak` | Score enters INFERNO |
-| `FFS_SCORE_HOT_AND_READY` | `ffs.score.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
-| `FFS_SCORE_DUAL_FLAME_PEAK` | `ffs.score.dual_flame.peak` | Dual Flame session hits INFERNO |
-| `FFS_SCORE_LEADERBOARD_UPDATED` | `ffs.score.leaderboard.updated` | ~every 10 s |
-| `FFS_SCORE_SESSION_STARTED` | `ffs.score.session.started` | `startSession()` called |
-| `FFS_SCORE_SESSION_ENDED` | `ffs.score.session.ended` | `endSession()` called |
-| `FFS_SCORE_ADAPTIVE_UPDATED` | `ffs.score.adaptive.updated` | Adaptive weights shift after tip |
+| `FFS_SCORE_UPDATE` | `ffs.score.update` | Every ingest (and 1 Hz re-emit) |
+| `FFS_TIER_CHANGED` | `ffs.score.tier.changed` | Tier crosses a band boundary |
+| `FFS_PEAK` | `ffs.score.peak` | Score enters INFERNO |
+| `FFS_HOT_AND_READY` | `ffs.score.hot_and_ready` | Score ≥ 70 + dwell ≥ 10 min |
+| `FFS_DUAL_FLAME_PEAK` | `ffs.score.dual_flame.peak` | Dual Flame hits INFERNO |
+| `FFS_LEADERBOARD_UPDATED` | `ffs.score.leaderboard.updated` | ~every 10 s |
+| `FFS_SESSION_STARTED` | `ffs.score.session.started` | `startSession()` called |
+| `FFS_SESSION_ENDED` | `ffs.score.session.ended` | `endSession()` called |
+| `FFS_ADAPTIVE_UPDATED` | `ffs.score.adaptive.updated` | Adaptive weights shift after tip |
 
 ---
 
@@ -115,7 +115,7 @@ downstream consumers.
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/ffs/leaderboard?category=all` | 10×10 leaderboard |
-| `GET` | `/ffs/session/:id` | Current score for a session |
+| `GET` | `/ffs/session/:id` | Current FFS score for a session |
 | `POST` | `/ffs/ingest` | Ingest a telemetry frame |
 | `POST` | `/ffs/session/:id/start` | Pre-register a session |
 | `DELETE` | `/ffs/session/:id` | End a session |
@@ -124,24 +124,12 @@ downstream consumers.
 
 ---
 
-## Adaptive Learning
-
-When a tip event fires (`learnFromTipEvent()`), the engine identifies which
-signals were elevated (≥ 70 % of their normalisation ceiling) at tip time:
-
-- **Elevated signals**: multiplier boosted by +2 % (capped at 1.20)  
-- **Non-elevated signals**: multiplier decayed by −0.5 % (floored at 0.80)
-
-Multipliers are persisted to `room_heat_adaptive_weights` and cached in-memory.
-
----
-
 ## Database Tables
 
 | Table | Purpose |
 |-------|---------|
-| `room_heat_snapshots` | Append-only time-series of every heat score computed |
-| `room_heat_adaptive_weights` | One row per creator — learned component multipliers |
+| `ffs_snapshots` | Append-only time-series of every FFS score computed |
+| `ffs_adaptive_weights` | One row per creator — learned component multipliers |
 
 ---
 

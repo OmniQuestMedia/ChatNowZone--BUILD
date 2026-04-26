@@ -251,7 +251,7 @@ export class PublicWalletPresenter {
     const labels: Record<WalletBucket, { label: string; description: string }> = {
       purchased: {
         label: 'Purchased',
-        description: 'Tokens bought via Tease Regular / ShowZone / Diamond bundles. Drained first.',
+        description: 'Tokens bought via Tease Regular / Diamond bundles. Drained first.',
       },
       membership: {
         label: 'Membership',

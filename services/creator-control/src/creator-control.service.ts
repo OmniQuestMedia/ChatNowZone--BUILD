@@ -4,7 +4,7 @@
 // Unified creator workstation (single-pane) — aggregates:
 //   • Broadcast Timing Copilot  — when to go live
 //   • Session Monitoring Copilot — real-time price nudges during broadcast
-//   • Flicker n'Flame Scoring (FFS)           — the live-telemetry foundation
+//   • Flicker n'Flame Scoring (FFS) — the live-telemetry foundation
 //   • OBS plugin + chat aggregator stubs (services/obs-bridge)
 //
 // This service is a READ + SUGGEST surface. It never writes to the ledger
@@ -15,9 +15,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import {
-  FfsEngine,
-  type HeatScore,
-  type RoomHeatSample,
+  FlickerNFlameScoringEngine,
+  type FfsScore,
+  type FfsSample,
 } from './ffs.engine';
 import {
   BroadcastTimingCopilot,
@@ -34,7 +34,7 @@ export const CREATOR_CONTROL_RULE_ID = 'CREATOR_CONTROL_ZONE_v1';
 export interface CreatorWorkstationSnapshot {
   creator_id: string;
   active_session_id: string | null;
-  latest_heat: HeatScore | null;
+  latest_heat: FfsScore | null;
   latest_nudge: PriceNudge | null;
   top_broadcast_slots: BroadcastWindowSuggestion[];
   obs_ready: boolean;
@@ -46,25 +46,25 @@ export interface CreatorWorkstationSnapshot {
 @Injectable()
 export class CreatorControlService {
   private readonly logger = new Logger(CreatorControlService.name);
-  // Per-creator cache of the most recent HeatScore / nudge — supports the
+  // Per-creator cache of the most recent FfsScore / nudge — supports the
   // single-pane snapshot without forcing recomputation on every read.
   private readonly latestByCreator = new Map<
     string,
-    { heat: HeatScore; nudge: PriceNudge }
+    { heat: FfsScore; nudge: PriceNudge }
   >();
 
   constructor(
     private readonly nats: NatsService,
-    private readonly heat: FfsEngine,
+    private readonly heat: FlickerNFlameScoringEngine,
     private readonly timing: BroadcastTimingCopilot,
     private readonly monitoring: SessionMonitoringCopilot,
   ) {}
 
   /**
-   * Ingest a ffs sample from Bijou/HeartZone and fan the
+   * Ingest a Flicker n'Flame Scoring (FFS) sample from ShowZone/Bijou/HeartZone and fan the
    * resulting suggestion out to the creator's copilot panel.
    */
-  ingestSample(sample: RoomHeatSample): { heat: HeatScore; nudge: PriceNudge } {
+  ingestSample(sample: FfsSample): { heat: FfsScore; nudge: PriceNudge } {
     const heat = this.heat.ingest(sample);
     const nudge = this.monitoring.suggestNudge(heat);
     this.latestByCreator.set(sample.creator_id, { heat, nudge });
@@ -87,7 +87,7 @@ export class CreatorControlService {
         direction: nudge.direction,
         magnitude_pct: nudge.magnitude_pct,
         tier: nudge.tier,
-        heat_score: nudge.heat_score,
+        ffs_score: nudge.ffs_score,
         reason_code: nudge.reason_code,
         rule_applied_id: CREATOR_CONTROL_RULE_ID,
         captured_at_utc: nudge.captured_at_utc,
@@ -157,7 +157,7 @@ export class CreatorControlService {
 
 // ## HANDOFF ─────────────────────────────────────────────────────────────────
 // CreatorControl.Zone is now a live single-pane workstation. It consumes
-// Room-Heat samples, runs Broadcast Timing + Session Monitoring copilots,
+// Flicker n'Flame Scoring (FFS) samples, runs Broadcast Timing + Session Monitoring copilots,
 // and publishes deterministic suggestions to NATS
 // (CREATOR_CONTROL_* and FFS_SCORE_* topics).
 //

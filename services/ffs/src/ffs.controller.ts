@@ -1,5 +1,5 @@
-// WO-003 — FFS: controller
-// REST surface for the Flicker n'Flame Scoring (FFS) service.
+// WO-003 — Flicker n'Flame Scoring (FFS): controller
+// REST surface for the Flicker n'Flame Scoring service.
 // All endpoints are advisory / read-oriented; no ledger mutations here.
 import {
   Body,
@@ -7,12 +7,13 @@ import {
   Delete,
   Get,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
 } from '@nestjs/common';
 import type { LeaderboardCategory } from './types/ffs.types';
-import type { RoomHeatLeaderboard, RoomHeatScore } from './types/ffs.types';
+import type { FfsLeaderboard, FfsScore } from './types/ffs.types';
 import { IngestFfsDto, TipEventDto } from './dto/ffs.dto';
 import { FfsService } from './ffs.service';
 
@@ -24,14 +25,11 @@ export class FfsController {
 
   /**
    * GET /ffs/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
-   *
-   * Returns the 10×10 leaderboard grid.
-   * Coolest sessions appear at the top (rank 0); hottest at the bottom (rank 99).
    */
   @Get('leaderboard')
   getLeaderboard(
     @Query('category') category?: string,
-  ): RoomHeatLeaderboard {
+  ): FfsLeaderboard {
     const validCategories: LeaderboardCategory[] = [
       'all',
       'standard',
@@ -51,28 +49,23 @@ export class FfsController {
 
   /**
    * GET /ffs/session/:sessionId
-   *
-   * Returns the current heat score for a live session, or 404 if unknown.
    */
   @Get('session/:sessionId')
-  getSessionHeat(
+  getSessionScore(
     @Param('sessionId') sessionId: string,
-  ): RoomHeatScore | { message: string; session_id: string } {
-    const score = this.ffsService.getSessionHeat(sessionId);
+  ): FfsScore {
+    const score = this.ffsService.getSessionScore(sessionId);
     if (!score) {
-      return { message: 'Session not found or not yet active', session_id: sessionId };
+      throw new NotFoundException(`Session not found or not yet active: ${sessionId}`);
     }
     return score;
   }
 
   /**
    * POST /ffs/ingest
-   *
-   * Ingest a full telemetry frame. Returns the computed heat score.
-   * Used by the creator-control surface and integration tests.
    */
   @Post('ingest')
-  ingestSample(@Body() dto: IngestFfsDto): RoomHeatScore {
+  ingestSample(@Body() dto: IngestFfsDto): FfsScore {
     this.logger.log('FfsController.ingestSample', {
       session_id: dto.session_id,
       creator_id: dto.creator_id,
@@ -82,9 +75,6 @@ export class FfsController {
 
   /**
    * POST /ffs/session/:sessionId/start
-   *
-   * Pre-register a session before the first telemetry frame.
-   * Callers may omit this — the session is auto-registered on first ingest.
    */
   @Post('session/:sessionId/start')
   startSession(
@@ -101,9 +91,6 @@ export class FfsController {
 
   /**
    * DELETE /ffs/session/:sessionId
-   *
-   * Teardown session heat state and stop the 1 Hz publisher.
-   * Call this when a broadcast ends.
    */
   @Delete('session/:sessionId')
   endSession(
@@ -114,10 +101,7 @@ export class FfsController {
   }
 
   /**
-   * POST /ffs/tip-event
-   *
-   * Trigger adaptive weight learning from a tip event.
-   * Called by the tip service whenever a tip is completed.
+   * POST /ffs/tip-event — trigger adaptive weight learning from a tip.
    */
   @Post('tip-event')
   recordTipEvent(@Body() dto: TipEventDto): { learned: boolean } {
@@ -126,14 +110,12 @@ export class FfsController {
       creator_id: dto.creator_id,
       tokens:     dto.tokens,
     });
-    this.ffsService.learnFromTipEvent(dto.heat_context);
+    this.ffsService.learnFromTipEvent(dto.ffs_context);
     return { learned: true };
   }
 
   /**
    * GET /ffs/adaptive-weights/:creatorId
-   *
-   * Returns the adaptive weight multipliers for a creator (advisory / debug).
    */
   @Get('adaptive-weights/:creatorId')
   getAdaptiveWeights(

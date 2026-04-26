@@ -1,16 +1,12 @@
-// WO-003 — FFS: DTOs (request validation shapes)
-// All fields are typed; callers provide primitives — no class-validator
-// decorators used (consistent with the rest of the codebase style).
+// FFS — Flicker n'Flame Scoring: DTOs (request validation shapes)
 
 import type {
+  FfsInput,
   LeaderboardCategory,
-  RoomHeatInput,
 } from '../types/ffs.types';
 
 // ── Ingest DTO ────────────────────────────────────────────────────────────────
-// Mirrors RoomHeatInput exactly but expressed as a plain class so NestJS
-// can deserialise the JSON body.
-export class IngestFfsDto implements RoomHeatInput {
+export class IngestFfsDto implements FfsInput {
   session_id!: string;
   creator_id!: string;
   captured_at_utc!: string;
@@ -29,6 +25,8 @@ export class IngestFfsDto implements RoomHeatInput {
   heart_rate_baseline_bpm!: number;
   eye_tracking_score!: number;
   facial_excitement_score!: number;
+  /** Optional SenSync™ BPM contribution (opt-in only; undefined if not consented or device unpaired). */
+  sensync_bpm?: number;
 
   // Content / Behavioral
   skin_exposure_score!: number;
@@ -53,8 +51,8 @@ export class LeaderboardQueryDto {
 export class TipEventDto {
   session_id!: string;
   creator_id!: string;
-  /** CZT tokens tipped — used to record adaptive signal strength. */
+  /** CZT tokens tipped. */
   tokens!: number;
-  /** Full heat input frame captured at tip moment. */
-  heat_context!: RoomHeatInput;
+  /** Full FFS input frame captured at tip moment. */
+  ffs_context!: FfsInput;
 }

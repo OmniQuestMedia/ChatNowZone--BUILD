@@ -77,14 +77,14 @@ Once decisions are recorded, a follow-up implementation PR will edit Business Pl
 
 -----
 
-### Claim 5 — HeartPleasure heart-rate-as-Room-Heat-input (§B.7.1)
+### Claim 5 — HeartPleasure heart-rate-as-Flicker n'Flame Scoring-input (§B.7.1)
 
-**Discrepancy.** §B.7.1 names heart-rate telemetry as a Room-Heat input. The directive flags "no engineering pathway." The repo contains no heart-rate ingestion service, no wearable/device integration spec, no consent / health-data compliance posture (HIPAA / state-level health-data law applicability), and no signal-processing or anti-spoofing design. Health-derived inputs are also a regulatory surface (consumer-health under the FTC Health Breach Notification Rule and several state privacy laws); shipping a plan that names this without a pathway carries reputational and regulatory risk.
+**Discrepancy.** §B.7.1 names heart-rate telemetry as a Flicker n'Flame Scoring input. The directive flags "no engineering pathway." The repo contains no heart-rate ingestion service, no wearable/device integration spec, no consent / health-data compliance posture (HIPAA / state-level health-data law applicability), and no signal-processing or anti-spoofing design. Health-derived inputs are also a regulatory surface (consumer-health under the FTC Health Breach Notification Rule and several state privacy laws); shipping a plan that names this without a pathway carries reputational and regulatory risk.
 
 **Proposed amendment options.**
 
-- **(a) Cite.** Specify (i) the device / SDK family (Apple HealthKit, Google Health Connect, named wearable vendor), (ii) the consent model and explicit retention/deletion posture, (iii) the regulatory analysis (FTC HBNR, applicable state law), (iv) the anti-spoof / signal-quality logic, and (v) the Room-Heat weighting. Add a heart-rate-ingestion service to the Wave-D spine.
-- **(b) Qualify.** Reword to: *"Heart-rate telemetry is a Phase-2 research direction subject to compliance review; v1 Room-Heat uses non-biometric inputs only. No biometric data is collected pre-launch."*
+- **(a) Cite.** Specify (i) the device / SDK family (Apple HealthKit, Google Health Connect, named wearable vendor), (ii) the consent model and explicit retention/deletion posture, (iii) the regulatory analysis (FTC HBNR, applicable state law), (iv) the anti-spoof / signal-quality logic, and (v) the Flicker n'Flame Scoring weighting. Add a heart-rate-ingestion service to the Wave-D spine.
+- **(b) Qualify.** Reword to: *"Heart-rate telemetry is a Phase-2 research direction subject to compliance review; v1 Flicker n'Flame Scoring uses non-biometric inputs only. No biometric data is collected pre-launch."*
 - **(c) Strike.** Remove heart-rate language from §B.7.1; the feature does not appear in any investor-facing material until a compliance-cleared pathway exists.
 
 **CEO DECISION:**

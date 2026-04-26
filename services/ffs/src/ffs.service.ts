@@ -1,18 +1,18 @@
-// WO-003 — FFS: core service
-// Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
+// FFS — Flicker n'Flame Scoring Engine: core service
+// Business Plan B.4 — real-time composite FFS score (0-100) emitted via NATS every 5–10 seconds.
 //
-// Doctrine (all from creator-control/src/ffs.engine.ts, extended):
+// Doctrine:
 //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
 //     only source of per-creator variance.
 //   - Anti-flicker (3-tick rule): tier transitions take effect only after
 //     three consecutive ticks agree on the new tier.
-//   - Early-phase generosity: 10 % boost for the first five minutes to
-//     prevent a cold-start dead zone on new sessions.
+//   - Early-phase generosity: 10 % boost for the first five minutes.
 //   - Adaptive learning: component multipliers shift ±2 %/−0.5 % per tip event.
 //   - Guardrails: score is clamped to 0-100; multipliers to 0.80-1.20.
 //   - Leaderboard: 10×10 grid, coolest slot at top (index 0).
 //   - Dual Flame: partner score contributes up to 5 bonus pts.
 //   - No ledger or payment mutations. No PII logged.
+//   - SenSync™ BPM takes precedence over heart_rate_bpm when consent is granted and device is paired.
 
 import {
   Injectable,
@@ -20,77 +20,78 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
+import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import type {
   AdaptiveWeights,
   AntiFlickerState,
-  HeatScoreComponents,
-  HeatTier,
+  FfsInput,
+  FfsLeaderboard,
+  FfsScore,
+  FfsScoreComponents,
+  FfsTier,
   LeaderboardCategory,
-  RoomHeatInput,
-  RoomHeatLeaderboard,
-  RoomHeatScore,
   SessionLiveState,
 } from './types/ffs.types';
 
-export const FFS_RULE_ID = 'FFS_ENGINE_v2';
+export const FFS_RULE_ID = 'FFS_ENGINE_v1';
 
-// ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
-const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
-  { min: 86, tier: 'INFERNO' },
-  { min: 61, tier: 'HOT' },
-  { min: 34, tier: 'WARM' },
-  { min: 0,  tier: 'COLD' },
+// ── Tier thresholds — derived from GovernanceConfig.HEAT_BAND_* canonical constants ──
+// See governance.config.ts. Do NOT hardcode these values here.
+const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> = [
+  { min: GovernanceConfig.HEAT_BAND_HOT_MAX + 1, tier: 'INFERNO' },
+  { min: GovernanceConfig.HEAT_BAND_WARM_MAX + 1, tier: 'HOT' },
+  { min: GovernanceConfig.HEAT_BAND_COLD_MAX + 1, tier: 'WARM' },
+  { min: 0, tier: 'COLD' },
 ];
 
 // ── Component weight ceilings (sum of all ceilings = 100) ────────────────────
-// Changing these values is a governance event (rule_applied_id bump required).
 const WEIGHT_CEILINGS = {
-  tip_pressure:      15,   // tips_per_min
-  chat_velocity:      8,   // chat_velocity_per_min
-  dwell:              5,   // dwell_minutes
-  hearts:             8,   // heart_reactions_per_min
-  private_spying:     5,   // private_spy_count
-  heart_rate:        12,   // bpm delta above baseline
-  eye_tracking:       6,   // eye_tracking_score (0-1)
-  facial_excitement:  7,   // facial_excitement_score (0-1)
-  skin_exposure:      5,   // skin_exposure_score (0-1)
-  motion:             5,   // motion_score (0-1)
-  audio_vocal:        5,   // audio_vocal_ratio (0-1)
-  momentum:          10,   // heat_trend_5min
-  hot_streak:         9,   // hot_streak_ticks
+  tip_pressure:      15,
+  chat_velocity:      8,
+  dwell:              5,
+  hearts:             8,
+  private_spying:     5,
+  heart_rate:        12,
+  eye_tracking:       6,
+  facial_excitement:  7,
+  skin_exposure:      5,
+  motion:             5,
+  audio_vocal:        5,
+  momentum:          10,
+  hot_streak:         9,
 } as const;
 
-// ── Normalisation reference maxima (linear mapping: value / max × ceiling) ──
+// ── Normalisation reference maxima ────────────────────────────────────────────
 const INPUT_MAX = {
-  tips_per_min:            2,    // ≥2 tips/min = full pressure
-  chat_velocity_per_min:  30,    // ≥30 msgs/min = full velocity
-  dwell_minutes:          60,    // ≥60 min dwell = full presence
-  heart_reactions_per_min: 10,   // ≥10 hearts/min = full engagement
-  private_spy_count:      10,    // ≥10 private/spy viewers = full
-  hr_delta_bpm:           40,    // ≥40 bpm above baseline = full arousal
-  heat_trend_5min:        50,    // ≥+50 score delta = full momentum
-  hot_streak_ticks:       10,    // ≥10 consecutive ticks = full streak
+  tips_per_min:            2,
+  chat_velocity_per_min:  30,
+  dwell_minutes:          60,
+  heart_reactions_per_min: 10,
+  private_spy_count:      10,
+  hr_delta_bpm:           40,
+  heat_trend_5min:        50,
+  hot_streak_ticks:       10,
 } as const;
 
-// ── Anti-flicker: ticks required before a tier transition is confirmed ───────
+// ── Anti-flicker: ticks required before a tier transition is confirmed ────────
 const ANTI_FLICKER_TICKS_REQUIRED = 3;
 
-// ── Early-phase generosity: boost applied when dwell < this threshold ─────────
+// ── Early-phase generosity ────────────────────────────────────────────────────
 const EARLY_PHASE_MINUTES = 5;
-const EARLY_PHASE_BOOST   = 1.10; // 10 %
+const EARLY_PHASE_BOOST   = 1.10;
 
 // ── Dual Flame: max bonus points contributed by partner score ─────────────────
 const DUAL_FLAME_PARTNER_MAX_BONUS = 5;
 
-// ── Leaderboard: Hot-and-Ready / New-Flames thresholds ───────────────────────
-const HOT_AND_READY_MIN_SCORE    = 70;
-const HOT_AND_READY_MIN_DWELL    = 10; // minutes
-const NEW_FLAMES_MAX_DWELL       = 15; // minutes
+// ── Hot-and-Ready / New-Flames thresholds ─────────────────────────────────────
+const HOT_AND_READY_MIN_SCORE = 70;
+const HOT_AND_READY_MIN_DWELL = 10;
+const NEW_FLAMES_MAX_DWELL    = 15;
 
-// ── Leaderboard grid dimensions ──────────────────────────────────────────────
+// ── Leaderboard grid dimensions ───────────────────────────────────────────────
 const LEADERBOARD_GRID_SIZE = 100; // 10 × 10
 
 // ── Adaptive weight defaults and guard rails ──────────────────────────────────
@@ -99,23 +100,18 @@ const ADAPTIVE_MIN            = 0.80;
 const ADAPTIVE_MAX            = 1.20;
 const ADAPTIVE_BOOST_ON_TIP   = 0.02;
 const ADAPTIVE_DECAY_ON_TIP   = 0.005;
-// Signals are considered "elevated" at tip time if they exceed 70 % of max
 const ADAPTIVE_ELEVATION_THRESHOLD = 0.70;
 
 @Injectable()
 export class FfsService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(FfsService.name);
 
-  // ── In-memory state ──────────────────────────────────────────────────────
-  private readonly antiFlicker  = new Map<string, AntiFlickerState>();
-  private readonly sessionState = new Map<string, SessionLiveState>();
+  private readonly antiFlicker   = new Map<string, AntiFlickerState>();
+  private readonly sessionState  = new Map<string, SessionLiveState>();
   private readonly adaptiveCache = new Map<string, Record<string, number>>();
-  // 1 Hz publish intervals: session_id → interval handle
-  private readonly heatIntervals = new Map<string, NodeJS.Timeout>();
-  // Most-recent input frames: session_id → last input (for 1 Hz re-emit)
-  private readonly lastInput = new Map<string, RoomHeatInput>();
-  // Per-session 1 Hz tick counters — used to throttle leaderboard broadcasts
-  private readonly tickCounters = new Map<string, number>();
+  private readonly ffsIntervals  = new Map<string, NodeJS.Timeout>();
+  private readonly lastInput     = new Map<string, FfsInput>();
+  private readonly tickCounters  = new Map<string, number>();
   /** Emit leaderboard broadcast every N ticks (default: every 10 s at 1 Hz). */
   private static readonly LEADERBOARD_EMIT_EVERY_TICKS = 10;
 
@@ -126,16 +122,14 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     this.subscribeNatsEvents();
-    this.logger.log('FfsService: initialised', {
-      rule_applied_id: FFS_RULE_ID,
-    });
+    this.logger.log('FfsService: initialised', { rule_applied_id: FFS_RULE_ID });
   }
 
   onModuleDestroy(): void {
-    for (const interval of this.heatIntervals.values()) {
+    for (const interval of this.ffsIntervals.values()) {
       clearInterval(interval);
     }
-    this.heatIntervals.clear();
+    this.ffsIntervals.clear();
     this.logger.log('FfsService: destroyed — all intervals cleared');
   }
 
@@ -145,15 +139,15 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Ingest a telemetry frame.
-   * Calculates the heat score, updates in-memory state, emits NATS events,
+   * Calculates the FFS score, updates in-memory state, emits NATS events,
    * persists a snapshot (async), and arms the 1 Hz publisher for the session.
    */
-  ingest(input: RoomHeatInput): RoomHeatScore {
-    const score = this.calculateHeatScore(input);
+  ingest(input: FfsInput): FfsScore {
+    const score = this.calculateFfsScore(input);
 
     this.lastInput.set(input.session_id, input);
-    this.updateSessionState(input, score);
     this.emitScoreEvents(score, input);
+    this.updateSessionState(input, score);
     void this.persistSnapshot(score, input);
     this.ensureInterval(input.session_id);
 
@@ -161,25 +155,22 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Pure computation — calculates heat score without side effects.
+   * Pure computation — calculates FFS score without side effects.
    * Same inputs always produce the same raw score.
    */
-  calculateHeatScore(input: RoomHeatInput): RoomHeatScore {
+  calculateFfsScore(input: FfsInput): FfsScore {
     const adaptiveWeights = this.getAdaptiveWeights(input.creator_id);
     const components      = this.calculateComponents(input, adaptiveWeights);
 
-    // Raw sum of components
     let rawScore = (Object.values(components) as number[]).reduce(
       (acc: number, v: number) => acc + v,
       0,
     );
 
-    // Early-phase generosity
     if (input.dwell_minutes < EARLY_PHASE_MINUTES) {
       rawScore *= EARLY_PHASE_BOOST;
     }
 
-    // Dual Flame partner bonus
     if (input.is_dual_flame && input.dual_flame_partner_score !== undefined) {
       const partnerBonus =
         (Math.min(100, Math.max(0, input.dual_flame_partner_score)) / 100) *
@@ -187,10 +178,10 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       rawScore += partnerBonus;
     }
 
-    const score = Math.min(100, Math.max(0, Math.round(rawScore)));
+    const ffsScore = Math.min(100, Math.max(0, Math.round(rawScore)));
     const { tier, pendingTier, ticks } = this.resolveAntiFlickerTier(
       input.session_id,
-      score,
+      ffsScore,
     );
 
     const adaptiveMultiplier = this.computeAdaptiveMultiplier(adaptiveWeights);
@@ -198,8 +189,8 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     return {
       session_id:              input.session_id,
       creator_id:              input.creator_id,
-      score,
-      tier,
+      ffs_score:               ffsScore,
+      ffs_tier:                tier,
       components,
       adaptive_multiplier:     adaptiveMultiplier,
       anti_flicker_pending_tier: pendingTier,
@@ -211,56 +202,56 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Called by tip service when a tip event fires — updates adaptive weights. */
-  learnFromTipEvent(input: RoomHeatInput): void {
+  learnFromTipEvent(input: FfsInput): void {
     const weights = this.getAdaptiveWeights(input.creator_id);
     const elevated = this.identifyElevatedSignals(input);
 
     let changed = false;
     for (const key of Object.keys(weights)) {
+      const prev = weights[key];
       if (elevated.includes(key)) {
         weights[key] = +(
           Math.min(ADAPTIVE_MAX, weights[key] + ADAPTIVE_BOOST_ON_TIP)
         ).toFixed(4);
-        changed = true;
       } else {
         weights[key] = +(
           Math.max(ADAPTIVE_MIN, weights[key] - ADAPTIVE_DECAY_ON_TIP)
         ).toFixed(4);
       }
+      if (weights[key] !== prev) changed = true;
     }
 
     if (changed) {
       this.adaptiveCache.set(input.creator_id, weights);
       void this.persistAdaptiveWeights(input.creator_id, weights);
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_ADAPTIVE_UPDATED, {
-        creator_id:      input.creator_id,
+      this.nats.publish(NATS_TOPICS.FFS_ADAPTIVE_UPDATED, {
+        creator_id:       input.creator_id,
         elevated,
         weights_snapshot: weights,
-        rule_applied_id: FFS_RULE_ID,
-        updated_at_utc:  new Date().toISOString(),
+        rule_applied_id:  FFS_RULE_ID,
+        updated_at_utc:   new Date().toISOString(),
       });
     }
   }
 
-  /** Returns the current heat score for a session, or null if unknown. */
-  getSessionHeat(sessionId: string): RoomHeatScore | null {
+  /** Returns the current FFS score for a session, or null if unknown. */
+  getSessionScore(sessionId: string): FfsScore | null {
     return this.sessionState.get(sessionId)?.currentScore ?? null;
   }
 
   /**
    * Returns the leaderboard for the requested category.
-   * Grid: 10×10, coolest session at rank 0 (top-left), hottest at rank 99
-   * (bottom-right).
+   * Grid: 10×10, coolest session at rank 0 (top-left), hottest at rank 99.
    */
-  getLeaderboard(category: LeaderboardCategory = 'all'): RoomHeatLeaderboard {
-    const now    = new Date();
-    const nowMs  = now.getTime();
+  getLeaderboard(category: LeaderboardCategory = 'all'): FfsLeaderboard {
+    const now   = new Date();
+    const nowMs = now.getTime();
     const states = [...this.sessionState.entries()];
 
     const filtered = states.filter(([, state]) => {
       const dwellMs = nowMs - state.sessionStartedAt.getTime();
       const dwell   = dwellMs / 60_000;
-      const s       = state.currentScore.score;
+      const s       = state.currentScore.ffs_score;
 
       switch (category) {
         case 'dual_flame':    return state.isDualFlame;
@@ -271,20 +262,19 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    // Coolest at top (index 0), hottest at bottom (index N-1)
-    filtered.sort(([, a], [, b]) => a.currentScore.score - b.currentScore.score);
+    filtered.sort(([, a], [, b]) => a.currentScore.ffs_score - b.currentScore.ffs_score);
 
     const grid = filtered.slice(0, LEADERBOARD_GRID_SIZE);
 
     const entries = grid.map(([sessionId, state], index) => {
       const dwellMs = nowMs - state.sessionStartedAt.getTime();
       const dwell   = dwellMs / 60_000;
-      const s       = state.currentScore.score;
+      const s       = state.currentScore.ffs_score;
       return {
         session_id:        sessionId,
         creator_id:        state.currentScore.creator_id,
-        score:             s,
-        tier:              state.currentScore.tier,
+        ffs_score:         s,
+        ffs_tier:          state.currentScore.ffs_tier,
         rank:              index,
         grid_row:          Math.floor(index / 10),
         grid_col:          index % 10,
@@ -305,21 +295,15 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Register a session start. Arms the 1 Hz publisher.
-   * Callers that don't pre-register will have the session auto-registered
-   * on the first `ingest()` call.
    */
-  startSession(
-    sessionId: string,
-    creatorId: string,
-    isDualFlame: boolean,
-  ): void {
+  startSession(sessionId: string, creatorId: string, isDualFlame: boolean): void {
     if (!this.sessionState.has(sessionId)) {
-      const now    = new Date();
-      const initial: RoomHeatScore = {
+      const now     = new Date();
+      const initial: FfsScore = {
         session_id:               sessionId,
         creator_id:               creatorId,
-        score:                    0,
-        tier:                     'COLD',
+        ffs_score:                0,
+        ffs_tier:                 'COLD',
         components:               this.zeroComponents(),
         adaptive_multiplier:      1.0,
         anti_flicker_pending_tier: null,
@@ -329,12 +313,12 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         rule_applied_id:          FFS_RULE_ID,
       };
       this.sessionState.set(sessionId, {
-        currentScore:    initial,
+        currentScore:     initial,
         sessionStartedAt: now,
         isDualFlame,
       });
     }
-    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_STARTED, {
+    this.nats.publish(NATS_TOPICS.FFS_SESSION_STARTED, {
       session_id:      sessionId,
       creator_id:      creatorId,
       is_dual_flame:   isDualFlame,
@@ -345,7 +329,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Tear down session state and stop the 1 Hz publisher for this session.
-   * Emits FFS_SCORE_SESSION_ENDED.
    */
   endSession(sessionId: string): void {
     this.clearInterval(sessionId);
@@ -354,11 +337,11 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     this.antiFlicker.delete(sessionId);
     this.lastInput.delete(sessionId);
 
-    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_ENDED, {
+    this.nats.publish(NATS_TOPICS.FFS_SESSION_ENDED, {
       session_id:      sessionId,
       creator_id:      state?.currentScore.creator_id ?? null,
-      final_score:     state?.currentScore.score ?? 0,
-      final_tier:      state?.currentScore.tier ?? 'COLD',
+      final_ffs_score: state?.currentScore.ffs_score ?? 0,
+      final_ffs_tier:  state?.currentScore.ffs_tier ?? 'COLD',
       rule_applied_id: FFS_RULE_ID,
       ended_at_utc:    new Date().toISOString(),
     });
@@ -368,16 +351,15 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — SCORING INTERNALS
   // ══════════════════════════════════════════════════════════════════════════
 
-  /** Normalises value in [min, max] → [0, 1]. Returns 0 on degenerate range. */
   private norm(value: number, max: number): number {
     if (max <= 0) return 0;
     return Math.min(1, Math.max(0, value / max));
   }
 
   private calculateComponents(
-    input: RoomHeatInput,
+    input: FfsInput,
     weights: Record<string, number>,
-  ): HeatScoreComponents {
+  ): FfsScoreComponents {
     const w = (key: string): number => weights[key] ?? ADAPTIVE_DEFAULT_WEIGHT;
 
     const tip_pressure = Math.min(
@@ -410,7 +392,9 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         WEIGHT_CEILINGS.private_spying * w('private_spying'),
     );
 
-    const hrDelta = Math.max(0, input.heart_rate_bpm - input.heart_rate_baseline_bpm);
+    // SenSync™ BPM takes precedence when available; falls back to heart_rate_bpm otherwise.
+    const effectiveBpm = input.sensync_bpm ?? input.heart_rate_bpm;
+    const hrDelta = Math.max(0, effectiveBpm - input.heart_rate_baseline_bpm);
     const heart_rate = Math.min(
       WEIGHT_CEILINGS.heart_rate,
       this.norm(hrDelta, INPUT_MAX.hr_delta_bpm) *
@@ -447,7 +431,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         WEIGHT_CEILINGS.audio_vocal * w('audio_vocal'),
     );
 
-    // Momentum: clamp negative trend to 0 (deficit penalises only via missing hot_streak)
     const momentumRaw = Math.max(0, input.heat_trend_5min);
     const momentum = Math.min(
       WEIGHT_CEILINGS.momentum,
@@ -482,7 +465,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   private resolveAntiFlickerTier(
     sessionId: string,
     score: number,
-  ): { tier: HeatTier; pendingTier: HeatTier | null; ticks: number } {
+  ): { tier: FfsTier; pendingTier: FfsTier | null; ticks: number } {
     const rawTier = this.scoreToBand(score);
 
     let state = this.antiFlicker.get(sessionId);
@@ -493,7 +476,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     }
 
     if (rawTier === state.confirmedTier) {
-      // Consistent with current tier — reset any pending drift
       state.pendingTier = rawTier;
       state.ticks       = 0;
       this.antiFlicker.set(sessionId, state);
@@ -503,7 +485,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     if (rawTier === state.pendingTier) {
       state.ticks += 1;
       if (state.ticks >= ANTI_FLICKER_TICKS_REQUIRED) {
-        // Promote — tier is now confirmed
         const promoted = state.pendingTier;
         state.confirmedTier = promoted;
         state.ticks         = 0;
@@ -511,7 +492,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         return { tier: promoted, pendingTier: null, ticks: 0 };
       }
     } else {
-      // New candidate tier — restart the flicker counter
       state.pendingTier = rawTier;
       state.ticks       = 1;
     }
@@ -524,7 +504,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private scoreToBand(score: number): HeatTier {
+  private scoreToBand(score: number): FfsTier {
     for (const band of TIER_THRESHOLDS) {
       if (score >= band.min) return band.tier;
     }
@@ -547,18 +527,17 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     }
     const defaults = this.defaultAdaptiveWeights();
     this.adaptiveCache.set(creatorId, defaults);
-    // Warm cache from DB async — next tick will have DB values
     void this.loadAdaptiveWeightsFromDb(creatorId);
     return { ...defaults };
   }
 
   private computeAdaptiveMultiplier(weights: Record<string, number>): number {
-    const vals  = Object.values(weights);
-    const mean  = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const vals = Object.values(weights);
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
     return Math.round(mean * 10000) / 10000;
   }
 
-  private identifyElevatedSignals(input: RoomHeatInput): string[] {
+  private identifyElevatedSignals(input: FfsInput): string[] {
     const elevated: string[] = [];
     const T = ADAPTIVE_ELEVATION_THRESHOLD;
 
@@ -566,7 +545,8 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     if (input.chat_velocity_per_min / INPUT_MAX.chat_velocity_per_min >= T)     elevated.push('chat_velocity');
     if (input.heart_reactions_per_min / INPUT_MAX.heart_reactions_per_min >= T) elevated.push('hearts');
     if (input.private_spy_count / INPUT_MAX.private_spy_count >= T)             elevated.push('private_spying');
-    const hrDelta = Math.max(0, input.heart_rate_bpm - input.heart_rate_baseline_bpm);
+    const effectiveBpm = input.sensync_bpm ?? input.heart_rate_bpm;
+    const hrDelta = Math.max(0, effectiveBpm - input.heart_rate_baseline_bpm);
     if (hrDelta / INPUT_MAX.hr_delta_bpm >= T)                                  elevated.push('heart_rate');
     if (input.eye_tracking_score >= T)                                           elevated.push('eye_tracking');
     if (input.facial_excitement_score >= T)                                      elevated.push('facial_excitement');
@@ -580,12 +560,11 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   private async loadAdaptiveWeightsFromDb(creatorId: string): Promise<void> {
     try {
-      const row = await this.prisma.roomHeatAdaptiveWeights.findUnique({
+      const row = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
       if (row) {
-        const loaded = row.weights as Record<string, number>;
-        // Merge: only override keys present in both defaults and DB row
+        const loaded   = row.weights as Record<string, number>;
         const defaults = this.defaultAdaptiveWeights();
         const merged: Record<string, number> = {};
         for (const key of Object.keys(defaults)) {
@@ -607,27 +586,27 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     weights: Record<string, number>,
   ): Promise<void> {
     try {
-      const existing = await this.prisma.roomHeatAdaptiveWeights.findUnique({
+      const existing = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
 
       if (existing) {
-        await this.prisma.roomHeatAdaptiveWeights.update({
+        await this.prisma.ffsAdaptiveWeights.update({
           where: { creator_id: creatorId },
-          data:  {
+          data: {
             weights,
             tip_events_seen: { increment: 1 },
             last_updated_at: new Date(),
           },
         });
       } else {
-        await this.prisma.roomHeatAdaptiveWeights.create({
+        await this.prisma.ffsAdaptiveWeights.create({
           data: {
             creator_id:      creatorId,
             weights,
             tip_events_seen: 1,
-            correlation_id:  `adaptive-init-${creatorId}-${Date.now()}`,
-            reason_code:     'ADAPTIVE_INIT',
+            correlation_id:  `ffs-adaptive-init-${creatorId}-${Date.now()}`,
+            reason_code:     'FFS_ADAPTIVE_INIT',
             rule_applied_id: FFS_RULE_ID,
           },
         });
@@ -643,84 +622,84 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — SESSION STATE & NATS EVENTS
   // ══════════════════════════════════════════════════════════════════════════
 
-  private updateSessionState(input: RoomHeatInput, score: RoomHeatScore): void {
+  private updateSessionState(input: FfsInput, score: FfsScore): void {
     const existing = this.sessionState.get(input.session_id);
     this.sessionState.set(input.session_id, {
-      currentScore:    score,
+      currentScore:     score,
       sessionStartedAt: existing?.sessionStartedAt ?? new Date(),
-      isDualFlame:     input.is_dual_flame,
+      isDualFlame:      input.is_dual_flame,
     });
   }
 
-  private emitScoreEvents(score: RoomHeatScore, input: RoomHeatInput): void {
+  private emitScoreEvents(score: FfsScore, input: FfsInput): void {
     const payload = {
-      session_id:       score.session_id,
-      creator_id:       score.creator_id,
-      score:            score.score,
-      tier:             score.tier,
-      components:       score.components,
+      session_id:          score.session_id,
+      creator_id:          score.creator_id,
+      ffs_score:           score.ffs_score,
+      ffs_tier:            score.ffs_tier,
+      components:          score.components,
       adaptive_multiplier: score.adaptive_multiplier,
-      is_dual_flame:    score.is_dual_flame,
-      captured_at_utc:  score.captured_at_utc,
-      rule_applied_id:  score.rule_applied_id,
+      is_dual_flame:       score.is_dual_flame,
+      captured_at_utc:     score.captured_at_utc,
+      rule_applied_id:     score.rule_applied_id,
     };
-    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, payload);
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_UPDATE, payload);
 
     // Tier transition
     const prev = this.previousTier(score.session_id);
-    if (prev !== null && prev !== score.tier) {
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
+    if (prev !== null && prev !== score.ffs_tier) {
+      this.nats.publish(NATS_TOPICS.FFS_TIER_CHANGED, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
         from:            prev,
-        to:              score.tier,
-        score:           score.score,
+        to:              score.ffs_tier,
+        ffs_score:       score.ffs_score,
         captured_at_utc: score.captured_at_utc,
         rule_applied_id: score.rule_applied_id,
       });
       this.logger.log('FfsService: tier transition', {
         session_id: score.session_id,
         from:       prev,
-        to:         score.tier,
+        to:         score.ffs_tier,
       });
     }
 
     // INFERNO peak
-    if (score.tier === 'INFERNO') {
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
+    if (score.ffs_tier === 'INFERNO') {
+      this.nats.publish(NATS_TOPICS.FFS_PEAK, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
-        score:           score.score,
+        ffs_score:       score.ffs_score,
         captured_at_utc: score.captured_at_utc,
         rule_applied_id: score.rule_applied_id,
       });
     }
 
     // Dual Flame INFERNO peak
-    if (score.tier === 'INFERNO' && score.is_dual_flame) {
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_DUAL_FLAME_PEAK, {
+    if (score.ffs_tier === 'INFERNO' && score.is_dual_flame) {
+      this.nats.publish(NATS_TOPICS.FFS_DUAL_FLAME_PEAK, {
         session_id:               score.session_id,
         creator_id:               score.creator_id,
-        score:                    score.score,
+        ffs_score:                score.ffs_score,
         dual_flame_partner_score: input.dual_flame_partner_score ?? null,
         captured_at_utc:          score.captured_at_utc,
         rule_applied_id:          score.rule_applied_id,
       });
     }
 
-    // Hot-and-Ready emit (threshold crossing)
+    // Hot-and-Ready
     const state = this.sessionState.get(score.session_id);
     if (state) {
       const dwellMs = Date.now() - state.sessionStartedAt.getTime();
       const dwell   = dwellMs / 60_000;
       if (
-        score.score >= HOT_AND_READY_MIN_SCORE &&
+        score.ffs_score >= HOT_AND_READY_MIN_SCORE &&
         dwell >= HOT_AND_READY_MIN_DWELL
       ) {
-        this.nats.publish(NATS_TOPICS.FFS_SCORE_HOT_AND_READY, {
+        this.nats.publish(NATS_TOPICS.FFS_HOT_AND_READY, {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
-          score:           score.score,
+          ffs_score:       score.ffs_score,
           dwell_minutes:   Math.round(dwell),
           captured_at_utc: score.captured_at_utc,
           rule_applied_id: score.rule_applied_id,
@@ -729,9 +708,8 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** Returns the last confirmed tier for the session (before this tick). */
-  private previousTier(sessionId: string): HeatTier | null {
-    return this.sessionState.get(sessionId)?.currentScore.tier ?? null;
+  private previousTier(sessionId: string): FfsTier | null {
+    return this.sessionState.get(sessionId)?.currentScore.ffs_tier ?? null;
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -739,40 +717,39 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private ensureInterval(sessionId: string): void {
-    if (this.heatIntervals.has(sessionId)) return;
+    if (this.ffsIntervals.has(sessionId)) return;
     const handle = setInterval(() => {
       const input = this.lastInput.get(sessionId);
       if (!input) {
         this.clearInterval(sessionId);
         return;
       }
-      const refreshed: RoomHeatInput = {
+      const refreshed: FfsInput = {
         ...input,
         captured_at_utc: new Date().toISOString(),
       };
-      const score = this.calculateHeatScore(refreshed);
-      this.updateSessionState(refreshed, score);
+      const score = this.calculateFfsScore(refreshed);
       this.emitScoreEvents(score, refreshed);
+      this.updateSessionState(refreshed, score);
 
-      // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;
       this.tickCounters.set(sessionId, ticks);
       if (ticks % FfsService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
         const leaderboard = this.getLeaderboard('all');
-        this.nats.publish(NATS_TOPICS.FFS_SCORE_LEADERBOARD_UPDATED, {
+        this.nats.publish(NATS_TOPICS.FFS_LEADERBOARD_UPDATED, {
           ...leaderboard,
           rule_applied_id: FFS_RULE_ID,
         });
       }
     }, 1_000);
-    this.heatIntervals.set(sessionId, handle);
+    this.ffsIntervals.set(sessionId, handle);
   }
 
   private clearInterval(sessionId: string): void {
-    const handle = this.heatIntervals.get(sessionId);
+    const handle = this.ffsIntervals.get(sessionId);
     if (handle) {
       clearInterval(handle);
-      this.heatIntervals.delete(sessionId);
+      this.ffsIntervals.delete(sessionId);
       this.tickCounters.delete(sessionId);
     }
   }
@@ -781,20 +758,17 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — PERSISTENCE
   // ══════════════════════════════════════════════════════════════════════════
 
-  private async persistSnapshot(
-    score: RoomHeatScore,
-    _input: RoomHeatInput,
-  ): Promise<void> {
+  private async persistSnapshot(score: FfsScore, _input: FfsInput): Promise<void> {
     try {
-      await this.prisma.roomHeatSnapshot.create({
+      await this.prisma.ffsSnapshot.create({
         data: {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
-          heat_score:      score.score,
-          heat_tier:       score.tier,
+          ffs_score:       score.ffs_score,
+          ffs_tier:        score.ffs_tier,
           components:      score.components as object,
-          correlation_id:  `rh-${score.session_id}-${Date.now()}`,
-          reason_code:     `HEAT_SAMPLE_${score.tier}`,
+          correlation_id:  `ffs-${score.session_id}-${Date.now()}`,
+          reason_code:     `FFS_SAMPLE_${score.ffs_tier}`,
           rule_applied_id: score.rule_applied_id,
           is_dual_flame:   score.is_dual_flame,
         },
@@ -812,15 +786,15 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private subscribeNatsEvents(): void {
-    // HeartSync BPM updates — update heart rate in last known input
-    this.nats.subscribe(NATS_TOPICS.HZ_BPM_UPDATE, (payload) => {
+    // SenSync™ BPM updates — update heart rate in last known input frame
+    this.nats.subscribe(NATS_TOPICS.SENSYNC_BPM_UPDATE, (payload) => {
       const sessionId = payload['session_id'] as string | undefined;
       const bpm       = payload['bpm'] as number | undefined;
       if (!sessionId || typeof bpm !== 'number') return;
 
       const last = this.lastInput.get(sessionId);
       if (last) {
-        this.lastInput.set(sessionId, { ...last, heart_rate_bpm: bpm });
+        this.lastInput.set(sessionId, { ...last, sensync_bpm: bpm });
       }
     });
 
@@ -830,7 +804,6 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       if (!sessionId) return;
       const last = this.lastInput.get(sessionId);
       if (last) {
-        // Increment raw count; velocity is caller-managed on the main ingest path
         this.lastInput.set(sessionId, {
           ...last,
           chat_velocity_per_min: Math.min(INPUT_MAX.chat_velocity_per_min, last.chat_velocity_per_min + 1),
@@ -839,7 +812,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log('FfsService: NATS subscriptions active', {
-      topics: [NATS_TOPICS.HZ_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
+      topics: [NATS_TOPICS.SENSYNC_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
     });
   }
 
@@ -847,7 +820,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — HELPERS
   // ══════════════════════════════════════════════════════════════════════════
 
-  private zeroComponents(): HeatScoreComponents {
+  private zeroComponents(): FfsScoreComponents {
     return {
       tip_pressure:      0,
       chat_velocity:     0,
@@ -874,7 +847,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     return {
       creator_id:      creatorId,
       weights,
-      tip_events_seen: 0, // live count is in DB; in-memory cache doesn't track
+      tip_events_seen: 0,
       last_updated_at: new Date().toISOString(),
     };
   }

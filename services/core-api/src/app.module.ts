@@ -2,7 +2,7 @@
 // CHORE: HOUSE-001 — restore missing module registrations dropped in merge
 // PAYLOAD 3: wire GateGuardModule + GateGuardMiddleware in front of
 //            /purchase, /spend, /payout route trees.
-// HZ: register HeartSyncModule + GuestHeatModule.
+// HZ: register SenSyncModule + GuestHeatModule.
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { CreatorModule } from './creator/creator.module';
@@ -19,7 +19,6 @@ import { SovereignCaCMiddleware } from './compliance/sovereign-cac.middleware';
 import { ZoneGptModule } from '../../zone-gpt/src/zone-gpt.module';
 import { BijouModule } from '../../bijou/src/bijou.module';
 import { AuthModule } from './auth/auth.module';
-import { FfsModule } from '../../ffs/src/ffs.module';
 import { SchedulingModule } from './scheduling/scheduling.module';
 import { ZoneAccessModule } from './zone-access/zone-access.module';
 import { MembershipModule } from './membership/membership.module';
@@ -28,7 +27,8 @@ import { GateGuardMiddleware } from './gateguard/gateguard.middleware';
 import { AuditModule } from './audit/audit.module';
 import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-guard.middleware';
 import { RefundModule } from './refund/refund.module';
-import { HeartSyncModule } from '../../heartsync/src/heartsync.module';
+import { FlickerNFlameScoringModule } from '../../ffs/src/ffs.module';
+import { SenSyncModule } from '../../sensync/src/sensync.module';
 import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
 
 @Module({
@@ -55,11 +55,11 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     ZoneGptModule,
     BijouModule,
     AuthModule,
-    FfsModule,
     SchedulingModule,
     MembershipModule,
     ZoneAccessModule,
-    HeartSyncModule,
+    FlickerNFlameScoringModule,
+    SenSyncModule,
     GuestHeatModule,
   ],
 })
