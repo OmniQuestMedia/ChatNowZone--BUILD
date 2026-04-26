@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-6-spec-tokentype-fix-K2Iu3`
-**Commit:** `736f152eb37281f76c0a878c71deca2e8de4e219`
-**Generated:** 2026-04-26T16:54:35Z
+**Branch:** `claude/phase-3b-7-T5-delete-stale-dts-K2Iu3`
+**Commit:** `980168a670b9af9a3df68421b1dbfdefc424ec39`
+**Generated:** 2026-04-26T17:01:03Z
 
 ## All Files
 
@@ -519,7 +519,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/ledger/redbook-rate-card.service.ts`
 - `services/ledger/repository.ts`
 - `services/ledger/types.ts`
-- `services/nats/topics.registry.d.ts`
 - `services/nats/topics.registry.js`
 - `services/nats/topics.registry.js.map`
 - `services/nats/topics.registry.ts`
