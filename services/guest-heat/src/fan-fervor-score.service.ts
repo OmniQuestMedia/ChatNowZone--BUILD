@@ -7,7 +7,7 @@
 //   • SenSync™ (HeartSync biometric relay) adds +10–25 pts when consent is
 //     granted and a valid BPM elevation is detected.
 //   • Result persisted to fan_fervor_scores (append-only) via Prisma.
-//   • NATS: emits FFS_SCORED on every score.
+//   • NATS: emits FFS_GUEST_SCORED on every score.
 //   • No ledger or payment mutations. No raw PII logged.
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -153,7 +153,7 @@ export class FanFervorScoreService {
 
   /**
    * Score a guest's fan fervor for the given session.
-   * Persists the result to fan_fervor_scores (append-only) and emits FFS_SCORED.
+   * Persists the result to fan_fervor_scores (append-only) and emits FFS_GUEST_SCORED.
    */
   async score(input: FfsInput): Promise<FfsResult> {
     const base_score = computeBaseScore(input);
@@ -188,7 +188,7 @@ export class FanFervorScoreService {
       },
     });
 
-    this.nats.publish(NATS_TOPICS.FFS_SCORED, {
+    this.nats.publish(NATS_TOPICS.FFS_GUEST_SCORED, {
       ...result,
     } as unknown as Record<string, unknown>);
 

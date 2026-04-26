@@ -291,7 +291,7 @@ export class GuestHeatController {
   /**
    * POST /guest-heat/ffs/score
    * Compute and persist the Fan Fervor Score for a guest in a session.
-   * Emits FFS_SCORED on NATS for consumption by payout engine, UI effects,
+   * Emits FFS_GUEST_SCORED on NATS for consumption by payout engine, UI effects,
    * Cyrano, GateGuard Welfare Score, and VelocityZone.
    */
   async scoreFanFervor(dto: ScoreFanFervorDto): Promise<FfsResult> {

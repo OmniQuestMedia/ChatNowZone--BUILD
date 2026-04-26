@@ -89,7 +89,7 @@ export class FlickerNFlameScoringEngine {
    */
   ingest(sample: FfsSample): FfsScore {
     const score = this.computeScore(sample);
-    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, { ...score });
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_UPDATE, { ...score });
 
     const prev = this.lastTier.get(sample.session_id);
     if (prev !== score.tier) {
@@ -112,7 +112,7 @@ export class FlickerNFlameScoringEngine {
     }
 
     if (score.tier === 'INFERNO') {
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_PEAK, {
         session_id: sample.session_id,
         creator_id: sample.creator_id,
         score: score.score,
