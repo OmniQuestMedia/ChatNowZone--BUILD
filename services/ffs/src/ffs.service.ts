@@ -1,7 +1,7 @@
 // WO-003 — FFS: core service
 // Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
 //
-// Doctrine (all from creator-control/src/room-heat.engine.ts, extended):
+// Doctrine (all from creator-control/src/ffs.engine.ts, extended):
 //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
 //     only source of per-creator variance.
 //   - Anti-flicker (3-tick rule): tier transitions take effect only after

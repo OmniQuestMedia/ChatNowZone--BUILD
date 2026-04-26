@@ -86,7 +86,7 @@ export class RedbookRateCardService {
     }
     const unit = row.usd / row.tokens;
     return {
-      tier: 'tease_showzone' as RateCardTier,
+      tier: 'tease_showzone' as unknown as RateCardTier,
       tokens: row.tokens,
       priceUsd: row.usd,
       creatorPayoutPerToken: row.creator_payout_per_token,

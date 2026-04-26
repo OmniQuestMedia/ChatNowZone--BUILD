@@ -10,12 +10,12 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
 import { CyranoService } from '../../services/cyrano/src/cyrano.service';
 import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
 import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
-import { RoomHeatEngine } from '../../services/creator-control/src/room-heat.engine';
+import { FfsEngine } from '../../services/creator-control/src/ffs.engine';
 import { PersonaManager } from '../../services/cyrano/src/persona.manager';
 import { SessionMemoryStore } from '../../services/cyrano/src/session-memory.store';
 import { CreatorControlPresenter } from '../../ui/view-models/creator-control.presenter';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
-import type { RoomHeatSample } from '../../services/creator-control/src/room-heat.engine';
+import type { RoomHeatSample } from '../../services/creator-control/src/ffs.engine';
 import type { CyranoInputFrame } from '../../services/cyrano/src/cyrano.types';
 
 type Published = { topic: string; payload: Record<string, unknown> };
@@ -28,7 +28,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
     ),
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const heat = new RoomHeatEngine(stub as any);
+  const heat = new FfsEngine(stub as any);
   const timing = new BroadcastTimingCopilot();
   const monitoring = new SessionMonitoringCopilot();
   const creatorControl = new CreatorControlService(

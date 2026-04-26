@@ -61,7 +61,7 @@ export class CreatorControlService {
   ) {}
 
   /**
-   * Ingest a room-heat sample from ShowZone/Bijou/HeartZone and fan the
+   * Ingest a ffs sample from Bijou/HeartZone and fan the
    * resulting suggestion out to the creator's copilot panel.
    */
   ingestSample(sample: RoomHeatSample): { heat: HeatScore; nudge: PriceNudge } {
@@ -159,10 +159,10 @@ export class CreatorControlService {
 // CreatorControl.Zone is now a live single-pane workstation. It consumes
 // Room-Heat samples, runs Broadcast Timing + Session Monitoring copilots,
 // and publishes deterministic suggestions to NATS
-// (CREATOR_CONTROL_* and ROOM_HEAT_* topics).
+// (CREATOR_CONTROL_* and FFS_SCORE_* topics).
 //
 // All major creator-facing systems (ledger, gateguard, recovery, diamond
-// concierge, room-heat, cyrano, integration hub) are now wired together.
+// concierge, ffs, cyrano, integration hub) are now wired together.
 //
 // NEXT PRIORITY: full Next.js frontend polish for /creator/control and
 // /creator/cyrano-panel, plus the pre-launch readiness checklist (OBS

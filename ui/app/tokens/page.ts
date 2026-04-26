@@ -95,44 +95,6 @@ export function renderTokensPage(args: {
           ]),
         ],
       ),
-      el(
-        'section',
-        {
-          test_id: 'tokens-showzone',
-          classes: ['cnz-panel'],
-          aria: { 'aria-label': 'ShowZone Premium bundles' },
-        },
-        [
-          el('h2', {}, ['ShowZone Premium']),
-          el('table', { classes: ['cnz-table', 'cnz-table--bundles'] }, [
-            el('thead', {}, [
-              el('tr', {}, [
-                el('th', {}, ['Tokens']),
-                el('th', {}, ['USD']),
-                el('th', {}, ['Per token']),
-              ]),
-            ]),
-            el(
-              'tbody',
-              {},
-              view.showzone_rows.map((r) =>
-                el(
-                  'tr',
-                  {
-                    test_id: `tokens-showzone-row-${r.tokens}`,
-                    props: { reason_code: r.reason_code },
-                  },
-                  [
-                    el('td', {}, [r.tokens.toLocaleString('en-US')]),
-                    el('td', {}, [`$${r.display_price_usd.toFixed(2)}`]),
-                    el('td', {}, [`$${r.per_token_usd.toFixed(4)}`]),
-                  ],
-                ),
-              ),
-            ),
-          ]),
-        ],
-      ),
     ],
   );
 
