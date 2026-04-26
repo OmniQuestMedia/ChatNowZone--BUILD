@@ -19,7 +19,6 @@ import {
   GUEST_HEAT_RULE_ID,
   type GuestOffer,
   type LoyaltyTier,
-  type OfferType,
   type PreferenceVector,
   type SpendWindows,
   type WhaleProfileRecord,

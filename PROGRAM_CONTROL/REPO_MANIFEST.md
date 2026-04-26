@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/rebaseline-against-current-main`
-**Commit:** `4e92327deedc6e1d8b382519addbd9c620bb4727`
-**Generated:** 2026-04-26T16:08:32Z
+**Branch:** `claude/phase-3b-3-ffs-and-lint-K2Iu3`
+**Commit:** `9d295f4fe789406e287fc8ed85c6770eece17995`
+**Generated:** 2026-04-26T16:31:56Z
 
 ## All Files
 

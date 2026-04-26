@@ -48,7 +48,7 @@ export class ZonebotSchedulingService {
    * moderation cooldown, staggered arrivals, FT floor/target, locked breaks,
    * fatigue scoring, and budget projection.
    */
-  async generateSchedule(weekStart: string, forecast?: Record<string, unknown>): Promise<Schedule> {
+  async generateSchedule(weekStart: string, _forecast?: Record<string, unknown>): Promise<Schedule> {
     this.logger.log('ZonebotSchedulingService: generating schedule', { weekStart });
 
     const staff = await this.prisma.staffMember.findMany({

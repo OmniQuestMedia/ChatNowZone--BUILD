@@ -26,8 +26,7 @@ import { GateGuardModule } from './gateguard/gateguard.module';
 import { GateGuardMiddleware } from './gateguard/gateguard.middleware';
 import { AuditModule } from './audit/audit.module';
 import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-guard.middleware';
-import { RefundModule } from './refund/refund.module';
-import { FlickerNFlameScoringModule } from '../../ffs/src/ffs.module';
+import { FfsModule } from '../../ffs/src/ffs.module';
 import { SenSyncModule } from '../../sensync/src/sensync.module';
 import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
 
@@ -58,7 +57,7 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     SchedulingModule,
     MembershipModule,
     ZoneAccessModule,
-    FlickerNFlameScoringModule,
+    FfsModule,
     SenSyncModule,
     GuestHeatModule,
   ],
