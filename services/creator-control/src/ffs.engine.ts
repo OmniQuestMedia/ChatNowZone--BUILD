@@ -100,7 +100,7 @@ export class FlickerNFlameScoringEngine {
         to: score.tier,
         rule_applied_id: FFS_RULE_ID,
       });
-      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
+      this.nats.publish(NATS_TOPICS.FFS_TIER_CHANGED, {
         session_id: sample.session_id,
         creator_id: sample.creator_id,
         from: prev ?? null,

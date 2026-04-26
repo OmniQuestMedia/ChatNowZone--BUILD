@@ -11,7 +11,6 @@
 // CORRELATION_ID: CNZ-WORK-001-CREATOR-RATE-TIER-DAY61
 
 import { Injectable, Logger } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
 
