@@ -51,6 +51,12 @@ export const NATS_TOPICS = {
   SENSYNC_HAPTIC_DISPATCHED:      'sensync.haptic.dispatched',
   SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
   SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
+  SENSYNC_DEVICE_CONNECTED:       'sensync.device.connected',
+  SENSYNC_DEVICE_DISCONNECTED:    'sensync.device.disconnected',
+  SENSYNC_PURGE_REQUESTED:        'sensync.purge.requested',
+  SENSYNC_PURGE_COMPLETED:        'sensync.purge.completed',
+  SENSYNC_HARDWARE_CONNECTED:     'sensync.hardware.connected',
+  SENSYNC_HARDWARE_DISCONNECTED:  'sensync.hardware.disconnected',
 
   // ── HeartSync topics — RETIRED (2026-04-26; superseded by SenSync™) ──
   // Kept as deprecated constants to allow legacy heartsync/ service to compile.
@@ -86,6 +92,12 @@ export const NATS_TOPICS = {
   // ── Risk & fraud ───────────────────────────────────────────────────────
   RISK_FLAG_RAISED:         'risk.flag.raised',
   RISK_CONTAINMENT_APPLIED: 'risk.containment.applied',
+  FRIENDLY_FRAUD_SIGNAL_RAISED: 'risk.friendly_fraud.signal_raised',
+
+  // ── Refund policy & CS extensions ─────────────────────────────────────────
+  REFUND_POLICY_ACKNOWLEDGED:   'refund.policy.acknowledged',
+  REFUND_EXTENSION_EXECUTED:    'refund.extension.executed',
+  SERVICE_TO_SALE_TRIGGERED:    'refund.service_to_sale.triggered',
 
   // ── GWP / VoucherVault ─────────────────────────────────────────────────
   GWP_OFFER_TRIGGERED:      'gwp.offer.triggered',
@@ -266,6 +278,8 @@ export const NATS_TOPICS = {
   // ── VelocityZone — payout rate events ─────────────────────────────────
   VELOCITYZONE_EVENT_ACTIVE:      'velocityzone.event.active',
   VELOCITYZONE_RATE_APPLIED:      'velocityzone.rate.applied',
+  VELOCITYZONE_EVENT_ENDED:       'velocityzone.event.ended',
+  VELOCITYZONE_RATE_LOCKED:       'velocityzone.rate.locked',
 
   // ── CreatorControl.Zone (Business Plan B.3 — creator workstation) ────────
   CREATOR_CONTROL_BROADCAST_SUGGESTION: 'creator_control.broadcast.suggestion',
@@ -276,51 +290,12 @@ export const NATS_TOPICS = {
   CYRANO_SUGGESTION_EMITTED:         'cyrano.suggestion.emitted',
   CYRANO_SUGGESTION_DROPPED:         'cyrano.suggestion.dropped',
   CYRANO_MEMORY_UPDATED:             'cyrano.memory.updated',
+  CYRANO_FFS_FRAME_CONSUMED:         'cyrano.ffs_frame.consumed',
 
   // ── Integration Hub (Business Plan B.3 + B.4 — cross-service wiring) ─────
   HUB_HIGH_HEAT_MONETIZATION:        'hub.high_heat.monetization',
   HUB_PAYOUT_SCALING_APPLIED:        'hub.payout.scaling_applied',
   HUB_DIAMOND_CONCIERGE_HANDOFF:     'hub.diamond_concierge.handoff',
-
-  // ── VelocityZone (time-window payout boosts) ──────────────────────────────
-  VELOCITYZONE_EVENT_ACTIVE:         'velocityzone.event.active',
-  VELOCITYZONE_EVENT_ENDED:          'velocityzone.event.ended',
-  VELOCITYZONE_RATE_LOCKED:          'velocityzone.rate.locked',
-
-  // ── SenSync™ Biometric Layer ───────────────────────────────────────────────
-  SENSYNC_BIOMETRIC_DATA:            'sensync.biometric.data',
-  SENSYNC_DEVICE_CONNECTED:          'sensync.device.connected',
-  SENSYNC_DEVICE_DISCONNECTED:       'sensync.device.disconnected',
-
-  // ── FFS periodic score broadcast (distinct from sample/tier topics) ────────
-  FFS_SCORE_UPDATE:                  'ffs.score.update',
-
-  // ── Refund policy & CS extensions ─────────────────────────────────────────
-  REFUND_POLICY_ACKNOWLEDGED:        'refund.policy.acknowledged',
-  REFUND_EXTENSION_EXECUTED:         'refund.extension.executed',
-  SERVICE_TO_SALE_TRIGGERED:         'refund.service_to_sale.triggered',
-  FRIENDLY_FRAUD_SIGNAL_RAISED:      'risk.friendly_fraud.signal_raised',
-
-  // ── SenSync™ biometric layer (HZ — Diamond-tier opt-in) ───────────────────
-  SENSYNC_CONSENT_GRANTED:          'sensync.consent.granted',
-  SENSYNC_CONSENT_REVOKED:          'sensync.consent.revoked',
-  SENSYNC_BIOMETRIC_DATA:           'sensync.biometric.data',
-  SENSYNC_PLAUSIBILITY_REJECTED:    'sensync.plausibility.rejected',
-  SENSYNC_TIER_DISABLED:            'sensync.tier.disabled',
-  SENSYNC_PURGE_REQUESTED:          'sensync.purge.requested',
-  SENSYNC_PURGE_COMPLETED:          'sensync.purge.completed',
-  SENSYNC_HARDWARE_CONNECTED:       'sensync.hardware.connected',
-  SENSYNC_HARDWARE_DISCONNECTED:    'sensync.hardware.disconnected',
-
-  // ── FairPlay/FairPay Scoring (FFS) ─────────────────────────────────────────
-  FFS_SCORE_UPDATE:                 'ffs.score.update',
-
-  // ── VelocityZone surge events ──────────────────────────────────────────────
-  VELOCITYZONE_EVENT_ACTIVE:        'velocityzone.event.active',
-  VELOCITYZONE_EVENT_ENDED:         'velocityzone.event.ended',
-
-  // ── Cyrano extended telemetry ──────────────────────────────────────────────
-  CYRANO_FFS_FRAME_CONSUMED:        'cyrano.ffs_frame.consumed',
 } as const;
 
 export type NatsTopic = typeof NATS_TOPICS[keyof typeof NATS_TOPICS];
