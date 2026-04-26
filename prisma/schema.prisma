@@ -1804,8 +1804,9 @@ model HczBudgetForecast {
 
 // ── SenSync™ Biometric Layer (HZ — SenSync consent store) ────────────────────
 // Law 25 / GDPR / PIPEDA compliant. Append-only: no UPDATE or DELETE on
-// consent_granted_at. Revocation is recorded via consent_revoked_at (new row
-// or nullable column update — service always writes a new row on revocation).
+// consent_granted_at. Revocation is recorded by stamping consent_revoked_at
+// on the existing active consent row (updateMany). The correlation_id column
+// is overwritten with the revocation action's ID for a complete audit trail.
 // Automatic purge on deletion request fires SENSYNC_PURGE_REQUESTED on NATS.
 
 model SenSyncConsent {
@@ -1822,7 +1823,7 @@ model SenSyncConsent {
   domain                  String    @default("ADULT_ENTERTAINMENT") @db.VarChar(50)
   correlation_id          String    @db.VarChar(200)
   reason_code             String    @db.VarChar(100)
-  rule_applied_id         String    @default("SENSYNC_CONSENT_v1") @db.VarChar(100)
+  rule_applied_id         String    @default("SENSYNC_v1") @db.VarChar(100)
   purge_requested_at      DateTime? @db.Timestamptz          // Law 25 deletion request
   purge_completed_at      DateTime? @db.Timestamptz
   created_at              DateTime  @default(now()) @db.Timestamptz
@@ -1851,7 +1852,7 @@ model CyranoSessionMemory {
   reason_code       String    @db.VarChar(100)
   rule_applied_id   String    @default("CYRANO_MEMORY_v1") @db.VarChar(100)
   created_at        DateTime  @default(now()) @db.Timestamptz
-  updated_at        DateTime  @default(now()) @db.Timestamptz
+  updated_at        DateTime  @updatedAt @db.Timestamptz
 
   @@unique([creator_id, guest_id, memory_type, memory_key])
   @@index([creator_id, guest_id])

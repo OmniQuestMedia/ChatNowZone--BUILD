@@ -7,8 +7,10 @@
 ## Overview
 
 SenSync™ is the biometric data pipeline for ChatNow.Zone. It accepts
-normalized BPM samples from hardware bridges (Lovense SDK, WebUSB, Web
-Bluetooth) and publishes them to the NATS `sensync.biometric.data` topic
+raw BPM samples (`bpm_raw`) from hardware bridges (Lovense SDK, WebUSB, Web
+Bluetooth), applies a plausibility filter [30–220 BPM], normalizes the value
+internally (passthrough today — smoothing/filtering extension point), and
+publishes the result to the NATS `sensync.biometric.data` topic
 for consumption by the FFS (FairPlay/FairPay Scoring) engine.
 
 Consent is stored persistently in Postgres (`sensync_consents`) to satisfy
