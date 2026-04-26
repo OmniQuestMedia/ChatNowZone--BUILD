@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/frontend-polish-concierge-ui-mlqrR`
-**Commit:** `a2e44772d6bc94e64510076b1ab6184a9d94e893`
-**Generated:** 2026-04-25T06:47:40Z
+**Branch:** `copilot/global-renames-and-cleanup-another-one`
+**Commit:** `4025510b294124babc53b3c3fb58eb042bd5f23a`
+**Generated:** 2026-04-26T03:15:48Z
 
 ## All Files
 
@@ -322,6 +322,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
+- `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -471,6 +472,13 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/session-memory.store.ts`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
+- `services/ffs/.env.example`
+- `services/ffs/README.md`
+- `services/ffs/src/dto/ffs.dto.ts`
+- `services/ffs/src/ffs.controller.ts`
+- `services/ffs/src/ffs.module.ts`
+- `services/ffs/src/ffs.service.ts`
+- `services/ffs/src/types/ffs.types.ts`
 - `services/fraud-prevention/src/AbuseDetector.ts`
 - `services/fraud-prevention/src/TokenExtensionTool.ts`
 - `services/fraud-prevention/src/events/ServiceToSaleEmitter.ts`
@@ -538,6 +546,13 @@ Auto-generated on every push. Do not edit manually.
 - `services/room-heat/src/room-heat.module.ts`
 - `services/room-heat/src/room-heat.service.ts`
 - `services/room-heat/src/types/room-heat.types.ts`
+- `services/sensync/.env.example`
+- `services/sensync/README.md`
+- `services/sensync/src/sensync.controller.ts`
+- `services/sensync/src/sensync.module.ts`
+- `services/sensync/src/sensync.service.ts`
+- `services/sensync/src/sensync.types.ts`
+- `services/showzone/RETIRED.md`
 - `services/showzone/src/room-session.service.d.ts`
 - `services/showzone/src/room-session.service.js`
 - `services/showzone/src/room-session.service.js.map`
@@ -546,6 +561,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/showzone/src/showzone.module.js`
 - `services/showzone/src/showzone.module.js.map`
 - `services/showzone/src/showzone.module.ts`
+- `services/velocityzone/README.md`
+- `services/velocityzone/src/velocityzone.controller.ts`
+- `services/velocityzone/src/velocityzone.module.ts`
+- `services/velocityzone/src/velocityzone.service.ts`
+- `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
 - `services/zone-gpt/src/proposal.service.d.ts`
