@@ -238,8 +238,6 @@ export const NATS_TOPICS = {
 
   // ── SenSync™ Biometric Layer ───────────────────────────────────────────────
   SENSYNC_BIOMETRIC_DATA:            'sensync.biometric.data',
-  SENSYNC_CONSENT_GRANTED:           'sensync.consent.granted',
-  SENSYNC_CONSENT_REVOKED:           'sensync.consent.revoked',
   SENSYNC_DEVICE_CONNECTED:          'sensync.device.connected',
   SENSYNC_DEVICE_DISCONNECTED:       'sensync.device.disconnected',
 
