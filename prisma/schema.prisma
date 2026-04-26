@@ -1651,6 +1651,8 @@ model FintracEvidencePackage {
   createdAt   DateTime @default(now())
 
   @@map("fintrac_evidence_packages")
+}
+
 // ─── WO-002: HCZ ZoneBot Zoey — Scheduling System ───────────────────────────
 // Standalone scheduler service (services/zonebot-scheduler).
 // All tables are append-only for audit integrity.
@@ -1829,4 +1831,89 @@ model HczBudgetForecast {
 
   @@unique([week_start, department])
   @@map("hcz_budget_forecasts")
+}
+
+// ── Creator Payout Rate Tier (Mic Drop Strategy — FIZ) ────────────────────────
+// Stores the base payout rate for each creator.  Two cohorts:
+//   • Founding creators (joined before launch):  7.5–9¢ floor from Day 1.
+//   • All others: 6.5–8¢ until Day 61, then auto-upgraded to 7.5–9¢ floor.
+// Append-only — rate changes are recorded as new rows with a reason code.
+// FIZ path: any read or write to this table is a FIZ-scoped operation.
+model CreatorRateTier {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id        String   @db.Uuid
+  /// "FOUNDING" | "STANDARD" | "DAY61_UPGRADED"
+  cohort            String   @db.VarChar(30)
+  /// Floor rate USD per CZT (Decimal stored as string for lossless precision).
+  rate_floor_usd    Decimal  @db.Decimal(6, 4)
+  /// Ceiling rate USD per CZT.
+  rate_ceiling_usd  Decimal  @db.Decimal(6, 4)
+  /// ISO 8601 date on which this rate tier becomes effective.
+  effective_from    DateTime @db.Timestamptz
+  /// NULL until this tier is superseded by a newer row.
+  effective_until   DateTime? @db.Timestamptz
+  /// Canonical: every FIZ row carries correlation_id + reason_code.
+  correlation_id    String   @db.VarChar(128)
+  reason_code       String   @db.VarChar(100)
+  rule_applied_id   String   @default("CREATOR_RATE_TIER_v1") @db.VarChar(100)
+  created_at        DateTime @default(now()) @db.Timestamptz
+
+  @@index([creator_id, effective_from])
+  @@index([cohort, effective_from])
+  @@map("creator_rate_tiers")
+}
+
+// ── VelocityZone Events (admin-defined time-window payout boosts) ─────────────
+// Admin UI creates rows here to define VelocityZone windows.
+// On every tip, the payout engine checks for an active event and maps the
+// current FFS score (0–100) to the interpolated rate in [rate_floor, rate_ceil].
+model VelocityZoneEvent {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Human-readable label shown in the admin UI and creator dashboard.
+  label           String    @db.VarChar(200)
+  /// When the VelocityZone window opens (inclusive).
+  starts_at       DateTime  @db.Timestamptz
+  /// When the VelocityZone window closes (exclusive).
+  ends_at         DateTime  @db.Timestamptz
+  /// Minimum payout rate during VelocityZone (USD per CZT). Maps to FFS=0.
+  rate_floor_usd  Decimal   @db.Decimal(6, 4)
+  /// Maximum payout rate during VelocityZone (USD per CZT). Maps to FFS=100.
+  rate_ceil_usd   Decimal   @db.Decimal(6, 4)
+  /// Whether this event is currently enabled by an operator.
+  is_active       Boolean   @default(true)
+  correlation_id  String    @db.VarChar(128)
+  reason_code     String    @db.VarChar(100)
+  rule_applied_id String    @default("VELOCITYZONE_v1") @db.VarChar(100)
+  created_by      String    @db.Uuid
+  created_at      DateTime  @default(now()) @db.Timestamptz
+  updated_at      DateTime  @default(now()) @db.Timestamptz
+
+  @@index([starts_at, ends_at])
+  @@index([is_active, starts_at])
+  @@map("velocityzone_events")
+}
+
+// ── SenSync™ Consent Records (Quebec Law 25 / Privacy Architecture) ───────────
+// One row per consent grant. Revocations write a new row with revoked_at set
+// rather than mutating the existing grant row (append-only).
+// All biometric data is ephemeral — only the CONSENT RECORD is persisted here.
+model SenSyncConsent {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id       String    @db.Uuid
+  session_id       String    @db.VarChar(200)
+  /// Semver of the consent text shown to the user at grant time.
+  consent_version  String    @db.VarChar(20)
+  /// ISO 8601 timestamp when consent was explicitly granted.
+  granted_at       DateTime  @db.Timestamptz
+  /// NULL until the creator revokes consent for this session.
+  revoked_at       DateTime? @db.Timestamptz
+  /// JSON array of device_id strings that were authorised under this consent.
+  device_ids       Json      @default("[]")
+  correlation_id   String    @db.VarChar(128)
+  reason_code      String    @db.VarChar(100)
+  created_at       DateTime  @default(now()) @db.Timestamptz
+
+  @@index([creator_id, session_id])
+  @@index([creator_id, granted_at])
+  @@map("sensync_consents")
 }
