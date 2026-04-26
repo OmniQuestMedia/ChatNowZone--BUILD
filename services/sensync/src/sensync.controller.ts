@@ -133,9 +133,9 @@ export class SenSyncController {
 
   /** POST /sensync/samples */
   @Post('samples')
-  submitSample(
+  async submitSample(
     @Body() dto: SubmitSampleDto,
-  ): SenSyncBiometricPayload | { ok: false; reason: string } {
+  ): Promise<SenSyncBiometricPayload | { ok: false; reason: string }> {
     const sample: SenSyncSample = {
       sample_id: randomUUID(),
       session_id: dto.session_id,
@@ -149,7 +149,7 @@ export class SenSyncController {
       domain: dto.domain ?? 'ADULT_ENTERTAINMENT',
     };
 
-    const result = this.senSync.submitSample(sample);
+    const result = await this.senSync.submitSample(sample);
     if (!result) {
       return { ok: false, reason: 'SAMPLE_REJECTED_OR_NO_CONSENT' };
     }

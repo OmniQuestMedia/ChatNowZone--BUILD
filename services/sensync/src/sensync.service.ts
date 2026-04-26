@@ -13,7 +13,7 @@
 //   • Hardware tiers: only VIP_DIAMOND may use hardware bridges. Other tiers
 //     receive TIER_SENSYNC_HARDWARE_DISABLED and the session is rejected.
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
@@ -114,6 +114,12 @@ export class SenSyncService implements OnModuleInit {
   }): Promise<SenSyncConsentRecord> {
     const now = new Date();
 
+    if (args.ip_hash !== undefined && !/^[0-9a-fA-F]{64}$/.test(args.ip_hash)) {
+      throw new BadRequestException(
+        'ip_hash must be a 64-character hex-encoded SHA-256 digest — never a raw IP address',
+      );
+    }
+
     const row = await this.prisma.senSyncConsent.create({
       data: {
         session_id: args.session_id,
@@ -188,6 +194,7 @@ export class SenSyncService implements OnModuleInit {
         consent_revoked_at: now,
         basis: 'REVOKED' satisfies SenSyncConsentBasis,
         reason_code: 'SENSYNC_CONSENT_REVOKED',
+        correlation_id: args.correlation_id,
       },
     });
 
@@ -226,7 +233,11 @@ export class SenSyncService implements OnModuleInit {
    * 4. Publish sensync.biometric.data to NATS for FFS scoring.
    * Returns the normalized payload or null if rejected.
    */
-  submitSample(sample: SenSyncSample): SenSyncBiometricPayload | null {
+  submitSample(sample: SenSyncSample): Promise<SenSyncBiometricPayload | null> {
+    return this._submitSample(sample);
+  }
+
+  private async _submitSample(sample: SenSyncSample): Promise<SenSyncBiometricPayload | null> {
     // Plausibility filter.
     if (sample.bpm_raw < SENSYNC_BPM_MIN || sample.bpm_raw > SENSYNC_BPM_MAX) {
       this.rejectSample(sample);
@@ -239,9 +250,23 @@ export class SenSyncService implements OnModuleInit {
       return null;
     }
 
-    // Consent gate.
+    // Consent gate — check ephemeral cache first, then fall back to DB so that
+    // consent is honoured across process restarts and multiple service instances.
     const consentKey = `${sample.session_id}:${sample.guest_id}`;
-    if (!this.consentCache.get(consentKey)) {
+    let hasConsent = this.consentCache.get(consentKey);
+    if (!hasConsent) {
+      const dbConsent = await this.prisma.senSyncConsent.findFirst({
+        where: {
+          session_id: sample.session_id,
+          guest_id: sample.guest_id,
+          consent_revoked_at: null,
+          purge_requested_at: null,
+        },
+      });
+      hasConsent = dbConsent !== null;
+      this.consentCache.set(consentKey, hasConsent);
+    }
+    if (!hasConsent) {
       this.logger.warn('SenSyncService: sample rejected — no consent', {
         session_id: sample.session_id,
         guest_id: sample.guest_id,
