@@ -1524,6 +1524,35 @@ model GemstoneAward {
   @@map("gemstone_awards")
 }
 
+// ── Fan Fervor Score ──────────────────────────────────────────────────────────
+// Append-only per-guest engagement score. No UPDATE, no DELETE.
+// Consumers: payout engine, UI effects, Cyrano, GateGuard Welfare Score,
+//   VelocityZone (via NATS FFS_SCORED).
+
+model FanFervorScore {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guest_id           String   @db.Uuid
+  session_id         String   @db.VarChar(100)
+  // Composite Fan Fervor Score 0–100.
+  ffs_score          Int
+  // Resolved tier: COLD | WARM | HOT | INFERNO.
+  ffs_tier           String   @db.VarChar(10)
+  // Raw base score before SenSync™/HeartSync boost.
+  base_score         Int
+  // Points added by the HeartSync biometric boost (0 if not opted in).
+  heartsync_boost    Int      @default(0)
+  // Whether the guest had active HeartSync biometric consent for this score.
+  heartsync_opted_in Boolean  @default(false)
+  correlation_id     String   @db.VarChar(100)
+  rule_applied_id    String   @db.VarChar(100)
+  scored_at          DateTime @default(now()) @db.Timestamptz
+
+  @@index([guest_id, scored_at])
+  @@index([session_id, scored_at])
+  @@index([ffs_tier, scored_at])
+  @@map("fan_fervor_scores")
+}
+
 // ── Fraud Prevention Models ───────────────────────────────────────────────────
 
 model ExtensionActionRecord {

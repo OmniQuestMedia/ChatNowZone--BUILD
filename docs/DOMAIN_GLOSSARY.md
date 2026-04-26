@@ -57,6 +57,18 @@ HOW TO USE:
 
 ---
 
+## GUEST INTELLIGENCE
+
+| Term | Definition | Code identifier |
+|------|------------|-----------------|
+| Fan Fervor Score | Per-guest engagement score 0–100 + tier (COLD/WARM/HOT/INFERNO). Weighted sum of tip, chat, dwell, and loyalty signals. SenSync™ heart-rate adds +10–25 pts when opted in. Consumers: payout engine, UI effects, Cyrano, GateGuard Welfare Score, VelocityZone. | FanFervorScore, ffs_score, ffs_tier, FanFervorScoreService |
+| FFS | Fan Fervor Score abbreviation | FFS |
+| FFS_SCORED | NATS topic emitted on every FFS computation | NATS_TOPICS.FFS_SCORED, 'ffs.scored' |
+| SenSync™ | Marketing / consumer-facing brand name for the HeartSync biometric relay. Code identifier: HeartSync (unchanged). | SenSync™ (docs/marketing only); HeartSync (all code) |
+| VelocityZone | Downstream consumer of FFS_SCORED NATS events; tracks guest velocity metrics | VelocityZone (consumer context only) |
+
+---
+
 ## CREATOR PAYOUT
 
 | Term | Definition | Code identifier |

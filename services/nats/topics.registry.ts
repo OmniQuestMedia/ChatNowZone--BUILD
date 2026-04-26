@@ -44,6 +44,9 @@ export const NATS_TOPICS = {
   HEARTSYNC_PLAUSIBILITY_REJECTED:  'heartsync.plausibility.rejected',
   HEARTSYNC_TIER_DISABLED:          'heartsync.tier.disabled',
 
+  // ── Fan Fervor Score (FFS) — per-guest engagement score ──────────────
+  FFS_SCORED:                       'ffs.scored',
+
   // ── Guest-Heat intelligence layer ─────────────────────────────────────
   GUEST_HEAT_WHALE_SCORED:          'guest_heat.whale.scored',
   GUEST_HEAT_OFFER_TRIGGERED:       'guest_heat.offer.triggered',
