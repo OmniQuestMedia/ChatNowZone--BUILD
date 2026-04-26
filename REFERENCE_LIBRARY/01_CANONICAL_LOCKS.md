@@ -69,8 +69,8 @@ These are add-on products, not membership tiers:
 
 ### RETIRED RATE STATES (NEVER USE)
 
-The following rate state was REMOVED and must NEVER be used as a tier
-value in any code, schema, or directive:
+The following rate state was REMOVED and must NEVER be used as a rate
+state value in any code, schema, or directive:
 
 - RATE_BLAZING (retired 2026-04-26 — collapsed into RATE_INFERNO per
   PAYLOAD-10 alignment to GovernanceConfig.HEAT_BAND_* canonical bands;
