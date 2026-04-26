@@ -171,10 +171,14 @@ export class VelocityZoneService {
       data:  { is_active: false, updated_at: new Date() },
     });
 
+    const endedAt = new Date().toISOString();
+
     await this.nats.publish(NATS_TOPICS.VELOCITYZONE_EVENT_ENDED, {
-      event_id:       id,
-      correlation_id: correlationId,
-      ended_at:       new Date().toISOString(),
+      event_id:        id,
+      correlation_id:  correlationId,
+      rule_applied_id: VELOCITYZONE_RULE_ID,
+      ended_at:        endedAt,
+      timestamp:       endedAt,
     });
 
     this.logger.log('VelocityZone event deactivated', { id, correlationId });
