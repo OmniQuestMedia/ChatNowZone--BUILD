@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-6-spec-tokentype-fix-K2Iu3`
-**Commit:** `736f152eb37281f76c0a878c71deca2e8de4e219`
-**Generated:** 2026-04-26T16:54:35Z
+**Branch:** `claude/phase-3b-7-T3-creator-control-spec-K2Iu3`
+**Commit:** `39fd60315b34b574ad2fa4a513825b3ed892df69`
+**Generated:** 2026-04-26T17:00:03Z
 
 ## All Files
 
