@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3c-di-dead-code-research-K2Iu3`
-**Commit:** `aff478d02159c7829b90c1fb61d4154c0867a617`
-**Generated:** 2026-04-26T23:31:53Z
+**Branch:** `claude/delete-finance-contracts-types-K2Iu3`
+**Commit:** `2f1497d5f79724338ed23c2ee15f2c35f13d1e23`
+**Generated:** 2026-04-26T23:37:43Z
 
 ## All Files
 
@@ -629,7 +629,6 @@ Auto-generated on every push. Do not edit manually.
 - `ui/types/admin-diamond-contracts.ts`
 - `ui/types/creator-control-contracts.ts`
 - `ui/types/creator-panel-contracts.ts`
-- `ui/types/finance-contracts.ts`
 - `ui/types/public-wallet-contracts.ts`
 - `ui/view-models/creator-control.presenter.ts`
 - `ui/view-models/diamond-concierge.presenter.ts`
