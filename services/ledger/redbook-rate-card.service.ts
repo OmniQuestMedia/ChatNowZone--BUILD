@@ -29,7 +29,7 @@ export interface DiamondQuote {
 }
 
 /**
- * Maps a Flicker n'Flame Scoring (FFS) score (0–100) to the canonical creator payout rate band.
+ * Maps a Room-Heat score (0–100) to the canonical creator payout rate band.
  * Bands are LOCKED in GovernanceConfig (PAY-001…005) — never redefine locally.
  */
 function resolveHeatRate(heatScore: number): { level: HeatLevel; ratePerToken: number } {
@@ -71,13 +71,12 @@ export class RedbookRateCardService {
   }
 
   /**
-   * @deprecated ShowZone service removed (CNZ-WORK-001 Section 1). Retained for backward
-   * compat during transition. Do not call from new code.
-   *
+   * @deprecated ShowZone has been removed. This method is retained for
+   * backward compatibility only and should not be called in new code.
    * Resolve a ShowZone Premium bundle quote. Premium is single-tier per REDBOOK —
    * same price for guests and members (entry is gated by a paid pass).
    */
-  quoteTeaseShowzone(tokens: number): BundleQuote {
+  quoteTeaseShowzone(tokens: number): Omit<BundleQuote, 'tier'> & { tier: 'tease_showzone' } {
     const row = REDBOOK_RATE_CARDS.TEASE_SHOWZONE.find((r) => r.tokens === tokens);
     if (!row) {
       throw new Error(
@@ -123,7 +122,7 @@ export class RedbookRateCardService {
 
   /**
    * Resolve the live creator payout rate for a session close.
-   * Flicker n'Flame Scoring (FFS) rate wins unless the Diamond floor ($0.080) is higher.
+   * Room-Heat wins unless the Diamond floor ($0.080) is higher.
    */
   resolveCreatorPayoutRate(args: {
     heatScore: number;
@@ -138,11 +137,10 @@ export class RedbookRateCardService {
   }
 
   /**
-   * @deprecated ShowZone service removed (CNZ-WORK-001 Section 1). Retained for backward
-   * compat during transition. Do not call from new code.
-   *
+   * @deprecated ShowZone has been removed.
    * Compute a ShowZone pass price in CZT applying REDBOOK day/time/creator/advance
-   * multipliers.
+   * multipliers. Returns the integer CZT cost rounded up (partial tokens are not
+   * issuable).
    */
   quoteShowzonePassCzt(args: {
     baseCzt?: number;
@@ -168,7 +166,6 @@ export class RedbookRateCardService {
     return REDBOOK_RATE_CARDS.TEASE_REGULAR;
   }
 
-  /** @deprecated ShowZone service removed. Use listTeaseRegularBundles() instead. */
   listTeaseShowzoneBundles(): ReadonlyArray<{ tokens: number; usd: number }> {
     return REDBOOK_RATE_CARDS.TEASE_SHOWZONE;
   }

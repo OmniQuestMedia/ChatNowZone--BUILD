@@ -32,14 +32,10 @@ export type ReasonCode =
   | 'REFUND';
 
 /**
- * Rate card tiers (REDBOOK §3). Tease Regular / Diamond Floor / VIP.
- * Note: tease_showzone is deprecated — ShowZone service removed post-April 2026
- * (CNZ-WORK-001 Section 1). Retained in type union for backward compat with
- * deprecated quoteTeaseShowzone().
+ * Rate card tiers (REDBOOK §3). Tease Regular / ShowZone / Diamond Floor / VIP.
  */
 export type RateCardTier =
   | 'tease_regular'
-  | 'tease_showzone'    // @deprecated — ShowZone service removed
   | 'diamond_floor'
   | 'vip_baseline';
 

@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/fix-duplicate-property-types-Zag57`
-**Commit:** `4d28d3bca4aac8365afa153f034f3b513f346d38`
-**Generated:** 2026-04-26T11:07:36Z
+**Branch:** `copilot/global-renames-cleanup`
+**Commit:** `9f5cf8cfc61d79f3a1f7a19ad7e1fc72802ab23f`
+**Generated:** 2026-04-26T11:26:18Z
 
 ## All Files
 
@@ -549,13 +549,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/sensync/src/sensync.service.ts`
 - `services/sensync/src/sensync.types.ts`
 - `services/showzone/RETIRED.md`
-- `services/showzone/src/room-session.service.d.ts`
-- `services/showzone/src/room-session.service.js`
-- `services/showzone/src/room-session.service.js.map`
 - `services/showzone/src/room-session.service.ts`
-- `services/showzone/src/showzone.module.d.ts`
-- `services/showzone/src/showzone.module.js`
-- `services/showzone/src/showzone.module.js.map`
 - `services/showzone/src/showzone.module.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`
