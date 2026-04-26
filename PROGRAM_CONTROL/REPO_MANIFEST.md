@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-9-retire-dead-migration-K2Iu3`
-**Commit:** `deec5dcf6a2780c05fa58375e8f0cdc6b9df24b5`
-**Generated:** 2026-04-26T19:22:14Z
+**Branch:** `claude/phase-3c-di-dead-code-research-K2Iu3`
+**Commit:** `5ada300874b69240f376f5ad7fc6b3908fa666ee`
+**Generated:** 2026-04-26T22:00:25Z
 
 ## All Files
 
@@ -154,6 +154,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-2-PRISMA-DEDUP-INVESTIGATION-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-4-AMBIGUITY-RESEARCH-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-REBASELINE-2026-04-26.md`
+- `PROGRAM_CONTROL/REPORT_BACK/PHASE-3C-DI-DEAD-CODE-RESEARCH-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PRISMA-001-SCHEMA-GENERATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PRISMA-002-SUPPRESSION-DB-MIGRATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PROC-001-REPORT-BACK.md`
