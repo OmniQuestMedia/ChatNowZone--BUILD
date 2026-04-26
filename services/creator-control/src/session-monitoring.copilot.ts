@@ -7,7 +7,7 @@
 // is the single writer of effective tip rates.
 
 import { Injectable, Logger } from '@nestjs/common';
-import type { HeatScore, HeatTier } from './room-heat.engine';
+import type { HeatScore, HeatTier } from './ffs.engine';
 
 export const SESSION_MONITORING_RULE_ID = 'SESSION_MONITORING_COPILOT_v1';
 

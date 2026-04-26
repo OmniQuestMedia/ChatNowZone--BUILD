@@ -4,7 +4,7 @@
 // Unified creator workstation (single-pane) — aggregates:
 //   • Broadcast Timing Copilot  — when to go live
 //   • Session Monitoring Copilot — real-time price nudges during broadcast
-//   • Room-Heat Engine           — the live-telemetry foundation
+//   • Flicker n'Flame Scoring (FFS) — the live-telemetry foundation
 //   • OBS plugin + chat aggregator stubs (services/obs-bridge)
 //
 // This service is a READ + SUGGEST surface. It never writes to the ledger
@@ -15,10 +15,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import {
-  RoomHeatEngine,
+  FfsEngine,
   type HeatScore,
   type RoomHeatSample,
-} from './room-heat.engine';
+} from './ffs.engine';
 import {
   BroadcastTimingCopilot,
   type BroadcastWindowSuggestion,
@@ -55,13 +55,13 @@ export class CreatorControlService {
 
   constructor(
     private readonly nats: NatsService,
-    private readonly heat: RoomHeatEngine,
+    private readonly heat: FfsEngine,
     private readonly timing: BroadcastTimingCopilot,
     private readonly monitoring: SessionMonitoringCopilot,
   ) {}
 
   /**
-   * Ingest a room-heat sample from ShowZone/Bijou/HeartZone and fan the
+   * Ingest an FFS sample from Bijou/HeartZone and fan the
    * resulting suggestion out to the creator's copilot panel.
    */
   ingestSample(sample: RoomHeatSample): { heat: HeatScore; nudge: PriceNudge } {

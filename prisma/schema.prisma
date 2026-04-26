@@ -518,7 +518,9 @@ model TokenBalance {
   organization_id     String
   tenant_id           String
   token_origin        String   @default("PURCHASED")
+  token_type          String   @default("CZT") @db.VarChar(10)
 
+  @@index([token_type])
   @@map("token_balances")
 }
 
@@ -1384,12 +1386,12 @@ model WormExportRecord {
   @@map("worm_export_records")
 }
 
-// ─── Room-Heat Engine (WO-003 — Business Plan B.4) ────────────────────────────
+// ─── Flicker n'Flame Scoring / FFS Engine (WO-003 — Business Plan B.4) ────────
 // Migration: 20260425000000_add_room_heat
 
-/// Time-series heat score snapshots — one row per ingest() call.
+/// Time-series FFS score snapshots — one row per ingest() call.
 /// Append-only by convention (no UPDATE/DELETE in service code).
-model RoomHeatSnapshot {
+model FfsScoreSnapshot {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   session_id      String   @db.VarChar(200)
   creator_id      String   @db.Uuid
@@ -1408,9 +1410,9 @@ model RoomHeatSnapshot {
   @@map("room_heat_snapshots")
 }
 
-/// Per-creator adaptive weight multipliers, learned from tip events.
+/// Per-creator FFS adaptive weight multipliers, learned from tip events.
 /// One row per creator — updated in-place via increment-only tip_events_seen.
-model RoomHeatAdaptiveWeights {
+model FfsScoreAdaptiveWeights {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   creator_id      String   @unique @db.Uuid
   /// JSON Record<string, number> — multipliers for each scoring component.

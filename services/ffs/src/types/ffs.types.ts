@@ -1,6 +1,6 @@
-// WO-003 — Room-Heat Engine: canonical types
-// Business Plan B.4 — real-time composite heat score (0-100) for all room-level telemetry.
-// Rule authority: ROOM_HEAT_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
+// WO-003 — Flicker n'Flame Scoring (FFS): canonical types
+// Business Plan B.4 — Flicker n'Flame Scoring (FFS) real-time composite heat score (0-100) for all room-level telemetry.
+// Rule authority: FFS_SCORE_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Flicker n'Flame Scoring).
 
 // ── Tier thresholds (canonical — locked in GovernanceConfig.HEAT_BAND_*)
 // COLD 0-33 / WARM 34-60 / HOT 61-85 / INFERNO 86-100
@@ -14,7 +14,7 @@ export type LeaderboardCategory =
   | 'new_flames';
 
 // ── Full input frame — all signals fed into the composite score ───────────────
-export interface RoomHeatInput {
+export interface FfsInput {
   // Identity
   session_id: string;
   creator_id: string;
@@ -98,7 +98,7 @@ export interface HeatScoreComponents {
 }
 
 // ── Full heat score output ────────────────────────────────────────────────────
-export interface RoomHeatScore {
+export interface FfsScore {
   session_id: string;
   creator_id: string;
   /** Composite score 0-100 after anti-flicker and guardrails. */
@@ -135,7 +135,7 @@ export interface LeaderboardEntry {
   session_started_at: string;
 }
 
-export interface RoomHeatLeaderboard {
+export interface FfsLeaderboard {
   entries: LeaderboardEntry[];
   total: number;
   generated_at_utc: string;
@@ -153,7 +153,7 @@ export interface AdaptiveWeights {
 
 // ── In-memory session state ───────────────────────────────────────────────────
 export interface SessionLiveState {
-  currentScore: RoomHeatScore;
+  currentScore: FfsScore;
   sessionStartedAt: Date;
   isDualFlame: boolean;
 }

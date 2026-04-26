@@ -21,7 +21,7 @@ import {
 // HeatTier is imported from creator-control following the established pattern
 // already used by cyrano.service and cyrano.types. When creator-control is
 // extracted to a shared package this import will be updated accordingly.
-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { HeatTier } from '../../creator-control/src/ffs.engine';
 
 // ── REST DTOs ─────────────────────────────────────────────────────────────────
 

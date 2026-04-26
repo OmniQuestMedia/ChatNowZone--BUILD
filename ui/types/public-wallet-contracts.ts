@@ -9,7 +9,7 @@ export type GuestTier = 'GUEST' | 'MEMBER' | 'DIAMOND';
 
 export type WalletBucket = 'purchased' | 'membership' | 'bonus';
 
-/** One row of the token bundle rate card (Tease Regular / ShowZone). */
+/** One row of the token bundle rate card (Tease Regular). */
 export interface TokenBundleRateRow {
   tokens: number;
   display_price_usd: number;
@@ -18,7 +18,7 @@ export interface TokenBundleRateRow {
   discount_for_members_pct: number | null;
   per_token_usd: number;
   creator_payout_per_token: number;
-  bundle_tier: 'TEASE_REGULAR' | 'TEASE_SHOWZONE';
+  bundle_tier: 'TEASE_REGULAR';
   is_promoted: boolean; // highlight row on the rate card
   reason_code: 'REDBOOK_SECTION_3';
 }
@@ -27,7 +27,6 @@ export interface TokenBundleRateRow {
 export interface TokenBundleRateCard {
   tier: GuestTier;
   rows: TokenBundleRateRow[];
-  showzone_rows: TokenBundleRateRow[];
   generated_at_utc: string;
   rule_applied_id: string;
 }

@@ -26,7 +26,7 @@ import {
   RECOVERY_ENGINE,
   REDBOOK_RATE_CARDS,
 } from '../../core-api/src/config/governance.config';
-import type { HeatScore, HeatTier, RoomHeatSample } from '../../creator-control/src/room-heat.engine';
+import type { HeatScore, HeatTier, RoomHeatSample } from '../../creator-control/src/ffs.engine';
 import type { CyranoInputFrame, CyranoSuggestion } from '../../cyrano/src/cyrano.types';
 import type { CreatorControlService } from '../../creator-control/src/creator-control.service';
 import type { CyranoService } from '../../cyrano/src/cyrano.service';

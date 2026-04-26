@@ -1,7 +1,7 @@
 // PAYLOAD 5 — Cyrano Layer 1 shared types
 // Business Plan B.3.5 — whisper copilot contract surface.
 
-import type { HeatScore, HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { HeatScore, HeatTier } from '../../creator-control/src/ffs.engine';
 
 /** The eight canonical suggestion categories from Business Plan B.3.5. */
 export type CyranoCategory =

@@ -12,7 +12,7 @@ import type {
   CyranoInputFrame,
   MemoryFact,
 } from '../../services/cyrano/src/cyrano.types';
-import type { HeatScore, HeatTier } from '../../services/creator-control/src/room-heat.engine';
+import type { HeatScore, HeatTier } from '../../services/creator-control/src/ffs.engine';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 
 type Published = { topic: string; payload: Record<string, unknown> };
