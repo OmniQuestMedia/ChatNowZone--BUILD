@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3c-di-dead-code-research-K2Iu3`
-**Commit:** `aff478d02159c7829b90c1fb61d4154c0867a617`
-**Generated:** 2026-04-26T23:31:53Z
+**Branch:** `claude/delete-surfaces-roster-gateway-K2Iu3`
+**Commit:** `f4c576c8ddebf668a2c17032e1a34676b1b8092f`
+**Generated:** 2026-04-26T23:36:53Z
 
 ## All Files
 
@@ -387,7 +387,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/creator/statements.controller.ts`
 - `services/core-api/src/creator/statements.service.ts`
 - `services/core-api/src/creator/surfaces/dashboard.controller.ts`
-- `services/core-api/src/creator/surfaces/roster.gateway.ts`
 - `services/core-api/src/creator/surfaces/statements.service.ts`
 - `services/core-api/src/db.ts`
 - `services/core-api/src/dfsp/account-recovery-hold.service.ts`
