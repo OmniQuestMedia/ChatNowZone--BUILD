@@ -22,9 +22,10 @@ import {
 } from './guest-heat.types';
 import type { FfsInput, FfsResult } from './fan-fervor-score.types';
 // HeatTier is imported from creator-control following the established pattern
+// FfsTier is imported from creator-control following the established pattern
 // already used by cyrano.service and cyrano.types. When creator-control is
 // extracted to a shared package this import will be updated accordingly.
-import type { HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { FfsTier } from '../../creator-control/src/ffs.engine';
 
 // ── REST DTOs ─────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ export interface RegisterPresenceDto {
   creator_id: string;
   guest_id: string;
   tier: MembershipTier;
-  current_heat: HeatTier;
+  current_heat: FfsTier;
 }
 
 export interface GenerateForecastDto {

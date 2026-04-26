@@ -1,5 +1,5 @@
 # DIRECTIVE: TOK-RETIRE-001
-# Retire ShowToken Types and Update Payout Logic to Room-Heat Rates
+# Retire ShowToken Types and Update Payout Logic to Flicker n'Flame Scoring Rates
 
 **Directive ID:** TOK-RETIRE-001
 **Agent:** CLAUDE_CODE
@@ -16,7 +16,7 @@
 
 ## Objective
 
-Retire `TokenType.SHOW_THEATER` and `TokenType.BIJOU`; collapse `TokenType` to CZT-only. Replace binary `SHOW_THEATER`/`REGULAR` payout rate split with Room-Heat rate resolver. Remove `PAYOUT_RATE_SHOWTHEATER`/`PAYOUT_RATE_REGULAR` and `SHOWTOKEN_EXCHANGE` block. Rename `ST_` field names to `CZT_` in `SHOWZONE_PRICING` and `BIJOU_PRICING`. Update dependent services.
+Retire `TokenType.SHOW_THEATER` and `TokenType.BIJOU`; collapse `TokenType` to CZT-only. Replace binary `SHOW_THEATER`/`REGULAR` payout rate split with Flicker n'Flame Scoring rate resolver. Remove `PAYOUT_RATE_SHOWTHEATER`/`PAYOUT_RATE_REGULAR` and `SHOWTOKEN_EXCHANGE` block. Rename `ST_` field names to `CZT_` in `SHOWZONE_PRICING` and `BIJOU_PRICING`. Update dependent services.
 
 ---
 

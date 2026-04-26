@@ -6,7 +6,7 @@
 
 ## Summary
 
-Delivered a new canonical `services/ledger/` module housing a three-bucket wallet + hash-chained append-only ledger, REDBOOK rate-card resolver, Room-Heat payout hook, and Unified-CS Recovery Engine. The legacy `services/core-api/src/finance/ledger.service.ts` is preserved; the two layers coexist intentionally until a follow-up core-api wiring branch migrates consumers.
+Delivered a new canonical `services/ledger/` module housing a three-bucket wallet + hash-chained append-only ledger, REDBOOK rate-card resolver, Flicker n'Flame Scoring payout hook, and Unified-CS Recovery Engine. The legacy `services/core-api/src/finance/ledger.service.ts` is preserved; the two layers coexist intentionally until a follow-up core-api wiring branch migrates consumers.
 
 ## Deliverables
 
@@ -36,14 +36,14 @@ Delivered a new canonical `services/ledger/` module housing a three-bucket walle
 - `repository.ts` — `LedgerRepository` interface + `InMemoryLedgerRepository` for tests. Production Prisma adapter lives alongside in the follow-up wiring branch.
 - `redbook-rate-card.service.ts` — Tease Regular / ShowZone / Diamond quotes + `resolveCreatorPayoutRate` honouring the Diamond floor.
 - `ledger.service.ts` — three-bucket spend (governance-sourced order), idempotent `record()` / `credit()` / `spend()`, SHA-256 hash chain with `verifyChain()` audit. `HANDOFF` block at file bottom.
-- `payout.service.ts` — `settleSessionClose()` for Room-Heat-scored session payouts (credits creator `bonus` bucket, stamps rate in entry metadata).
+- `payout.service.ts` — `settleSessionClose()` for Flicker n'Flame Scoring-scored session payouts (credits creator `bonus` bucket, stamps rate in entry metadata).
 - `recovery.service.ts` — `findExpirationsNeedingWarning`, `extendExpiration`, `recoverExpiration`, `tokenBridge`, `threeFifthsExit`, `redistributeExpired`.
 - `index.ts` — barrel export.
 
 ### Tests (`tests/integration/`)
 
 - `canonical-ledger.spec.ts` — 17 tests: spend order across all permutations, idempotent replay, hash chain continuity + tamper detection, input validation.
-- `redbook-rate-card.spec.ts` — 14 tests: guest/member Tease pricing, ShowZone bundles, Diamond volume + velocity brackets, Room-Heat rate bands, Diamond floor interaction.
+- `redbook-rate-card.spec.ts` — 14 tests: guest/member Tease pricing, ShowZone bundles, Diamond volume + velocity brackets, Flicker n'Flame Scoring rate bands, Diamond floor interaction.
 - `recovery-engine.spec.ts` — 10 tests: 48-hour warning, extension fee + window, Token Bridge 20% + idempotency, 3/5ths Exit refund + lock, 70/30 redistribution.
 - Total: **41 new tests, all green.**
 

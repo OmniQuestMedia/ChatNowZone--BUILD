@@ -87,7 +87,7 @@ on intent alone.
 - [ ] **CS Recovery Command Center** at `/admin/recovery` — open-case
       table + audit trail + per-stage counts.
 - [ ] **CreatorControl.Zone** at `/creator/control` — Broadcast Timing
-      Copilot + Session Monitoring + Cyrano whisper panel + Room-Heat
+      Copilot + Session Monitoring + Cyrano whisper panel + Flicker n'Flame Scoring
       meter + persona switcher + payout indicator.
 - [ ] **Guest token bundles** at `/tokens` — REDBOOK §3 rate card
       (Tease Regular + ShowZone Premium).

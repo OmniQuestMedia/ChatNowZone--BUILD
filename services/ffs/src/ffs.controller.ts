@@ -11,19 +11,19 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import type { LeaderboardCategory } from './types/room-heat.types';
-import type { RoomHeatLeaderboard, RoomHeatScore } from './types/room-heat.types';
-import { IngestRoomHeatDto, TipEventDto } from './dto/room-heat.dto';
-import { RoomHeatService } from './room-heat.service';
+import type { LeaderboardCategory } from './types/ffs.types';
+import type { FfsLeaderboard, FfsScore } from './types/ffs.types';
+import { IngestFfsDto, TipEventDto } from './dto/ffs.dto';
+import { FlickerNFlameScoringService } from './ffs.service';
 
-@Controller('room-heat')
-export class RoomHeatController {
-  private readonly logger = new Logger(RoomHeatController.name);
+@Controller('ffs')
+export class FlickerNFlameScoringController {
+  private readonly logger = new Logger(FlickerNFlameScoringController.name);
 
-  constructor(private readonly roomHeatService: RoomHeatService) {}
+  constructor(private readonly flickerNFlameScoringService: FlickerNFlameScoringService) {}
 
   /**
-   * GET /room-heat/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
+   * GET /ffs/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
    *
    * Returns the 10×10 leaderboard grid.
    * Coolest sessions appear at the top (rank 0); hottest at the bottom (rank 99).
@@ -31,7 +31,7 @@ export class RoomHeatController {
   @Get('leaderboard')
   getLeaderboard(
     @Query('category') category?: string,
-  ): RoomHeatLeaderboard {
+  ): FfsLeaderboard {
     const validCategories: LeaderboardCategory[] = [
       'all',
       'standard',
@@ -45,20 +45,20 @@ export class RoomHeatController {
       ? (category as LeaderboardCategory)
       : 'all';
 
-    this.logger.log('RoomHeatController.getLeaderboard', { category: cat });
-    return this.roomHeatService.getLeaderboard(cat);
+    this.logger.log('FlickerNFlameScoringController.getLeaderboard', { category: cat });
+    return this.flickerNFlameScoringService.getLeaderboard(cat);
   }
 
   /**
-   * GET /room-heat/session/:sessionId
+   * GET /ffs/session/:sessionId
    *
    * Returns the current heat score for a live session, or 404 if unknown.
    */
   @Get('session/:sessionId')
   getSessionHeat(
     @Param('sessionId') sessionId: string,
-  ): RoomHeatScore | { message: string; session_id: string } {
-    const score = this.roomHeatService.getSessionHeat(sessionId);
+  ): FfsScore | { message: string; session_id: string } {
+    const score = this.flickerNFlameScoringService.getSessionHeat(sessionId);
     if (!score) {
       return { message: 'Session not found or not yet active', session_id: sessionId };
     }
@@ -66,22 +66,22 @@ export class RoomHeatController {
   }
 
   /**
-   * POST /room-heat/ingest
+   * POST /ffs/ingest
    *
    * Ingest a full telemetry frame. Returns the computed heat score.
    * Used by the creator-control surface and integration tests.
    */
   @Post('ingest')
-  ingestSample(@Body() dto: IngestRoomHeatDto): RoomHeatScore {
-    this.logger.log('RoomHeatController.ingestSample', {
+  ingestSample(@Body() dto: IngestFfsDto): FfsScore {
+    this.logger.log('FlickerNFlameScoringController.ingestSample', {
       session_id: dto.session_id,
       creator_id: dto.creator_id,
     });
-    return this.roomHeatService.ingest(dto);
+    return this.flickerNFlameScoringService.ingest(dto);
   }
 
   /**
-   * POST /room-heat/session/:sessionId/start
+   * POST /ffs/session/:sessionId/start
    *
    * Pre-register a session before the first telemetry frame.
    * Callers may omit this — the session is auto-registered on first ingest.
@@ -91,7 +91,7 @@ export class RoomHeatController {
     @Param('sessionId') sessionId: string,
     @Body() body: { creator_id: string; is_dual_flame?: boolean },
   ): { session_id: string; started: boolean } {
-    this.roomHeatService.startSession(
+    this.flickerNFlameScoringService.startSession(
       sessionId,
       body.creator_id,
       body.is_dual_flame ?? false,
@@ -100,7 +100,7 @@ export class RoomHeatController {
   }
 
   /**
-   * DELETE /room-heat/session/:sessionId
+   * DELETE /ffs/session/:sessionId
    *
    * Teardown session heat state and stop the 1 Hz publisher.
    * Call this when a broadcast ends.
@@ -109,29 +109,29 @@ export class RoomHeatController {
   endSession(
     @Param('sessionId') sessionId: string,
   ): { session_id: string; ended: boolean } {
-    this.roomHeatService.endSession(sessionId);
+    this.flickerNFlameScoringService.endSession(sessionId);
     return { session_id: sessionId, ended: true };
   }
 
   /**
-   * POST /room-heat/tip-event
+   * POST /ffs/tip-event
    *
    * Trigger adaptive weight learning from a tip event.
    * Called by the tip service whenever a tip is completed.
    */
   @Post('tip-event')
   recordTipEvent(@Body() dto: TipEventDto): { learned: boolean } {
-    this.logger.log('RoomHeatController.recordTipEvent', {
+    this.logger.log('FlickerNFlameScoringController.recordTipEvent', {
       session_id: dto.session_id,
       creator_id: dto.creator_id,
       tokens:     dto.tokens,
     });
-    this.roomHeatService.learnFromTipEvent(dto.heat_context);
+    this.flickerNFlameScoringService.learnFromTipEvent(dto.heat_context);
     return { learned: true };
   }
 
   /**
-   * GET /room-heat/adaptive-weights/:creatorId
+   * GET /ffs/adaptive-weights/:creatorId
    *
    * Returns the adaptive weight multipliers for a creator (advisory / debug).
    */
@@ -139,6 +139,6 @@ export class RoomHeatController {
   getAdaptiveWeights(
     @Param('creatorId') creatorId: string,
   ) {
-    return this.roomHeatService.getAdaptiveWeightsPublic(creatorId);
+    return this.flickerNFlameScoringService.getAdaptiveWeightsPublic(creatorId);
   }
 }

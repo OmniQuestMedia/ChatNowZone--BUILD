@@ -56,7 +56,7 @@ is owned by a single named operator who reports back into
 
 ### Gates
 - CEO sign-off on Mic Drop dry-run filed in `PROGRAM_CONTROL/CLEARANCES/`
-- Observability dashboards green (Cyrano p95, GateGuard latency, Room-Heat tier transitions, Ledger throughput)
+- Observability dashboards green (Cyrano p95, GateGuard latency, Flicker n'Flame Scoring tier transitions, Ledger throughput)
 
 ## 3. First 3,000 Creator Rate-Lock
 

@@ -3,7 +3,7 @@
 #         No host port bindings for db or redis — internal traffic only.
 # PAYLOAD-9: Env-var driven configuration only. No hard-coded secrets.
 #            All Payload 1–8 services routed through the `api` process boundary:
-#            GateGuard, Room-Heat, CreatorControl, Cyrano, Diamond Concierge,
+#            GateGuard, Flicker n'Flame Scoring (FFS), CreatorControl, Cyrano, Diamond Concierge,
 #            Recovery, Immutable Audit, and Integration Hub are NestJS modules
 #            mounted inside the `api` composite runtime (see
 #            services/core-api/src/app.module.ts). A dedicated service row
@@ -71,7 +71,7 @@ services:
 
   api:
     # Core API monolith — hosts all NestJS modules including:
-    # GateGuard, Room-Heat, CreatorControl, Cyrano, Audit, Recovery,
+    # GateGuard, Flicker n'Flame Scoring (FFS), CreatorControl, Cyrano, Audit, Recovery,
     # Integration Hub, Ledger, DFSP, Bijou, ShowZone, OBS-Bridge,
     # Scheduling, Membership, Risk Engine, Geo, Games, Zone-GPT.
     build:
@@ -91,7 +91,7 @@ services:
       GATEGUARD_ENABLED: ${GATEGUARD_ENABLED:-true}
       RECOVERY_ENABLED: ${RECOVERY_ENABLED:-true}
       DIAMOND_CONCIERGE_ENABLED: ${DIAMOND_CONCIERGE_ENABLED:-true}
-      ROOM_HEAT_ENABLED: ${ROOM_HEAT_ENABLED:-true}
+      FFS_ENABLED: ${FFS_ENABLED:-true}
       CREATOR_CONTROL_ENABLED: ${CREATOR_CONTROL_ENABLED:-true}
       CYRANO_ENABLED: ${CYRANO_ENABLED:-true}
       INTEGRATION_HUB_ENABLED: ${INTEGRATION_HUB_ENABLED:-true}

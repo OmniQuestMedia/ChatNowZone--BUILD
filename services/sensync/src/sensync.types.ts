@@ -1,4 +1,4 @@
-// HZ: HeartSync biometric relay — shared types
+// HZ: SenSync™ biometric relay — shared types
 // Business Plan §HZ — bidirectional haptic + BPM relay for consenting guests.
 
 /** All membership tiers supported by the platform. */
@@ -11,8 +11,8 @@ export type MembershipTier =
   | 'VIP_PLATINUM'
   | 'VIP_DIAMOND';
 
-/** HeartSync relay transmission mode. */
-export type HeartSyncMode =
+/** SenSync™ relay transmission mode. */
+export type SenSyncMode =
   | 'BIDIRECTIONAL' // guest ↔ creator — each receives the other's BPM
   | 'CREATOR_TO_GUEST' // only creator BPM flows to guest device
   | 'GUEST_TO_CREATOR'  // only guest BPM flows to creator device
@@ -31,7 +31,7 @@ export type ConsentBasis =
   | 'REVOKED';          // guest withdrew consent
 
 /** A single raw BPM sample from a device. */
-export interface HeartSyncSample {
+export interface SenSyncSample {
   sample_id: string;
   session_id: string;
   creator_id: string;
@@ -48,17 +48,17 @@ export interface HeartSyncSample {
 }
 
 /** A BPM sample that has passed the plausibility filter. */
-export interface HeartSyncValidSample extends HeartSyncSample {
+export interface SenSyncValidSample extends SenSyncSample {
   bpm_filtered: number; // same as raw, confirmed in [30..220]
 }
 
 /** Relay event broadcast to participating devices. */
-export interface HeartSyncRelayEvent {
+export interface SenSyncRelayEvent {
   relay_id: string;
   session_id: string;
   creator_id: string;
   guest_id: string;
-  mode: HeartSyncMode;
+  mode: SenSyncMode;
   /** BPM value relayed to the remote party. */
   bpm_relayed: number;
   /** Driver selected for this relay. */
@@ -69,7 +69,7 @@ export interface HeartSyncRelayEvent {
 }
 
 /** Combined-mode BPM event — arithmetic mean of creator + guest samples. */
-export interface HeartSyncCombinedBpm {
+export interface SenSyncCombinedBpm {
   event_id: string;
   session_id: string;
   creator_id: string;
@@ -82,7 +82,7 @@ export interface HeartSyncCombinedBpm {
 }
 
 /** Consent grant or revocation record. */
-export interface HeartSyncConsent {
+export interface SenSyncConsent {
   consent_id: string;
   session_id: string;
   guest_id: string;
@@ -95,7 +95,7 @@ export interface HeartSyncConsent {
 }
 
 /** Plausibility rejection audit record. */
-export interface HeartSyncPlausibilityRejection {
+export interface SenSyncPlausibilityRejection {
   rejection_id: string;
   session_id: string;
   guest_id: string;
@@ -107,22 +107,22 @@ export interface HeartSyncPlausibilityRejection {
 }
 
 /** Tier-disabled rejection audit record. */
-export interface HeartSyncTierDisabledEvent {
+export interface SenSyncTierDisabledEvent {
   event_id: string;
   session_id: string;
   guest_id: string;
   tier: MembershipTier;
-  reason_code: 'TIER_HEARTSYNC_DISABLED';
+  reason_code: 'TIER_SENSYNC_DISABLED';
   occurred_at_utc: string;
   rule_applied_id: string;
 }
 
 /** In-session state tracked ephemerally per session. */
-export interface HeartSyncSessionState {
+export interface SenSyncSessionState {
   session_id: string;
   creator_id: string;
   guest_id: string;
-  mode: HeartSyncMode;
+  mode: SenSyncMode;
   consent_granted: boolean;
   last_creator_bpm?: number;
   last_guest_bpm?: number;
@@ -132,7 +132,7 @@ export interface HeartSyncSessionState {
 }
 
 /** Haptic dispatch command sent downstream. */
-export interface HeartSyncHapticCommand {
+export interface SenSyncHapticCommand {
   command_id: string;
   session_id: string;
   target: 'CREATOR' | 'GUEST';
@@ -145,11 +145,11 @@ export interface HeartSyncHapticCommand {
 }
 
 /** BPM plausibility bounds — governance constant. */
-export const HEARTSYNC_BPM_MIN = 30;
-export const HEARTSYNC_BPM_MAX = 220;
+export const SENSYNC_BPM_MIN = 30;
+export const SENSYNC_BPM_MAX = 220;
 
 /** Random sampling interval bounds (milliseconds). */
-export const HEARTSYNC_SAMPLE_INTERVAL_MIN_MS = 1_500;
-export const HEARTSYNC_SAMPLE_INTERVAL_MAX_MS = 3_000;
+export const SENSYNC_SAMPLE_INTERVAL_MIN_MS = 1_500;
+export const SENSYNC_SAMPLE_INTERVAL_MAX_MS = 3_000;
 
-export const HEARTSYNC_RULE_ID = 'HEARTSYNC_v1';
+export const SENSYNC_RULE_ID = 'SENSYNC_v1';

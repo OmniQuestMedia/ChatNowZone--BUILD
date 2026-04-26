@@ -94,7 +94,7 @@ Read any file: `git show {branch}:{filepath}`
 | refs/oss/socketio-chat | OBS-001/002, CCZ-001, OPS-003 |
 | refs/oss/react-chat-app | CCZ-001/002, OBS-001 |
 | refs/oss/discussion-platform | FC-001–006, OPS-004 |
-| refs/oss/live-polling | OBS Room-Heat Engine broadcast |
+| refs/oss/live-polling | OBS Flicker n'Flame Scoring (FFS) broadcast |
 | refs/oss/zoom-clone | OBS ShowZone Theatre UI, DISC |
 | refs/oss/loadbalancer-nginx | Bijou SFU infra, OPS deployment |
 | refs/oss/social-media-app | FC-003, CCZ-003, OPS-006 notifications |
@@ -119,7 +119,7 @@ DAY_PASS, ANNUAL (as tier), OMNIPASS_PLUS (as tier), standalone DIAMOND
 
 **Platform name:** ChatNow.Zone / chatnow.zone
 **Currency:** ChatZoneTokens (CZT)
-**Payout engine:** Room-Heat Engine (RATE_COLD → RATE_INFERNO)
+**Payout engine:** Flicker n'Flame Scoring (FFS) (RATE_COLD → RATE_INFERNO)
 **Video infra:** LiveKit OSS self-hosted (Bijou SFU)
 
 ---

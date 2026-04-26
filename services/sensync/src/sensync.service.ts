@@ -1,4 +1,4 @@
-// HZ: HeartSync biometric relay service
+// HZ: SenSync™ biometric relay service
 // Business Plan §HZ — bidirectional haptic + BPM relay for consenting guests.
 //
 // Contract:
@@ -6,7 +6,7 @@
 //     phone haptic drivers.
 //   • Applies plausibility filter (30–220 BPM). Out-of-range samples are
 //     rejected with an audit-only NATS event.
-//   • Per-tier enablement checked against HeartSyncTierConfig (in-memory
+//   • Per-tier enablement checked against SenSyncTierConfig (in-memory
 //     cache; refreshed on module init).
 //   • Three relay modes: BIDIRECTIONAL, CREATOR_TO_GUEST, GUEST_TO_CREATOR.
 //     COMBINED mode averages both BPMs ("feel as one").
@@ -20,22 +20,22 @@ import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import {
-  HEARTSYNC_BPM_MAX,
-  HEARTSYNC_BPM_MIN,
-  HEARTSYNC_RULE_ID,
+  SENSYNC_BPM_MAX,
+  SENSYNC_BPM_MIN,
+  SENSYNC_RULE_ID,
   type HapticDriver,
-  type HeartSyncCombinedBpm,
-  type HeartSyncConsent,
-  type HeartSyncHapticCommand,
-  type HeartSyncMode,
-  type HeartSyncPlausibilityRejection,
-  type HeartSyncRelayEvent,
-  type HeartSyncSample,
-  type HeartSyncSessionState,
-  type HeartSyncTierDisabledEvent,
-  type HeartSyncValidSample,
+  type SenSyncCombinedBpm,
+  type SenSyncConsent,
+  type SenSyncHapticCommand,
+  type SenSyncMode,
+  type SenSyncPlausibilityRejection,
+  type SenSyncRelayEvent,
+  type SenSyncSample,
+  type SenSyncSessionState,
+  type SenSyncTierDisabledEvent,
+  type SenSyncValidSample,
   type MembershipTier,
-} from './heartsync.types';
+} from './sensync.types';
 
 /** Fallback driver priority when preferred driver is unavailable. */
 const DRIVER_FALLBACK_ORDER: HapticDriver[] = [
@@ -46,11 +46,11 @@ const DRIVER_FALLBACK_ORDER: HapticDriver[] = [
 ];
 
 @Injectable()
-export class HeartSyncService implements OnModuleInit {
-  private readonly logger = new Logger(HeartSyncService.name);
+export class SenSyncService implements OnModuleInit {
+  private readonly logger = new Logger(SenSyncService.name);
 
   /** Ephemeral session state — never persisted. Cleared on session end. */
-  private readonly sessions = new Map<string, HeartSyncSessionState>();
+  private readonly sessions = new Map<string, SenSyncSessionState>();
 
   /** Per-tier enabled flags — refreshed from DB on init. */
   private tierEnabled = new Map<MembershipTier, boolean>();
@@ -66,13 +66,13 @@ export class HeartSyncService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.refreshTierConfig();
-    this.logger.log('HeartSyncService: tier config loaded');
+    this.logger.log('SenSyncService: tier config loaded');
   }
 
   // ── Public API ────────────────────────────────────────────────────────────
 
   /**
-   * Open a HeartSync relay session.
+   * Open a SenSync™ relay session.
    * Must be called before any samples are submitted.
    * Returns the initial session state.
    */
@@ -81,21 +81,21 @@ export class HeartSyncService implements OnModuleInit {
     creator_id: string,
     guest_id: string,
     tier: MembershipTier,
-    mode: HeartSyncMode,
+    mode: SenSyncMode,
     driver: HapticDriver,
-  ): HeartSyncSessionState | null {
+  ): SenSyncSessionState | null {
     if (!this.isTierEnabled(tier)) {
       this.emitTierDisabled(session_id, guest_id, tier);
       return null;
     }
 
     if (mode === 'COMBINED' && !this.isCombinedAllowed(tier)) {
-      this.logger.warn('HeartSyncService: COMBINED mode not permitted for tier', { tier, session_id });
+      this.logger.warn('SenSyncService: COMBINED mode not permitted for tier', { tier, session_id });
       this.emitTierDisabled(session_id, guest_id, tier);
       return null;
     }
 
-    const state: HeartSyncSessionState = {
+    const state: SenSyncSessionState = {
       session_id,
       creator_id,
       guest_id,
@@ -106,14 +106,14 @@ export class HeartSyncService implements OnModuleInit {
     };
 
     this.sessions.set(session_id, state);
-    this.logger.log('HeartSyncService: session opened', { session_id, mode, tier });
+    this.logger.log('SenSyncService: session opened', { session_id, mode, tier });
     return state;
   }
 
   /**
    * Record guest consent for biometric relay.
    * Must be called before samples are relayed.
-   * Emits HEARTSYNC_CONSENT_GRANTED on NATS.
+   * Emits SENSYNC_CONSENT_GRANTED on NATS.
    */
   grantConsent(
     session_id: string,
@@ -121,11 +121,11 @@ export class HeartSyncService implements OnModuleInit {
     creator_id: string,
     ip_hash?: string,
     device_fingerprint?: string,
-  ): HeartSyncConsent {
+  ): SenSyncConsent {
     const key = `${session_id}:${guest_id}`;
     this.consentStore.set(key, true);
 
-    const consent: HeartSyncConsent = {
+    const consent: SenSyncConsent = {
       consent_id: randomUUID(),
       session_id,
       guest_id,
@@ -134,21 +134,21 @@ export class HeartSyncService implements OnModuleInit {
       ip_hash,
       device_fingerprint,
       issued_at_utc: new Date().toISOString(),
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_CONSENT_GRANTED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_GRANTED, {
       ...consent,
     } as unknown as Record<string, unknown>);
 
-    this.logger.log('HeartSyncService: consent granted', { session_id, guest_id });
+    this.logger.log('SenSyncService: consent granted', { session_id, guest_id });
     return consent;
   }
 
   /**
    * Revoke guest consent for biometric relay.
    * Clears all buffered BPM state for the session.
-   * Emits HEARTSYNC_CONSENT_REVOKED on NATS.
+   * Emits SENSYNC_CONSENT_REVOKED on NATS.
    */
   revokeConsent(session_id: string, guest_id: string, creator_id: string): void {
     const key = `${session_id}:${guest_id}`;
@@ -161,33 +161,33 @@ export class HeartSyncService implements OnModuleInit {
       state.last_guest_bpm = undefined;
     }
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_CONSENT_REVOKED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, {
       event_id: randomUUID(),
       session_id,
       guest_id,
       creator_id,
       basis: 'REVOKED',
       revoked_at_utc: new Date().toISOString(),
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     } as unknown as Record<string, unknown>);
 
-    this.logger.log('HeartSyncService: consent revoked', { session_id, guest_id });
+    this.logger.log('SenSyncService: consent revoked', { session_id, guest_id });
   }
 
   /**
    * Submit a raw BPM sample for relay processing.
    * Returns the relay event(s) emitted, or null if sample was rejected.
    */
-  submitSample(sample: HeartSyncSample): HeartSyncRelayEvent | HeartSyncCombinedBpm | null {
+  submitSample(sample: SenSyncSample): SenSyncRelayEvent | SenSyncCombinedBpm | null {
     // Plausibility filter — hard bounds [30..220].
-    if (sample.bpm_raw < HEARTSYNC_BPM_MIN || sample.bpm_raw > HEARTSYNC_BPM_MAX) {
+    if (sample.bpm_raw < SENSYNC_BPM_MIN || sample.bpm_raw > SENSYNC_BPM_MAX) {
       this.rejectSample(sample);
       return null;
     }
 
     const state = this.sessions.get(sample.session_id);
     if (!state) {
-      this.logger.warn('HeartSyncService: no active session for sample', {
+      this.logger.warn('SenSyncService: no active session for sample', {
         session_id: sample.session_id,
       });
       return null;
@@ -196,14 +196,14 @@ export class HeartSyncService implements OnModuleInit {
     // Consent check.
     const consentKey = `${sample.session_id}:${sample.guest_id}`;
     if (!this.consentStore.get(consentKey)) {
-      this.logger.warn('HeartSyncService: sample rejected — no consent', {
+      this.logger.warn('SenSyncService: sample rejected — no consent', {
         session_id: sample.session_id,
         guest_id: sample.guest_id,
       });
       return null;
     }
 
-    const valid: HeartSyncValidSample = {
+    const valid: SenSyncValidSample = {
       ...sample,
       bpm_filtered: sample.bpm_raw,
     };
@@ -217,7 +217,7 @@ export class HeartSyncService implements OnModuleInit {
     state.last_sample_at_utc = new Date().toISOString();
 
     // Emit sample-received event.
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_SAMPLE_RECEIVED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_SAMPLE_RECEIVED, {
       ...valid,
     } as unknown as Record<string, unknown>);
 
@@ -225,26 +225,26 @@ export class HeartSyncService implements OnModuleInit {
   }
 
   /**
-   * Close a HeartSync session — purges all ephemeral state.
+   * Close a SenSync™ session — purges all ephemeral state.
    */
   closeSession(session_id: string): void {
     this.sessions.delete(session_id);
-    this.logger.log('HeartSyncService: session closed', { session_id });
+    this.logger.log('SenSyncService: session closed', { session_id });
   }
 
   /**
    * Return current ephemeral session state (read-only copy).
    */
-  getSessionState(session_id: string): HeartSyncSessionState | undefined {
+  getSessionState(session_id: string): SenSyncSessionState | undefined {
     return this.sessions.get(session_id);
   }
 
   // ── Relay logic ───────────────────────────────────────────────────────────
 
   private relay(
-    state: HeartSyncSessionState,
-    sample: HeartSyncValidSample,
-  ): HeartSyncRelayEvent | HeartSyncCombinedBpm | null {
+    state: SenSyncSessionState,
+    sample: SenSyncValidSample,
+  ): SenSyncRelayEvent | SenSyncCombinedBpm | null {
     const now = new Date().toISOString();
 
     if (state.mode === 'COMBINED') {
@@ -263,7 +263,7 @@ export class HeartSyncService implements OnModuleInit {
     const target: 'CREATOR' | 'GUEST' =
       sample.source === 'CREATOR' ? 'GUEST' : 'CREATOR';
 
-    const event: HeartSyncRelayEvent = {
+    const event: SenSyncRelayEvent = {
       relay_id: randomUUID(),
       session_id: state.session_id,
       creator_id: state.creator_id,
@@ -272,10 +272,10 @@ export class HeartSyncService implements OnModuleInit {
       bpm_relayed,
       driver: state.driver,
       relayed_at_utc: now,
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_RELAY_EMITTED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_RELAY_EMITTED, {
       ...event,
     } as unknown as Record<string, unknown>);
 
@@ -284,9 +284,9 @@ export class HeartSyncService implements OnModuleInit {
   }
 
   private relayCombined(
-    state: HeartSyncSessionState,
+    state: SenSyncSessionState,
     now: string,
-  ): HeartSyncCombinedBpm | null {
+  ): SenSyncCombinedBpm | null {
     if (state.last_creator_bpm === undefined || state.last_guest_bpm === undefined) {
       // Not enough data for combined mode yet.
       return null;
@@ -296,7 +296,7 @@ export class HeartSyncService implements OnModuleInit {
       (state.last_creator_bpm + state.last_guest_bpm) / 2,
     );
 
-    const combined: HeartSyncCombinedBpm = {
+    const combined: SenSyncCombinedBpm = {
       event_id: randomUUID(),
       session_id: state.session_id,
       creator_id: state.creator_id,
@@ -305,10 +305,10 @@ export class HeartSyncService implements OnModuleInit {
       bpm_guest: state.last_guest_bpm,
       bpm_combined,
       combined_at_utc: now,
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_COMBINED_BPM, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_COMBINED_BPM, {
       ...combined,
     } as unknown as Record<string, unknown>);
 
@@ -319,12 +319,12 @@ export class HeartSyncService implements OnModuleInit {
   }
 
   private dispatchHaptic(
-    state: HeartSyncSessionState,
+    state: SenSyncSessionState,
     target: 'CREATOR' | 'GUEST',
     bpm: number,
     now: string,
   ): void {
-    const cmd: HeartSyncHapticCommand = {
+    const cmd: SenSyncHapticCommand = {
       command_id: randomUUID(),
       session_id: state.session_id,
       target,
@@ -333,10 +333,10 @@ export class HeartSyncService implements OnModuleInit {
       bpm,
       driver: state.driver,
       dispatched_at_utc: now,
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_HAPTIC_DISPATCHED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_HAPTIC_DISPATCHED, {
       ...cmd,
     } as unknown as Record<string, unknown>);
 
@@ -347,24 +347,24 @@ export class HeartSyncService implements OnModuleInit {
 
   // ── Plausibility rejection ─────────────────────────────────────────────────
 
-  private rejectSample(sample: HeartSyncSample): void {
-    const rejection: HeartSyncPlausibilityRejection = {
+  private rejectSample(sample: SenSyncSample): void {
+    const rejection: SenSyncPlausibilityRejection = {
       rejection_id: randomUUID(),
       session_id: sample.session_id,
       guest_id: sample.guest_id,
       source: sample.source,
       bpm_raw: sample.bpm_raw,
       reason_code:
-        sample.bpm_raw < HEARTSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
+        sample.bpm_raw < SENSYNC_BPM_MIN ? 'BPM_BELOW_MIN' : 'BPM_ABOVE_MAX',
       rejected_at_utc: new Date().toISOString(),
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_PLAUSIBILITY_REJECTED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_PLAUSIBILITY_REJECTED, {
       ...rejection,
     } as unknown as Record<string, unknown>);
 
-    this.logger.warn('HeartSyncService: sample rejected', rejection);
+    this.logger.warn('SenSyncService: sample rejected', rejection);
   }
 
   private emitTierDisabled(
@@ -372,17 +372,17 @@ export class HeartSyncService implements OnModuleInit {
     guest_id: string,
     tier: MembershipTier,
   ): void {
-    const event: HeartSyncTierDisabledEvent = {
+    const event: SenSyncTierDisabledEvent = {
       event_id: randomUUID(),
       session_id,
       guest_id,
       tier,
-      reason_code: 'TIER_HEARTSYNC_DISABLED',
+      reason_code: 'TIER_SENSYNC_DISABLED',
       occurred_at_utc: new Date().toISOString(),
-      rule_applied_id: HEARTSYNC_RULE_ID,
+      rule_applied_id: SENSYNC_RULE_ID,
     };
 
-    this.nats.publish(NATS_TOPICS.HEARTSYNC_TIER_DISABLED, {
+    this.nats.publish(NATS_TOPICS.SENSYNC_TIER_DISABLED, {
       ...event,
     } as unknown as Record<string, unknown>);
   }
@@ -412,7 +412,7 @@ export class HeartSyncService implements OnModuleInit {
    * Called on module init. Can be called again by operators without restart.
    */
   async refreshTierConfig(): Promise<void> {
-    const rows = await this.prisma.heartSyncTierConfig.findMany();
+    const rows = await this.prisma.senSyncTierConfig.findMany();
     this.tierEnabled.clear();
     this.tierCombinedAllowed.clear();
 
@@ -421,7 +421,7 @@ export class HeartSyncService implements OnModuleInit {
       this.tierCombinedAllowed.set(row.tier as MembershipTier, row.combined_mode);
     }
 
-    this.logger.log('HeartSyncService: tier config refreshed', {
+    this.logger.log('SenSyncService: tier config refreshed', {
       count: rows.length,
     });
   }

@@ -1,7 +1,7 @@
 // WO-003 — Room-Heat Engine: core service
 // Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
 //
-// Doctrine (all from creator-control/src/room-heat.engine.ts, extended):
+// Doctrine (all from creator-control/src/ffs.engine.ts, extended):
 //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
 //     only source of per-creator variance.
 //   - Anti-flicker (3-tick rule): tier transitions take effect only after
@@ -26,19 +26,19 @@ import { NATS_TOPICS } from '../../nats/topics.registry';
 import type {
   AdaptiveWeights,
   AntiFlickerState,
-  HeatScoreComponents,
-  HeatTier,
+  FfsComponents,
+  FfsTier,
   LeaderboardCategory,
-  RoomHeatInput,
-  RoomHeatLeaderboard,
-  RoomHeatScore,
+  FfsInput,
+  FfsLeaderboard,
+  FfsScore,
   SessionLiveState,
-} from './types/room-heat.types';
+} from './types/ffs.types';
 
-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v2';
+export const FFS_RULE_ID = 'FFS_ENGINE_v2';
 
 // ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
-const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
+const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> = [
   { min: 86, tier: 'INFERNO' },
   { min: 61, tier: 'HOT' },
   { min: 34, tier: 'WARM' },
@@ -103,8 +103,8 @@ const ADAPTIVE_DECAY_ON_TIP   = 0.005;
 const ADAPTIVE_ELEVATION_THRESHOLD = 0.70;
 
 @Injectable()
-export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(RoomHeatService.name);
+export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(FlickerNFlameScoringService.name);
 
   // ── In-memory state ──────────────────────────────────────────────────────
   private readonly antiFlicker  = new Map<string, AntiFlickerState>();
@@ -113,7 +113,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   // 1 Hz publish intervals: session_id → interval handle
   private readonly heatIntervals = new Map<string, NodeJS.Timeout>();
   // Most-recent input frames: session_id → last input (for 1 Hz re-emit)
-  private readonly lastInput = new Map<string, RoomHeatInput>();
+  private readonly lastInput = new Map<string, FfsInput>();
   // Per-session 1 Hz tick counters — used to throttle leaderboard broadcasts
   private readonly tickCounters = new Map<string, number>();
   /** Emit leaderboard broadcast every N ticks (default: every 10 s at 1 Hz). */
@@ -126,8 +126,8 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     this.subscribeNatsEvents();
-    this.logger.log('RoomHeatService: initialised', {
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+    this.logger.log('FlickerNFlameScoringService: initialised', {
+      rule_applied_id: FFS_RULE_ID,
     });
   }
 
@@ -136,7 +136,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       clearInterval(interval);
     }
     this.heatIntervals.clear();
-    this.logger.log('RoomHeatService: destroyed — all intervals cleared');
+    this.logger.log('FlickerNFlameScoringService: destroyed — all intervals cleared');
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -148,8 +148,8 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
    * Calculates the heat score, updates in-memory state, emits NATS events,
    * persists a snapshot (async), and arms the 1 Hz publisher for the session.
    */
-  ingest(input: RoomHeatInput): RoomHeatScore {
-    const score = this.calculateHeatScore(input);
+  ingest(input: FfsInput): FfsScore {
+    const score = this.calculateFfsScore(input);
 
     this.lastInput.set(input.session_id, input);
     this.updateSessionState(input, score);
@@ -164,7 +164,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
    * Pure computation — calculates heat score without side effects.
    * Same inputs always produce the same raw score.
    */
-  calculateHeatScore(input: RoomHeatInput): RoomHeatScore {
+  calculateFfsScore(input: FfsInput): FfsScore {
     const adaptiveWeights = this.getAdaptiveWeights(input.creator_id);
     const components      = this.calculateComponents(input, adaptiveWeights);
 
@@ -206,12 +206,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       anti_flicker_ticks:      ticks,
       is_dual_flame:           input.is_dual_flame,
       captured_at_utc:         input.captured_at_utc,
-      rule_applied_id:         ROOM_HEAT_RULE_ID,
+      rule_applied_id:         FFS_RULE_ID,
     };
   }
 
   /** Called by tip service when a tip event fires — updates adaptive weights. */
-  learnFromTipEvent(input: RoomHeatInput): void {
+  learnFromTipEvent(input: FfsInput): void {
     const weights = this.getAdaptiveWeights(input.creator_id);
     const elevated = this.identifyElevatedSignals(input);
 
@@ -232,18 +232,18 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     if (changed) {
       this.adaptiveCache.set(input.creator_id, weights);
       void this.persistAdaptiveWeights(input.creator_id, weights);
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_ADAPTIVE_UPDATED, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_ADAPTIVE_UPDATED, {
         creator_id:      input.creator_id,
         elevated,
         weights_snapshot: weights,
-        rule_applied_id: ROOM_HEAT_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
         updated_at_utc:  new Date().toISOString(),
       });
     }
   }
 
   /** Returns the current heat score for a session, or null if unknown. */
-  getSessionHeat(sessionId: string): RoomHeatScore | null {
+  getSessionHeat(sessionId: string): FfsScore | null {
     return this.sessionState.get(sessionId)?.currentScore ?? null;
   }
 
@@ -252,7 +252,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
    * Grid: 10×10, coolest session at rank 0 (top-left), hottest at rank 99
    * (bottom-right).
    */
-  getLeaderboard(category: LeaderboardCategory = 'all'): RoomHeatLeaderboard {
+  getLeaderboard(category: LeaderboardCategory = 'all'): FfsLeaderboard {
     const now    = new Date();
     const nowMs  = now.getTime();
     const states = [...this.sessionState.entries()];
@@ -299,7 +299,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       entries,
       total:             filtered.length,
       generated_at_utc:  now.toISOString(),
-      rule_applied_id:   ROOM_HEAT_RULE_ID,
+      rule_applied_id:   FFS_RULE_ID,
     };
   }
 
@@ -315,7 +315,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   ): void {
     if (!this.sessionState.has(sessionId)) {
       const now    = new Date();
-      const initial: RoomHeatScore = {
+      const initial: FfsScore = {
         session_id:               sessionId,
         creator_id:               creatorId,
         score:                    0,
@@ -326,7 +326,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         anti_flicker_ticks:       0,
         is_dual_flame:            isDualFlame,
         captured_at_utc:          now.toISOString(),
-        rule_applied_id:          ROOM_HEAT_RULE_ID,
+        rule_applied_id:          FFS_RULE_ID,
       };
       this.sessionState.set(sessionId, {
         currentScore:    initial,
@@ -334,18 +334,18 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         isDualFlame,
       });
     }
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_STARTED, {
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_STARTED, {
       session_id:      sessionId,
       creator_id:      creatorId,
       is_dual_flame:   isDualFlame,
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       started_at_utc:  new Date().toISOString(),
     });
   }
 
   /**
    * Tear down session state and stop the 1 Hz publisher for this session.
-   * Emits ROOM_HEAT_SESSION_ENDED.
+   * Emits FFS_SCORE_SESSION_ENDED.
    */
   endSession(sessionId: string): void {
     this.clearInterval(sessionId);
@@ -354,12 +354,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     this.antiFlicker.delete(sessionId);
     this.lastInput.delete(sessionId);
 
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SESSION_ENDED, {
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SESSION_ENDED, {
       session_id:      sessionId,
       creator_id:      state?.currentScore.creator_id ?? null,
       final_score:     state?.currentScore.score ?? 0,
       final_tier:      state?.currentScore.tier ?? 'COLD',
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       ended_at_utc:    new Date().toISOString(),
     });
   }
@@ -375,9 +375,9 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   }
 
   private calculateComponents(
-    input: RoomHeatInput,
+    input: FfsInput,
     weights: Record<string, number>,
-  ): HeatScoreComponents {
+  ): FfsComponents {
     const w = (key: string): number => weights[key] ?? ADAPTIVE_DEFAULT_WEIGHT;
 
     const tip_pressure = Math.min(
@@ -482,7 +482,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   private resolveAntiFlickerTier(
     sessionId: string,
     score: number,
-  ): { tier: HeatTier; pendingTier: HeatTier | null; ticks: number } {
+  ): { tier: FfsTier; pendingTier: FfsTier | null; ticks: number } {
     const rawTier = this.scoreToBand(score);
 
     let state = this.antiFlicker.get(sessionId);
@@ -524,7 +524,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private scoreToBand(score: number): HeatTier {
+  private scoreToBand(score: number): FfsTier {
     for (const band of TIER_THRESHOLDS) {
       if (score >= band.min) return band.tier;
     }
@@ -558,7 +558,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     return Math.round(mean * 10000) / 10000;
   }
 
-  private identifyElevatedSignals(input: RoomHeatInput): string[] {
+  private identifyElevatedSignals(input: FfsInput): string[] {
     const elevated: string[] = [];
     const T = ADAPTIVE_ELEVATION_THRESHOLD;
 
@@ -580,7 +580,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
   private async loadAdaptiveWeightsFromDb(creatorId: string): Promise<void> {
     try {
-      const row = await this.prisma.roomHeatAdaptiveWeights.findUnique({
+      const row = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
       if (row) {
@@ -595,7 +595,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         this.adaptiveCache.set(creatorId, merged);
       }
     } catch (err) {
-      this.logger.warn('RoomHeatService: adaptive weights DB load failed', {
+      this.logger.warn('FlickerNFlameScoringService: adaptive weights DB load failed', {
         creator_id: creatorId,
         error:      String(err),
       });
@@ -607,12 +607,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     weights: Record<string, number>,
   ): Promise<void> {
     try {
-      const existing = await this.prisma.roomHeatAdaptiveWeights.findUnique({
+      const existing = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
 
       if (existing) {
-        await this.prisma.roomHeatAdaptiveWeights.update({
+        await this.prisma.ffsAdaptiveWeights.update({
           where: { creator_id: creatorId },
           data:  {
             weights,
@@ -621,19 +621,19 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
           },
         });
       } else {
-        await this.prisma.roomHeatAdaptiveWeights.create({
+        await this.prisma.ffsAdaptiveWeights.create({
           data: {
             creator_id:      creatorId,
             weights,
             tip_events_seen: 1,
             correlation_id:  `adaptive-init-${creatorId}-${Date.now()}`,
             reason_code:     'ADAPTIVE_INIT',
-            rule_applied_id: ROOM_HEAT_RULE_ID,
+            rule_applied_id: FFS_RULE_ID,
           },
         });
       }
     } catch (err) {
-      this.logger.error('RoomHeatService: adaptive weights persist failed', err, {
+      this.logger.error('FlickerNFlameScoringService: adaptive weights persist failed', err, {
         creator_id: creatorId,
       });
     }
@@ -643,7 +643,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — SESSION STATE & NATS EVENTS
   // ══════════════════════════════════════════════════════════════════════════
 
-  private updateSessionState(input: RoomHeatInput, score: RoomHeatScore): void {
+  private updateSessionState(input: FfsInput, score: FfsScore): void {
     const existing = this.sessionState.get(input.session_id);
     this.sessionState.set(input.session_id, {
       currentScore:    score,
@@ -652,7 +652,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  private emitScoreEvents(score: RoomHeatScore, input: RoomHeatInput): void {
+  private emitScoreEvents(score: FfsScore, input: FfsInput): void {
     const payload = {
       session_id:       score.session_id,
       creator_id:       score.creator_id,
@@ -664,12 +664,12 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       captured_at_utc:  score.captured_at_utc,
       rule_applied_id:  score.rule_applied_id,
     };
-    this.nats.publish(NATS_TOPICS.ROOM_HEAT_SAMPLE, payload);
+    this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, payload);
 
     // Tier transition
     const prev = this.previousTier(score.session_id);
     if (prev !== null && prev !== score.tier) {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_TIER_CHANGED, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
         from:            prev,
@@ -678,7 +678,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         captured_at_utc: score.captured_at_utc,
         rule_applied_id: score.rule_applied_id,
       });
-      this.logger.log('RoomHeatService: tier transition', {
+      this.logger.log('FlickerNFlameScoringService: tier transition', {
         session_id: score.session_id,
         from:       prev,
         to:         score.tier,
@@ -687,7 +687,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
     // INFERNO peak
     if (score.tier === 'INFERNO') {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_PEAK, {
         session_id:      score.session_id,
         creator_id:      score.creator_id,
         score:           score.score,
@@ -698,7 +698,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
 
     // Dual Flame INFERNO peak
     if (score.tier === 'INFERNO' && score.is_dual_flame) {
-      this.nats.publish(NATS_TOPICS.ROOM_HEAT_DUAL_FLAME_PEAK, {
+      this.nats.publish(NATS_TOPICS.FFS_SCORE_DUAL_FLAME_PEAK, {
         session_id:               score.session_id,
         creator_id:               score.creator_id,
         score:                    score.score,
@@ -717,7 +717,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         score.score >= HOT_AND_READY_MIN_SCORE &&
         dwell >= HOT_AND_READY_MIN_DWELL
       ) {
-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_HOT_AND_READY, {
+        this.nats.publish(NATS_TOPICS.FFS_SCORE_HOT_AND_READY, {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
           score:           score.score,
@@ -730,7 +730,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Returns the last confirmed tier for the session (before this tick). */
-  private previousTier(sessionId: string): HeatTier | null {
+  private previousTier(sessionId: string): FfsTier | null {
     return this.sessionState.get(sessionId)?.currentScore.tier ?? null;
   }
 
@@ -746,22 +746,22 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         this.clearInterval(sessionId);
         return;
       }
-      const refreshed: RoomHeatInput = {
+      const refreshed: FfsInput = {
         ...input,
         captured_at_utc: new Date().toISOString(),
       };
-      const score = this.calculateHeatScore(refreshed);
+      const score = this.calculateFfsScore(refreshed);
       this.updateSessionState(refreshed, score);
       this.emitScoreEvents(score, refreshed);
 
       // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;
       this.tickCounters.set(sessionId, ticks);
-      if (ticks % RoomHeatService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
+      if (ticks % FlickerNFlameScoringService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
         const leaderboard = this.getLeaderboard('all');
-        this.nats.publish(NATS_TOPICS.ROOM_HEAT_LEADERBOARD_UPDATED, {
+        this.nats.publish(NATS_TOPICS.FFS_SCORE_LEADERBOARD_UPDATED, {
           ...leaderboard,
-          rule_applied_id: ROOM_HEAT_RULE_ID,
+          rule_applied_id: FFS_RULE_ID,
         });
       }
     }, 1_000);
@@ -782,16 +782,16 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private async persistSnapshot(
-    score: RoomHeatScore,
-    _input: RoomHeatInput,
+    score: FfsScore,
+    _input: FfsInput,
   ): Promise<void> {
     try {
-      await this.prisma.roomHeatSnapshot.create({
+      await this.prisma.ffsSnapshot.create({
         data: {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
-          heat_score:      score.score,
-          heat_tier:       score.tier,
+          ffs_score:      score.score,
+          ffs_tier:       score.tier,
           components:      score.components as object,
           correlation_id:  `rh-${score.session_id}-${Date.now()}`,
           reason_code:     `HEAT_SAMPLE_${score.tier}`,
@@ -800,7 +800,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
         },
       });
     } catch (err) {
-      this.logger.warn('RoomHeatService: snapshot persist failed', {
+      this.logger.warn('FlickerNFlameScoringService: snapshot persist failed', {
         session_id: score.session_id,
         error:      String(err),
       });
@@ -812,7 +812,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private subscribeNatsEvents(): void {
-    // HeartSync BPM updates — update heart rate in last known input
+    // SenSync™ BPM updates — update heart rate in last known input
     this.nats.subscribe(NATS_TOPICS.HZ_BPM_UPDATE, (payload) => {
       const sessionId = payload['session_id'] as string | undefined;
       const bpm       = payload['bpm'] as number | undefined;
@@ -838,7 +838,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    this.logger.log('RoomHeatService: NATS subscriptions active', {
+    this.logger.log('FlickerNFlameScoringService: NATS subscriptions active', {
       topics: [NATS_TOPICS.HZ_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
     });
   }
@@ -847,7 +847,7 @@ export class RoomHeatService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — HELPERS
   // ══════════════════════════════════════════════════════════════════════════
 
-  private zeroComponents(): HeatScoreComponents {
+  private zeroComponents(): FfsComponents {
     return {
       tip_pressure:      0,
       chat_velocity:     0,

@@ -72,7 +72,7 @@ In Layer 1, storage is in-process; Layer 2 will persist to Prisma.
 ## Integration
 
 Cyrano is consumed by the Integration Hub (`services/integration-hub/`),
-which subscribes to room-heat and session events and forwards
+which subscribes to ffs and session events and forwards
 `CyranoInputFrame` objects to `CyranoService.suggest()`.
 
 Cyrano is **not** directly exposed via REST — suggestions flow exclusively

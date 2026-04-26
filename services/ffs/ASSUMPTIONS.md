@@ -1,7 +1,7 @@
-# Room-Heat Engine — ASSUMPTIONS
+# Flicker n'Flame Scoring (FFS) — ASSUMPTIONS
 
 **Work Order:** WO-003  
-**Rule ID:** `ROOM_HEAT_ENGINE_v2`
+**Rule ID:** `FFS_ENGINE_v2`
 
 This file documents design assumptions that cannot be verified purely from the
 codebase.  Any assumption challenged by a future CEO directive or governance
@@ -15,7 +15,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
    the caller (creator-control or tip.service). The engine does not own this
    aggregation.
 
-2. **`heart_rate_bpm`** — provided by the HeartSync BPM update subscription
+2. **`heart_rate_bpm`** — provided by the SenSync™ BPM update subscription
    (`HZ_BPM_UPDATE` NATS topic). If the creator's band is unpaired, callers
    MUST set `heart_rate_bpm = heart_rate_baseline_bpm` to contribute zero
    delta (i.e. pass `0` for both fields).
@@ -40,7 +40,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
 
 6. The leaderboard is **fully in-memory**.  On service restart, it is rebuilt
    from live `ingest()` calls.  There is no DB-backed leaderboard replay.  If
-   a persistent leaderboard is required post-launch, add a `RoomHeatLeaderboardEntry`
+   a persistent leaderboard is required post-launch, add a `FfsLeaderboardEntry`
    model (flagged in FLAGS.md).
 
 7. The 10×10 grid is a visual layout hint for the frontend.  The engine
@@ -71,7 +71,7 @@ amendment requires a `CHORE: bump rule_applied_id` commit.
 ## Dual Flame
 
 11. Dual Flame support assumes both sessions are independently scored.  The
-    partner score is an input provided by the caller — the Room-Heat Engine
+    partner score is an input provided by the caller — the Flicker n'Flame Scoring (FFS)
     does not look up the partner's score from its own state to avoid race
     conditions.
 
