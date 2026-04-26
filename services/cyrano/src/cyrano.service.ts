@@ -28,6 +28,16 @@ import { SessionMemoryStore } from './session-memory.store';
 
 export const CYRANO_RULE_ID = 'CYRANO_LAYER_1_v1';
 
+/**
+ * Categories that are restricted to adult-entertainment domains only.
+ * Non-adult domains (TEACHING, COACHING, FIRST_RESPONDER, FACTORY_SAFETY,
+ * MEDICAL) receive a DOMAIN_BLOCKED drop when these categories are selected.
+ */
+const ADULT_ONLY_CATEGORIES: readonly CyranoCategory[] = [
+  'CAT_ESCALATION',
+  'CAT_MONETIZATION',
+] as const;
+
 /** Latency SLOs — governance constant. */
 export const CYRANO_LATENCY = {
   IDEAL_MS: 2_000,
@@ -250,8 +260,7 @@ export class CyranoService {
     domain?: CyranoDomain,
   ): boolean {
     if (!domain || domain === 'ADULT_ENTERTAINMENT') return false;
-    const adultOnlyCategories: CyranoCategory[] = ['CAT_ESCALATION', 'CAT_MONETIZATION'];
-    return adultOnlyCategories.includes(category);
+    return (ADULT_ONLY_CATEGORIES as readonly CyranoCategory[]).includes(category);
   }
 
   private reasonCodes(category: CyranoCategory, frame: CyranoInputFrame): string[] {
