@@ -1,7 +1,7 @@
 // WO-003 — Flicker n'Flame Scoring (FFS): core service
 // Business Plan B.4 — Flicker n'Flame Scoring (FFS) composite heat score (0-100) emitted via NATS at 1 Hz.
 //
-// Doctrine (all from creator-control/src/room-heat.engine.ts, extended):
+// Doctrine (all from creator-control/src/ffs.engine.ts, extended):
 //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
 //     only source of per-creator variance.
 //   - Anti-flicker (3-tick rule): tier transitions take effect only after
@@ -345,7 +345,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Tear down session state and stop the 1 Hz publisher for this session.
-   * Emits ROOM_HEAT_SESSION_ENDED.
+   * Emits FFS_SCORE_SESSION_ENDED.
    */
   endSession(sessionId: string): void {
     this.clearInterval(sessionId);

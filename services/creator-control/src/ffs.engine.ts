@@ -6,7 +6,7 @@
 //   - Pure computation. No persistence here — callers decide whether to store.
 //   - Deterministic. Same inputs → same tier. No randomness.
 //   - Side-channel free. Does not talk to ledger or payments directly.
-//   - Emits via NATS (ROOM_HEAT_* topics) for downstream consumers.
+//   - Emits via NATS (FFS_SCORE_* topics) for downstream consumers.
 
 import { Injectable, Logger } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
