@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-9-retire-dead-migration-K2Iu3`
-**Commit:** `deec5dcf6a2780c05fa58375e8f0cdc6b9df24b5`
-**Generated:** 2026-04-26T19:22:14Z
+**Branch:** `claude/blazing-test-fixture-rename-K2Iu3`
+**Commit:** `fc4b58dcdc37404cc5df1816cbddd37586e9a83d`
+**Generated:** 2026-04-26T19:45:34Z
 
 ## All Files
 
