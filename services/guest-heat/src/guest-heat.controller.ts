@@ -1,10 +1,12 @@
 // CRM: Guest-Heat REST controller — insights, offers, gemstones, teleprompter,
-// forecast, performance timer.
+// forecast, performance timer, Fan Fervor Score.
 import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { WhaleProfileService, OfferEngine } from './guest-heat.service';
 import { GemstoneService } from './gemstone.service';
 import { CyranoTeleprompterService } from './cyrano-teleprompter.service';
 import { DualFlamePulseService } from './dual-flame-pulse.service';
+import { FanFervorScoreService } from './fan-fervor-score.service';
 import { ForecastService } from './forecast.service';
 import { PerformanceTimerService } from './performance-timer.service';
 import {
@@ -18,10 +20,12 @@ import {
   type SpendWindows,
   type WhaleProfileRecord,
 } from './guest-heat.types';
+import type { FfsInput, FfsResult } from './fan-fervor-score.types';
 // HeatTier is imported from creator-control following the established pattern
+// FfsTier is imported from creator-control following the established pattern
 // already used by cyrano.service and cyrano.types. When creator-control is
 // extracted to a shared package this import will be updated accordingly.
-import type { HeatTier } from '../../creator-control/src/ffs.engine';
+import type { FfsTier } from '../../creator-control/src/ffs.engine';
 
 // ── REST DTOs ─────────────────────────────────────────────────────────────────
 
@@ -62,7 +66,7 @@ export interface RegisterPresenceDto {
   creator_id: string;
   guest_id: string;
   tier: MembershipTier;
-  current_heat: HeatTier;
+  current_heat: FfsTier;
 }
 
 export interface GenerateForecastDto {
@@ -85,6 +89,22 @@ export interface TimerTickDto {
   correlation_id?: string;
 }
 
+export interface ScoreFanFervorDto {
+  guest_id: string;
+  session_id: string;
+  tips_czt_in_session: number;
+  tip_velocity_per_min: number;
+  chat_messages_in_session: number;
+  heart_reactions_in_session: number;
+  dwell_minutes: number;
+  private_request_count: number;
+  whale_score: number;
+  heartsync_opted_in: boolean;
+  heartsync_bpm: number;
+  heartsync_baseline_bpm: number;
+  correlation_id?: string;
+}
+
 // ── Controller ────────────────────────────────────────────────────────────────
 
 @Injectable()
@@ -97,6 +117,7 @@ export class GuestHeatController {
     private readonly gemstone: GemstoneService,
     private readonly teleprompter: CyranoTeleprompterService,
     private readonly dualFlame: DualFlamePulseService,
+    private readonly fanFervorScore: FanFervorScoreService,
     private readonly forecast: ForecastService,
     private readonly perfTimer: PerformanceTimerService,
   ) {}
@@ -263,5 +284,45 @@ export class GuestHeatController {
       dto.revenue_czt,
       dto.correlation_id,
     );
+  }
+
+  // ── Fan Fervor Score ───────────────────────────────────────────────────────
+
+  /**
+   * POST /guest-heat/ffs/score
+   * Compute and persist the Fan Fervor Score for a guest in a session.
+   * Emits FFS_SCORED on NATS for consumption by payout engine, UI effects,
+   * Cyrano, GateGuard Welfare Score, and VelocityZone.
+   */
+  async scoreFanFervor(dto: ScoreFanFervorDto): Promise<FfsResult> {
+    const input: FfsInput = {
+      guest_id:                   dto.guest_id,
+      session_id:                 dto.session_id,
+      captured_at_utc:            new Date().toISOString(),
+      tips_czt_in_session:        dto.tips_czt_in_session,
+      tip_velocity_per_min:       dto.tip_velocity_per_min,
+      chat_messages_in_session:   dto.chat_messages_in_session,
+      heart_reactions_in_session: dto.heart_reactions_in_session,
+      dwell_minutes:              dto.dwell_minutes,
+      private_request_count:      dto.private_request_count,
+      whale_score:                dto.whale_score,
+      heartsync_opted_in:         dto.heartsync_opted_in,
+      heartsync_bpm:              dto.heartsync_bpm,
+      heartsync_baseline_bpm:     dto.heartsync_baseline_bpm,
+      correlation_id:             dto.correlation_id ?? randomUUID(),
+    };
+    return this.fanFervorScore.score(input);
+  }
+
+  /**
+   * GET /guest-heat/ffs/:guest_id
+   * Retrieve the latest Fan Fervor Score for a guest.
+   */
+  async getLatestFanFervorScore(
+    guest_id: string,
+  ): Promise<FfsResult | { error: string }> {
+    const result = await this.fanFervorScore.getLatest(guest_id);
+    if (!result) return { error: 'FFS_NOT_FOUND' };
+    return result;
   }
 }

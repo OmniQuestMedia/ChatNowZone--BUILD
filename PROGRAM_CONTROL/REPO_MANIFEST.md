@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/global-renames-cleanup-again`
-**Commit:** `1738a46ce08409b2e1d443608b8dd02c4350dd04`
-**Generated:** 2026-04-26T03:01:55Z
+**Branch:** `copilot/add-ffs-score-and-tier`
+**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
+**Generated:** 2026-04-26T02:58:47Z
 
 ## All Files
 
@@ -138,6 +138,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-004-SCHEMA-NEW-TABLES.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-PRICING-DECISIONS-2026-04-11.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GEO-001-GEO-FENCING-SERVICE.md`
+- `PROGRAM_CONTROL/REPORT_BACK/GLOBAL-RENAME-FFS-SENSYNC-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-001-GAME-ENGINE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GM-002-GAMES-MODULE-WIRING.md`
 - `PROGRAM_CONTROL/REPORT_BACK/GOV-001-GEO-PRICING-SERVICE.md`
@@ -253,6 +254,8 @@ Auto-generated on every push. Do not edit manually.
 - `archive/LEGACY_CONFIGS_2026-04/HANDOFF.md`
 - `archive/LEGACY_CONFIGS_2026-04/package.json`
 - `archive/LEGACY_CONFIGS_2026-04/tsconfig.json`
+- `copilot-global-rename.bundle`
+- `copilot-global-rename.patch`
 - `docker-compose.yml`
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
@@ -322,6 +325,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
+- `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -352,7 +356,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/pass-pricing.service.js.map`
 - `services/bijou/src/pass-pricing.service.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
-- `services/core-api/src/analytics/heat-score.service.ts`
+- `services/core-api/src/analytics/ffs-score.service.ts`
 - `services/core-api/src/app.module.ts`
 - `services/core-api/src/audit/audit-bridge.service.ts`
 - `services/core-api/src/audit/audit-dashboard.controller.ts`
@@ -471,6 +475,10 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/session-memory.store.ts`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
+- `services/ffs/.env.example`
+- `services/ffs/ASSUMPTIONS.md`
+- `services/ffs/FLAGS.md`
+- `services/ffs/README.md`
 - `services/ffs/src/dto/ffs.dto.ts`
 - `services/ffs/src/ffs.controller.ts`
 - `services/ffs/src/ffs.module.ts`
@@ -490,6 +498,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/README.md`
 - `services/guest-heat/src/cyrano-teleprompter.service.ts`
 - `services/guest-heat/src/dual-flame-pulse.service.ts`
+- `services/guest-heat/src/fan-fervor-score.service.ts`
+- `services/guest-heat/src/fan-fervor-score.types.ts`
 - `services/guest-heat/src/forecast.service.ts`
 - `services/guest-heat/src/gemstone.service.ts`
 - `services/guest-heat/src/guest-heat.controller.ts`
@@ -497,14 +507,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/src/guest-heat.service.ts`
 - `services/guest-heat/src/guest-heat.types.ts`
 - `services/guest-heat/src/performance-timer.service.ts`
-- `services/heartsync/.env.example`
-- `services/heartsync/ASSUMPTIONS.md`
-- `services/heartsync/FLAGS.md`
-- `services/heartsync/README.md`
-- `services/heartsync/src/heartsync.controller.ts`
-- `services/heartsync/src/heartsync.module.ts`
-- `services/heartsync/src/heartsync.service.ts`
-- `services/heartsync/src/heartsync.types.ts`
 - `services/integration-hub/src/hub.module.ts`
 - `services/integration-hub/src/hub.service.ts`
 - `services/ledger/index.ts`
@@ -534,6 +536,14 @@ Auto-generated on every push. Do not edit manually.
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
 - `services/risk-engine/src/risk.module.ts`
+- `services/sensync/.env.example`
+- `services/sensync/ASSUMPTIONS.md`
+- `services/sensync/FLAGS.md`
+- `services/sensync/README.md`
+- `services/sensync/src/sensync.controller.ts`
+- `services/sensync/src/sensync.module.ts`
+- `services/sensync/src/sensync.service.ts`
+- `services/sensync/src/sensync.types.ts`
 - `services/showzone/src/room-session.service.d.ts`
 - `services/showzone/src/room-session.service.js`
 - `services/showzone/src/room-session.service.js.map`

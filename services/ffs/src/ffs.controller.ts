@@ -1,5 +1,5 @@
-// WO-003 — Flicker n'Flame Scoring (FFS): controller
-// REST surface for the Flicker n'Flame Scoring (FFS) service.
+// WO-003 — Room-Heat Engine: controller
+// REST surface for the Room-Heat Engine service.
 // All endpoints are advisory / read-oriented; no ledger mutations here.
 import {
   Body,
@@ -14,13 +14,13 @@ import {
 import type { LeaderboardCategory } from './types/ffs.types';
 import type { FfsLeaderboard, FfsScore } from './types/ffs.types';
 import { IngestFfsDto, TipEventDto } from './dto/ffs.dto';
-import { FfsService } from './ffs.service';
+import { FlickerNFlameScoringService } from './ffs.service';
 
 @Controller('ffs')
-export class FfsController {
-  private readonly logger = new Logger(FfsController.name);
+export class FlickerNFlameScoringController {
+  private readonly logger = new Logger(FlickerNFlameScoringController.name);
 
-  constructor(private readonly ffsService: FfsService) {}
+  constructor(private readonly flickerNFlameScoringService: FlickerNFlameScoringService) {}
 
   /**
    * GET /ffs/leaderboard?category=all|standard|dual_flame|hot_and_ready|new_flames
@@ -45,8 +45,8 @@ export class FfsController {
       ? (category as LeaderboardCategory)
       : 'all';
 
-    this.logger.log('FfsController.getLeaderboard', { category: cat });
-    return this.ffsService.getLeaderboard(cat);
+    this.logger.log('FlickerNFlameScoringController.getLeaderboard', { category: cat });
+    return this.flickerNFlameScoringService.getLeaderboard(cat);
   }
 
   /**
@@ -58,7 +58,7 @@ export class FfsController {
   getSessionHeat(
     @Param('sessionId') sessionId: string,
   ): FfsScore | { message: string; session_id: string } {
-    const score = this.ffsService.getSessionHeat(sessionId);
+    const score = this.flickerNFlameScoringService.getSessionHeat(sessionId);
     if (!score) {
       return { message: 'Session not found or not yet active', session_id: sessionId };
     }
@@ -73,11 +73,11 @@ export class FfsController {
    */
   @Post('ingest')
   ingestSample(@Body() dto: IngestFfsDto): FfsScore {
-    this.logger.log('FfsController.ingestSample', {
+    this.logger.log('FlickerNFlameScoringController.ingestSample', {
       session_id: dto.session_id,
       creator_id: dto.creator_id,
     });
-    return this.ffsService.ingest(dto);
+    return this.flickerNFlameScoringService.ingest(dto);
   }
 
   /**
@@ -91,7 +91,7 @@ export class FfsController {
     @Param('sessionId') sessionId: string,
     @Body() body: { creator_id: string; is_dual_flame?: boolean },
   ): { session_id: string; started: boolean } {
-    this.ffsService.startSession(
+    this.flickerNFlameScoringService.startSession(
       sessionId,
       body.creator_id,
       body.is_dual_flame ?? false,
@@ -109,7 +109,7 @@ export class FfsController {
   endSession(
     @Param('sessionId') sessionId: string,
   ): { session_id: string; ended: boolean } {
-    this.ffsService.endSession(sessionId);
+    this.flickerNFlameScoringService.endSession(sessionId);
     return { session_id: sessionId, ended: true };
   }
 
@@ -121,12 +121,12 @@ export class FfsController {
    */
   @Post('tip-event')
   recordTipEvent(@Body() dto: TipEventDto): { learned: boolean } {
-    this.logger.log('FfsController.recordTipEvent', {
+    this.logger.log('FlickerNFlameScoringController.recordTipEvent', {
       session_id: dto.session_id,
       creator_id: dto.creator_id,
       tokens:     dto.tokens,
     });
-    this.ffsService.learnFromTipEvent(dto.heat_context);
+    this.flickerNFlameScoringService.learnFromTipEvent(dto.heat_context);
     return { learned: true };
   }
 
@@ -139,6 +139,6 @@ export class FfsController {
   getAdaptiveWeights(
     @Param('creatorId') creatorId: string,
   ) {
-    return this.ffsService.getAdaptiveWeightsPublic(creatorId);
+    return this.flickerNFlameScoringService.getAdaptiveWeightsPublic(creatorId);
   }
 }

@@ -18,7 +18,7 @@ export const NATS_TOPICS = {
   BIJOU_CAMERA_VIOLATION:   'bijou.camera.violation',
   BIJOU_EJECTION:           'bijou.ejection',
 
-  // ── ShowZone Theatre (@deprecated — service removed; topics retained for audit trail) ──
+  // ── ShowZone Theatre ───────────────────────────────────────────────────
   SHOWZONE_DWELL_TICK:      'showzone.dwell.tick',
   SHOWZONE_SEAT_OPENED:     'showzone.seat.opened',
   SHOWZONE_PHASE2_TRIGGER:  'showzone.phase2.trigger',
@@ -34,15 +34,18 @@ export const NATS_TOPICS = {
   HZ_HAPTIC_TRIGGER:        'hz.haptic.trigger',
   HZ_WISH_FULFILLED:        'hz.wish.fulfilled',
 
-  // ── HeartSync biometric relay ──────────────────────────────────────────
-  HEARTSYNC_SAMPLE_RECEIVED:        'heartsync.sample.received',
-  HEARTSYNC_RELAY_EMITTED:          'heartsync.relay.emitted',
-  HEARTSYNC_COMBINED_BPM:           'heartsync.combined.bpm',
-  HEARTSYNC_CONSENT_GRANTED:        'heartsync.consent.granted',
-  HEARTSYNC_CONSENT_REVOKED:        'heartsync.consent.revoked',
-  HEARTSYNC_HAPTIC_DISPATCHED:      'heartsync.haptic.dispatched',
-  HEARTSYNC_PLAUSIBILITY_REJECTED:  'heartsync.plausibility.rejected',
-  HEARTSYNC_TIER_DISABLED:          'heartsync.tier.disabled',
+  // ── SenSync™ biometric relay ──────────────────────────────────────────
+  SENSYNC_SAMPLE_RECEIVED:        'sensync.sample.received',
+  SENSYNC_RELAY_EMITTED:          'sensync.relay.emitted',
+  SENSYNC_COMBINED_BPM:           'sensync.combined.bpm',
+  SENSYNC_CONSENT_GRANTED:        'sensync.consent.granted',
+  SENSYNC_CONSENT_REVOKED:        'sensync.consent.revoked',
+  SENSYNC_HAPTIC_DISPATCHED:      'sensync.haptic.dispatched',
+  SENSYNC_PLAUSIBILITY_REJECTED:  'sensync.plausibility.rejected',
+  SENSYNC_TIER_DISABLED:          'sensync.tier.disabled',
+
+  // ── Fan Fervor Score (FFS) — per-guest engagement score ──────────────
+  FFS_SCORED:                       'ffs.scored',
 
   // ── Guest-Heat intelligence layer ─────────────────────────────────────
   GUEST_HEAT_WHALE_SCORED:          'guest_heat.whale.scored',
@@ -202,7 +205,7 @@ export const NATS_TOPICS = {
   GATEGUARD_FEDERATED_LOOKUP:        'gateguard.federated.lookup',
   GATEGUARD_HUMAN_CONTACT_ZONE:      'gateguard.human_contact_zone.escalated',
 
-  // ── Flicker n'Flame Scoring (FFS) (Business Plan B.4 — room-level telemetry) ──
+  // ── Flicker n'Flame Scoring (FFS) — room-level telemetry ──────────
   FFS_SCORE_SAMPLE:                  'ffs.score.sample',
   FFS_SCORE_TIER_CHANGED:            'ffs.score.tier.changed',
   FFS_SCORE_PEAK:                    'ffs.score.peak',

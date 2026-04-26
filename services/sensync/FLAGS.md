@@ -1,21 +1,21 @@
-# HeartSync — FLAGS.md
+# SenSync™ — FLAGS.md
 
 ## FLAG-001: COMBINED_MODE_DEFAULT_OFF
 **Default:** `combined_mode = false` for all tiers.  
 **Intent:** "Feel as one" is an opt-in premium feature; operators must
-explicitly enable it per tier via `heartsync_tier_configs`.
+explicitly enable it per tier via `sensync_tier_configs`.
 
 ## FLAG-002: GUEST_TIER_DEFAULT_DISABLED
 **Default:** `enabled = false` for GUEST tier.  
 **Intent:** Biometric relay requires at minimum a VIP membership. Guests
-(unauthenticated or free-tier) cannot participate in HeartSync.
+(unauthenticated or free-tier) cannot participate in SenSync™.
 
 ## FLAG-003: PLAUSIBILITY_BOUNDS_30_220
 **Values:** min = 30 BPM, max = 220 BPM.  
 **Intent:** Medical-grade resting/peak range. Samples outside this window
 are considered device error or spoofed data and are silently discarded.
-To adjust, update `HEARTSYNC_BPM_MIN` and `HEARTSYNC_BPM_MAX` in
-`heartsync.types.ts` and redeploy.
+To adjust, update `SENSYNC_BPM_MIN` and `SENSYNC_BPM_MAX` in
+`sensync.types.ts` and redeploy.
 
 ## FLAG-004: CONSENT_REQUIRED_BEFORE_RELAY
 **Default:** Enforced always.  

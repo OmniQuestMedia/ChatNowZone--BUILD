@@ -3,7 +3,7 @@
 // bind without re-deriving field names. The live Next.js app is not yet
 // bootstrapped — these contracts keep the frontend integration gap narrow.
 
-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'BLAZING';
+export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'BLAZING';
 
 export type CyranoCategory =
   | 'CAT_SESSION_OPEN'
@@ -18,7 +18,7 @@ export type CyranoCategory =
 /** Feed element rendered on the real-time heat meter for /creator/control. */
 export interface HeatMeterFrame {
   session_id: string;
-  tier: HeatTier;
+  tier: FfsTier;
   score: number;                      // 0..100
   captured_at_utc: string;
 }
@@ -28,8 +28,8 @@ export interface PriceNudgeCard {
   session_id: string;
   direction: 'HOLD' | 'RAISE' | 'LOWER';
   magnitude_pct: number;
-  tier: HeatTier;
-  heat_score: number;
+  tier: FfsTier;
+  ffs_score: number;
   reason_code: string;
   copy: string;
 }
@@ -61,7 +61,7 @@ export interface CyranoPanelSuggestion {
   session_id: string;
   category: CyranoCategory;
   weight: number;                     // 0..100
-  tier_context: HeatTier;
+  tier_context: FfsTier;
   copy: string;
   reason_codes: string[];
   emitted_at_utc: string;

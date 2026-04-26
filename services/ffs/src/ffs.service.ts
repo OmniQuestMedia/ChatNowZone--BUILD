@@ -1,5 +1,5 @@
-// WO-003 — Flicker n'Flame Scoring (FFS): core service
-// Business Plan B.4 — Flicker n'Flame Scoring (FFS) composite heat score (0-100) emitted via NATS at 1 Hz.
+// WO-003 — Room-Heat Engine: core service
+// Business Plan B.4 — real-time composite heat score (0-100) emitted via NATS at 1 Hz.
 //
 // Doctrine (all from creator-control/src/ffs.engine.ts, extended):
 //   - Deterministic. Same inputs → same raw score. Adaptive weights are the
@@ -26,8 +26,8 @@ import { NATS_TOPICS } from '../../nats/topics.registry';
 import type {
   AdaptiveWeights,
   AntiFlickerState,
-  HeatScoreComponents,
-  HeatTier,
+  FfsComponents,
+  FfsTier,
   LeaderboardCategory,
   FfsInput,
   FfsLeaderboard,
@@ -35,10 +35,10 @@ import type {
   SessionLiveState,
 } from './types/ffs.types';
 
-export const FFS_SCORE_RULE_ID = 'FFS_SCORE_ENGINE_v2';
+export const FFS_RULE_ID = 'FFS_ENGINE_v2';
 
 // ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
-const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
+const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> = [
   { min: 86, tier: 'INFERNO' },
   { min: 61, tier: 'HOT' },
   { min: 34, tier: 'WARM' },
@@ -103,8 +103,8 @@ const ADAPTIVE_DECAY_ON_TIP   = 0.005;
 const ADAPTIVE_ELEVATION_THRESHOLD = 0.70;
 
 @Injectable()
-export class FfsService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(FfsService.name);
+export class FlickerNFlameScoringService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(FlickerNFlameScoringService.name);
 
   // ── In-memory state ──────────────────────────────────────────────────────
   private readonly antiFlicker  = new Map<string, AntiFlickerState>();
@@ -126,8 +126,8 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit(): Promise<void> {
     this.subscribeNatsEvents();
-    this.logger.log('FfsService: initialised', {
-      rule_applied_id: FFS_SCORE_RULE_ID,
+    this.logger.log('FlickerNFlameScoringService: initialised', {
+      rule_applied_id: FFS_RULE_ID,
     });
   }
 
@@ -136,7 +136,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       clearInterval(interval);
     }
     this.heatIntervals.clear();
-    this.logger.log('FfsService: destroyed — all intervals cleared');
+    this.logger.log('FlickerNFlameScoringService: destroyed — all intervals cleared');
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -149,7 +149,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
    * persists a snapshot (async), and arms the 1 Hz publisher for the session.
    */
   ingest(input: FfsInput): FfsScore {
-    const score = this.calculateHeatScore(input);
+    const score = this.calculateFfsScore(input);
 
     this.lastInput.set(input.session_id, input);
     this.updateSessionState(input, score);
@@ -164,7 +164,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
    * Pure computation — calculates heat score without side effects.
    * Same inputs always produce the same raw score.
    */
-  calculateHeatScore(input: FfsInput): FfsScore {
+  calculateFfsScore(input: FfsInput): FfsScore {
     const adaptiveWeights = this.getAdaptiveWeights(input.creator_id);
     const components      = this.calculateComponents(input, adaptiveWeights);
 
@@ -206,7 +206,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       anti_flicker_ticks:      ticks,
       is_dual_flame:           input.is_dual_flame,
       captured_at_utc:         input.captured_at_utc,
-      rule_applied_id:         FFS_SCORE_RULE_ID,
+      rule_applied_id:         FFS_RULE_ID,
     };
   }
 
@@ -236,7 +236,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         creator_id:      input.creator_id,
         elevated,
         weights_snapshot: weights,
-        rule_applied_id: FFS_SCORE_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
         updated_at_utc:  new Date().toISOString(),
       });
     }
@@ -299,7 +299,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       entries,
       total:             filtered.length,
       generated_at_utc:  now.toISOString(),
-      rule_applied_id:   FFS_SCORE_RULE_ID,
+      rule_applied_id:   FFS_RULE_ID,
     };
   }
 
@@ -326,7 +326,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         anti_flicker_ticks:       0,
         is_dual_flame:            isDualFlame,
         captured_at_utc:          now.toISOString(),
-        rule_applied_id:          FFS_SCORE_RULE_ID,
+        rule_applied_id:          FFS_RULE_ID,
       };
       this.sessionState.set(sessionId, {
         currentScore:    initial,
@@ -338,7 +338,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       session_id:      sessionId,
       creator_id:      creatorId,
       is_dual_flame:   isDualFlame,
-      rule_applied_id: FFS_SCORE_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       started_at_utc:  new Date().toISOString(),
     });
   }
@@ -359,7 +359,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       creator_id:      state?.currentScore.creator_id ?? null,
       final_score:     state?.currentScore.score ?? 0,
       final_tier:      state?.currentScore.tier ?? 'COLD',
-      rule_applied_id: FFS_SCORE_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
       ended_at_utc:    new Date().toISOString(),
     });
   }
@@ -377,7 +377,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   private calculateComponents(
     input: FfsInput,
     weights: Record<string, number>,
-  ): HeatScoreComponents {
+  ): FfsComponents {
     const w = (key: string): number => weights[key] ?? ADAPTIVE_DEFAULT_WEIGHT;
 
     const tip_pressure = Math.min(
@@ -482,7 +482,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   private resolveAntiFlickerTier(
     sessionId: string,
     score: number,
-  ): { tier: HeatTier; pendingTier: HeatTier | null; ticks: number } {
+  ): { tier: FfsTier; pendingTier: FfsTier | null; ticks: number } {
     const rawTier = this.scoreToBand(score);
 
     let state = this.antiFlicker.get(sessionId);
@@ -524,7 +524,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private scoreToBand(score: number): HeatTier {
+  private scoreToBand(score: number): FfsTier {
     for (const band of TIER_THRESHOLDS) {
       if (score >= band.min) return band.tier;
     }
@@ -580,7 +580,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
 
   private async loadAdaptiveWeightsFromDb(creatorId: string): Promise<void> {
     try {
-      const row = await this.prisma.ffsScoreAdaptiveWeights.findUnique({
+      const row = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
       if (row) {
@@ -595,7 +595,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         this.adaptiveCache.set(creatorId, merged);
       }
     } catch (err) {
-      this.logger.warn('FfsService: adaptive weights DB load failed', {
+      this.logger.warn('FlickerNFlameScoringService: adaptive weights DB load failed', {
         creator_id: creatorId,
         error:      String(err),
       });
@@ -607,12 +607,12 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     weights: Record<string, number>,
   ): Promise<void> {
     try {
-      const existing = await this.prisma.ffsScoreAdaptiveWeights.findUnique({
+      const existing = await this.prisma.ffsAdaptiveWeights.findUnique({
         where: { creator_id: creatorId },
       });
 
       if (existing) {
-        await this.prisma.ffsScoreAdaptiveWeights.update({
+        await this.prisma.ffsAdaptiveWeights.update({
           where: { creator_id: creatorId },
           data:  {
             weights,
@@ -621,19 +621,19 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
           },
         });
       } else {
-        await this.prisma.ffsScoreAdaptiveWeights.create({
+        await this.prisma.ffsAdaptiveWeights.create({
           data: {
             creator_id:      creatorId,
             weights,
             tip_events_seen: 1,
             correlation_id:  `adaptive-init-${creatorId}-${Date.now()}`,
             reason_code:     'ADAPTIVE_INIT',
-            rule_applied_id: FFS_SCORE_RULE_ID,
+            rule_applied_id: FFS_RULE_ID,
           },
         });
       }
     } catch (err) {
-      this.logger.error('FfsService: adaptive weights persist failed', err, {
+      this.logger.error('FlickerNFlameScoringService: adaptive weights persist failed', err, {
         creator_id: creatorId,
       });
     }
@@ -678,7 +678,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         captured_at_utc: score.captured_at_utc,
         rule_applied_id: score.rule_applied_id,
       });
-      this.logger.log('FfsService: tier transition', {
+      this.logger.log('FlickerNFlameScoringService: tier transition', {
         session_id: score.session_id,
         from:       prev,
         to:         score.tier,
@@ -730,7 +730,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Returns the last confirmed tier for the session (before this tick). */
-  private previousTier(sessionId: string): HeatTier | null {
+  private previousTier(sessionId: string): FfsTier | null {
     return this.sessionState.get(sessionId)?.currentScore.tier ?? null;
   }
 
@@ -750,18 +750,18 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         ...input,
         captured_at_utc: new Date().toISOString(),
       };
-      const score = this.calculateHeatScore(refreshed);
+      const score = this.calculateFfsScore(refreshed);
       this.updateSessionState(refreshed, score);
       this.emitScoreEvents(score, refreshed);
 
       // Emit leaderboard broadcast every LEADERBOARD_EMIT_EVERY_TICKS ticks (~10 s)
       const ticks = (this.tickCounters.get(sessionId) ?? 0) + 1;
       this.tickCounters.set(sessionId, ticks);
-      if (ticks % FfsService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
+      if (ticks % FlickerNFlameScoringService.LEADERBOARD_EMIT_EVERY_TICKS === 0) {
         const leaderboard = this.getLeaderboard('all');
         this.nats.publish(NATS_TOPICS.FFS_SCORE_LEADERBOARD_UPDATED, {
           ...leaderboard,
-          rule_applied_id: FFS_SCORE_RULE_ID,
+          rule_applied_id: FFS_RULE_ID,
         });
       }
     }, 1_000);
@@ -786,12 +786,12 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     _input: FfsInput,
   ): Promise<void> {
     try {
-      await this.prisma.ffsScoreSnapshot.create({
+      await this.prisma.ffsSnapshot.create({
         data: {
           session_id:      score.session_id,
           creator_id:      score.creator_id,
-          heat_score:      score.score,
-          heat_tier:       score.tier,
+          ffs_score:      score.score,
+          ffs_tier:       score.tier,
           components:      score.components as object,
           correlation_id:  `rh-${score.session_id}-${Date.now()}`,
           reason_code:     `HEAT_SAMPLE_${score.tier}`,
@@ -800,7 +800,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         },
       });
     } catch (err) {
-      this.logger.warn('FfsService: snapshot persist failed', {
+      this.logger.warn('FlickerNFlameScoringService: snapshot persist failed', {
         session_id: score.session_id,
         error:      String(err),
       });
@@ -812,7 +812,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private subscribeNatsEvents(): void {
-    // HeartSync BPM updates — update heart rate in last known input
+    // SenSync™ BPM updates — update heart rate in last known input
     this.nats.subscribe(NATS_TOPICS.HZ_BPM_UPDATE, (payload) => {
       const sessionId = payload['session_id'] as string | undefined;
       const bpm       = payload['bpm'] as number | undefined;
@@ -838,7 +838,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    this.logger.log('FfsService: NATS subscriptions active', {
+    this.logger.log('FlickerNFlameScoringService: NATS subscriptions active', {
       topics: [NATS_TOPICS.HZ_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
     });
   }
@@ -847,7 +847,7 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // PRIVATE — HELPERS
   // ══════════════════════════════════════════════════════════════════════════
 
-  private zeroComponents(): HeatScoreComponents {
+  private zeroComponents(): FfsComponents {
     return {
       tip_pressure:      0,
       chat_velocity:     0,

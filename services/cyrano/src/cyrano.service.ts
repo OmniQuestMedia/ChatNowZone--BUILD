@@ -3,7 +3,7 @@
 //
 // Contract:
 //   • Eight suggestion categories (see CyranoCategory in cyrano.types).
-//   • Real-time telemetry consumed from Room-Heat + session frames via NATS.
+//   • Real-time telemetry consumed from Flicker n'Flame Scoring (FFS) + session frames via NATS.
 //   • Session memory keyed (creator_id, guest_id); persona manager supports
 //     multiple active personas per creator (one-per-session).
 //   • Latency SLO: ideal <2s, hard cutoff <4s — slow suggestions are
@@ -234,7 +234,7 @@ export class CyranoService {
 // CYRANO_SUGGESTION_EMITTED.
 //
 // All major creator-facing systems (ledger, gateguard, recovery, diamond
-// concierge, room-heat, creator-control, cyrano, integration hub) are now
+// concierge, ffs, creator-control, cyrano, integration hub) are now
 // integrated.
 //
 // NEXT PRIORITY: Layer 2 — LLM-backed suggestion refinement + a Prisma-
