@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-ffs-score-and-tier`
-**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
-**Generated:** 2026-04-26T02:58:47Z
+**Branch:** `copilot/global-renames-cleanup-again`
+**Commit:** `7e59fd43bdc1d0c04023c93f2f1dc7d5926085d8`
+**Generated:** 2026-04-26T03:16:40Z
 
 ## All Files
 
