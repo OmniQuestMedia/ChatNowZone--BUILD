@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-sensync-biometric-layer`
-**Commit:** `4b5f6ea39d13e636cd5f9bf4fb1ed09f82083378`
-**Generated:** 2026-04-26T11:46:46Z
+**Branch:** `copilot/claudecleanup-legacy-code-k2iu3`
+**Commit:** `736e94d477592cf8306feba5853f02273d729f15`
+**Generated:** 2026-04-26T12:22:51Z
 
 ## All Files
 
@@ -110,6 +110,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/CHORE-PIPELINE-006.md`
 - `PROGRAM_CONTROL/REPORT_BACK/CHORE-TS-CLEANUP.md`
 - `PROGRAM_CONTROL/REPORT_BACK/CLEAN-SWEEP-2026-04-13.md`
+- `PROGRAM_CONTROL/REPORT_BACK/CLEANUP-PRESHIP-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A002-report.md`
 - `PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A003-report.md`
 - `PROGRAM_CONTROL/REPORT_BACK/CNZ-WORK-001-A004-report.md`
