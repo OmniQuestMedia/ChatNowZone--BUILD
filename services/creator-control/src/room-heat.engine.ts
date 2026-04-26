@@ -13,6 +13,8 @@ import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 
 export const ROOM_HEAT_RULE_ID = 'FFS_ENGINE_v1';
+/** @deprecated Use ROOM_HEAT_RULE_ID. Alias for backward compat with tests. */
+export const FFS_RULE_ID = ROOM_HEAT_RULE_ID;
 
 export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
@@ -94,7 +96,7 @@ export class RoomHeatEngine {
     const prev = this.lastTier.get(sample.session_id);
     if (prev !== score.tier) {
       this.lastTier.set(sample.session_id, score.tier);
-      this.logger.log('FfsEngine: tier transition', {
+      this.logger.log('RoomHeatEngine: tier transition', {
         session_id: sample.session_id,
         from: prev ?? 'UNKNOWN',
         to: score.tier,

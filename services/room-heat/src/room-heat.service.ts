@@ -35,7 +35,8 @@ import type {
   SessionLiveState,
 } from './types/room-heat.types';
 
-export const ROOM_HEAT_RULE_ID = 'ROOM_HEAT_ENGINE_v2';
+// @deprecated — Use FFS_RULE_ID from services/ffs/src/ffs.service.ts
+export const ROOM_HEAT_RULE_ID = 'FFS_ENGINE_v2';
 
 // ── Tier thresholds — canonical (DOMAIN_GLOSSARY.md) ─────────────────────────
 const TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: HeatTier }> = [
