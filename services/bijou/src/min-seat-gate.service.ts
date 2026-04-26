@@ -1,5 +1,5 @@
 // services/bijou/src/min-seat-gate.service.ts
-// Handles T-1hr auto-cancel gate for Bijou.
+// Handles T-1hr auto-cancel gate for supported venues (Bijou and ShowZone).
 import { Injectable, Logger } from '@nestjs/common';
 import { BIJOU_PRICING, SHOWZONE_PRICING } from
   '../../../services/core-api/src/config/governance.config';
