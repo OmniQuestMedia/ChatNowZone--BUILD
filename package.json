@@ -10,6 +10,7 @@
     "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "typecheck:api": "tsc --noEmit --project services/core-api/tsconfig.json",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push --skip-generate",
     "seed:scheduling": "ts-node scripts/seed-scheduling.ts",
