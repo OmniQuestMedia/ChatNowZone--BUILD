@@ -1,10 +1,10 @@
 // WO-003 — Room-Heat Engine: canonical types
 // Business Plan B.4 — real-time composite heat score (0-100) for all room-level telemetry.
-// Rule authority: ROOM_HEAT_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
+// Rule authority: FFS_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
 
 // ── Tier thresholds (canonical — locked in GovernanceConfig.HEAT_BAND_*)
 // COLD 0-33 / WARM 34-60 / HOT 61-85 / INFERNO 86-100
-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
 export type LeaderboardCategory =
   | 'all'
@@ -14,7 +14,7 @@ export type LeaderboardCategory =
   | 'new_flames';
 
 // ── Full input frame — all signals fed into the composite score ───────────────
-export interface RoomHeatInput {
+export interface FfsInput {
   // Identity
   session_id: string;
   creator_id: string;
@@ -36,8 +36,8 @@ export interface RoomHeatInput {
   /** Session runtime in minutes. */
   dwell_minutes: number;
 
-  // ── Group 2: Biometric Signals (HeartSync + vision-monitor) ───────────────
-  /** Current BPM from HeartSync band. 0 = signal absent / not paired. */
+  // ── Group 2: Biometric Signals (SenSync™ + vision-monitor) ───────────────
+  /** Current BPM from SenSync™ band. 0 = signal absent / not paired. */
   heart_rate_bpm: number;
   /** Creator's individual resting baseline BPM (from calibration). */
   heart_rate_baseline_bpm: number;
@@ -68,7 +68,7 @@ export interface RoomHeatInput {
 }
 
 // ── Per-component breakdown (maps to weight-max values in calculateComponents) ─
-export interface HeatScoreComponents {
+export interface FfsComponents {
   /** Tip pressure — max 15. */
   tip_pressure: number;
   /** Chat velocity — max 8. */
@@ -98,18 +98,18 @@ export interface HeatScoreComponents {
 }
 
 // ── Full heat score output ────────────────────────────────────────────────────
-export interface RoomHeatScore {
+export interface FfsScore {
   session_id: string;
   creator_id: string;
   /** Composite score 0-100 after anti-flicker and guardrails. */
   score: number;
   /** Resolved tier (anti-flicker applied). */
-  tier: HeatTier;
-  components: HeatScoreComponents;
+  tier: FfsTier;
+  components: FfsComponents;
   /** Per-creator learned multiplier — default 1.0, range 0.80-1.20. */
   adaptive_multiplier: number;
   /** Tier being evaluated for the 3-tick anti-flicker rule. */
-  anti_flicker_pending_tier: HeatTier | null;
+  anti_flicker_pending_tier: FfsTier | null;
   /** Consecutive ticks consistent with the pending tier (0-2 before promotion). */
   anti_flicker_ticks: number;
   is_dual_flame: boolean;
@@ -122,7 +122,7 @@ export interface LeaderboardEntry {
   session_id: string;
   creator_id: string;
   score: number;
-  tier: HeatTier;
+  tier: FfsTier;
   /** 0-indexed rank in the filtered set. Rank 0 = coolest (lowest score); higher rank = hotter session. */
   rank: number;
   /** Row in the 10×10 grid. Row 0 = top row (coolest), row 9 = bottom row (hottest). */
@@ -135,7 +135,7 @@ export interface LeaderboardEntry {
   session_started_at: string;
 }
 
-export interface RoomHeatLeaderboard {
+export interface FfsLeaderboard {
   entries: LeaderboardEntry[];
   total: number;
   generated_at_utc: string;
@@ -153,15 +153,15 @@ export interface AdaptiveWeights {
 
 // ── In-memory session state ───────────────────────────────────────────────────
 export interface SessionLiveState {
-  currentScore: RoomHeatScore;
+  currentScore: FfsScore;
   sessionStartedAt: Date;
   isDualFlame: boolean;
 }
 
 // ── Anti-flicker state (per session) ─────────────────────────────────────────
 export interface AntiFlickerState {
-  confirmedTier: HeatTier;
-  pendingTier: HeatTier;
+  confirmedTier: FfsTier;
+  pendingTier: FfsTier;
   /** Ticks elapsed since pendingTier was first seen. Resets on confirm. */
   ticks: number;
 }

@@ -189,7 +189,7 @@ unrelated to this payload).
   - Federated intelligence adapter is a stub — `requestFederatedLookup()`
     fires a NATS event; a subscriber that populates the federation list
     has not been implemented in this payload.
-  - Cyrano / Room-Heat welfare-signal consumption is downstream of the
+  - Cyrano / Flicker n'Flame Scoring welfare-signal consumption is downstream of the
     `gateguard.welfare.signal` topic — that consumer lives in PAYLOAD 4.
   - Prisma migration SQL (`prisma/migrations/*/migration.sql`) is not
     generated here — run `yarn prisma:generate && yarn prisma:push` in a

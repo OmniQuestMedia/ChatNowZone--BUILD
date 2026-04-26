@@ -22,7 +22,7 @@
 - **D1** Slot Machine: RETIRED (slot machine + chance-based games removed; SLOT_MACHINE_BRIEFING.md and docs/specs/SLOT_MACHINE_SPEC_v1.0.md to archive/delete; archive/xxxchatnow-seed/ to remove).
 - **D2** Primary Tenant: ChatNow.Zone (XXXChatNow.com prior name; merchant tenant 1; RedRoomPleasures and Cyrano onboard first Phase 1; ChatNow.Zone Phase 2).
 - **D3** Diamond Concierge Earn: Zero Points (Diamond purchases earn 0 RRR points; discount built into Diamond pricing; RRR points CAN be burned against Diamond purchases; RRR-P3-003 REMOVED from build scope).
-- **D4** Room-Heat Inferno Bonus Multiplier: Configurable + Guardrails (active when Guest tipped + remains in room + tip activity not idle 30+ min; merchant-configurable via `inferno_multiplier` on `EarnRateConfig`; not nullable at activation).
+- **D4** Flicker n'Flame Scoring Inferno Bonus Multiplier: Configurable + Guardrails (active when Guest tipped + remains in room + tip activity not idle 30+ min; merchant-configurable via `inferno_multiplier` on `EarnRateConfig`; not nullable at activation).
 - **D5** GGS Integration: Deferred (RRR builds webhook-ready integration points; hold logic deferred until directed).
 
 **Secondary decisions (B1–B?):** B1 Inferno Multiplier Value (merchant-configurable, no platform default), B2 Tier Structure: Dual Layer (merchant tier launch + RRR member tier future), and additional B-series decisions through line 115 covering tier structure, redemption mechanics, and merchant onboarding.
