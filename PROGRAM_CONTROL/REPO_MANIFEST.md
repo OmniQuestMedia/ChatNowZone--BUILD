@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/phase-3c-di-dead-code-research-K2Iu3`
 **Commit:** `5ada300874b69240f376f5ad7fc6b3908fa666ee`
 **Generated:** 2026-04-26T22:00:25Z
+**Branch:** `claude/blazing-test-fixture-rename-K2Iu3`
+**Commit:** `fc4b58dcdc37404cc5df1816cbddd37586e9a83d`
+**Generated:** 2026-04-26T19:45:34Z
 
 ## All Files
 
