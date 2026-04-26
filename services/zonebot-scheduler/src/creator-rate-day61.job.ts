@@ -11,6 +11,7 @@
 // CORRELATION_ID: CNZ-WORK-001-CREATOR-RATE-TIER-DAY61
 
 import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
 
@@ -45,8 +46,8 @@ export class CreatorRateDay61Job {
     // (i.e. their rate has not yet been superseded).
     const standardRows = await this.prisma.creatorRateTier.findMany({
       where: {
-        cohort:           'STANDARD',
-        effective_to:  null,
+        tier_name:        'STANDARD',
+        effective_to:     null,
       },
       select: { id: true, creator_id: true },
     });
@@ -69,12 +70,13 @@ export class CreatorRateDay61Job {
         // Insert the new DAY61_UPGRADED row.
         this.prisma.creatorRateTier.create({
           data: {
+            tier_id:          randomUUID(),
             creator_id:       row.creator_id,
-            cohort:           'DAY61_UPGRADED',
+            tier_name:        'DAY61_UPGRADED',
             rate_floor_usd:   GovernanceConfig.CREATOR_RATE_DAY61_FLOOR,
             rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_DAY61_CEILING,
             effective_from:   effectiveFrom,
-            effective_to:  null,
+            effective_to:     null,
             correlation_id:   correlationId,
             reason_code:      'DAY61_FLOOR_UPGRADE',
             rule_applied_id:  DAY61_RULE_ID,

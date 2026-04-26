@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3b-8a-effective-until-rename-K2Iu3`
-**Commit:** `946a62cb29c8a74b28477260a54d74726e976a0e`
-**Generated:** 2026-04-26T19:11:39Z
+**Branch:** `claude/phase-3b-8b-cohort-rename-K2Iu3`
+**Commit:** `9238582a2d01d5c64e9c78124329b1ff55fd718b`
+**Generated:** 2026-04-26T19:15:40Z
 
 ## All Files
 

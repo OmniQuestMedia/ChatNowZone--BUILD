@@ -8,6 +8,7 @@
 // CORRELATION_ID: CNZ-WORK-001-CREATOR-RATE-TIER
 
 import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import Decimal from 'decimal.js';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
@@ -15,7 +16,7 @@ import { GovernanceConfig } from '../../core-api/src/governance/governance.confi
 export const CREATOR_RATE_RULE_ID = 'CREATOR_RATE_TIER_v1';
 
 export interface CreatorEffectiveRate {
-  cohort: string;
+  tier_name: string;
   rate_floor_usd: Decimal;
   rate_ceiling_usd: Decimal;
   rule_applied_id: string;
@@ -53,7 +54,7 @@ export class CreatorRateTierService {
         asOf: asOf.toISOString(),
       });
       return {
-        cohort:           'FOUNDING',
+        tier_name:           'FOUNDING',
         rate_floor_usd:   GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
         rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_CEILING,
         rule_applied_id:  CREATOR_RATE_RULE_ID,
@@ -61,7 +62,7 @@ export class CreatorRateTierService {
     }
 
     return {
-      cohort:           row.cohort,
+      tier_name:           row.tier_name,
       rate_floor_usd:   new Decimal(row.rate_floor_usd.toString()),
       rate_ceiling_usd: new Decimal(row.rate_ceiling_usd.toString()),
       rule_applied_id:  row.rule_applied_id,
@@ -87,8 +88,9 @@ export class CreatorRateTierService {
 
     await this.prisma.creatorRateTier.create({
       data: {
+        tier_id:          randomUUID(),
         creator_id:       creatorId,
-        cohort:           'FOUNDING',
+        tier_name:        'FOUNDING',
         rate_floor_usd:   GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
         rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_CEILING,
         effective_from:   effectiveFrom,
