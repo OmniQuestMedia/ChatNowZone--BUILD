@@ -5,6 +5,12 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/phase-3b-7-T8-ui-threshold-align-K2Iu3`
 **Commit:** `6faf6114128eab1eddb6b518290438d6242ca45e`
 **Generated:** 2026-04-26T18:38:42Z
+**Branch:** `claude/canonical-lock-rate-blazing-retire-K2Iu3`
+**Commit:** `092b2332bef78aef1611747d7d15b1bffe6ab180`
+**Generated:** 2026-04-26T18:39:58Z
+**Branch:** `claude/phase-3b-2-prisma-investigation-K2Iu3`
+**Commit:** `25c47ee2a7c8c13d04450f9d7b7a33a9c518b785`
+**Generated:** 2026-04-26T18:42:03Z
 
 ## All Files
 
@@ -151,6 +157,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-2-REDBOOK-RECOVERY-DASHBOARD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3A-BASELINE-SCOPING-2026-04-26.md`
+- `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-2-PRISMA-DEDUP-INVESTIGATION-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-4-AMBIGUITY-RESEARCH-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-REBASELINE-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PRISMA-001-SCHEMA-GENERATION.md`
