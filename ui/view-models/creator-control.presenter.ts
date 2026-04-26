@@ -22,12 +22,13 @@ import type {
 
 export const CREATOR_PRESENTER_RULE_ID = 'CREATOR_CONTROL_UI_v1';
 
-/** Tier-boundary lookup mirrors the Flicker n'Flame Scoring (FFS) TIER_THRESHOLDS. */
+/** Tier-boundary lookup aligned to canonical GovernanceConfig.HEAT_BAND_* constants
+ *  (mirror of FFS TIER_THRESHOLDS in services/creator-control/src/ffs.engine.ts). */
 const TIER_BOUNDS: Record<FfsTier, { min: number; max: number }> = {
-  COLD: { min: 0, max: 25 },
-  WARM: { min: 25, max: 50 },
-  HOT: { min: 50, max: 75 },
-  INFERNO: { min: 75, max: 101 }, // max exclusive; 101 so 100 still lies inside
+  COLD:    { min: 0,  max: 34 },  // GovernanceConfig.HEAT_BAND_COLD_MAX = 33; max exclusive
+  WARM:    { min: 34, max: 61 },  // GovernanceConfig.HEAT_BAND_WARM_MAX = 60
+  HOT:     { min: 61, max: 86 },  // GovernanceConfig.HEAT_BAND_HOT_MAX = 85
+  INFERNO: { min: 86, max: 101 }, // 86–100 inclusive; max exclusive = 101
 };
 
 /** Payout scaling table mirrors integration-hub PAYOUT_SCALING_PCT_BY_TIER. */
