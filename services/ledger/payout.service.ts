@@ -1,8 +1,8 @@
-// FIZ: PAYLOAD-001 — Payout / Room-Heat Engine stub
+// FIZ: PAYLOAD-001 — Payout / Flicker n'Flame Scoring (FFS) stub
 // Settles a creator session at close: reads session CZT, resolves the
-// Room-Heat payout rate, and credits the creator wallet's `bonus` bucket
+// FFS payout rate, and credits the creator wallet's `bonus` bucket
 // with the computed USD-equivalent payout recorded in CZT.
-// Full Room-Heat scoring engine lands in HZ-002; this module provides the
+// Full FFS engine is in services/ffs/; this module provides the
 // deterministic plumbing those consumers will call into.
 
 import type { LedgerService } from './ledger.service';
@@ -13,7 +13,7 @@ export interface SessionCloseInput {
   sessionId: string;                   // correlation_id root
   creatorWalletId: string;
   grossCzt: number;                    // total CZT earned this session (integer)
-  heatScore: number;                   // 0–100 — from Room-Heat scorer
+  heatScore: number;                   // 0–100 — from FFS scorer
   diamondFloorActive: boolean;         // true when creator has Diamond floor guarantee
 }
 
@@ -35,7 +35,7 @@ export class PayoutService {
 
   /**
    * Idempotent on `sessionId`: settles the creator share of a session into
-   * the creator wallet's bonus bucket. Room-Heat rate is resolved once at
+   * the creator wallet's bonus bucket. FFS payout rate is resolved once at
    * close-time and persisted in the ledger metadata for later audit.
    */
   async settleSessionClose(input: SessionCloseInput): Promise<SessionPayoutResult> {

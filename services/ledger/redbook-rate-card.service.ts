@@ -123,7 +123,7 @@ export class RedbookRateCardService {
 
   /**
    * Resolve the live creator payout rate for a session close.
-   * FFS score wins unless the Diamond floor ($0.080) is higher.
+   * Flicker n'Flame Scoring (FFS) rate wins unless the Diamond floor ($0.080) is higher.
    */
   resolveCreatorPayoutRate(args: {
     heatScore: number;

@@ -1,11 +1,13 @@
-// FFS — Flicker n'Flame Scoring: REST controller
-// Advisory / read-oriented endpoints. No ledger mutations.
+// WO-003 — Flicker n'Flame Scoring (FFS): controller
+// REST surface for the Flicker n'Flame Scoring service.
+// All endpoints are advisory / read-oriented; no ledger mutations here.
 import {
   Body,
   Controller,
   Delete,
   Get,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -51,10 +53,10 @@ export class FfsController {
   @Get('session/:sessionId')
   getSessionScore(
     @Param('sessionId') sessionId: string,
-  ): FfsScore | { message: string; session_id: string } {
+  ): FfsScore {
     const score = this.ffsService.getSessionScore(sessionId);
     if (!score) {
-      return { message: 'Session not found or not yet active', session_id: sessionId };
+      throw new NotFoundException(`Session not found or not yet active: ${sessionId}`);
     }
     return score;
   }

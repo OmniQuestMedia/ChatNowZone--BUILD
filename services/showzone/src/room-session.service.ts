@@ -1,5 +1,9 @@
 // @deprecated — ShowZone service removed (see CNZ-WORK-001 Section 1). Retained for reference only.
 // services/showzone/src/room-session.service.ts
+// @deprecated SHOWZONE-DEPRECATED — ShowZone service is deprecated as of post-April 2026.
+// Legacy ShowToken pricing fields (pass_price_st / phase2_price_st) and dual-wallet
+// logic are retained here for historical reference, but are no longer exercised in
+// production. Active token operations now use CZT exclusively via services/ledger/.
 // BIJOU: SHOWZONE-001 — ShowZone room lifecycle state machine
 // Lifecycle: DRAFT → SCHEDULED → COUNTDOWN → LIVE_PHASE_1 → LIVE_PHASE_2 → ENDED
 // All transitions are logged. Invalid transitions throw and are never silent.

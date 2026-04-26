@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/fix-nats-topics-duplicates-YcGQy`
-**Commit:** `5809d58798b68bc62d1c19d8ed7c44b1a74072cc`
-**Generated:** 2026-04-26T10:51:56Z
+**Branch:** `copilot/global-renames-and-cleanup`
+**Commit:** `b093a335362bae2fbbc4f5988da571e848a5bf0b`
+**Generated:** 2026-04-26T11:01:01Z
 
 ## All Files
 
@@ -327,6 +327,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
 - `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
+- `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/migration_lock.toml`

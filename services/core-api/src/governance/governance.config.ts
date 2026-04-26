@@ -51,27 +51,27 @@ export const GovernanceConfig = {
   /** TTL (seconds) for entries in the nonce / event_id dedup stores. */
   WEBHOOK_NONCE_STORE_TTL_SECONDS: 600, // 10 minutes
 
-  // ── Room-Heat Payout Rates (FairPay/FairPlay™) ────────────────────────────
+  // ── Flicker n'Flame Scoring (FFS) Payout Rates (FairPay/FairPlay™) ──────────
   // LOCKED by CEO 2026-04-16. Tech Debt Delta PAY-001 through PAY-005.
-  // Performance-determined in real time by Room-Heat Engine.
+  // Performance-determined in real time by Flicker n'Flame Scoring (FFS) engine.
   // These five constants are NOT operator-configurable.
   // Any change requires CEO direction + FIZ commit.
 
-  // Payout rate when Room-Heat score is 0–33 (Cold band)
+  // Payout rate when FFS score is 0–33 (Cold band)
   RATE_COLD: new Decimal('0.075'),
 
-  // Payout rate when Room-Heat score is 34–60 (Warm band)
+  // Payout rate when FFS score is 34–60 (Warm band)
   RATE_WARM: new Decimal('0.080'),
 
-  // Payout rate when Room-Heat score is 61–85 (Hot band)
+  // Payout rate when FFS score is 61–85 (Hot band)
   RATE_HOT: new Decimal('0.085'),
 
-  // Payout rate when Room-Heat score is 86–100 (Inferno band)
+  // Payout rate when FFS score is 86–100 (Inferno band)
   RATE_INFERNO: new Decimal('0.090'),
 
   // Diamond bulk floor: 10,000+ CZT purchase floors creator payout at
-  // RATE_WARM ($0.080) regardless of live Room-Heat score.
-  // If heat score warrants a higher rate, higher rate applies.
+  // RATE_WARM ($0.080) regardless of live FFS score.
+  // If FFS score warrants a higher rate, higher rate applies.
   // Floor is a minimum, not a cap.
   // Store diamond_floor_active: bool on purchase record at issuance.
   RATE_DIAMOND_FLOOR: new Decimal('0.080'),

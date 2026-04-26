@@ -74,5 +74,14 @@ export declare const NATS_TOPICS: {
     readonly SCHEDULE_COVERAGE_GAP_DETECTED: "gz.schedule.coverage.gap_detected";
     readonly SCHEDULE_STAT_HOLIDAY_ALERT: "gz.schedule.stat_holiday.alert";
     readonly SCHEDULE_REMINDER_BLOCK_CUTOFF: "gz.schedule.reminder.block_cutoff";
+    readonly FFS_SCORE_SAMPLE: "ffs.score.sample";
+    readonly FFS_SCORE_TIER_CHANGED: "ffs.score.tier.changed";
+    readonly FFS_SCORE_PEAK: "ffs.score.peak";
+    readonly FFS_SCORE_LEADERBOARD_UPDATED: "ffs.score.leaderboard.updated";
+    readonly FFS_SCORE_HOT_AND_READY: "ffs.score.hot_and_ready";
+    readonly FFS_SCORE_DUAL_FLAME_PEAK: "ffs.score.dual_flame.peak";
+    readonly FFS_SCORE_SESSION_STARTED: "ffs.score.session.started";
+    readonly FFS_SCORE_SESSION_ENDED: "ffs.score.session.ended";
+    readonly FFS_SCORE_ADAPTIVE_UPDATED: "ffs.score.adaptive.updated";
 };
 export type NatsTopic = typeof NATS_TOPICS[keyof typeof NATS_TOPICS];
