@@ -3,17 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/global-renames-and-cleanup`
-**Commit:** `b1f0445e1add3580d777a8814de2468c5fc8dd92`
-**Generated:** 2026-04-26T10:10:02Z
-**Branch:** `copilot/global-renames-cleanup-again`
-**Commit:** `6875d3dc9784c33d61a0060ee01793671397877d`
-**Generated:** 2026-04-26T09:57:43Z
-**Branch:** `copilot/update-creator-rate-tier-table`
-**Commit:** `331e01330fb616052be539cb43c2b8a5d42becd5`
-**Generated:** 2026-04-26T10:04:45Z
-**Branch:** `copilot/add-ffs-score-and-tier`
-**Commit:** `e0a9bb2ebf0ae3230e5f00ae68a156ad033ca9ea`
-**Generated:** 2026-04-26T02:58:47Z
+**Commit:** `f5233be08786d0702b29a79fc3052b84b7183903`
+**Generated:** 2026-04-26T10:14:03Z
 
 ## All Files
 
@@ -334,9 +325,9 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260425000000_add_room_heat/migration.sql`
 - `prisma/migrations/20260425100000_zonebot_scheduler/migration.sql`
 - `prisma/migrations/20260425120000_add_heartsync_guest_heat/migration.sql`
-- `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
 - `prisma/migrations/20260426000000_add_fan_fervor_score/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
+- `prisma/migrations/20260426020000_creator_rate_tier_velocityzone_sensync/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
