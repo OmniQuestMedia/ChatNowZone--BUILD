@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/frontend-polish-concierge-ui-mlqrR`
-**Commit:** `a2e44772d6bc94e64510076b1ab6184a9d94e893`
-**Generated:** 2026-04-25T06:47:40Z
+**Branch:** `copilot/global-renames-cleanup`
+**Commit:** `51738de0bf8bd748d373f1f3a08dde1bdcbb8f4d`
+**Generated:** 2026-04-26T03:10:54Z
 
 ## All Files
 
@@ -458,7 +458,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/creator-control/src/broadcast-timing.copilot.ts`
 - `services/creator-control/src/creator-control.module.ts`
 - `services/creator-control/src/creator-control.service.ts`
-- `services/creator-control/src/room-heat.engine.ts`
+- `services/creator-control/src/ffs.engine.ts`
 - `services/creator-control/src/session-monitoring.copilot.ts`
 - `services/cyrano/.env.example`
 - `services/cyrano/ASSUMPTIONS.md`
@@ -471,6 +471,15 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/session-memory.store.ts`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
+- `services/ffs/.env.example`
+- `services/ffs/ASSUMPTIONS.md`
+- `services/ffs/FLAGS.md`
+- `services/ffs/README.md`
+- `services/ffs/src/dto/ffs.dto.ts`
+- `services/ffs/src/ffs.controller.ts`
+- `services/ffs/src/ffs.module.ts`
+- `services/ffs/src/ffs.service.ts`
+- `services/ffs/src/types/ffs.types.ts`
 - `services/fraud-prevention/src/AbuseDetector.ts`
 - `services/fraud-prevention/src/TokenExtensionTool.ts`
 - `services/fraud-prevention/src/events/ServiceToSaleEmitter.ts`
@@ -529,23 +538,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
 - `services/risk-engine/src/risk.module.ts`
-- `services/room-heat/.env.example`
-- `services/room-heat/ASSUMPTIONS.md`
-- `services/room-heat/FLAGS.md`
-- `services/room-heat/README.md`
-- `services/room-heat/src/dto/room-heat.dto.ts`
-- `services/room-heat/src/room-heat.controller.ts`
-- `services/room-heat/src/room-heat.module.ts`
-- `services/room-heat/src/room-heat.service.ts`
-- `services/room-heat/src/types/room-heat.types.ts`
-- `services/showzone/src/room-session.service.d.ts`
-- `services/showzone/src/room-session.service.js`
-- `services/showzone/src/room-session.service.js.map`
-- `services/showzone/src/room-session.service.ts`
-- `services/showzone/src/showzone.module.d.ts`
-- `services/showzone/src/showzone.module.js`
-- `services/showzone/src/showzone.module.js.map`
-- `services/showzone/src/showzone.module.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
 - `services/zone-gpt/src/proposal.service.d.ts`
