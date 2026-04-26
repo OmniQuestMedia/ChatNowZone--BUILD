@@ -1,9 +1,9 @@
 # Flicker n'Flame Scoring (FFS) — FLAGS
 
-**Work Order:** WO-003 (supersedes room-heat)
+**Work Order:** WO-003  
 **Rule ID:** `FFS_ENGINE_v2`
 
-Feature flags and deferred capabilities for the Flicker n'Flame Scoring engine.
+Feature flags and deferred capabilities for the Flicker n'Flame Scoring (FFS).
 
 ---
 
@@ -28,8 +28,8 @@ Feature flags and deferred capabilities for the Flicker n'Flame Scoring engine.
 
 | Flag | Trigger condition | Description |
 |------|-------------------|-------------|
-| `FFS_PERSISTENT_LEADERBOARD` | Post-launch requirement | Persist leaderboard state to `ffs_leaderboard_entries` DB table for restart-safety. |
+| `FFS_PERSISTENT_LEADERBOARD` | Post-launch requirement | Persist leaderboard state to `room_heat_leaderboard_entries` DB table for restart-safety. |
 | `FFS_REDIS_WINDOWS` | Volume scaling | Move rolling-window aggregations (tips/min, chat/min, hearts/min) from caller-provided inputs to Redis ZADD windows within the engine. |
 | `FFS_CYRANO_DIRECT_INJECT` | Cyrano L2 integration | Allow the engine to directly call `CyranoService.evaluate()` instead of emitting via NATS + Hub. |
-| `FFS_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export snapshots to WORM storage on session end. |
+| `FFS_WEBHOOK_SNAPSHOT_EXPORT` | Compliance request | Export ffs_snapshots to WORM storage on session end. |
 | `FFS_ML_WEIGHTS` | ML pipeline ready | Replace static adaptive weight learning with an ML-trained model inference call. |

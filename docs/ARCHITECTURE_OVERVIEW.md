@@ -24,10 +24,10 @@ For per-service detail, follow the links into `services/*/` and
 | RBAC + step-up       | `services/core-api/src/auth/`                                | Role decision + audit + step-up coordination.                                                                                                                      |
 | Compliance           | `services/core-api/src/compliance/`                          | Audit chain, geo fencing, sovereign CAC, legal hold, WORM export.                                                                                                  |
 | Immutable audit      | `services/core-api/src/audit/`                               | Hash-chained ledger of every sensitive action; integrity verifier.                                                                                                 |
-| Room-Heat            | `services/creator-control/src/room-heat.engine.ts`           | Deterministic tier computation from telemetry.                                                                                                                     |
+| Flicker n'Flame Scoring            | `services/creator-control/src/ffs.engine.ts`           | Deterministic tier computation from telemetry.                                                                                                                     |
 | Creator Control      | `services/creator-control/`                                  | Broadcast Timing + Session Monitoring copilots, single-pane snapshot.                                                                                              |
 | Cyrano Layer 1       | `services/cyrano/`                                           | 8-category whisper engine, persona memory, latency SLO.                                                                                                            |
-| Integration Hub      | `services/integration-hub/`                                  | Wires Ledger ↔ GateGuard, Recovery ↔ Concierge, Room-Heat ↔ CreatorControl + Cyrano.                                                                               |
+| Integration Hub      | `services/integration-hub/`                                  | Wires Ledger ↔ GateGuard, Recovery ↔ Concierge, Flicker n'Flame Scoring ↔ CreatorControl + Cyrano.                                                                               |
 | Notification         | `services/notification/`                                     | 48h warnings, personal-touch follow-ups, dispatcher abstraction.                                                                                                   |
 | UI layer             | `ui/`                                                        | Type contracts + view-model presenters + page render plans for `/admin/diamond`, `/admin/recovery`, `/creator/control`, `/tokens`, `/diamond/purchase`, `/wallet`. |
 | Tests                | `tests/integration/` + `tests/e2e/`                          | Jest integration suite + Payload-8 end-to-end flows.                                                                                                               |
@@ -40,7 +40,7 @@ For per-service detail, follow the links into `services/*/` and
 | 1       | Canonical Ledger         | Three-bucket wallet + hash-chain + idempotent writes.                                             |
 | 2       | Recovery Engine          | REDBOOK §5 — Token Bridge, 3/5ths Exit, Expiration.                                               |
 | 3       | GateGuard                | Welfare Guardian Score + middleware + decisioner.                                                 |
-| 4       | OBS + Streaming          | Room-Heat sample contract + OBS bridge + chat aggregator stubs.                                   |
+| 4       | OBS + Streaming          | Flicker n'Flame Scoring sample contract + OBS bridge + chat aggregator stubs.                                   |
 | 5       | Creator Control / Cyrano | Single-pane workstation + 8-category whisper engine.                                              |
 | 6       | Immutable Audit          | Append-only hash-chain + WORM export + Canonical Compliance Checklist.                            |
 | 7       | Frontend Polish          | Diamond Concierge UI + CreatorControl pages + guest rate cards + dark mode + SEO + accessibility. |

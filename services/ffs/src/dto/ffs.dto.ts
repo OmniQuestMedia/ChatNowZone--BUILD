@@ -1,4 +1,4 @@
-// Flicker n'Flame Scoring (FFS) — DTOs (request validation shapes)
+// WO-003 — Room-Heat Engine: DTOs (request validation shapes)
 // All fields are typed; callers provide primitives — no class-validator
 // decorators used (consistent with the rest of the codebase style).
 
@@ -55,6 +55,6 @@ export class TipEventDto {
   creator_id!: string;
   /** CZT tokens tipped — used to record adaptive signal strength. */
   tokens!: number;
-  /** Full FFS input frame captured at tip moment. */
+  /** Full heat input frame captured at tip moment. */
   heat_context!: FfsInput;
 }

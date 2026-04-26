@@ -3,7 +3,7 @@
 **Branch:** `refs/oss/live-polling`
 **Source Repository:** `CelaDaniel/react-polling`
 **Source URL:** https://github.com/CelaDaniel/react-polling
-**Primary Directive Series:** OBS Room-Heat Engine broadcast
+**Primary Directive Series:** OBS Flicker n'Flame Scoring (FFS) broadcast
 **Harvest Date:** 2026-04-19
 **Harvest Agent:** Copilot (THREAD15-OSS-HARVEST)
 **Harvest Status:** MANIFEST-STUB (OSS source content pending internet access)
@@ -16,7 +16,7 @@ Permanent read-only reference branch for OmniQuest Media Inc. ChatNow.Zone
 build. Contains open-source reference material from `CelaDaniel/react-polling`
 for use by agents when authoring directives.
 
-React real-time polling library. Live vote/reaction broadcast patterns for the OBS Room-Heat Engine that drives audience engagement metrics.
+React real-time polling library. Live vote/reaction broadcast patterns for the OBS Flicker n'Flame Scoring (FFS) that drives audience engagement metrics.
 
 ## HOW TO USE
 

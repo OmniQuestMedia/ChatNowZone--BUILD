@@ -49,7 +49,7 @@
 
 ## SECTION 2 — CREATOR PAYOUT ENGINE (FairPay/FairPlay)
 
-**Payout is performance-determined by Room-Heat Engine in real time.**
+**Payout is performance-determined by Flicker n'Flame Scoring (FFS) in real time.**
 
 | ID | Requirement | Tag | Status | Directive | FIZ |
 |----|-------------|-----|--------|-----------|-----|
@@ -58,13 +58,13 @@
 | PAY-003 | RATE_HOT: heat 61-85 = $0.085/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
 | PAY-004 | RATE_INFERNO: heat 86-100 = $0.090/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
 | PAY-005 | RATE_DIAMOND_FLOOR: $0.080 minimum on 10,000+ CZT bulk. Higher rate applies if heat warrants. | NET-NEW | QUEUED | PAY-RATES-001 | YES |
-| PAY-006 | Purchase-moment lock: Room-Heat multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+| PAY-006 | Purchase-moment lock: Flicker n'Flame Scoring multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
 | PAY-007 | Human-action only guardrail: block clipboard paste on all tip/CZT-spend UI. Keyboard and touch only. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | PAY-008 | Audio modulation check: rate escalation above RATE_COLD requires active audio signal. Silent room cannot accumulate heat above Cold. Enforce in OBS kernel. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
-| PAY-009 | Purchase-response correlation: guest CZT purchase events are dominant weight in Room-Heat composite. Passive presence does not elevate heat. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+| PAY-009 | Purchase-response correlation: guest CZT purchase events are dominant weight in Flicker n'Flame Scoring composite. Passive presence does not elevate heat. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
 | PAY-010 | 100% tip pass-through: VERIFY platform_deduction = 0 on all tip transactions after CZT migration. Add test coverage. | VERIFY | VERIFY | — | YES |
 | PAY-011 | Tip transaction record: add heat_score_at_tip (int) and payout_rate_applied (decimal) fields. | CHANGED | NEEDS_DIRECTIVE | — | YES |
-| PAY-012 | Creator rate display: show live rate range ($0.075-$0.090), current Room-Heat tier, and active rate. Not a static number. | CHANGED | NEEDS_DIRECTIVE | — | NO |
+| PAY-012 | Creator rate display: show live rate range ($0.075-$0.090), current Flicker n'Flame Scoring tier, and active rate. Not a static number. | CHANGED | NEEDS_DIRECTIVE | — | NO |
 | PAY-013 | Remove founding creator static rate assignment at registration. Superseded by Pixel Legacy + Tease rate. | SUPERSEDED | DONE | TOK-RETIRE-001 | YES |
 
 ---
@@ -109,7 +109,7 @@ Lives at services/cyrano/**
 | ID | Requirement | Tag | Status | Directive | FIZ |
 |----|-------------|-----|--------|-----------|-----|
 | CYR-001 | Retire standalone Cyrano platform, subscription billing, separate accounts, parallel build workstream. | RETIRED | NEEDS_DIRECTIVE | — | NO |
-| CYR-002 | L1 CNZ Creator Feature: LLM integration (Anthropic Claude API) consuming Room-Heat, tipping velocity, chat sentiment via NATS. Suggestion panel in CreatorControl.Zone UI. Latency under 2s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+| CYR-002 | L1 CNZ Creator Feature: LLM integration (Anthropic Claude API) consuming Flicker n'Flame Scoring, tipping velocity, chat sentiment via NATS. Suggestion panel in CreatorControl.Zone UI. Latency under 2s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-003 | L2 Consumer Audio Platform: standalone audio session type within CNZ. Voice-native. Persona management. Gold/Diamond gating. Year 3+ standalone fork path preserved. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-004 | L3 HCZ Whisper Intelligence: RedBook scenario classifier feeds Cyrano prompt engine. Agent-facing overlay. No Guest surface. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-005 | L4 Enterprise B2B Whisper API: clean external API, key-gated, rate-limited. Year 3+. Architecture must support from launch. | DEFERRED | DEFERRED | — | NO |
@@ -205,7 +205,7 @@ Zero prior code exists.**
 | GGS-010 | Predictive Intervention Engine: soft nudge delivery, cool-down protocol, outcome learning feedback loop, webhook output (no PII in payload). | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | GGS-011 | Zero-Knowledge Compliance Oracle: zk-SNARKs (Groth16/PLONK via snarkjs). Proof attests: age verified, consent satisfied, welfare check passed, RedBook followed. zk_proof_hash on every response. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
 | GGS-012 | ZK proof archival: 7 years minimum. Separate from operational DB. Immutable. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
-| GGS-013 | Session-Heat Welfare Flywheel: Room-Heat to GGS feed via NATS. Heat spike + velocity hard rule (20+ point rise in 5min AND anomalous velocity = floor welfare score to 40). Max staleness 5s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+| GGS-013 | Session-Heat Welfare Flywheel: Flicker n'Flame Scoring to GGS feed via NATS. Heat spike + velocity hard rule (20+ point rise in 5min AND anomalous velocity = floor welfare score to 40). Max staleness 5s. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | GGS-014 | Human-AI Hybrid Escalation (RedBook-as-a-Service): auto-routing at welfare_score 85+, HCZ ticket pre-populated with dual scores + RedBook playbook ID. Agent decision feedback loop. Standalone licensable. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 
 ---

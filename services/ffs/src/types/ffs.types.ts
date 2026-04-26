@@ -1,10 +1,10 @@
-// Flicker n'Flame Scoring (FFS) — canonical types
+// WO-003 — Room-Heat Engine: canonical types
 // Business Plan B.4 — real-time composite heat score (0-100) for all room-level telemetry.
-// Rule authority: FFS_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Flicker n'Flame Scoring).
+// Rule authority: FFS_ENGINE_v2 — see DOMAIN_GLOSSARY.md (Room-Heat Engine).
 
 // ── Tier thresholds (canonical — locked in GovernanceConfig.HEAT_BAND_*)
 // COLD 0-33 / WARM 34-60 / HOT 61-85 / INFERNO 86-100
-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
 export type LeaderboardCategory =
   | 'all'
@@ -36,8 +36,8 @@ export interface FfsInput {
   /** Session runtime in minutes. */
   dwell_minutes: number;
 
-  // ── Group 2: Biometric Signals (HeartSync + vision-monitor) ───────────────
-  /** Current BPM from HeartSync band. 0 = signal absent / not paired. */
+  // ── Group 2: Biometric Signals (SenSync™ + vision-monitor) ───────────────
+  /** Current BPM from SenSync™ band. 0 = signal absent / not paired. */
   heart_rate_bpm: number;
   /** Creator's individual resting baseline BPM (from calibration). */
   heart_rate_baseline_bpm: number;
@@ -68,7 +68,7 @@ export interface FfsInput {
 }
 
 // ── Per-component breakdown (maps to weight-max values in calculateComponents) ─
-export interface FfsScoreComponents {
+export interface FfsComponents {
   /** Tip pressure — max 15. */
   tip_pressure: number;
   /** Chat velocity — max 8. */
@@ -97,19 +97,19 @@ export interface FfsScoreComponents {
   hot_streak: number;
 }
 
-// ── Full FFS score output ─────────────────────────────────────────────────────
+// ── Full heat score output ────────────────────────────────────────────────────
 export interface FfsScore {
   session_id: string;
   creator_id: string;
   /** Composite score 0-100 after anti-flicker and guardrails. */
   score: number;
   /** Resolved tier (anti-flicker applied). */
-  tier: HeatTier;
-  components: FfsScoreComponents;
+  tier: FfsTier;
+  components: FfsComponents;
   /** Per-creator learned multiplier — default 1.0, range 0.80-1.20. */
   adaptive_multiplier: number;
   /** Tier being evaluated for the 3-tick anti-flicker rule. */
-  anti_flicker_pending_tier: HeatTier | null;
+  anti_flicker_pending_tier: FfsTier | null;
   /** Consecutive ticks consistent with the pending tier (0-2 before promotion). */
   anti_flicker_ticks: number;
   is_dual_flame: boolean;
@@ -122,7 +122,7 @@ export interface LeaderboardEntry {
   session_id: string;
   creator_id: string;
   score: number;
-  tier: HeatTier;
+  tier: FfsTier;
   /** 0-indexed rank in the filtered set. Rank 0 = coolest (lowest score); higher rank = hotter session. */
   rank: number;
   /** Row in the 10×10 grid. Row 0 = top row (coolest), row 9 = bottom row (hottest). */
@@ -143,7 +143,7 @@ export interface FfsLeaderboard {
 }
 
 // ── Adaptive weights (per-creator learned multipliers) ────────────────────────
-export interface FfsAdaptiveWeights {
+export interface AdaptiveWeights {
   creator_id: string;
   /** Multiplier per component key — range 0.80-1.20, default 1.0. */
   weights: Record<string, number>;
@@ -160,20 +160,8 @@ export interface SessionLiveState {
 
 // ── Anti-flicker state (per session) ─────────────────────────────────────────
 export interface AntiFlickerState {
-  confirmedTier: HeatTier;
-  pendingTier: HeatTier;
+  confirmedTier: FfsTier;
+  pendingTier: FfsTier;
   /** Ticks elapsed since pendingTier was first seen. Resets on confirm. */
   ticks: number;
 }
-
-// ── Backward-compat aliases (consumers migrating from room-heat types) ─────────
-/** @deprecated Use FfsInput */
-export type RoomHeatInput = FfsInput;
-/** @deprecated Use FfsScore */
-export type RoomHeatScore = FfsScore;
-/** @deprecated Use FfsScoreComponents */
-export type HeatScoreComponents = FfsScoreComponents;
-/** @deprecated Use FfsLeaderboard */
-export type RoomHeatLeaderboard = FfsLeaderboard;
-/** @deprecated Use FfsAdaptiveWeights */
-export type AdaptiveWeights = FfsAdaptiveWeights;

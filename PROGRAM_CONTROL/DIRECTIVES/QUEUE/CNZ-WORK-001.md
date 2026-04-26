@@ -494,7 +494,7 @@ CEO_GATE: YES (per-claim sign-off)
 FIZ: NO
 Source: Deficit doc R-P0-007
 Status: QUEUED
-Directive: Cite or qualify each of: zk-SNARK production claim (§B.5.3 F4), federation-as-production claim (§B.5.3 F2), 72–85% precision/recall claim (§B.5.3 F1, currently uncited), 200ms latency budget (§B.5.1/§B.5.3, unanalyzed), HeartPleasure heart-rate-as-Room-Heat-input (§B.7.1, no engineering pathway). Required before next investor pass.
+Directive: Cite or qualify each of: zk-SNARK production claim (§B.5.3 F4), federation-as-production claim (§B.5.3 F2), 72–85% precision/recall claim (§B.5.3 F1, currently uncited), 200ms latency budget (§B.5.1/§B.5.3, unanalyzed), HeartPleasure heart-rate-as-Flicker n'Flame Scoring-input (§B.7.1, no engineering pathway). Required before next investor pass.
 ```
 
 ```
@@ -750,7 +750,7 @@ Directive: BLOCKED until R-CLARIFY-002 resolved (custom service vs Twenty CRM in
 ```
 
 ```
-CNZ-WORK-001-F003: R-005 — Room-Heat Engine
+CNZ-WORK-001-F003: R-005 — Flicker n'Flame Scoring (FFS)
 Wave: F
 Priority: P1
 Scope: M
@@ -1033,7 +1033,7 @@ Quick lookup. Every deficit doc row (Thread 18, 36 rows) maps to one or more tas
 |R-002 Risk Toolkit                  |D002                |merged with R-102                         |
 |R-003 CreatorControl.Zone           |F001                |clarify-blocked                           |
 |R-004 MyCrew.Zone                   |F002                |clarify-blocked                           |
-|R-005 Room-Heat Engine              |F003                |clarify-blocked                           |
+|R-005 Flicker n'Flame Scoring (FFS)              |F003                |clarify-blocked                           |
 |R-006 FairPay/FairPlay              |D006                |clarify-blocked, FIZ                      |
 |R-007 Compliance Stack              |D008                |merged with R-107                         |
 |R-008 DFSP                          |F004                |clarify-blocked                           |

@@ -1,7 +1,7 @@
 // PAYLOAD 5 — Cyrano Layer 1 shared types
 // Business Plan B.3.5 — whisper copilot contract surface.
 
-import type { HeatScore, HeatTier } from '../../creator-control/src/room-heat.engine';
+import type { FfsScore, FfsTier } from '../../creator-control/src/ffs.engine';
 
 /** The eight canonical suggestion categories from Business Plan B.3.5. */
 export type CyranoCategory =
@@ -53,7 +53,7 @@ export interface CyranoInputFrame {
   creator_id: string;
   guest_id: string;
   phase: SessionPhase;
-  heat: HeatScore;
+  heat: FfsScore;
   /** Seconds since the last guest message. */
   silence_seconds: number;
   /** Minutes since session start. */
@@ -75,7 +75,7 @@ export interface CyranoSuggestion {
   category: CyranoCategory;
   /** 0..100 priority score — higher = more urgent. */
   weight: number;
-  tier_context: HeatTier;
+  tier_context: FfsTier;
   copy: string;
   reason_codes: string[];
   persona_id: string | null;

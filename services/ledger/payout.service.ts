@@ -67,7 +67,7 @@ export class PayoutService {
         reasonCode: 'PAYOUT',
         metadata: {
           session_id: input.sessionId,
-          heat_score: input.heatScore,
+          ffs_score: input.heatScore,
           heat_level: rate.level,
           rate_per_token: rate.ratePerToken,
           applied_diamond_floor: rate.appliedFloor,

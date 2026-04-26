@@ -1,13 +1,13 @@
-// Flicker n'Flame Scoring (FFS) — module
+// WO-003 — Room-Heat Engine: module
 // Business Plan B.4 — real-time composite heat score service.
 // NatsModule and PrismaModule are global — no local import needed.
 import { Module } from '@nestjs/common';
-import { FfsController } from './ffs.controller';
-import { FfsService } from './ffs.service';
+import { FlickerNFlameScoringController } from './ffs.controller';
+import { FlickerNFlameScoringService } from './ffs.service';
 
 @Module({
-  controllers: [FfsController],
-  providers:   [FfsService],
-  exports:     [FfsService],
+  controllers: [FlickerNFlameScoringController],
+  providers:   [FlickerNFlameScoringService],
+  exports:     [FlickerNFlameScoringService],
 })
-export class FfsModule {}
+export class FlickerNFlameScoringModule {}

@@ -1,5 +1,5 @@
 # DIRECTIVE: PAY-RATES-001
-# Add Room-Heat Payout Rate Constants to GovernanceConfig
+# Add Flicker n'Flame Scoring Payout Rate Constants to GovernanceConfig
 
 **Directive ID:** PAY-RATES-001
 **Agent:** CLAUDE_CODE
@@ -16,7 +16,7 @@
 
 ## Objective
 
-Add the five locked Room-Heat payout rate constants + three heat band
+Add the five locked Flicker n'Flame Scoring payout rate constants + three heat band
 boundaries to `services/core-api/src/governance/governance.config.ts`.
 Locked by CEO 2026-04-16. Not operator-configurable.
 

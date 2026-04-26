@@ -26,7 +26,7 @@ import {
   RECOVERY_ENGINE,
   REDBOOK_RATE_CARDS,
 } from '../../core-api/src/config/governance.config';
-import type { HeatScore, HeatTier, RoomHeatSample } from '../../creator-control/src/room-heat.engine';
+import type { FfsScore, FfsTier, FfsSample } from '../../creator-control/src/ffs.engine';
 import type { CyranoInputFrame, CyranoSuggestion } from '../../cyrano/src/cyrano.types';
 import type { CreatorControlService } from '../../creator-control/src/creator-control.service';
 import type { CyranoService } from '../../cyrano/src/cyrano.service';
@@ -86,7 +86,7 @@ export interface GuardedLedgerDecision {
  * the ledger — it publishes HUB_PAYOUT_SCALING_APPLIED so the payout
  * service can enrich the next statement cycle.
  */
-const PAYOUT_SCALING_PCT_BY_TIER: Record<HeatTier, number> = {
+const PAYOUT_SCALING_PCT_BY_TIER: Record<FfsTier, number> = {
   COLD:    0.00,
   WARM:    0.00,
   HOT:     0.05,
@@ -94,11 +94,11 @@ const PAYOUT_SCALING_PCT_BY_TIER: Record<HeatTier, number> = {
 };
 
 /** Minimum heat tier that triggers a monetization handoff to Cyrano. */
-const MONETIZATION_TRIGGER_TIERS: ReadonlySet<HeatTier> = new Set(['HOT', 'INFERNO']);
+const MONETIZATION_TRIGGER_TIERS: ReadonlySet<FfsTier> = new Set(['HOT', 'INFERNO']);
 
 export interface HighHeatFlowInput {
   /** Telemetry sample — CreatorControl is the authoritative scorer. */
-  sample: RoomHeatSample;
+  sample: FfsSample;
   /** Cyrano frame, less the heat score which is injected post-scoring. */
   frame: Omit<CyranoInputFrame, 'heat'>;
   creator_payout_rate_per_token_usd: number;
@@ -106,7 +106,7 @@ export interface HighHeatFlowInput {
 }
 
 export interface HighHeatFlowResult {
-  heat: HeatScore;
+  heat: FfsScore;
   suggestion: CyranoSuggestion | null;
   payout_scaling_pct: number;
   scaled_payout_per_token_usd: number;
@@ -142,7 +142,7 @@ export class IntegrationHubService {
     const suggestion = this.cyrano.evaluate({ ...input.frame, heat });
 
     const capturedAt = new Date().toISOString();
-    const tier: HeatTier = heat.tier;
+    const tier: FfsTier = heat.tier;
     const scalingPct = PAYOUT_SCALING_PCT_BY_TIER[tier];
     const scaledRate = +(
       input.creator_payout_rate_per_token_usd * (1 + scalingPct)
@@ -154,7 +154,7 @@ export class IntegrationHubService {
         creator_id: input.frame.creator_id,
         guest_id: input.frame.guest_id,
         tier,
-        heat_score: heat.score,
+        ffs_score: heat.score,
         suggested_category: suggestion?.category ?? null,
         suggestion_id: suggestion?.suggestion_id ?? null,
         captured_at_utc: capturedAt,

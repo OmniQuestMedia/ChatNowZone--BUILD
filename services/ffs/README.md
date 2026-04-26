@@ -1,20 +1,20 @@
 # Flicker n'Flame Scoring (FFS) — `services/ffs/`
 
-**Work Order:** WO-003 (supersedes room-heat)
-**Business Plan Reference:** B.4 — Room-level telemetry
-**Rule ID:** `FFS_ENGINE_v2`
-**Status:** Active — replaces `services/room-heat/` (deprecated)
+**Work Order:** WO-003  
+**Business Plan Reference:** B.4 — Room-level telemetry  
+**Rule ID:** `FFS_ENGINE_v2`  
+**Status:** Active
 
 ---
 
 ## Purpose
 
-The Flicker n'Flame Scoring (FFS) engine computes a real-time **composite heat score (0–100)** for every
+The Flicker n'Flame Scoring (FFS) computes a real-time **composite heat score (0–100)** for every
 live creator session.  The score is published to NATS at **1 Hz** and consumed by:
 
-- **CreatorControl.Zone** — session suggestions and price nudges
-- **Cyrano** — suggestion weighting and category selection
-- **Integration Hub** — payout scaling and Diamond Concierge handoffs
+- **CreatorControl.Zone** — session suggestions and price nudges  
+- **Cyrano** — suggestion weighting and category selection  
+- **Integration Hub** — payout scaling and Diamond Concierge handoffs  
 - **Leaderboard surface** — 10 × 10 grid sorted coolest-to-hottest
 
 ---
@@ -25,7 +25,7 @@ live creator session.  The score is published to NATS at **1 Hz** and consumed b
 NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
         │
         ▼
- FfsService.ingest(FfsInput)
+ FlickerNFlameScoringService.ingest(FfsInput)
         │
         ├─ calculateComponents()   ← 13 weighted signals
         ├─ earlyPhaseBoost()       ← +10 % if dwell < 5 min
@@ -36,7 +36,7 @@ NATS (HZ_BPM_UPDATE, CHAT_MESSAGE_INGESTED)
         │                FFS_SCORE_PEAK, FFS_SCORE_HOT_AND_READY,
         │                FFS_SCORE_DUAL_FLAME_PEAK)
         │
-        ├─ Prisma.roomHeatSnapshot.create()  (async)
+        ├─ Prisma.ffsSnapshot.create()  (async)
         │
         └─ 1 Hz interval → re-emit with refreshed timestamp
 ```
@@ -85,11 +85,11 @@ downstream consumers.
 
 ## Leaderboard Grid (10 × 10)
 
-- Rank 0 (top-left) = **coolest** active session
-- Rank 99 (bottom-right) = **hottest** active session
-- Up to 100 concurrent sessions rendered
-- Categories: `all`, `standard`, `dual_flame`, `hot_and_ready`, `new_flames`
-- **Hot and Ready**: score ≥ 70 **and** dwell ≥ 10 min
+- Rank 0 (top-left) = **coolest** active session  
+- Rank 99 (bottom-right) = **hottest** active session  
+- Up to 100 concurrent sessions rendered  
+- Categories: `all`, `standard`, `dual_flame`, `hot_and_ready`, `new_flames`  
+- **Hot and Ready**: score ≥ 70 **and** dwell ≥ 10 min  
 - **New Flames**: session started < 15 min ago
 
 ---
@@ -129,7 +129,7 @@ downstream consumers.
 When a tip event fires (`learnFromTipEvent()`), the engine identifies which
 signals were elevated (≥ 70 % of their normalisation ceiling) at tip time:
 
-- **Elevated signals**: multiplier boosted by +2 % (capped at 1.20)
+- **Elevated signals**: multiplier boosted by +2 % (capped at 1.20)  
 - **Non-elevated signals**: multiplier decayed by −0.5 % (floored at 0.80)
 
 Multipliers are persisted to `room_heat_adaptive_weights` and cached in-memory.
@@ -140,8 +140,8 @@ Multipliers are persisted to `room_heat_adaptive_weights` and cached in-memory.
 
 | Table | Purpose |
 |-------|---------|
-| `room_heat_snapshots` | Append-only time-series of every FFS score computed |
-| `room_heat_adaptive_weights` | One row per creator — learned component multipliers |
+| `ffs_snapshots` | Append-only time-series of every heat score computed |
+| `ffs_adaptive_weights` | One row per creator — learned component multipliers |
 
 ---
 

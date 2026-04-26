@@ -10,12 +10,12 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
 import { CyranoService } from '../../services/cyrano/src/cyrano.service';
 import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
 import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
-import { RoomHeatEngine } from '../../services/creator-control/src/room-heat.engine';
+import { FlickerNFlameScoringEngine } from '../../services/creator-control/src/ffs.engine';
 import { PersonaManager } from '../../services/cyrano/src/persona.manager';
 import { SessionMemoryStore } from '../../services/cyrano/src/session-memory.store';
 import { CreatorControlPresenter } from '../../ui/view-models/creator-control.presenter';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
-import type { RoomHeatSample } from '../../services/creator-control/src/room-heat.engine';
+import type { FfsSample } from '../../services/creator-control/src/ffs.engine';
 import type { CyranoInputFrame } from '../../services/cyrano/src/cyrano.types';
 
 type Published = { topic: string; payload: Record<string, unknown> };
@@ -28,7 +28,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
     ),
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const heat = new RoomHeatEngine(stub as any);
+  const heat = new FlickerNFlameScoringEngine(stub as any);
   const timing = new BroadcastTimingCopilot();
   const monitoring = new SessionMonitoringCopilot();
   const creatorControl = new CreatorControlService(
@@ -49,7 +49,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
   return { hub, published };
 }
 
-const blazingSample: RoomHeatSample = {
+const blazingSample: FfsSample = {
   session_id: 'sess-payload8',
   creator_id: 'creator-payload8',
   tippers_online: 60,
@@ -119,7 +119,7 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
         direction: 'RAISE',
         magnitude_pct: 0.15,
         tier: 'BLAZING',
-        heat_score: 92,
+        ffs_score: 92,
         reason_code: 'BLAZING_RAISE',
         copy: 'Heat is at peak — push private show offer.',
         captured_at_utc: '2026-04-25T20:00:00Z',

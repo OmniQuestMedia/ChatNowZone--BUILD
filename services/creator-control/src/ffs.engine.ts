@@ -12,13 +12,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 
-export const ROOM_HEAT_RULE_ID = 'FFS_ENGINE_v1';
-/** @deprecated Use ROOM_HEAT_RULE_ID. Alias for backward compat with tests. */
-export const FFS_RULE_ID = ROOM_HEAT_RULE_ID;
+export const FFS_RULE_ID = 'FFS_ENGINE_v1';
 
-export type HeatTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
-export interface RoomHeatSample {
+export interface FfsSample {
   session_id: string;
   creator_id: string;
   tippers_online: number;         // how many viewers are currently tip-capable
@@ -29,10 +27,10 @@ export interface RoomHeatSample {
   captured_at_utc: string;
 }
 
-export interface HeatScore {
+export interface FfsScore {
   session_id: string;
   creator_id: string;
-  tier: HeatTier;
+  tier: FfsTier;
   score: number;                  // 0..100 composite
   components: {
     tipper_pressure: number;      // 0..40
@@ -46,7 +44,7 @@ export interface HeatScore {
 // Tier thresholds — canonical bands locked in GovernanceConfig.HEAT_BAND_* constants.
 // COLD 0–33, WARM 34–60, HOT 61–85, INFERNO 86–100.
 // Source of truth: GovernanceConfig (governance.config.ts) + DOMAIN_GLOSSARY.md.
-const TIER_THRESHOLDS: Array<{ min: number; tier: HeatTier }> = [
+const TIER_THRESHOLDS: Array<{ min: number; tier: FfsTier }> = [
   { min: 86, tier: 'INFERNO' },
   { min: 61, tier: 'HOT' },
   { min: 34, tier: 'WARM' },
@@ -54,15 +52,15 @@ const TIER_THRESHOLDS: Array<{ min: number; tier: HeatTier }> = [
 ];
 
 @Injectable()
-export class RoomHeatEngine {
-  private readonly logger = new Logger(RoomHeatEngine.name);
+export class FlickerNFlameScoringEngine {
+  private readonly logger = new Logger(FlickerNFlameScoringEngine.name);
   // Last-known tier per session — transition emits FFS_SCORE_TIER_CHANGED.
-  private readonly lastTier = new Map<string, HeatTier>();
+  private readonly lastTier = new Map<string, FfsTier>();
 
   constructor(private readonly nats: NatsService) {}
 
-  /** Compute a HeatScore from a sample. Pure; no side effects. */
-  computeScore(sample: RoomHeatSample): HeatScore {
+  /** Compute a FfsScore from a sample. Pure; no side effects. */
+  computeScore(sample: FfsSample): FfsScore {
     const tipperPressure = this.tipperPressure(sample.tippers_online);
     const velocity = this.velocity(sample.tips_per_minute, sample.avg_tip_tokens);
     const vipPresence = this.vipPresence(sample.diamond_guests_present);
@@ -81,7 +79,7 @@ export class RoomHeatEngine {
         vip_presence: vipPresence,
       },
       captured_at_utc: sample.captured_at_utc,
-      rule_applied_id: ROOM_HEAT_RULE_ID,
+      rule_applied_id: FFS_RULE_ID,
     };
   }
 
@@ -89,18 +87,18 @@ export class RoomHeatEngine {
    * Ingest a sample: score it, publish to NATS, and emit a tier-changed
    * signal when the tier crosses a band boundary.
    */
-  ingest(sample: RoomHeatSample): HeatScore {
+  ingest(sample: FfsSample): FfsScore {
     const score = this.computeScore(sample);
     this.nats.publish(NATS_TOPICS.FFS_SCORE_SAMPLE, { ...score });
 
     const prev = this.lastTier.get(sample.session_id);
     if (prev !== score.tier) {
       this.lastTier.set(sample.session_id, score.tier);
-      this.logger.log('RoomHeatEngine: tier transition', {
+      this.logger.log('FlickerNFlameScoringEngine: tier transition', {
         session_id: sample.session_id,
         from: prev ?? 'UNKNOWN',
         to: score.tier,
-        rule_applied_id: ROOM_HEAT_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
       });
       this.nats.publish(NATS_TOPICS.FFS_SCORE_TIER_CHANGED, {
         session_id: sample.session_id,
@@ -109,7 +107,7 @@ export class RoomHeatEngine {
         to: score.tier,
         score: score.score,
         captured_at_utc: score.captured_at_utc,
-        rule_applied_id: ROOM_HEAT_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
       });
     }
 
@@ -119,7 +117,7 @@ export class RoomHeatEngine {
         creator_id: sample.creator_id,
         score: score.score,
         captured_at_utc: score.captured_at_utc,
-        rule_applied_id: ROOM_HEAT_RULE_ID,
+        rule_applied_id: FFS_RULE_ID,
       });
     }
 
@@ -148,7 +146,7 @@ export class RoomHeatEngine {
     return Math.min(20, diamondGuests * 5);
   }
 
-  private resolveTier(score: number): HeatTier {
+  private resolveTier(score: number): FfsTier {
     for (const band of TIER_THRESHOLDS) {
       if (score >= band.min) return band.tier;
     }

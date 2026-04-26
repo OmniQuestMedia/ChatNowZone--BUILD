@@ -4,9 +4,9 @@
  * copilots. Hermetic tests, no broker connection required.
  */
 import {
-  RoomHeatEngine,
-  type RoomHeatSample,
-} from '../../services/creator-control/src/room-heat.engine';
+  FlickerNFlameScoringEngine,
+  type FfsSample,
+} from '../../services/creator-control/src/ffs.engine';
 import { BroadcastTimingCopilot } from '../../services/creator-control/src/broadcast-timing.copilot';
 import { SessionMonitoringCopilot } from '../../services/creator-control/src/session-monitoring.copilot';
 import { CreatorControlService } from '../../services/creator-control/src/creator-control.service';
@@ -24,7 +24,7 @@ function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
   return { stub, published };
 }
 
-function sample(overrides: Partial<RoomHeatSample> = {}): RoomHeatSample {
+function sample(overrides: Partial<FfsSample> = {}): FfsSample {
   return {
     session_id: 'sess-1',
     creator_id: 'creator-1',
@@ -38,11 +38,11 @@ function sample(overrides: Partial<RoomHeatSample> = {}): RoomHeatSample {
   };
 }
 
-describe('RoomHeatEngine — tier resolution', () => {
+describe('FlickerNFlameScoringEngine — tier resolution', () => {
   it('computes COLD when no tippers and no velocity', () => {
     const { stub } = natsStub();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const engine = new RoomHeatEngine(stub as any);
+    const engine = new FlickerNFlameScoringEngine(stub as any);
     const score = engine.computeScore(
       sample({ tippers_online: 0, tips_per_minute: 0, diamond_guests_present: 0, avg_tip_tokens: 0 }),
     );
@@ -53,7 +53,7 @@ describe('RoomHeatEngine — tier resolution', () => {
   it('computes INFERNO when pressure + velocity + VIPs all saturate', () => {
     const { stub } = natsStub();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const engine = new RoomHeatEngine(stub as any);
+    const engine = new FlickerNFlameScoringEngine(stub as any);
     const score = engine.computeScore(
       sample({
         tippers_online: 50,          // → 40 (capped)
@@ -69,7 +69,7 @@ describe('RoomHeatEngine — tier resolution', () => {
   it('publishes TIER_CHANGED only when the tier crosses a band boundary', () => {
     const { stub, published } = natsStub();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const engine = new RoomHeatEngine(stub as any);
+    const engine = new FlickerNFlameScoringEngine(stub as any);
     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // COLD
     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // still COLD
     engine.ingest(sample({ tippers_online: 40, tips_per_minute: 5, avg_tip_tokens: 4, diamond_guests_present: 1 })); // WARM+
@@ -176,7 +176,7 @@ describe('CreatorControlService — workstation orchestration', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      new RoomHeatEngine(stub as any),
+      new FlickerNFlameScoringEngine(stub as any),
       new BroadcastTimingCopilot(),
       new SessionMonitoringCopilot(),
     );
@@ -197,7 +197,7 @@ describe('CreatorControlService — workstation orchestration', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      new RoomHeatEngine(stub as any),
+      new FlickerNFlameScoringEngine(stub as any),
       new BroadcastTimingCopilot(),
       new SessionMonitoringCopilot(),
     );
@@ -214,7 +214,7 @@ describe('CreatorControlService — workstation orchestration', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      new RoomHeatEngine(stub as any),
+      new FlickerNFlameScoringEngine(stub as any),
       new BroadcastTimingCopilot(),
       new SessionMonitoringCopilot(),
     );

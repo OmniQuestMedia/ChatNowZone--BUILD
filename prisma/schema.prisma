@@ -1386,19 +1386,18 @@ model WormExportRecord {
   @@map("worm_export_records")
 }
 
-// ─── Flicker n'Flame Scoring (FFS) (WO-003 — Business Plan B.4) ───────────────
-// Migration: 20260425000000_add_room_heat
-// DB tables retain room_heat_* names for backward compatibility with existing data.
+// ─── Flicker n'Flame Scoring (FFS) Engine (WO-003 — Business Plan B.4) ────────────────────────────
+// Migration: 20260425000000_add_ffs_scoring
 
 /// Time-series FFS score snapshots — one row per ingest() call.
 /// Append-only by convention (no UPDATE/DELETE in service code).
-model RoomHeatSnapshot {
+model FfsSnapshot {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   session_id      String   @db.VarChar(200)
   creator_id      String   @db.Uuid
-  heat_score      Decimal  @db.Decimal(5, 2)
-  heat_tier       String   @db.VarChar(20)
-  /// JSON object of FfsScoreComponents (all 13 component values).
+  ffs_score      Decimal  @db.Decimal(5, 2)
+  ffs_tier       String   @db.VarChar(20)
+  /// JSON object of HeatScoreComponents (all 13 component values).
   components      Json
   correlation_id  String   @db.VarChar(128)
   reason_code     String   @db.VarChar(100)
@@ -1408,12 +1407,12 @@ model RoomHeatSnapshot {
 
   @@index([session_id, created_at])
   @@index([creator_id, created_at])
-  @@map("room_heat_snapshots")
+  @@map("ffs_snapshots")
 }
 
 /// Per-creator adaptive weight multipliers, learned from tip events.
 /// One row per creator — updated in-place via increment-only tip_events_seen.
-model RoomHeatAdaptiveWeights {
+model FfsAdaptiveWeights {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   creator_id      String   @unique @db.Uuid
   /// JSON Record<string, number> — multipliers for each scoring component.
@@ -1426,18 +1425,18 @@ model RoomHeatAdaptiveWeights {
   rule_applied_id String   @default("FFS_ADAPTIVE_v1") @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
 
-  @@map("room_heat_adaptive_weights")
+  @@map("ffs_adaptive_weights")
 }
 
-// ── HeartSync + Guest-Heat models ────────────────────────────────────────
+// ── SenSync™ + Guest-Heat models ────────────────────────────────────────
 
-// Per-tier on/off toggle for HeartSync biometric relay.
+// Per-tier on/off toggle for SenSync™ biometric relay.
 // Managed by platform operators. Non-FIZ; no financial impact.
-model HeartSyncTierConfig {
+model SenSyncTierConfig {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // Membership tier this row governs.
   tier           String   @db.VarChar(40)
-  // Whether HeartSync relay is enabled for this tier.
+  // Whether SenSync™ relay is enabled for this tier.
   enabled        Boolean  @default(false)
   // Whether COMBINED ("feel as one") mode is permitted for this tier.
   combined_mode  Boolean  @default(false)
@@ -1449,7 +1448,7 @@ model HeartSyncTierConfig {
 
   @@unique([tier])
   @@index([tier, enabled])
-  @@map("heartsync_tier_configs")
+  @@map("sensync_tier_configs")
 }
 
 // Room-level visual/haptic effect config (e.g. dual-flame pulse).
@@ -1525,6 +1524,35 @@ model GemstoneAward {
   @@index([guest_id, status])
   @@index([session_id, status])
   @@map("gemstone_awards")
+}
+
+// ── Fan Fervor Score ──────────────────────────────────────────────────────────
+// Append-only per-guest engagement score. No UPDATE, no DELETE.
+// Consumers: payout engine, UI effects, Cyrano, GateGuard Welfare Score,
+//   VelocityZone (via NATS FFS_SCORED).
+
+model FanFervorScore {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guest_id           String   @db.Uuid
+  session_id         String   @db.VarChar(100)
+  // Composite Fan Fervor Score 0–100.
+  ffs_score          Int
+  // Resolved tier: COLD | WARM | HOT | INFERNO.
+  ffs_tier           String   @db.VarChar(10)
+  // Raw base score before SenSync™/HeartSync boost.
+  base_score         Int
+  // Points added by the HeartSync biometric boost (0 if not opted in).
+  heartsync_boost    Int      @default(0)
+  // Whether the guest had active HeartSync biometric consent for this score.
+  heartsync_opted_in Boolean  @default(false)
+  correlation_id     String   @db.VarChar(100)
+  rule_applied_id    String   @db.VarChar(100)
+  scored_at          DateTime @default(now()) @db.Timestamptz
+
+  @@index([guest_id, scored_at])
+  @@index([session_id, scored_at])
+  @@index([ffs_tier, scored_at])
+  @@map("fan_fervor_scores")
 }
 
 // ── Fraud Prevention Models ───────────────────────────────────────────────────

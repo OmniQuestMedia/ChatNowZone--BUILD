@@ -1,11 +1,11 @@
 // PAYLOAD 7 — CreatorControl.Zone command center presenter.
-// Composes HeatScore + nudge + broadcast windows + Cyrano panel into a single
+// Composes FfsScore + nudge + broadcast windows + Cyrano panel into a single
 // CreatorCommandCenterView consumed by /creator/control. Pure TypeScript —
 // no NestJS dependencies, so the UI layer can be built / shipped independently
 // of the service bootstrap graph.
 
 import type {
-  HeatTier,
+  FfsTier,
   HeatMeterFrame,
   PriceNudgeCard,
   BroadcastWindowRow,
@@ -15,15 +15,15 @@ import type {
   BroadcastTimingDashboard,
   CreatorCommandCenterView,
   CyranoWhisperPanel,
+  FfsMeter,
   PayoutRateIndicator,
-  RoomHeatMeter,
   SessionMonitoringPanel,
 } from '../types/creator-panel-contracts';
 
 export const CREATOR_PRESENTER_RULE_ID = 'CREATOR_CONTROL_UI_v1';
 
-/** Tier-boundary lookup mirrors the Room-Heat Engine TIER_THRESHOLDS. */
-const TIER_BOUNDS: Record<HeatTier, { min: number; max: number }> = {
+/** Tier-boundary lookup mirrors the Flicker n'Flame Scoring (FFS) TIER_THRESHOLDS. */
+const TIER_BOUNDS: Record<FfsTier, { min: number; max: number }> = {
   COLD: { min: 0, max: 25 },
   WARM: { min: 25, max: 50 },
   HOT: { min: 50, max: 75 },
@@ -31,7 +31,7 @@ const TIER_BOUNDS: Record<HeatTier, { min: number; max: number }> = {
 };
 
 /** Payout scaling table mirrors integration-hub PAYOUT_SCALING_PCT_BY_TIER. */
-const PAYOUT_SCALING_BY_TIER: Record<HeatTier, number> = {
+const PAYOUT_SCALING_BY_TIER: Record<FfsTier, number> = {
   COLD: 0.0,
   WARM: 0.0,
   HOT: 0.05,
@@ -44,7 +44,7 @@ export const REDBOOK_PAYOUT_CEILING = 0.09;
 export interface HeatSampleInput {
   session_id: string;
   creator_id: string;
-  tier: HeatTier;
+  tier: FfsTier;
   score: number;
   components: {
     tipper_pressure: number;
@@ -59,8 +59,8 @@ export interface PriceNudgeInput {
   creator_id: string;
   direction: 'HOLD' | 'RAISE' | 'LOWER';
   magnitude_pct: number;
-  tier: HeatTier;
-  heat_score: number;
+  tier: FfsTier;
+  ffs_score: number;
   reason_code: string;
   copy: string;
   captured_at_utc: string;
@@ -79,7 +79,7 @@ export interface CyranoSuggestionInput {
   session_id: string;
   category: string;
   weight: number;
-  tier_context: HeatTier;
+  tier_context: FfsTier;
   copy: string;
   reason_codes: string[];
   emitted_at_utc: string;
@@ -159,7 +159,7 @@ export class CreatorControlPresenter {
     };
   }
 
-  buildHeatMeter(heat: HeatSampleInput): RoomHeatMeter {
+  buildHeatMeter(heat: HeatSampleInput): FfsMeter {
     const bounds = TIER_BOUNDS[heat.tier];
     return {
       session_id: heat.session_id,
@@ -193,7 +193,7 @@ export class CreatorControlPresenter {
           direction: nudge.direction,
           magnitude_pct: nudge.magnitude_pct,
           tier: nudge.tier,
-          heat_score: nudge.heat_score,
+          ffs_score: nudge.ffs_score,
           reason_code: nudge.reason_code,
           copy: nudge.copy,
         }
@@ -275,7 +275,7 @@ export class CreatorControlPresenter {
   buildPayoutRate(
     creator_id: string,
     base_rate: number,
-    tier: HeatTier,
+    tier: FfsTier,
     now: Date,
   ): PayoutRateIndicator {
     const scaling = PAYOUT_SCALING_BY_TIER[tier];
