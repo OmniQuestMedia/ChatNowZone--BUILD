@@ -49,7 +49,7 @@ function buildHub(): { hub: IntegrationHubService; published: Published[] } {
   return { hub, published };
 }
 
-const blazingSample: FfsSample = {
+const infernoSample: FfsSample = {
   session_id: 'sess-payload8',
   creator_id: 'creator-payload8',
   tippers_online: 60,
@@ -60,7 +60,7 @@ const blazingSample: FfsSample = {
   captured_at_utc: '2026-04-25T20:00:00Z',
 };
 
-const blazingFrame: Omit<CyranoInputFrame, 'heat'> = {
+const infernoFrame: Omit<CyranoInputFrame, 'heat'> = {
   session_id: 'sess-payload8',
   creator_id: 'creator-payload8',
   guest_id: 'guest-payload8',
@@ -76,8 +76,8 @@ describe('PAYLOAD 8 — high-heat E2E flow', () => {
   it('produces INFERNO heat → CAT_MONETIZATION → +10% payout scaling', async () => {
     const { hub, published } = buildHub();
     const result = await hub.processHighHeatSession({
-      sample: blazingSample,
-      frame: blazingFrame,
+      sample: infernoSample,
+      frame: infernoFrame,
       creator_payout_rate_per_token_usd: 0.075,
       base_wallet_id: 'wallet-payload8',
     });

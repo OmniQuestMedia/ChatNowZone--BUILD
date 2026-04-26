@@ -47,7 +47,7 @@ function makeHub(): {
   return { hub, published };
 }
 
-function blazingSample(): FfsSample {
+function infernoSample(): FfsSample {
   return {
     session_id: 'sess-e2e',
     creator_id: 'creator-e2e',
@@ -60,7 +60,7 @@ function blazingSample(): FfsSample {
   };
 }
 
-function blazingFrame(): Omit<CyranoInputFrame, 'heat'> {
+function infernoFrame(): Omit<CyranoInputFrame, 'heat'> {
   return {
     session_id: 'sess-e2e',
     creator_id: 'creator-e2e',
@@ -78,8 +78,8 @@ describe('IntegrationHubService.processHighHeatSession — E2E flow', () => {
   it('returns INFERNO heat + CAT_MONETIZATION suggestion + 10% payout scaling', async () => {
     const { hub, published } = makeHub();
     const result = await hub.processHighHeatSession({
-      sample: blazingSample(),
-      frame: blazingFrame(),
+      sample: infernoSample(),
+      frame: infernoFrame(),
       creator_payout_rate_per_token_usd: 0.075,
       base_wallet_id: 'wallet-creator-e2e',
     });
@@ -97,8 +97,8 @@ describe('IntegrationHubService.processHighHeatSession — E2E flow', () => {
   it('three-bucket spend order is returned verbatim from governance config', async () => {
     const { hub } = makeHub();
     const result = await hub.processHighHeatSession({
-      sample: blazingSample(),
-      frame: blazingFrame(),
+      sample: infernoSample(),
+      frame: infernoFrame(),
       creator_payout_rate_per_token_usd: 0.075,
       base_wallet_id: 'wallet-creator-e2e',
     });
@@ -120,7 +120,7 @@ describe('IntegrationHubService.processHighHeatSession — E2E flow', () => {
     };
     const result = await hub.processHighHeatSession({
       sample: coldSample,
-      frame: blazingFrame(),
+      frame: infernoFrame(),
       creator_payout_rate_per_token_usd: 0.075,
       base_wallet_id: 'wallet-creator-e2e',
     });
