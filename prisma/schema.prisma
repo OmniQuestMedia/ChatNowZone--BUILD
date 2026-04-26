@@ -1803,10 +1803,11 @@ model HczBudgetForecast {
 }
 
 // ── SenSync™ Biometric Layer (HZ — SenSync consent store) ────────────────────
-// Law 25 / GDPR / PIPEDA compliant. Append-only: no UPDATE or DELETE on
-// consent_granted_at. Revocation is recorded by stamping consent_revoked_at
-// on the existing active consent row (updateMany). The correlation_id column
-// is overwritten with the revocation action's ID for a complete audit trail.
+// Law 25 / GDPR / PIPEDA compliant. consent_granted_at is immutable once
+// recorded. Revocation is tracked by setting consent_revoked_at on the
+// existing consent row; the service does not create a separate revocation row.
+// The correlation_id column is overwritten with the revocation action's ID
+// for a complete audit trail.
 // Automatic purge on deletion request fires SENSYNC_PURGE_REQUESTED on NATS.
 
 model SenSyncConsent {
