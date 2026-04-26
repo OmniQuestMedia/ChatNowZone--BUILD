@@ -3,7 +3,7 @@
 // bind without re-deriving field names. The live Next.js app is not yet
 // bootstrapped — these contracts keep the frontend integration gap narrow.
 
-export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'BLAZING';
+export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
 
 export type CyranoCategory =
   | 'CAT_SESSION_OPEN'
