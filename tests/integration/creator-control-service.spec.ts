@@ -73,7 +73,7 @@ describe('FlickerNFlameScoringEngine — tier resolution', () => {
     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // COLD
     engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // still COLD
     engine.ingest(sample({ tippers_online: 40, tips_per_minute: 5, avg_tip_tokens: 4, diamond_guests_present: 1 })); // WARM+
-    const tierEvents = published.filter((p) => p.topic === NATS_TOPICS.FFS_SCORE_TIER_CHANGED);
+    const tierEvents = published.filter((p) => p.topic === NATS_TOPICS.FFS_TIER_CHANGED);
     // One transition COLD→X (initial set), then WARM (or higher) shift. Duplicates suppressed.
     expect(tierEvents.length).toBeGreaterThanOrEqual(1);
     expect(tierEvents.length).toBeLessThanOrEqual(2);
