@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-prize-pool-management-RmG9y`
-**Commit:** `59d0854629c185943edb5b07d3140e37fc5787e0`
-**Generated:** 2026-04-27T02:03:20Z
+**Branch:** `claude/creator-studio-rbac-system-Zy9dR`
+**Commit:** `749e14f9b49e5725aed2acc138485fbbd4a8456e`
+**Generated:** 2026-04-27T03:58:37Z
 
 ## All Files
 
@@ -337,6 +337,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
+- `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -345,6 +346,9 @@ Auto-generated on every push. Do not edit manually.
 - `scripts/seed-scheduling.ts`
 - `scripts/verify-gov-gate.sh`
 - `scripts/verify-vault-delivery.ts`
+- `services/affiliation-number/src/affiliation-number.module.ts`
+- `services/affiliation-number/src/affiliation-number.service.spec.ts`
+- `services/affiliation-number/src/affiliation-number.service.ts`
 - `services/assets/DigitalVaultService.ts`
 - `services/assets/WatermarkUtility.ts`
 - `services/bijou/src/bijou-admission.service.ts`
@@ -482,6 +486,12 @@ Auto-generated on every push. Do not edit manually.
 - `services/creator-control/src/creator-control.service.ts`
 - `services/creator-control/src/ffs.engine.ts`
 - `services/creator-control/src/session-monitoring.copilot.ts`
+- `services/creator-onboarding/src/creator-onboarding.controller.ts`
+- `services/creator-onboarding/src/creator-onboarding.module.ts`
+- `services/creator-onboarding/src/creator-onboarding.service.ts`
+- `services/creator-onboarding/src/dto/onboarding.dto.ts`
+- `services/creator-onboarding/src/email-domain.policy.spec.ts`
+- `services/creator-onboarding/src/email-domain.policy.ts`
 - `services/cyrano/.env.example`
 - `services/cyrano/ASSUMPTIONS.md`
 - `services/cyrano/FLAGS.md`
@@ -606,6 +616,16 @@ Auto-generated on every push. Do not edit manually.
 - `services/sensync/src/sensync.service.ts`
 - `services/sensync/src/sensync.types.ts`
 - `services/showzone/RETIRED.md`
+- `services/studio-affiliation/src/dto/studio.dto.ts`
+- `services/studio-affiliation/src/studio-affiliation.module.ts`
+- `services/studio-affiliation/src/studio-commission.service.ts`
+- `services/studio-affiliation/src/studio-contract.controller.ts`
+- `services/studio-affiliation/src/studio-contract.service.ts`
+- `services/studio-affiliation/src/studio-dashboard.controller.ts`
+- `services/studio-affiliation/src/studio-rbac.guard.spec.ts`
+- `services/studio-affiliation/src/studio-rbac.guard.ts`
+- `services/studio-affiliation/src/studio.controller.ts`
+- `services/studio-affiliation/src/studio.service.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`
 - `services/velocityzone/src/velocityzone.controller.ts`
@@ -688,6 +708,7 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/admin/recovery/page.ts`
 - `ui/app/creator/control/page.ts`
 - `ui/app/creator/gamification/page.ts`
+- `ui/app/creator/studio/page.ts`
 - `ui/app/diamond/purchase/page.ts`
 - `ui/app/tokens/page.ts`
 - `ui/app/wallet/page.ts`
