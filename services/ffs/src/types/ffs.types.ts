@@ -47,6 +47,12 @@ export interface FfsInput {
   facial_excitement_score: number;
   /** Optional SenSync™ BPM contribution (opt-in only; undefined if not consented or device unpaired). */
   sensync_bpm?: number;
+  /**
+   * Phase 3 — SenSync™ FFS quality boost in [10..25] points. Added directly to
+   * the composite score on top of the heart_rate component when present.
+   * Undefined when SenSync is not consented (BPM_TO_FFS scope) or unpaired.
+   */
+  sensync_boost_points?: number;
 
   // ── Group 3: Content / Behavioral Signals ─────────────────────────────────
   /** Content exposure level 0-1 (derived from vision-monitor). Advisory only. */

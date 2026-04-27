@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/rename-ffs-velocityzone-evFWv`
 **Commit:** `ee35a3ca1b4159deda8f6585fcb7cd5dd2daa183`
 **Generated:** 2026-04-27T03:18:55Z
+**Branch:** `feature/sensync-full-implementation-v1`
+**Commit:** `617e990f0baf4740a994c9888992181b7ee16209`
+**Generated:** 2026-04-27T03:13:42Z
 
 ## All Files
 
@@ -337,6 +340,8 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
+- `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
+- `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`

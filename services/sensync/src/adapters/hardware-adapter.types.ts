@@ -96,3 +96,27 @@ export interface SenSyncHardwareAdapter {
 export const HARDWARE_RECONNECT_INITIAL_BACKOFF_MS = 500;
 export const HARDWARE_RECONNECT_MAX_BACKOFF_MS = 30_000;
 export const HARDWARE_RECONNECT_MAX_ATTEMPTS = 10;
+
+/**
+ * Phase 1 — renderer-shim contract. WebUSB / WebBluetooth / future renderer-
+ * driven bridges decode the device descriptor in the browser and POST a
+ * normalised BPM frame to the service. Adapters that implement this surface
+ * accept those frames via `ingestRendererFrame`.
+ */
+export interface SenSyncRendererBridgeAdapter extends SenSyncHardwareAdapter {
+  ingestRendererFrame(args: {
+    session_id: string;
+    bpm: number;
+    captured_device_ms: number;
+  }): void;
+  notifyRendererDisconnect(args: { session_id: string; reason: string }): void;
+}
+
+export function isRendererBridgeAdapter(
+  a: SenSyncHardwareAdapter,
+): a is SenSyncRendererBridgeAdapter {
+  return (
+    typeof (a as Partial<SenSyncRendererBridgeAdapter>).ingestRendererFrame === 'function' &&
+    typeof (a as Partial<SenSyncRendererBridgeAdapter>).notifyRendererDisconnect === 'function'
+  );
+}
