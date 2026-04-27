@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/delete-finance-contracts-types-K2Iu3`
-**Commit:** `2f1497d5f79724338ed23c2ee15f2c35f13d1e23`
-**Generated:** 2026-04-26T23:37:43Z
-**Branch:** `claude/ffs-sensync-czt-velocityzone-upgrade-UEcUG`
-**Commit:** `b784177e4f2a1d7f7f38a7893e2ebc42f2aae887`
-**Generated:** 2026-04-27T01:05:10Z
+**Branch:** `claude/add-bundle-purchase-ynkrw`
+**Commit:** `33f5dd70459abbd08377326c547b46f3dbbcd9aa`
+**Generated:** 2026-04-27T01:26:24Z
 
 ## All Files
 
@@ -447,6 +444,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/refund/refund-disclosure.service.ts`
 - `services/core-api/src/refund/refund-disclosure.types.ts`
 - `services/core-api/src/refund/refund.module.ts`
+- `services/core-api/src/rewards/points.controller.ts`
+- `services/core-api/src/rewards/rewards.module.ts`
+- `services/core-api/src/rewards/rrr-client.service.ts`
 - `services/core-api/src/risk/risk-score.service.ts`
 - `services/core-api/src/safety/incident.service.ts`
 - `services/core-api/src/safety/provisional-suppression.service.ts`
@@ -553,6 +553,10 @@ Auto-generated on every push. Do not edit manually.
 - `services/recovery/src/recovery.service.ts`
 - `services/recovery/src/recovery.types.ts`
 - `services/rewards-api/src/engine/points-calculator.logic.ts`
+- `services/rewards-api/src/index.ts`
+- `services/rewards-api/src/interfaces/redroom-rewards.ts`
+- `services/rewards-api/src/services/points-purchase.service.ts`
+- `services/rewards-api/src/services/redroom-ledger.service.ts`
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
 - `services/risk-engine/src/risk.module.ts`
@@ -623,6 +627,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/nats-circuit-breaker.spec.ts`
 - `tests/integration/nats-sharding.spec.ts`
 - `tests/integration/notification-engine.spec.ts`
+- `tests/integration/points-purchase-bundles.spec.ts`
 - `tests/integration/purchase-hours-gate.spec.ts`
 - `tests/integration/rbac-service.spec.ts`
 - `tests/integration/recovery-engine.spec.ts`
