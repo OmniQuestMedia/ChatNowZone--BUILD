@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/refactor-token-economy-dN8pg`
-**Commit:** `01978ef6af3ce14631d6027d405f312e888ff17e`
-**Generated:** 2026-04-27T02:53:26Z
+**Branch:** `claude/implement-biometric-layer-d4KP5`
+**Commit:** `617e990f0baf4740a994c9888992181b7ee16209`
+**Generated:** 2026-04-27T03:13:44Z
 
 ## All Files
 
@@ -338,6 +338,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
+- `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
