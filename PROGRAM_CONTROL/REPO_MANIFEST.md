@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-prize-pool-management-RmG9y`
-**Commit:** `59d0854629c185943edb5b07d3140e37fc5787e0`
-**Generated:** 2026-04-27T02:03:20Z
+**Branch:** `claude/rename-ffs-velocityzone-evFWv`
+**Commit:** `ee35a3ca1b4159deda8f6585fcb7cd5dd2daa183`
+**Generated:** 2026-04-27T03:18:55Z
 
 ## All Files
 
@@ -646,6 +646,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/cyrano-prompt-templates.spec.ts`
 - `tests/integration/cyrano-service.spec.ts`
 - `tests/integration/diamond-concierge-service.spec.ts`
+- `tests/integration/ffs-sensync-boost.spec.ts`
 - `tests/integration/gamification-cooldown.spec.ts`
 - `tests/integration/gamification-prize-pool.spec.ts`
 - `tests/integration/gamification-weighted-selector.spec.ts`
