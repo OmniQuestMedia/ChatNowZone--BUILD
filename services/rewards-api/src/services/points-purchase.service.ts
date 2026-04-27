@@ -9,6 +9,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { findBundle, type PointsBundle } from '../interfaces/redroom-rewards';
 import { RedRoomLedgerService } from './redroom-ledger.service';
+import { GateGuardSentinelService, NoopGateGuardSentinel } from './gate-guard-sentinel.service';
 
 export type PointsAuditEventType = 'POINTS_PURCHASE_AUTHORIZATION';
 
@@ -65,13 +66,15 @@ export class InvalidBundleError extends Error {
 export class PointsPurchaseService {
   private readonly logger = new Logger(PointsPurchaseService.name);
   private readonly clock: () => Date;
+  private readonly sentinel: GateGuardSentinelService;
 
   constructor(
     private readonly ledger: RedRoomLedgerService,
     private readonly auditSink: PointsAuditSink = new InMemoryPointsAuditSink(),
-    deps: { clock?: () => Date } = {},
+    deps: { clock?: () => Date; sentinel?: GateGuardSentinelService } = {},
   ) {
     this.clock = deps.clock ?? (() => new Date());
+    this.sentinel = deps.sentinel ?? new NoopGateGuardSentinel();
   }
 
   async purchaseBundle(
@@ -88,6 +91,13 @@ export class PointsPurchaseService {
     if (!bundle) {
       throw new InvalidBundleError(bundleId);
     }
+
+    // GateGuard Sentinel evaluation — fraud/welfare scoring on the purchase
+    // pattern. HARD_DECLINE throws a SentinelDeclineError; nothing past this
+    // point runs (no audit row, no ledger credit).
+    await this.sentinel.evaluateTransaction(creatorId, bundle.points, 'PURCHASE', {
+      bundleId: bundle.id,
+    });
 
     // Immutable audit record FIRST — no points are credited unless the
     // authorization is durably recorded.

@@ -8,12 +8,23 @@
 // against the creator's next payout (settled by the FFS payout service).
 
 import { Injectable, Logger } from '@nestjs/common';
+import {
+  GateGuardSentinelService,
+  NoopGateGuardSentinel,
+  type SentinelContext,
+} from './gate-guard-sentinel.service';
+import {
+  type AccountVerificationService,
+  InProcessAccountVerificationService,
+} from './account-verification.service';
 
 export type PointsLedgerReason =
   | 'POINTS_PURCHASE'
   | 'POINTS_SPEND'
   | 'POINTS_BONUS'
-  | 'POINTS_REFUND';
+  | 'POINTS_REFUND'
+  | 'REDROOM_REWARDS'
+  | 'CREATOR_GIFT';
 
 export interface PointsLedgerEntry {
   id: string;
@@ -61,11 +72,31 @@ export class InMemoryPointsLedgerSink implements PointsLedgerSink {
   }
 }
 
+export class AvVerificationRequiredError extends Error {
+  constructor() {
+    super('18+ verification required');
+    this.name = 'AvVerificationRequiredError';
+  }
+}
+
+export interface RedRoomLedgerCompliance {
+  sentinel?: GateGuardSentinelService;
+  av?: AccountVerificationService;
+}
+
 @Injectable()
 export class RedRoomLedgerService {
   private readonly logger = new Logger(RedRoomLedgerService.name);
+  private readonly sentinel: GateGuardSentinelService;
+  private readonly av: AccountVerificationService;
 
-  constructor(private readonly sink: PointsLedgerSink = new InMemoryPointsLedgerSink()) {}
+  constructor(
+    private readonly sink: PointsLedgerSink = new InMemoryPointsLedgerSink(),
+    compliance: RedRoomLedgerCompliance = {},
+  ) {
+    this.sentinel = compliance.sentinel ?? new NoopGateGuardSentinel();
+    this.av = compliance.av ?? new InProcessAccountVerificationService();
+  }
 
   async creditPoints(
     creatorId: string,
@@ -93,5 +124,33 @@ export class RedRoomLedgerService {
 
   async getBalance(creatorId: string): Promise<number> {
     return this.sink.getBalance(creatorId);
+  }
+
+  /**
+   * Full GateGuard Sentinel-gated award path. Used for system-issued points
+   * (RedRoom Rewards onboarding, milestone bonuses, creator-issued promos
+   * etc.) where 18+ verification AND fraud/welfare scoring must clear before
+   * the ledger is mutated.
+   *
+   * Throws `AvVerificationRequiredError` if AV fails.
+   * Throws `SentinelDeclineError` (from the Sentinel) on HARD_DECLINE.
+   */
+  async awardPointsWithCompliance(
+    guestId: string,
+    points: number,
+    reason: string,
+    context: SentinelContext = {},
+  ): Promise<boolean> {
+    const avResult = await this.av.verifyAccount(guestId);
+    if (!avResult.verified) {
+      throw new AvVerificationRequiredError();
+    }
+
+    await this.sentinel.evaluateTransaction(guestId, points, 'AWARD', {
+      reason,
+      ...context,
+    });
+
+    return this.creditPoints(guestId, points, 'REDROOM_REWARDS', reason);
   }
 }
