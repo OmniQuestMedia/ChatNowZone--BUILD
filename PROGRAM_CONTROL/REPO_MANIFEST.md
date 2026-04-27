@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/add-bundle-purchase-ynkrw`
 **Commit:** `33f5dd70459abbd08377326c547b46f3dbbcd9aa`
 **Generated:** 2026-04-27T01:26:24Z
+**Branch:** `claude/add-gift-controller-AaDf7`
+**Commit:** `d9a16775f23e4aea42554bd096ddb2616ca2fdc5`
+**Generated:** 2026-04-27T01:25:21Z
 
 ## All Files
 
@@ -421,6 +424,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/gateguard/gateguard.types.ts`
 - `services/core-api/src/gateguard/welfare-guardian.scorer.ts`
 - `services/core-api/src/geo/geo-pricing.service.ts`
+- `services/core-api/src/gifts/gift.controller.spec.ts`
+- `services/core-api/src/gifts/gift.controller.ts`
+- `services/core-api/src/gifts/gifts.module.ts`
+- `services/core-api/src/gifts/rrr-client.service.spec.ts`
+- `services/core-api/src/gifts/rrr-client.service.ts`
 - `services/core-api/src/governance/governance.config.ts`
 - `services/core-api/src/growth/growth.module.ts`
 - `services/core-api/src/growth/guarded-notification.service.ts`
@@ -659,6 +667,8 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/tokens/page.ts`
 - `ui/app/wallet/page.ts`
 - `ui/components/render-plan.ts`
+- `ui/components/send-gift-panel.spec.ts`
+- `ui/components/send-gift-panel.ts`
 - `ui/config/accessibility.ts`
 - `ui/config/build-config.ts`
 - `ui/config/seo.ts`

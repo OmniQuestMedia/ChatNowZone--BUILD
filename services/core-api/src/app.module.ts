@@ -15,6 +15,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { NatsModule } from './nats/nats.module';
 import { PrismaModule } from './prisma.module';
 import { GamesModule } from './games/games.module';
+import { GiftsModule } from './gifts/gifts.module';
 import { SovereignCaCMiddleware } from './compliance/sovereign-cac.middleware';
 import { ZoneGptModule } from '../../zone-gpt/src/zone-gpt.module';
 import { BijouModule } from '../../bijou/src/bijou.module';
@@ -42,8 +43,8 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
         port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
       },
     }),
-    GateGuardModule,   // Register before finance-adjacent modules — middleware
-                       //  wires against /purchase, /spend, /payout below.
+    GateGuardModule, // Register before finance-adjacent modules — middleware
+    //  wires against /purchase, /spend, /payout below.
     CreatorModule,
     SafetyModule,
     GrowthModule,
@@ -52,6 +53,7 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     DfspModule,
     PaymentsModule,
     GamesModule,
+    GiftsModule,
     ZoneGptModule,
     BijouModule,
     AuthModule,
@@ -66,21 +68,15 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(SovereignCaCMiddleware)
-      .forRoutes('*');
+    consumer.apply(SovereignCaCMiddleware).forRoutes('*');
 
     // PAYLOAD 3: GateGuard runs AFTER SovereignCaCMiddleware (jurisdiction
     // context is attached first) but BEFORE any ledger mutation handler.
-    consumer
-      .apply(GateGuardMiddleware)
-      .forRoutes('/purchase', '/spend', '/payout');
+    consumer.apply(GateGuardMiddleware).forRoutes('/purchase', '/spend', '/payout');
 
     // PAYLOAD 6: Three-bucket spend-order guard runs after GateGuard on
     // /spend routes. Final defence against a handler that tries to debit
     // PURCHASED before MEMBERSHIP_ALLOCATION or PROMOTIONAL_BONUS.
-    consumer
-      .apply(ThreeBucketSpendGuardMiddleware)
-      .forRoutes('/spend');
+    consumer.apply(ThreeBucketSpendGuardMiddleware).forRoutes('/spend');
   }
 }
