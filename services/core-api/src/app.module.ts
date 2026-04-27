@@ -26,6 +26,7 @@ import { MembershipModule } from './membership/membership.module';
 import { GateGuardModule } from './gateguard/gateguard.module';
 import { GateGuardMiddleware } from './gateguard/gateguard.middleware';
 import { AuditModule } from './audit/audit.module';
+import { RewardsModule } from './rewards/rewards.module';
 import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-guard.middleware';
 import { FfsModule } from '../../ffs/src/ffs.module';
 import { SenSyncModule } from '../../sensync/src/sensync.module';
@@ -62,6 +63,7 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     FfsModule,
     SenSyncModule,
     GuestHeatModule,
+    RewardsModule,
   ],
 })
 export class AppModule implements NestModule {

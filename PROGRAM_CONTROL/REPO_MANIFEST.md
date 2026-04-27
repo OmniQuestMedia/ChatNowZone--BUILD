@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-gift-controller-AaDf7`
-**Commit:** `d9a16775f23e4aea42554bd096ddb2616ca2fdc5`
-**Generated:** 2026-04-27T01:25:21Z
+**Branch:** `claude/add-bundle-purchase-ynkrw`
+**Commit:** `92d16b1cfe654e96864b585e06a12b3605e41a2d`
+**Generated:** 2026-04-27T01:27:22Z
 
 ## All Files
 
@@ -449,6 +449,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/refund/refund-disclosure.service.ts`
 - `services/core-api/src/refund/refund-disclosure.types.ts`
 - `services/core-api/src/refund/refund.module.ts`
+- `services/core-api/src/rewards/points.controller.ts`
+- `services/core-api/src/rewards/rewards.module.ts`
+- `services/core-api/src/rewards/rrr-client.service.ts`
 - `services/core-api/src/risk/risk-score.service.ts`
 - `services/core-api/src/safety/incident.service.ts`
 - `services/core-api/src/safety/provisional-suppression.service.ts`
@@ -555,6 +558,10 @@ Auto-generated on every push. Do not edit manually.
 - `services/recovery/src/recovery.service.ts`
 - `services/recovery/src/recovery.types.ts`
 - `services/rewards-api/src/engine/points-calculator.logic.ts`
+- `services/rewards-api/src/index.ts`
+- `services/rewards-api/src/interfaces/redroom-rewards.ts`
+- `services/rewards-api/src/services/points-purchase.service.ts`
+- `services/rewards-api/src/services/redroom-ledger.service.ts`
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
 - `services/risk-engine/src/risk.module.ts`
@@ -625,6 +632,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/nats-circuit-breaker.spec.ts`
 - `tests/integration/nats-sharding.spec.ts`
 - `tests/integration/notification-engine.spec.ts`
+- `tests/integration/points-purchase-bundles.spec.ts`
 - `tests/integration/purchase-hours-gate.spec.ts`
 - `tests/integration/rbac-service.spec.ts`
 - `tests/integration/recovery-engine.spec.ts`
