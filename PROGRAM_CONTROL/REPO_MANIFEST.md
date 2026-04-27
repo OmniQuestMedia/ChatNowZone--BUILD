@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/ffs-sensync-czt-velocityzone-upgrade-UEcUG`
 **Commit:** `8e0acd2d74210f65699e9d02643de2dd2de5b591`
 **Generated:** 2026-04-27T00:05:31Z
+**Branch:** `claude/delete-surfaces-roster-gateway-K2Iu3`
+**Commit:** `f4c576c8ddebf668a2c17032e1a34676b1b8092f`
+**Generated:** 2026-04-26T23:36:53Z
 
 ## All Files
 
@@ -394,7 +397,6 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/creator/statements.controller.ts`
 - `services/core-api/src/creator/statements.service.ts`
 - `services/core-api/src/creator/surfaces/dashboard.controller.ts`
-- `services/core-api/src/creator/surfaces/roster.gateway.ts`
 - `services/core-api/src/creator/surfaces/statements.service.ts`
 - `services/core-api/src/db.ts`
 - `services/core-api/src/dfsp/account-recovery-hold.service.ts`
