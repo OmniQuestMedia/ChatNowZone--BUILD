@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/phase-3c-di-dead-code-research-K2Iu3`
-**Commit:** `aff478d02159c7829b90c1fb61d4154c0867a617`
-**Generated:** 2026-04-26T23:31:53Z
+**Branch:** `claude/ffs-sensync-czt-velocityzone-upgrade-UEcUG`
+**Commit:** `8e0acd2d74210f65699e9d02643de2dd2de5b591`
+**Generated:** 2026-04-27T00:05:31Z
 
 ## All Files
 
@@ -253,6 +253,13 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-zoom-clone/REFS_MANIFEST.md`
 - `REFERENCE_LIBRARY/TEMPLATES/OQMInc_REFERENCE_LIBRARY_MASTER_TEMPLATE.md`
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
+- `apps/cyrano-standalone/README.md`
+- `apps/cyrano-standalone/app/layout.tsx`
+- `apps/cyrano-standalone/app/page.tsx`
+- `apps/cyrano-standalone/lib/cyrano-client.ts`
+- `apps/cyrano-standalone/next.config.js`
+- `apps/cyrano-standalone/package.json`
+- `apps/cyrano-standalone/tsconfig.json`
 - `archive/LEGACY_CONFIGS_2026-04/.eslintrc.js`
 - `archive/LEGACY_CONFIGS_2026-04/.gitignore`
 - `archive/LEGACY_CONFIGS_2026-04/.prettierrc`
@@ -472,6 +479,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/ASSUMPTIONS.md`
 - `services/cyrano/FLAGS.md`
 - `services/cyrano/README.md`
+- `services/cyrano/src/cyrano-layer3-hcz.service.ts`
+- `services/cyrano/src/cyrano-layer4-enterprise.service.ts`
+- `services/cyrano/src/cyrano-prompt-templates.ts`
 - `services/cyrano/src/cyrano.module.ts`
 - `services/cyrano/src/cyrano.service.ts`
 - `services/cyrano/src/cyrano.types.ts`
@@ -520,6 +530,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/ledger/redbook-rate-card.service.ts`
 - `services/ledger/repository.ts`
 - `services/ledger/types.ts`
+- `services/nats/optim/batch-publisher.service.ts`
+- `services/nats/optim/circuit-breaker.service.ts`
+- `services/nats/optim/jetstream.config.ts`
+- `services/nats/optim/nats-optim.module.ts`
+- `services/nats/optim/sharding.util.ts`
 - `services/nats/topics.registry.js`
 - `services/nats/topics.registry.js.map`
 - `services/nats/topics.registry.ts`
@@ -543,7 +558,16 @@ Auto-generated on every push. Do not edit manually.
 - `services/sensync/ASSUMPTIONS.md`
 - `services/sensync/FLAGS.md`
 - `services/sensync/README.md`
+- `services/sensync/src/adapters/base-hardware.adapter.ts`
+- `services/sensync/src/adapters/hardware-adapter.registry.ts`
+- `services/sensync/src/adapters/hardware-adapter.types.ts`
+- `services/sensync/src/adapters/lovense.adapter.ts`
+- `services/sensync/src/adapters/phone-haptic.adapter.ts`
+- `services/sensync/src/adapters/webble.adapter.ts`
+- `services/sensync/src/adapters/webusb.adapter.ts`
+- `services/sensync/src/sensync-rate-limit.service.ts`
 - `services/sensync/src/sensync.controller.ts`
+- `services/sensync/src/sensync.metrics.ts`
 - `services/sensync/src/sensync.module.ts`
 - `services/sensync/src/sensync.service.ts`
 - `services/sensync/src/sensync.types.ts`
@@ -584,6 +608,8 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/canonical-ledger.spec.ts`
 - `tests/integration/compliance-guard.spec.ts`
 - `tests/integration/creator-control-service.spec.ts`
+- `tests/integration/cyrano-layer4-enterprise.spec.ts`
+- `tests/integration/cyrano-prompt-templates.spec.ts`
 - `tests/integration/cyrano-service.spec.ts`
 - `tests/integration/diamond-concierge-service.spec.ts`
 - `tests/integration/gateguard-middleware.spec.ts`
@@ -592,6 +618,8 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/immutable-audit-service.spec.ts`
 - `tests/integration/integration-hub.spec.ts`
 - `tests/integration/ledger-service.spec.ts`
+- `tests/integration/nats-circuit-breaker.spec.ts`
+- `tests/integration/nats-sharding.spec.ts`
 - `tests/integration/notification-engine.spec.ts`
 - `tests/integration/purchase-hours-gate.spec.ts`
 - `tests/integration/rbac-service.spec.ts`
@@ -601,6 +629,8 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/refund-disclosure.spec.ts`
 - `tests/integration/scheduling-service.spec.ts`
 - `tests/integration/seed-loader.ts`
+- `tests/integration/sensync-metrics.spec.ts`
+- `tests/integration/sensync-rate-limit.spec.ts`
 - `tests/integration/stat-holidays.spec.ts`
 - `tests/integration/three-bucket-spend-guard.spec.ts`
 - `tests/integration/zonebot-service.spec.ts`
