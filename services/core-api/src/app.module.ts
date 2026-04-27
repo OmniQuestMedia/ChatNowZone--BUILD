@@ -31,6 +31,7 @@ import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-gu
 import { FfsModule } from '../../ffs/src/ffs.module';
 import { SenSyncModule } from '../../sensync/src/sensync.module';
 import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
+import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
     SenSyncModule,
     GuestHeatModule,
     RewardsModule,
+    CyranoAuthModule,
   ],
 })
 export class AppModule implements NestModule {
