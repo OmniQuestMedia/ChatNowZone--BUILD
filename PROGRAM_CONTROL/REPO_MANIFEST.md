@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/cyrano-layer-2-implementation-qM4fy`
 **Commit:** `15a0eded688ae469d7c94cec66b20067c607407f`
 **Generated:** 2026-04-27T03:13:36Z
+**Branch:** `claude/implement-biometric-layer-d4KP5`
+**Commit:** `a18b71d2adb61f3075e023cb889718e94150f2f4`
+**Generated:** 2026-04-27T03:20:02Z
 
 ## All Files
 
@@ -344,6 +347,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
+- `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`

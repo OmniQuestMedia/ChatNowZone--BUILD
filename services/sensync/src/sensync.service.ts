@@ -13,7 +13,14 @@
 //   • Hardware tiers: only VIP_DIAMOND may use hardware bridges. Other tiers
 //     receive TIER_SENSYNC_HARDWARE_DISABLED and the session is rejected.
 
-import { BadRequestException, Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  Optional,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
@@ -25,12 +32,21 @@ import {
   SENSYNC_BPM_MAX,
   SENSYNC_BPM_MIN,
   SENSYNC_CONSENT_VERSION,
+  SENSYNC_DEFAULT_CONSENT_SCOPES,
+  SENSYNC_DEFAULT_CONSENT_TTL_SECONDS,
+  SENSYNC_FFS_BOOST_MAX,
+  SENSYNC_FFS_BOOST_MIN,
   SENSYNC_HARDWARE_TIERS,
+  SENSYNC_MAX_CONSENT_TTL_SECONDS,
+  SENSYNC_MIN_CONSENT_TTL_SECONDS,
   SENSYNC_RULE_ID,
   type MembershipTier,
+  type SenSyncAuditEvent,
   type SenSyncBiometricPayload,
+  type SenSyncBpmUpdatePayload,
   type SenSyncConsentBasis,
   type SenSyncConsentRecord,
+  type SenSyncConsentScope,
   type SenSyncDomain,
   type SenSyncHardwareBridge,
   type SenSyncHardwareEvent,
@@ -43,15 +59,28 @@ import {
   type SenSyncValidSample,
 } from './sensync.types';
 
+/** Phase 4 — interval at which the in-memory consent cache is swept for expired rows. */
+const SENSYNC_EXPIRY_SWEEP_INTERVAL_MS = 60_000;
+
 @Injectable()
-export class SenSyncService implements OnModuleInit {
+export class SenSyncService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SenSyncService.name);
+  private expirySweepTimer: NodeJS.Timeout | null = null;
 
   /** Ephemeral in-session state — never persisted directly. */
   private readonly sessions = new Map<string, SenSyncSessionState>();
 
-  /** Consent cache keyed by `${session_id}:${guest_id}`. */
-  private readonly consentCache = new Map<string, boolean>();
+  /**
+   * Phase 5.3 — scope-aware consent cache.
+   * Key: `${session_id}:${guest_id}`.
+   * Value: an object containing the granted scope set + UTC ms expiry. A
+   * missing entry forces a DB lookup; a present entry with empty scope set
+   * means "consent revoked / not granted" and short-circuits the gate.
+   */
+  private readonly consentCache = new Map<
+    string,
+    { scopes: Set<SenSyncConsentScope>; expires_at_ms: number | null }
+  >();
 
   constructor(
     private readonly nats: NatsService,
@@ -70,6 +99,51 @@ export class SenSyncService implements OnModuleInit {
       metrics: this.metrics ? 'enabled' : 'disabled',
     });
     this.bindHardwareAdapters();
+    this.startExpirySweep();
+  }
+
+  onModuleDestroy(): void {
+    if (this.expirySweepTimer) {
+      clearInterval(this.expirySweepTimer);
+      this.expirySweepTimer = null;
+    }
+  }
+
+  /**
+   * Phase 4 — periodic expiry sweep. Walks the in-memory consent cache and
+   * tears down entries whose TTL has elapsed, even when no sample has been
+   * submitted recently. Emits a CONSENT_EXPIRED audit event per evicted row.
+   */
+  private startExpirySweep(): void {
+    const handle = setInterval(() => {
+      const now = Date.now();
+      for (const [key, cached] of this.consentCache) {
+        if (cached.expires_at_ms !== null && now >= cached.expires_at_ms) {
+          this.consentCache.delete(key);
+          const [session_id, guest_id] = key.split(':');
+          const state = this.sessions.get(session_id);
+          if (state) {
+            state.consent_granted = false;
+            state.consent_scopes.clear();
+            state.consent_expires_at_ms = undefined;
+            state.last_bpm = undefined;
+            state.last_sample_at_utc = undefined;
+          }
+          this.rateLimiter?.forget(session_id);
+          this.emitAudit({
+            event_type: 'CONSENT_EXPIRED',
+            session_id,
+            guest_id,
+            creator_id: state?.creator_id,
+            domain: state?.domain ?? 'ADULT_ENTERTAINMENT',
+            correlation_id: `sensync-expiry-sweep-${session_id}`,
+            reason_code: 'SENSYNC_CONSENT_EXPIRED',
+          });
+        }
+      }
+    }, SENSYNC_EXPIRY_SWEEP_INTERVAL_MS);
+    if (typeof handle.unref === 'function') handle.unref();
+    this.expirySweepTimer = handle;
   }
 
   // ── Public API ──────────────────────────────────────────────────────────────
@@ -103,6 +177,7 @@ export class SenSyncService implements OnModuleInit {
       domain,
       bridge,
       consent_granted: false,
+      consent_scopes: new Set<SenSyncConsentScope>(),
     };
 
     this.sessions.set(session_id, state);
@@ -127,8 +202,9 @@ export class SenSyncService implements OnModuleInit {
 
   /**
    * Grant SenSync consent for a session.
-   * Persists a SenSyncConsent row to Postgres.
-   * Emits SENSYNC_CONSENT_GRANTED on NATS.
+   * Phase 5.3 — explicit opt-in with granular scopes and ephemerality TTL.
+   * Persists a SenSyncConsent row to Postgres and emits SENSYNC_CONSENT_GRANTED
+   * on NATS. Also publishes a SenSyncAuditEvent for the immutable audit log.
    */
   async grantConsent(args: {
     session_id: string;
@@ -138,6 +214,8 @@ export class SenSyncService implements OnModuleInit {
     ip_hash?: string;
     device_fingerprint?: string;
     correlation_id: string;
+    scopes?: SenSyncConsentScope[];
+    ttl_seconds?: number;
   }): Promise<SenSyncConsentRecord> {
     const now = new Date();
 
@@ -147,6 +225,13 @@ export class SenSyncService implements OnModuleInit {
       );
     }
 
+    const scopes = (args.scopes && args.scopes.length > 0
+      ? Array.from(new Set(args.scopes))
+      : [...SENSYNC_DEFAULT_CONSENT_SCOPES]) as SenSyncConsentScope[];
+
+    const ttl = clampTtlSeconds(args.ttl_seconds);
+    const consent_expires_at = new Date(now.getTime() + ttl * 1000);
+
     const row = await this.prisma.senSyncConsent.create({
       data: {
         session_id: args.session_id,
@@ -155,6 +240,8 @@ export class SenSyncService implements OnModuleInit {
         consent_version: SENSYNC_CONSENT_VERSION,
         basis: 'EXPLICIT_OPT_IN' satisfies SenSyncConsentBasis,
         consent_granted_at: now,
+        consent_scopes: scopes,
+        consent_expires_at,
         ip_hash: args.ip_hash ?? null,
         device_fingerprint: args.device_fingerprint ?? null,
         domain: args.domain ?? 'ADULT_ENTERTAINMENT',
@@ -166,8 +253,15 @@ export class SenSyncService implements OnModuleInit {
 
     // Update ephemeral session state.
     const state = this.sessions.get(args.session_id);
-    if (state) state.consent_granted = true;
-    this.consentCache.set(`${args.session_id}:${args.guest_id}`, true);
+    if (state) {
+      state.consent_granted = true;
+      state.consent_scopes = new Set(scopes);
+      state.consent_expires_at_ms = consent_expires_at.getTime();
+    }
+    this.consentCache.set(`${args.session_id}:${args.guest_id}`, {
+      scopes: new Set(scopes),
+      expires_at_ms: consent_expires_at.getTime(),
+    });
 
     const record: SenSyncConsentRecord = {
       consent_id: row.id,
@@ -177,6 +271,8 @@ export class SenSyncService implements OnModuleInit {
       consent_version: row.consent_version,
       basis: row.basis as SenSyncConsentBasis,
       consent_granted_at: row.consent_granted_at.toISOString(),
+      consent_scopes: scopes,
+      consent_expires_at: consent_expires_at.toISOString(),
       ip_hash: row.ip_hash ?? undefined,
       device_fingerprint: row.device_fingerprint ?? undefined,
       domain: row.domain as SenSyncDomain,
@@ -188,15 +284,137 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_GRANTED, {
       ...record,
     } as unknown as Record<string, unknown>);
+    this.emitAudit({
+      event_type: 'CONSENT_GRANTED',
+      session_id: args.session_id,
+      guest_id: args.guest_id,
+      creator_id: args.creator_id,
+      domain: args.domain ?? 'ADULT_ENTERTAINMENT',
+      correlation_id: args.correlation_id,
+      reason_code: 'SENSYNC_CONSENT_GRANTED',
+    });
 
     this.metrics?.recordConsentGranted();
 
     this.logger.log('SenSyncService: consent granted', {
       session_id: args.session_id,
       guest_id: args.guest_id,
+      scopes,
+      ttl_seconds: ttl,
     });
 
     return record;
+  }
+
+  /**
+   * Phase 5.3 — granular scope revocation.
+   * Removes the named scope from every active consent row for this
+   * session+guest. If no scopes remain after the operation, the row is
+   * fully revoked (basis=REVOKED) and ephemeral data is cleared. Emits
+   * SENSYNC_CONSENT_REVOKED on full revocation, otherwise emits an audit
+   * event with reason_code=SENSYNC_CONSENT_SCOPE_REVOKED.
+   */
+  async revokeConsentScope(args: {
+    session_id: string;
+    creator_id: string;
+    guest_id: string;
+    scope: SenSyncConsentScope;
+    correlation_id: string;
+  }): Promise<void> {
+    const rows = await this.prisma.senSyncConsent.findMany({
+      where: {
+        session_id: args.session_id,
+        guest_id: args.guest_id,
+        consent_revoked_at: null,
+      },
+    });
+
+    if (rows.length === 0) {
+      this.logger.warn('SenSyncService: scope revoke — no active consent', {
+        session_id: args.session_id,
+        guest_id: args.guest_id,
+        scope: args.scope,
+      });
+      return;
+    }
+
+    const now = new Date();
+    let fullyRevokedAny = false;
+
+    for (const row of rows) {
+      const current = parseScopeArray(row.consent_scopes);
+      if (!current.includes(args.scope)) continue;
+      const next = current.filter((s) => s !== args.scope);
+      const fullyRevoked = next.length === 0;
+      await this.prisma.senSyncConsent.update({
+        where: { id: row.id },
+        data: {
+          consent_scopes: next,
+          basis: (fullyRevoked
+            ? 'REVOKED'
+            : 'PARTIALLY_REVOKED') satisfies SenSyncConsentBasis,
+          consent_revoked_at: fullyRevoked ? now : null,
+          reason_code: fullyRevoked
+            ? 'SENSYNC_CONSENT_REVOKED'
+            : 'SENSYNC_CONSENT_SCOPE_REVOKED',
+          correlation_id: args.correlation_id,
+        },
+      });
+      if (fullyRevoked) fullyRevokedAny = true;
+    }
+
+    // Update ephemeral state.
+    const state = this.sessions.get(args.session_id);
+    if (state) {
+      state.consent_scopes.delete(args.scope);
+      if (state.consent_scopes.size === 0) {
+        state.consent_granted = false;
+        state.last_bpm = undefined;
+        state.last_sample_at_utc = undefined;
+      }
+    }
+    const cacheKey = `${args.session_id}:${args.guest_id}`;
+    const cached = this.consentCache.get(cacheKey);
+    if (cached) {
+      cached.scopes.delete(args.scope);
+      if (cached.scopes.size === 0) this.consentCache.delete(cacheKey);
+    }
+
+    if (fullyRevokedAny) {
+      this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, {
+        event_id: randomUUID(),
+        session_id: args.session_id,
+        creator_id: args.creator_id,
+        guest_id: args.guest_id,
+        basis: 'REVOKED',
+        revoked_at_utc: now.toISOString(),
+        correlation_id: args.correlation_id,
+        reason_code: 'SENSYNC_CONSENT_REVOKED',
+        rule_applied_id: SENSYNC_RULE_ID,
+      } as unknown as Record<string, unknown>);
+      this.rateLimiter?.forget(args.session_id);
+      this.metrics?.recordConsentRevoked();
+    }
+
+    this.emitAudit({
+      event_type: fullyRevokedAny ? 'CONSENT_REVOKED' : 'CONSENT_SCOPE_REVOKED',
+      session_id: args.session_id,
+      guest_id: args.guest_id,
+      creator_id: args.creator_id,
+      scope: args.scope,
+      domain: state?.domain ?? 'ADULT_ENTERTAINMENT',
+      correlation_id: args.correlation_id,
+      reason_code: fullyRevokedAny
+        ? 'SENSYNC_CONSENT_REVOKED'
+        : 'SENSYNC_CONSENT_SCOPE_REVOKED',
+    });
+
+    this.logger.log('SenSyncService: scope revoked', {
+      session_id: args.session_id,
+      guest_id: args.guest_id,
+      scope: args.scope,
+      fully_revoked: fullyRevokedAny,
+    });
   }
 
   /**
@@ -222,19 +440,24 @@ export class SenSyncService implements OnModuleInit {
       data: {
         consent_revoked_at: now,
         basis: 'REVOKED' satisfies SenSyncConsentBasis,
+        consent_scopes: [],
         reason_code: 'SENSYNC_CONSENT_REVOKED',
         correlation_id: args.correlation_id,
       },
     });
 
-    // Clear ephemeral state.
+    // Clear ephemeral state — Phase 5.3 ephemerality requirement: BPM and
+    // last-sample timestamps are dropped immediately on revocation, even if
+    // the session itself stays open.
     const state = this.sessions.get(args.session_id);
     if (state) {
       state.consent_granted = false;
+      state.consent_scopes.clear();
+      state.consent_expires_at_ms = undefined;
       state.last_bpm = undefined;
       state.last_sample_at_utc = undefined;
     }
-    this.consentCache.set(`${args.session_id}:${args.guest_id}`, false);
+    this.consentCache.delete(`${args.session_id}:${args.guest_id}`);
 
     this.nats.publish(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, {
       event_id: randomUUID(),
@@ -251,6 +474,16 @@ export class SenSyncService implements OnModuleInit {
     // Drop any in-process rate-limit/anomaly state for this session.
     this.rateLimiter?.forget(args.session_id);
     this.metrics?.recordConsentRevoked();
+
+    this.emitAudit({
+      event_type: 'CONSENT_REVOKED',
+      session_id: args.session_id,
+      guest_id: args.guest_id,
+      creator_id: args.creator_id,
+      domain: state?.domain ?? 'ADULT_ENTERTAINMENT',
+      correlation_id: args.correlation_id,
+      reason_code: 'SENSYNC_CONSENT_REVOKED',
+    });
 
     this.logger.log('SenSyncService: consent revoked', {
       session_id: args.session_id,
@@ -302,11 +535,11 @@ export class SenSyncService implements OnModuleInit {
       }
     }
 
-    // Consent gate — check ephemeral cache first, then fall back to DB so that
-    // consent is honoured across process restarts and multiple service instances.
+    // Phase 5.3 — scope-aware consent gate. Resolve scopes from cache, falling
+    // back to DB; enforce TTL; and refuse samples with an empty scope set.
     const consentKey = `${sample.session_id}:${sample.guest_id}`;
-    let hasConsent = this.consentCache.get(consentKey);
-    if (!hasConsent) {
+    let cached = this.consentCache.get(consentKey);
+    if (!cached) {
       const dbConsent = await this.prisma.senSyncConsent.findFirst({
         where: {
           session_id: sample.session_id,
@@ -315,15 +548,42 @@ export class SenSyncService implements OnModuleInit {
           purge_requested_at: null,
         },
       });
-      hasConsent = dbConsent !== null;
-      this.consentCache.set(consentKey, hasConsent);
+      if (dbConsent) {
+        cached = {
+          scopes: new Set(parseScopeArray(dbConsent.consent_scopes)),
+          expires_at_ms: dbConsent.consent_expires_at?.getTime() ?? null,
+        };
+        this.consentCache.set(consentKey, cached);
+      }
     }
-    if (!hasConsent) {
+    if (!cached || cached.scopes.size === 0) {
       this.logger.warn('SenSyncService: sample rejected — no consent', {
         session_id: sample.session_id,
         guest_id: sample.guest_id,
       });
       this.metrics?.recordSampleRejected('NO_CONSENT');
+      return null;
+    }
+    // Phase 5.3 — TTL / ephemerality gate.
+    if (cached.expires_at_ms !== null && Date.now() >= cached.expires_at_ms) {
+      this.logger.warn('SenSyncService: sample rejected — consent expired', {
+        session_id: sample.session_id,
+        guest_id: sample.guest_id,
+      });
+      this.metrics?.recordSampleRejected('NO_CONSENT');
+      this.consentCache.delete(consentKey);
+      // Mirror state.
+      state.consent_granted = false;
+      state.consent_scopes.clear();
+      this.emitAudit({
+        event_type: 'CONSENT_EXPIRED',
+        session_id: sample.session_id,
+        guest_id: sample.guest_id,
+        creator_id: sample.creator_id,
+        domain: sample.domain,
+        correlation_id: `sensync-expiry-${sample.session_id}`,
+        reason_code: 'SENSYNC_CONSENT_EXPIRED',
+      });
       return null;
     }
 
@@ -336,6 +596,15 @@ export class SenSyncService implements OnModuleInit {
     state.last_bpm = valid.bpm_normalized;
     state.last_sample_at_utc = new Date().toISOString();
 
+    // Phase 3 — derive quality_boost_points (10..25) from adapter quality.
+    const quality_score = this.deriveQualityScore(sample.bridge);
+    const quality_boost_points = Math.round(
+      SENSYNC_FFS_BOOST_MIN +
+        (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN) * quality_score,
+    );
+
+    const activeScopes = Array.from(cached.scopes) as SenSyncConsentScope[];
+
     const payload: SenSyncBiometricPayload = {
       event_id: randomUUID(),
       session_id: valid.session_id,
@@ -345,17 +614,63 @@ export class SenSyncService implements OnModuleInit {
       bridge: valid.bridge,
       domain: valid.domain,
       consent_version: SENSYNC_CONSENT_VERSION,
+      consent_scopes: activeScopes,
+      quality_score,
+      quality_boost_points,
       emitted_at_utc: state.last_sample_at_utc,
       rule_applied_id: SENSYNC_RULE_ID,
     };
 
+    // Canonical payload — every consumer.
     this.nats.publish(NATS_TOPICS.SENSYNC_BIOMETRIC_DATA, {
       ...payload,
     } as unknown as Record<string, unknown>);
 
+    // Phase 3 — FFS-shaped narrow payload. ONLY published when BPM_TO_FFS scope
+    // is active. FFS subscribes to SENSYNC_BPM_UPDATE and folds the BPM into
+    // its score input frame; without this scope the BPM stays out of FFS.
+    if (cached.scopes.has('BPM_TO_FFS')) {
+      const ffsPayload: SenSyncBpmUpdatePayload = {
+        session_id: valid.session_id,
+        creator_id: valid.creator_id,
+        guest_id: valid.guest_id,
+        bpm: valid.bpm_normalized,
+        bridge: valid.bridge,
+        consent_version: SENSYNC_CONSENT_VERSION,
+        emitted_at_utc: state.last_sample_at_utc,
+        rule_applied_id: SENSYNC_RULE_ID,
+      };
+      this.nats.publish(NATS_TOPICS.SENSYNC_BPM_UPDATE, {
+        ...ffsPayload,
+        // FFS service reads quality_boost_points to apply the +10..25 bonus.
+        quality_boost_points,
+      } as unknown as Record<string, unknown>);
+    }
+
     this.metrics?.recordSampleAdmitted(sample.bridge);
+    this.metrics?.recordSampleByDomain(sample.domain);
 
     return payload;
+  }
+
+  /**
+   * Phase 3 — derive the FFS quality boost in [0,1] from the adapter health
+   * snapshot. Falls back to 0.5 (mid-band) when no health data is available
+   * (e.g. PHONE_HAPTIC fallback or adapter registry not wired).
+   */
+  private deriveQualityScore(bridge: SenSyncHardwareBridge): number {
+    if (!this.hardware) return 0.5;
+    try {
+      const adapter = this.hardware.resolve(bridge);
+      const health = adapter.getHealthSnapshot();
+      // Clamp to [0,1] in case of NaN from a no-sample window.
+      const q = Number.isFinite(health.sample_quality_1m)
+        ? Math.min(1, Math.max(0, health.sample_quality_1m))
+        : 0.5;
+      return q;
+    } catch {
+      return 0.5;
+    }
   }
 
   /**
@@ -461,6 +776,13 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_PURGE_REQUESTED, {
       ...purgeRequest,
     } as unknown as Record<string, unknown>);
+    this.emitAudit({
+      event_type: 'PURGE_REQUESTED',
+      guest_id: args.guest_id,
+      domain: 'ADULT_ENTERTAINMENT',
+      correlation_id: args.correlation_id,
+      reason_code: args.reason_code,
+    });
 
     this.metrics?.recordPurgeRequested();
 
@@ -510,6 +832,13 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_PURGE_COMPLETED, {
       ...purgeCompleted,
     } as unknown as Record<string, unknown>);
+    this.emitAudit({
+      event_type: 'PURGE_COMPLETED',
+      guest_id: args.guest_id,
+      domain: 'ADULT_ENTERTAINMENT',
+      correlation_id: args.correlation_id,
+      reason_code: 'SENSYNC_PURGE_COMPLETED',
+    });
 
     this.metrics?.recordPurgeCompleted();
 
@@ -568,6 +897,27 @@ export class SenSyncService implements OnModuleInit {
   }
 
   /**
+   * Phase 5.3 — emit an immutable audit event onto NATS for the platform
+   * audit pipeline. Best-effort; never throws.
+   */
+  private emitAudit(args: Omit<SenSyncAuditEvent, 'audit_id' | 'occurred_at_utc' | 'rule_applied_id'>): void {
+    try {
+      const event: SenSyncAuditEvent = {
+        audit_id: randomUUID(),
+        occurred_at_utc: new Date().toISOString(),
+        rule_applied_id: SENSYNC_RULE_ID,
+        ...args,
+      };
+      this.nats.publish(
+        NATS_TOPICS.SENSYNC_BIOMETRIC_DATA, // canonical bus; audit consumers filter on event_type
+        { ...event, _kind: 'SENSYNC_AUDIT' } as unknown as Record<string, unknown>,
+      );
+    } catch (err) {
+      this.logger.warn('SenSyncService: audit emit failed', { error: String(err) });
+    }
+  }
+
+  /**
    * Bridge every adapter's sample/event streams into the service:
    *   • samples are routed through the consent + plausibility + rate-limit
    *     gate via `submitSample()`,
@@ -601,4 +951,36 @@ export class SenSyncService implements OnModuleInit {
       });
     }
   }
+}
+
+/**
+ * Coerce a TTL hint into the [MIN..MAX] window. Falls back to the default when
+ * the hint is undefined / NaN.
+ */
+function clampTtlSeconds(hint: number | undefined): number {
+  if (typeof hint !== 'number' || !Number.isFinite(hint)) {
+    return SENSYNC_DEFAULT_CONSENT_TTL_SECONDS;
+  }
+  return Math.max(
+    SENSYNC_MIN_CONSENT_TTL_SECONDS,
+    Math.min(SENSYNC_MAX_CONSENT_TTL_SECONDS, Math.round(hint)),
+  );
+}
+
+/**
+ * Parse a Prisma Json column into a SenSyncConsentScope[] safely. Returns the
+ * default scope set when the value is malformed or empty.
+ */
+function parseScopeArray(raw: unknown): SenSyncConsentScope[] {
+  const KNOWN: ReadonlyArray<SenSyncConsentScope> = [
+    'BPM_TO_FFS',
+    'BPM_TO_HAPTIC',
+    'BPM_TO_CYRANO',
+    'BPM_TO_PARTNER',
+  ];
+  if (!Array.isArray(raw)) return [];
+  const filtered = raw.filter(
+    (s): s is SenSyncConsentScope => typeof s === 'string' && (KNOWN as readonly string[]).includes(s),
+  );
+  return filtered;
 }

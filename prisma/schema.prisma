@@ -1855,6 +1855,14 @@ model SenSyncConsent {
   basis                   String    @db.VarChar(50)          // EXPLICIT_OPT_IN | REVOKED
   consent_granted_at      DateTime  @db.Timestamptz
   consent_revoked_at      DateTime? @db.Timestamptz          // null until revoked
+  /// Phase 5.3 — granular consent scopes (JSON string array).
+  /// Default: ['BPM_TO_FFS','BPM_TO_HAPTIC','BPM_TO_CYRANO','BPM_TO_PARTNER']
+  /// Single scopes can be revoked without revoking the entire consent row.
+  consent_scopes          Json      @default("[\"BPM_TO_FFS\",\"BPM_TO_HAPTIC\",\"BPM_TO_CYRANO\",\"BPM_TO_PARTNER\"]")
+  /// Phase 5.3 — ephemerality TTL. NULL means no auto-expiry.
+  /// Default lifetime is 24h from grant; the rate-limit / submit gate refuses
+  /// samples once the row has expired and the purge worker tombstones the row.
+  consent_expires_at      DateTime? @db.Timestamptz
   ip_hash                 String?   @db.Char(64)             // SHA-256 of guest IP — never raw
   device_fingerprint      String?   @db.VarChar(255)
   domain                  String    @default("ADULT_ENTERTAINMENT") @db.VarChar(50)
@@ -1868,6 +1876,7 @@ model SenSyncConsent {
   @@index([session_id])
   @@index([creator_id, guest_id])
   @@index([guest_id, consent_revoked_at])
+  @@index([consent_expires_at])
   @@map("sensync_consents")
 }
 

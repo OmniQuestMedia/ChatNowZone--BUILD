@@ -9,11 +9,13 @@
 // inside core services.
 
 import { Injectable } from '@nestjs/common';
-import type { SenSyncHardwareBridge } from './sensync.types';
+import type { SenSyncDomain, SenSyncHardwareBridge } from './sensync.types';
 
 export interface SenSyncMetricsSnapshot {
   samples_admitted_total: Record<string, number>;
   samples_rejected_total: Record<string, number>;
+  /** Phase 4 — per-domain sample counters (non-adult extension visibility). */
+  samples_by_domain_total: Record<string, number>;
   consent_grants_total: number;
   consent_revocations_total: number;
   purges_requested_total: number;
@@ -38,6 +40,7 @@ type RejectReason =
 export class SenSyncMetrics {
   private samplesAdmitted = new Map<SenSyncHardwareBridge, number>();
   private samplesRejected = new Map<RejectReason, number>();
+  private samplesByDomain = new Map<SenSyncDomain, number>();
   private consentGrants = 0;
   private consentRevocations = 0;
   private purgesRequested = 0;
@@ -50,6 +53,11 @@ export class SenSyncMetrics {
 
   recordSampleAdmitted(bridge: SenSyncHardwareBridge): void {
     this.samplesAdmitted.set(bridge, (this.samplesAdmitted.get(bridge) ?? 0) + 1);
+  }
+
+  /** Phase 4 — per-domain admitted-sample counter (non-adult extension visibility). */
+  recordSampleByDomain(domain: SenSyncDomain): void {
+    this.samplesByDomain.set(domain, (this.samplesByDomain.get(domain) ?? 0) + 1);
   }
 
   recordSampleRejected(reason: RejectReason): void {
@@ -99,6 +107,7 @@ export class SenSyncMetrics {
     return {
       samples_admitted_total: mapToObj(this.samplesAdmitted),
       samples_rejected_total: mapToObj(this.samplesRejected),
+      samples_by_domain_total: mapToObj(this.samplesByDomain),
       consent_grants_total: this.consentGrants,
       consent_revocations_total: this.consentRevocations,
       purges_requested_total: this.purgesRequested,
@@ -115,6 +124,7 @@ export class SenSyncMetrics {
   reset(): void {
     this.samplesAdmitted.clear();
     this.samplesRejected.clear();
+    this.samplesByDomain.clear();
     this.consentGrants = 0;
     this.consentRevocations = 0;
     this.purgesRequested = 0;

@@ -12,6 +12,7 @@ import { BaseHardwareAdapter } from './base-hardware.adapter';
 import {
   HARDWARE_RECONNECT_MAX_ATTEMPTS,
   type SenSyncAdapterOpenParams,
+  type SenSyncRendererBridgeAdapter,
 } from './hardware-adapter.types';
 import {
   SENSYNC_BPM_MAX,
@@ -21,7 +22,10 @@ import {
 } from '../sensync.types';
 
 @Injectable()
-export class WebBluetoothHardwareAdapter extends BaseHardwareAdapter {
+export class WebBluetoothHardwareAdapter
+  extends BaseHardwareAdapter
+  implements SenSyncRendererBridgeAdapter
+{
   readonly bridge: SenSyncHardwareBridge = 'WEB_BLUETOOTH';
 
   private readonly active = new Map<string, SenSyncAdapterOpenParams>();
