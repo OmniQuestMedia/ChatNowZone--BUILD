@@ -24,6 +24,10 @@ import { GovernanceConfig } from '../../core-api/src/governance/governance.confi
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
+import {
+  SENSYNC_FFS_BOOST_MAX,
+  SENSYNC_FFS_BOOST_MIN,
+} from './types/ffs.types';
 import type {
   AdaptiveWeights,
   AntiFlickerState,
@@ -85,6 +89,10 @@ const EARLY_PHASE_BOOST   = 1.10;
 
 // ── Dual Flame: max bonus points contributed by partner score ─────────────────
 const DUAL_FLAME_PARTNER_MAX_BONUS = 5;
+
+// ── Phase 3: SenSync™ FFS boost. Bounded to the documented [10..25] range. ────
+const SENSYNC_BOOST_MIN = 10;
+const SENSYNC_BOOST_MAX = 25;
 
 // ── Hot-and-Ready / New-Flames thresholds ─────────────────────────────────────
 const HOT_AND_READY_MIN_SCORE = 70;
@@ -176,6 +184,35 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
         (Math.min(100, Math.max(0, input.dual_flame_partner_score)) / 100) *
         DUAL_FLAME_PARTNER_MAX_BONUS;
       rawScore += partnerBonus;
+    }
+
+    // SenSync™ optional boost — additive, separate from the 12-pt heart_rate
+    // component. Gated on `sensync_bpm !== undefined`; consent revocation is
+    // honoured by clearing `sensync_bpm` on the SENSYNC_CONSENT_REVOKED event
+    // (see subscribeNatsEvents). Formula: linear scale on HR-delta vs. the
+    // creator's calibrated baseline, normalised to INPUT_MAX.hr_delta_bpm.
+    //   boost = MIN + clamp01(hrDelta / 40) * (MAX - MIN)
+    //   sensync_bpm at baseline (delta 0)   → +10 (presence floor)
+    //   sensync_bpm at baseline + 40 BPM    → +25 (ceiling)
+    if (input.sensync_bpm !== undefined) {
+      const hrDelta = Math.max(0, input.sensync_bpm - input.heart_rate_baseline_bpm);
+      const t = this.norm(hrDelta, INPUT_MAX.hr_delta_bpm);
+      const boost =
+        SENSYNC_FFS_BOOST_MIN + t * (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN);
+      rawScore += boost;
+    // Phase 3 — SenSync™ FFS boost. Applied only when the BPM_TO_FFS scope is
+    // active upstream (the SenSync service refuses to publish to
+    // SENSYNC_BPM_UPDATE without it, so by the time `sensync_boost_points` is
+    // populated here, consent has already been validated).
+    if (
+      typeof input.sensync_boost_points === 'number' &&
+      Number.isFinite(input.sensync_boost_points)
+    ) {
+      const clamped = Math.max(
+        SENSYNC_BOOST_MIN,
+        Math.min(SENSYNC_BOOST_MAX, input.sensync_boost_points),
+      );
+      rawScore += clamped;
     }
 
     const ffsScore = Math.min(100, Math.max(0, Math.round(rawScore)));
@@ -786,15 +823,36 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
   // ══════════════════════════════════════════════════════════════════════════
 
   private subscribeNatsEvents(): void {
-    // SenSync™ BPM updates — update heart rate in last known input frame
+    // SenSync™ BPM updates — update heart rate AND boost points in last input.
+    // Phase 3 — `quality_boost_points` is the precomputed +10..25 bonus that
+    // the SenSync service derives from adapter quality. We carry it into the
+    // input frame so the next score tick adds it to the composite.
     this.nats.subscribe(NATS_TOPICS.SENSYNC_BPM_UPDATE, (payload) => {
       const sessionId = payload['session_id'] as string | undefined;
       const bpm       = payload['bpm'] as number | undefined;
+      const boost     = payload['quality_boost_points'] as number | undefined;
       if (!sessionId || typeof bpm !== 'number') return;
 
       const last = this.lastInput.get(sessionId);
       if (last) {
-        this.lastInput.set(sessionId, { ...last, sensync_bpm: bpm });
+        this.lastInput.set(sessionId, {
+          ...last,
+          sensync_bpm: bpm,
+          sensync_boost_points: typeof boost === 'number' ? boost : last.sensync_boost_points,
+        });
+      }
+    });
+
+    // SenSync™ consent revoked — drop sensync_bpm so the boost stops next tick.
+    // Upstream gate prevents new BPM publishes after revoke; this clears any
+    // stale value already cached on `lastInput`.
+    this.nats.subscribe(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, (payload) => {
+      const sessionId = payload['session_id'] as string | undefined;
+      if (!sessionId) return;
+      const last = this.lastInput.get(sessionId);
+      if (last && last.sensync_bpm !== undefined) {
+        const { sensync_bpm: _dropped, ...rest } = last;
+        this.lastInput.set(sessionId, rest);
       }
     });
 
@@ -812,7 +870,11 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log('FfsService: NATS subscriptions active', {
-      topics: [NATS_TOPICS.SENSYNC_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
+      topics: [
+        NATS_TOPICS.SENSYNC_BPM_UPDATE,
+        NATS_TOPICS.SENSYNC_CONSENT_REVOKED,
+        NATS_TOPICS.CHAT_MESSAGE_INGESTED,
+      ],
     });
   }
 

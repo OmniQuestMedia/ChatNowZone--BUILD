@@ -8,7 +8,7 @@
 // `connectTransport` hook so this adapter is exercise-able by tests using
 // an in-process fake transport.
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { BaseHardwareAdapter } from './base-hardware.adapter';
 import {
@@ -28,19 +28,32 @@ export type LovenseTransportFactory = (
   onClose: (reason: string) => void,
 ) => Promise<{ close: () => void }>;
 
+/**
+ * DI tokens for the Lovense transport factory and gateway URL.
+ * Real deployments register a concrete WebSocket-backed factory by binding
+ * `LOVENSE_TRANSPORT_FACTORY` in `sensync.module.ts`. The default is a no-op
+ * stub so the service starts cleanly in test/local environments.
+ */
+export const LOVENSE_TRANSPORT_FACTORY = 'LOVENSE_TRANSPORT_FACTORY';
+export const LOVENSE_GATEWAY_URL = 'LOVENSE_GATEWAY_URL';
+
 @Injectable()
 export class LovenseHardwareAdapter extends BaseHardwareAdapter {
   readonly bridge: SenSyncHardwareBridge = 'LOVENSE';
 
   private transports = new Map<string, { close: () => void }>();
   private openParams = new Map<string, SenSyncAdapterOpenParams>();
+  private readonly transportFactory: LovenseTransportFactory;
+  private readonly gatewayUrl: string;
 
   constructor(
-    private readonly transportFactory: LovenseTransportFactory = defaultLovenseTransport,
-    private readonly gatewayUrl: string = process.env.LOVENSE_CONNECT_URL ??
-      'wss://api.lovense.com/connect',
+    @Optional() @Inject(LOVENSE_TRANSPORT_FACTORY) factory?: LovenseTransportFactory,
+    @Optional() @Inject(LOVENSE_GATEWAY_URL) gatewayUrl?: string,
   ) {
     super();
+    this.transportFactory = factory ?? defaultLovenseTransport;
+    this.gatewayUrl =
+      gatewayUrl ?? process.env.LOVENSE_CONNECT_URL ?? 'wss://api.lovense.com/connect';
   }
 
   async open(params: SenSyncAdapterOpenParams): Promise<void> {

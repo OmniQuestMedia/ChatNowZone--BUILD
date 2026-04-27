@@ -15,11 +15,13 @@ import {
   IdempotencyReplayError,
   InsufficientBalanceError,
   LedgerError,
+  TOKEN_TYPE_CZT,
   type LedgerBucket,
   type LedgerEntry,
   type LedgerEntryInput,
   type ReasonCode,
   type SpendResult,
+  type TokenType,
   type UserType,
   type WalletSnapshot,
 } from './types';
@@ -59,6 +61,10 @@ export class LedgerService {
       return { wallet, entry: existing };
     }
 
+    // Single CZT economy: token_type is immutable. The DB-layer CHECK
+    // constraint (migration 20260426010000) is the runtime backstop.
+    const tokenType: TokenType = TOKEN_TYPE_CZT;
+
     const prev = await this.repo.getLatestLedgerEntry(input.walletId);
     const hashPrev = prev ? prev.hashCurrent : null;
     const hashCurrent = this.computeHash({
@@ -79,6 +85,7 @@ export class LedgerService {
         amount: input.amount,
         bucket: input.bucket,
         metadata: input.metadata,
+        tokenType,
         hashPrev,
         hashCurrent,
       },
@@ -218,6 +225,12 @@ export class LedgerService {
     }
     if (!LEDGER_SPEND_ORDER.includes(input.bucket as SpendBucket)) {
       throw new LedgerError('INVALID_BUCKET', `unknown bucket ${input.bucket}`);
+    }
+    if (input.tokenType !== undefined && input.tokenType !== TOKEN_TYPE_CZT) {
+      throw new LedgerError(
+        'INVALID_TOKEN_TYPE',
+        `only '${TOKEN_TYPE_CZT}' is accepted (got '${input.tokenType}'). ShowToken / SZT and other token types are retired.`,
+      );
     }
   }
 

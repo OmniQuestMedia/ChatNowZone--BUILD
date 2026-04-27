@@ -34,6 +34,7 @@ import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
 import { AffiliationNumberModule } from '../../affiliation-number/src/affiliation-number.module';
 import { StudioAffiliationModule } from '../../studio-affiliation/src/studio-affiliation.module';
 import { CreatorOnboardingModule } from '../../creator-onboarding/src/creator-onboarding.module';
+import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { CreatorOnboardingModule } from '../../creator-onboarding/src/creator-on
     AffiliationNumberModule,
     StudioAffiliationModule,
     CreatorOnboardingModule,
+    CyranoAuthModule,
   ],
 })
 export class AppModule implements NestModule {

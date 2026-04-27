@@ -47,6 +47,12 @@ export interface FfsInput {
   facial_excitement_score: number;
   /** Optional SenSync™ BPM contribution (opt-in only; undefined if not consented or device unpaired). */
   sensync_bpm?: number;
+  /**
+   * Phase 3 — SenSync™ FFS quality boost in [10..25] points. Added directly to
+   * the composite score on top of the heart_rate component when present.
+   * Undefined when SenSync is not consented (BPM_TO_FFS scope) or unpaired.
+   */
+  sensync_boost_points?: number;
 
   // ── Group 3: Content / Behavioral Signals ─────────────────────────────────
   /** Content exposure level 0-1 (derived from vision-monitor). Advisory only. */
@@ -167,3 +173,12 @@ export interface AntiFlickerState {
   /** Ticks elapsed since pendingTier was first seen. Resets on confirm. */
   ticks: number;
 }
+
+// ── SenSync™ FFS boost (additive — separate from heart_rate component) ───────
+// Applied only when consent is active AND `sensync_bpm` is present on the
+// input frame. Floor expresses "presence reward" for being on the SenSync
+// rail at all; ceiling tracks HR elevation above the creator's baseline.
+// The boost is added after the existing component sum (and after early-phase /
+// dual-flame bonuses) and before the final clamp to 0–100.
+export const SENSYNC_FFS_BOOST_MIN = 10;
+export const SENSYNC_FFS_BOOST_MAX = 25;

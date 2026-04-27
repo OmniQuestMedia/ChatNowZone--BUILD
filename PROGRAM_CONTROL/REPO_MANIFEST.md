@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/creator-studio-rbac-system-Zy9dR`
 **Commit:** `749e14f9b49e5725aed2acc138485fbbd4a8456e`
 **Generated:** 2026-04-27T03:58:37Z
+**Branch:** `claude/cyrano-layer-2-implementation-qM4fy`
+**Commit:** `ffbf066223c9f622df327f5c01f16efc7aef5111`
+**Generated:** 2026-04-27T03:53:43Z
 
 ## All Files
 
@@ -254,9 +257,15 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/TEMPLATES/OQMInc_REFERENCE_LIBRARY_MASTER_TEMPLATE.md`
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
 - `apps/cyrano-standalone/README.md`
+- `apps/cyrano-standalone/app/access-denied/page.tsx`
+- `apps/cyrano-standalone/app/api/auth/session/route.ts`
 - `apps/cyrano-standalone/app/layout.tsx`
 - `apps/cyrano-standalone/app/page.tsx`
+- `apps/cyrano-standalone/lib/cyrano-auth-client.ts`
 - `apps/cyrano-standalone/lib/cyrano-client.ts`
+- `apps/cyrano-standalone/lib/cyrano-session.ts`
+- `apps/cyrano-standalone/middleware.ts`
+- `apps/cyrano-standalone/next-env.d.ts`
 - `apps/cyrano-standalone/next.config.js`
 - `apps/cyrano-standalone/package.json`
 - `apps/cyrano-standalone/tsconfig.json`
@@ -338,6 +347,8 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
 - `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
+- `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
+- `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -399,6 +410,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/creator/statements.service.ts`
 - `services/core-api/src/creator/surfaces/dashboard.controller.ts`
 - `services/core-api/src/creator/surfaces/statements.service.ts`
+- `services/core-api/src/cyrano/cyrano-auth.controller.ts`
+- `services/core-api/src/cyrano/cyrano-auth.guard.ts`
+- `services/core-api/src/cyrano/cyrano-auth.module.ts`
+- `services/core-api/src/cyrano/cyrano-auth.service.ts`
+- `services/core-api/src/cyrano/cyrano-auth.types.ts`
 - `services/core-api/src/db.ts`
 - `services/core-api/src/dfsp/account-recovery-hold.service.ts`
 - `services/core-api/src/dfsp/checkout-confirmation.service.ts`
@@ -666,6 +682,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/cyrano-prompt-templates.spec.ts`
 - `tests/integration/cyrano-service.spec.ts`
 - `tests/integration/diamond-concierge-service.spec.ts`
+- `tests/integration/ffs-sensync-boost.spec.ts`
 - `tests/integration/gamification-cooldown.spec.ts`
 - `tests/integration/gamification-prize-pool.spec.ts`
 - `tests/integration/gamification-weighted-selector.spec.ts`

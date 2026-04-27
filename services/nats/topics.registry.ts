@@ -294,6 +294,10 @@ export const NATS_TOPICS = {
   CYRANO_MEMORY_UPDATED:             'cyrano.memory.updated',
   CYRANO_FFS_FRAME_CONSUMED:         'cyrano.ffs_frame.consumed',
 
+  // ── Cyrano Layer 2 (standalone role-play platform — VIP gate events) ─────
+  CYRANO_LAYER2_SESSION_GRANTED:     'cyrano.layer2.session.granted',
+  CYRANO_LAYER2_SESSION_DENIED:      'cyrano.layer2.session.denied',
+
   // ── Integration Hub (Business Plan B.3 + B.4 — cross-service wiring) ─────
   HUB_HIGH_HEAT_MONETIZATION:        'hub.high_heat.monetization',
   HUB_PAYOUT_SCALING_APPLIED:        'hub.payout.scaling_applied',
