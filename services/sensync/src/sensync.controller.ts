@@ -5,11 +5,15 @@ import {
   Delete,
   Get,
   Logger,
+  Optional,
   Param,
   Post,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { SenSyncService } from './sensync.service';
+import { SenSyncMetrics, type SenSyncMetricsSnapshot } from './sensync.metrics';
+import { HardwareAdapterRegistry } from './adapters/hardware-adapter.registry';
+import type { SenSyncAdapterHealth } from './adapters/hardware-adapter.types';
 import type {
   MembershipTier,
   SenSyncBiometricPayload,
@@ -30,6 +34,10 @@ export interface OpenSessionDto {
   tier: MembershipTier;
   bridge: SenSyncHardwareBridge;
   domain?: SenSyncDomain;
+  /** Vendor short-code (e.g. Lovense Connect token). */
+  vendor_token?: string;
+  /** WebUSB / WebBluetooth device identifier supplied by the renderer. */
+  device_id?: string;
 }
 
 export interface GrantConsentDto {
@@ -86,7 +94,25 @@ export interface PurgeCompleteDto {
 export class SenSyncController {
   private readonly logger = new Logger(SenSyncController.name);
 
-  constructor(private readonly senSync: SenSyncService) {}
+  constructor(
+    private readonly senSync: SenSyncService,
+    @Optional() private readonly metrics?: SenSyncMetrics,
+    @Optional() private readonly adapters?: HardwareAdapterRegistry,
+  ) {}
+
+  /** GET /sensync/metrics — JSON snapshot for the platform Prometheus exporter. */
+  @Get('metrics')
+  getMetrics(): SenSyncMetricsSnapshot | { error: string } {
+    if (!this.metrics) return { error: 'METRICS_DISABLED' };
+    return this.metrics.snapshot();
+  }
+
+  /** GET /sensync/hardware/health — per-adapter quality snapshot. */
+  @Get('hardware/health')
+  getHardwareHealth(): SenSyncAdapterHealth[] | { error: string } {
+    if (!this.adapters) return { error: 'HARDWARE_REGISTRY_DISABLED' };
+    return this.adapters.all().map((a) => a.getHealthSnapshot());
+  }
 
   /** POST /sensync/sessions */
   @Post('sessions')
@@ -98,6 +124,8 @@ export class SenSyncController {
       dto.tier,
       dto.bridge,
       dto.domain,
+      dto.vendor_token,
+      dto.device_id,
     );
     if (!state) {
       return { error: 'SENSYNC_TIER_HARDWARE_DISABLED' };
