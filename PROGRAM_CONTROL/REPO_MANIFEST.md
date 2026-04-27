@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/creator-studio-rbac-system-Zy9dR`
-**Commit:** `12ea9dfe518e54c0eadf6f5e60bcdff8575111f4`
-**Generated:** 2026-04-27T04:16:50Z
+**Branch:** `claude/cyrano-layer-4-whisper-WJdo8`
+**Commit:** `7fefb5eae6da84c8ba510996db132734a8e857b9`
+**Generated:** 2026-04-27T05:06:01Z
 
 ## All Files
 
@@ -510,7 +510,16 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/FLAGS.md`
 - `services/cyrano/README.md`
 - `services/cyrano/src/cyrano-layer3-hcz.service.ts`
+- `services/cyrano/src/cyrano-layer4-api-key.service.ts`
+- `services/cyrano/src/cyrano-layer4-audit.service.ts`
+- `services/cyrano/src/cyrano-layer4-enterprise.service.spec.ts`
 - `services/cyrano/src/cyrano-layer4-enterprise.service.ts`
+- `services/cyrano/src/cyrano-layer4-rate-limiter.service.ts`
+- `services/cyrano/src/cyrano-layer4-tenant.store.ts`
+- `services/cyrano/src/cyrano-layer4-voice.bridge.ts`
+- `services/cyrano/src/cyrano-layer4.controller.ts`
+- `services/cyrano/src/cyrano-layer4.guard.ts`
+- `services/cyrano/src/cyrano-layer4.types.ts`
 - `services/cyrano/src/cyrano-prompt-templates.ts`
 - `services/cyrano/src/cyrano.module.ts`
 - `services/cyrano/src/cyrano.service.ts`
