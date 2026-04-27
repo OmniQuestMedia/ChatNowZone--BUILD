@@ -31,6 +31,9 @@ import { ThreeBucketSpendGuardMiddleware } from './finance/three-bucket-spend-gu
 import { FfsModule } from '../../ffs/src/ffs.module';
 import { SenSyncModule } from '../../sensync/src/sensync.module';
 import { GuestHeatModule } from '../../guest-heat/src/guest-heat.module';
+import { AffiliationNumberModule } from '../../affiliation-number/src/affiliation-number.module';
+import { StudioAffiliationModule } from '../../studio-affiliation/src/studio-affiliation.module';
+import { CreatorOnboardingModule } from '../../creator-onboarding/src/creator-onboarding.module';
 import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
 
 @Module({
@@ -65,6 +68,10 @@ import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
     SenSyncModule,
     GuestHeatModule,
     RewardsModule,
+    // RBAC-STUDIO-001 — Studio onboarding + affiliation + RBAC
+    AffiliationNumberModule,
+    StudioAffiliationModule,
+    CreatorOnboardingModule,
     CyranoAuthModule,
   ],
 })

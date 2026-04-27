@@ -1270,12 +1270,172 @@ model Creator {
   stream_key_hash String?  @unique @db.VarChar(64)
   // OBS-001: CREATOR_AUTO flag gates persona auto-responses. Default false.
   creator_auto    Boolean  @default(false)
+  // RBAC-STUDIO-001: denormalised affiliation number for fast profile reads
+  // and login/verification flows. Source-of-truth lives on the Studio row;
+  // this column mirrors it after the StudioAffiliation is created. Permanent
+  // once set — no regeneration policy is enforced at the application layer.
+  affiliation_number String? @db.VarChar(9)
   organization_id String   @db.VarChar(100)
   tenant_id       String   @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
   updated_at      DateTime @updatedAt @db.Timestamptz
 
+  studio_affiliations StudioAffiliation[]
+  studio_onboarding   CreatorOnboarding?
+
+  @@index([affiliation_number])
   @@map("creators")
+}
+
+// ─── RBAC-STUDIO-001: Studio Onboarding + Affiliation + RBAC ────────────
+// Spec: services/studio-affiliation + services/creator-onboarding +
+//       services/affiliation-number generator. Append-only writes carry
+//       correlation_id + reason_code + rule_applied_id (Canonical L0).
+
+enum StudioStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum StudioRole {
+  STUDIO_OWNER
+  STUDIO_ADMIN
+  CREATOR
+}
+
+enum AffiliationStatus {
+  ACTIVE
+  PENDING
+  REVOKED
+}
+
+enum OnboardingStatus {
+  PENDING
+  AFFILIATED
+  COMPLETE
+}
+
+enum StudioContractStatus {
+  UPLOADED
+  SIGNED
+  COUNTERSIGNED
+  VOIDED
+}
+
+model Studio {
+  id                  String       @id @default(uuid())
+  name                String       @db.VarChar(200)
+  // 6-9 char uppercase alphanumeric (A-Z, 2-9 — excludes 0, 1, O, I).
+  // Length range enforced by the AffiliationNumberService + DB CHECK.
+  // Uniqueness enforced globally (no organization scope).
+  affiliation_number  String       @unique @db.VarChar(9)
+  status              StudioStatus @default(PENDING)
+  // Commission set by PLATFORM_ADMIN only (read-only on the studio dashboard).
+  // Stored as a 4-decimal fraction (e.g. 0.2500 == 25%). Bounded 0..1.
+  commission_rate     Decimal      @default(0.0000) @db.Decimal(5, 4)
+  // Multi-tenant scoping (every write must include).
+  organization_id     String       @db.VarChar(100)
+  tenant_id           String       @db.VarChar(100)
+  // Canonical audit columns — populated on every mutation by the service layer.
+  correlation_id      String       @db.VarChar(128)
+  reason_code         String       @db.VarChar(64)
+  rule_applied_id     String       @db.VarChar(100)
+  created_at          DateTime     @default(now()) @db.Timestamptz
+  updated_at          DateTime     @updatedAt @db.Timestamptz
+
+  affiliations        StudioAffiliation[]
+  contracts           StudioContractDocument[]
+  onboardings         CreatorOnboarding[]
+
+  @@index([affiliation_number])
+  @@index([status, organization_id])
+  @@map("studios")
+}
+
+model StudioAffiliation {
+  id              String            @id @default(uuid())
+  studio_id       String
+  creator_id      String
+  role            StudioRole        @default(CREATOR)
+  status          AffiliationStatus @default(ACTIVE)
+  joined_at       DateTime          @default(now()) @db.Timestamptz
+  // Canonical audit columns.
+  correlation_id  String            @db.VarChar(128)
+  reason_code     String            @db.VarChar(64)
+  rule_applied_id String            @db.VarChar(100)
+  organization_id String            @db.VarChar(100)
+  tenant_id       String            @db.VarChar(100)
+  created_at      DateTime          @default(now()) @db.Timestamptz
+  updated_at      DateTime          @updatedAt @db.Timestamptz
+
+  studio          Studio            @relation(fields: [studio_id], references: [id])
+  creator         Creator           @relation(fields: [creator_id], references: [id])
+
+  @@unique([studio_id, creator_id])
+  @@index([creator_id])
+  @@index([status, role])
+  @@map("studio_affiliations")
+}
+
+model CreatorOnboarding {
+  id                  String           @id @default(uuid())
+  creator_id          String           @unique
+  // Resolved studio (NULL until affiliation is granted).
+  studio_id           String?
+  // Mirror of studio.affiliation_number for read-side convenience.
+  affiliation_number  String?          @db.VarChar(9)
+  status              OnboardingStatus @default(PENDING)
+  // Secondary email used for the verification code step.
+  secondary_email     String?          @db.VarChar(255)
+  email_verified_at   DateTime?        @db.Timestamptz
+  // Optional studio-domain block reason (audit only).
+  email_block_reason  String?          @db.VarChar(64)
+  // Canonical audit columns.
+  correlation_id      String           @db.VarChar(128)
+  reason_code         String           @db.VarChar(64)
+  rule_applied_id     String           @db.VarChar(100)
+  organization_id     String           @db.VarChar(100)
+  tenant_id           String           @db.VarChar(100)
+  created_at          DateTime         @default(now()) @db.Timestamptz
+  updated_at          DateTime         @updatedAt @db.Timestamptz
+
+  creator             Creator          @relation(fields: [creator_id], references: [id])
+  studio              Studio?          @relation(fields: [studio_id], references: [id])
+
+  @@index([affiliation_number])
+  @@index([status])
+  @@map("creator_onboardings")
+}
+
+model StudioContractDocument {
+  id                  String               @id @default(uuid())
+  studio_id           String
+  // FK to Creator (the signing party). Studio side is the studio owner.
+  creator_id          String
+  // Storage URI for the uploaded document (e.g. s3://… or assets-service ref).
+  storage_uri         String               @db.VarChar(500)
+  // SHA-256 of the document bytes — used to detect tampering at sign time.
+  document_hash       String               @db.Char(64)
+  status              StudioContractStatus @default(UPLOADED)
+  // Typed-name signature block (MVP). Prod: replace with cryptographic.
+  signed_typed_name   String?              @db.VarChar(200)
+  signed_at           DateTime?            @db.Timestamptz
+  // Canonical audit columns.
+  correlation_id      String               @db.VarChar(128)
+  reason_code         String               @db.VarChar(64)
+  rule_applied_id     String               @db.VarChar(100)
+  organization_id     String               @db.VarChar(100)
+  tenant_id           String               @db.VarChar(100)
+  created_at          DateTime             @default(now()) @db.Timestamptz
+  updated_at          DateTime             @updatedAt @db.Timestamptz
+
+  studio              Studio               @relation(fields: [studio_id], references: [id])
+
+  @@index([studio_id, status])
+  @@index([creator_id])
+  @@map("studio_contract_documents")
 }
 
 // ─── GateGuard Sentinel Pre-Processor (Business Plan B.5 + Canonical Corpus) ─

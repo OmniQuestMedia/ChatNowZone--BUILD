@@ -18,7 +18,11 @@ export type NotificationTemplate =
   | 'RECOVERY_PLAYBOOK_HANDOFF'
   | 'TOKEN_BRIDGE_OFFER'
   | 'THREE_FIFTHS_EXIT_CONFIRMATION'
-  | 'EXPIRATION_PROCESSED';
+  | 'EXPIRATION_PROCESSED'
+  // ── RBAC-STUDIO-001: Studio onboarding ─────────────────────────────────
+  | 'STUDIO_AFFILIATION_NUMBER_ASSIGNED'
+  | 'STUDIO_CONTRACT_READY_FOR_SIGNATURE'
+  | 'STUDIO_ACTIVATION_CONFIRMED';
 
 export type SuppressionReason =
   | 'NONE'

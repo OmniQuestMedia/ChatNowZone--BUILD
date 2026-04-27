@@ -302,6 +302,23 @@ export const NATS_TOPICS = {
   HUB_HIGH_HEAT_MONETIZATION:        'hub.high_heat.monetization',
   HUB_PAYOUT_SCALING_APPLIED:        'hub.payout.scaling_applied',
   HUB_DIAMOND_CONCIERGE_HANDOFF:     'hub.diamond_concierge.handoff',
+
+  // ── Creator/Studio Onboarding + Affiliation (RBAC-STUDIO-001) ────────────
+  STUDIO_CREATED:                    'studio.created',
+  STUDIO_ACTIVATED:                  'studio.activated',
+  STUDIO_SUSPENDED:                  'studio.suspended',
+  STUDIO_AFFILIATION_GRANTED:        'studio.affiliation.granted',
+  STUDIO_AFFILIATION_REVOKED:        'studio.affiliation.revoked',
+  STUDIO_CONTRACT_UPLOADED:          'studio.contract.uploaded',
+  STUDIO_CONTRACT_SIGNED:            'studio.contract.signed',
+  STUDIO_COMMISSION_UPDATED:         'studio.commission.updated',
+
+  AFFILIATION_NUMBER_GENERATED:      'affiliation.number.generated',
+  AFFILIATION_NUMBER_DELIVERED:      'affiliation.number.delivered',
+
+  CREATOR_ONBOARDING_STARTED:        'creator.onboarding.started',
+  CREATOR_ONBOARDING_AFFILIATED:     'creator.onboarding.affiliated',
+  CREATOR_ONBOARDING_COMPLETED:      'creator.onboarding.completed',
 } as const;
 
 export type NatsTopic = typeof NATS_TOPICS[keyof typeof NATS_TOPICS];
