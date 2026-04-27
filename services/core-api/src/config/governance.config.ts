@@ -419,7 +419,14 @@ export const ZONE_MAP = {
 export const SHOW_ZONE_PASS_OVERRIDE_ZONES = ['SHOW_THEATRE', 'BIJOU'] as const;
 
 // Canonical membership tiers for zone access (ordered lowest → highest)
-export const ZONE_ACCESS_TIERS = ['GUEST', 'VIP', 'VIP_SILVER', 'VIP_GOLD', 'VIP_PLATINUM', 'VIP_DIAMOND'] as const;
+export const ZONE_ACCESS_TIERS = [
+  'GUEST',
+  'VIP',
+  'VIP_SILVER',
+  'VIP_GOLD',
+  'VIP_PLATINUM',
+  'VIP_DIAMOND',
+] as const;
 export type ZoneAccessTier = (typeof ZONE_ACCESS_TIERS)[number];
 export type ZoneAccessZone = keyof typeof ZONE_MAP;
 
@@ -454,26 +461,26 @@ export const OBS = {
 export const REDBOOK_RATE_CARDS = {
   // Tease Phase regular bundles (guest-facing purchase rail).
   TEASE_REGULAR: [
-    { tokens:    150, guest_usd:  19.99, member_usd:  17.99, creator_payout_per_token: 0.075 },
-    { tokens:    500, guest_usd:  59.99, member_usd:  53.99, creator_payout_per_token: 0.075 },
-    { tokens:  1_000, guest_usd: 119.99, member_usd: 107.99, creator_payout_per_token: 0.075 },
-    { tokens:  5_000, guest_usd: 549.99, member_usd: 494.99, creator_payout_per_token: 0.080 },
+    { tokens: 150, guest_usd: 19.99, member_usd: 17.99, creator_payout_per_token: 0.075 },
+    { tokens: 500, guest_usd: 59.99, member_usd: 53.99, creator_payout_per_token: 0.075 },
+    { tokens: 1_000, guest_usd: 119.99, member_usd: 107.99, creator_payout_per_token: 0.075 },
+    { tokens: 5_000, guest_usd: 549.99, member_usd: 494.99, creator_payout_per_token: 0.08 },
     { tokens: 10_000, guest_usd: 999.99, member_usd: 899.99, creator_payout_per_token: 0.082 },
   ] as const,
 
   // ShowZone Premium bundles (theatre pass attendees).
   TEASE_SHOWZONE: [
-    { tokens:   300, usd:  48.00, creator_payout_per_token: 0.080 },
-    { tokens: 1_000, usd: 145.00, creator_payout_per_token: 0.082 },
+    { tokens: 300, usd: 48.0, creator_payout_per_token: 0.08 },
+    { tokens: 1_000, usd: 145.0, creator_payout_per_token: 0.082 },
   ] as const,
 
   // Diamond Tier floor — matches DIAMOND_TIER volume brackets above.
   // Represented here as the (min,max,rate,velocity) matrix pre-joined for O(1) lookup.
   DIAMOND_FLOOR_PER_TOKEN_MIN: 0.077,
-  DIAMOND_FLOOR_PER_TOKEN_MAX: 0.120,
+  DIAMOND_FLOOR_PER_TOKEN_MAX: 0.12,
 
   // VIP comparison baseline shown in estimators and Diamond quote flow.
-  VIP_BASELINE_PER_TOKEN: 0.120,
+  VIP_BASELINE_PER_TOKEN: 0.12,
 } as const;
 
 // ─── RECOVERY ENGINE — Unified Customer Service (REDBOOK §5) ─────────────────
@@ -487,25 +494,25 @@ export const RECOVERY_ENGINE = {
   EXPIRY_WARNING_HOURS: 48,
 
   // Extension fee in USD — applied before expiry to push horizon +14 days.
-  EXTENSION_FEE_USD: 49.00,
+  EXTENSION_FEE_USD: 49.0,
   EXTENSION_GRANT_DAYS: 14,
 
   // Recovery fee in USD — applied after expiry to restore lapsed balance.
-  RECOVERY_FEE_USD: 79.00,
+  RECOVERY_FEE_USD: 79.0,
 
   // Expired token redistribution (when neither extension nor recovery is exercised).
-  EXPIRED_CREATOR_POOL_PCT: 0.70,     // 70% → Creator Bonus Pool
-  EXPIRED_PLATFORM_PCT:     0.30,     // 30% → Platform (OQMI mgmt fee)
+  EXPIRED_CREATOR_POOL_PCT: 0.7, // 70% → Creator Bonus Pool
+  EXPIRED_PLATFORM_PCT: 0.3, // 30% → Platform (OQMI mgmt fee)
 
   // Token Bridge — goodwill reinstatement.
   // Grants a 20% bonus credit + waives the recovery fee on a single future lapse.
-  TOKEN_BRIDGE_BONUS_PCT: 0.20,
-  TOKEN_BRIDGE_WAIVER_LIMIT: 1,       // Waiver applies to one lapse per 365 days.
+  TOKEN_BRIDGE_BONUS_PCT: 0.2,
+  TOKEN_BRIDGE_WAIVER_LIMIT: 1, // Waiver applies to one lapse per 365 days.
 
   // 3/5ths Exit — partial refund with 24h cool-off.
   // Refunds 60% of current purchased-bucket balance and locks both buy + spend
   // for 24 hours. Name reflects the three-of-five split (60% refund / 40% retained).
-  THREE_FIFTHS_REFUND_PCT: 0.60,
+  THREE_FIFTHS_REFUND_PCT: 0.6,
   THREE_FIFTHS_LOCK_HOURS: 24,
 } as const;
 
@@ -514,3 +521,53 @@ export const RECOVERY_ENGINE = {
 // System-enforced; user cannot choose which bucket funds a spend.
 export const LEDGER_SPEND_ORDER = ['purchased', 'membership', 'bonus'] as const;
 export type LedgerBucket = (typeof LEDGER_SPEND_ORDER)[number];
+
+// ─── MICRO-GIFTS (Payload #13 — CNZ × RRR Integration) ──────────────────────
+// Cross-system micro-gift catalogue. Every gift is purchasable in two
+// currencies:
+//   • CZT tokens (debited via LedgerService inside CNZ)
+//   • RRR points (burned via RedRoomRewards /api/v1/burn/gift)
+// Point price = ceil(token_value / RRR_POINT_USD_VALUE) × (1 + commission).
+// The commission is the operator margin RRR collects on cross-redemption.
+export const RRR_GIFT_COMMISSION_PCT = 0.25;
+
+/** USD value of a single RRR point — used for token↔point parity calc. */
+export const RRR_POINT_USD_VALUE = 0.01;
+
+/** USD value of a single CZT token used for gift parity quoting. */
+export const GIFT_TOKEN_USD_VALUE = 0.08;
+
+export interface MicroGiftDef {
+  /** Stable canonical id — sent to RRR as `giftId`. */
+  gift_id: string;
+  display_name: string;
+  emoji: string;
+  /** Price in CZT tokens when paid via wallet. */
+  token_value: number;
+}
+
+export const MICRO_GIFTS: readonly MicroGiftDef[] = [
+  { gift_id: 'rose', display_name: 'Rose', emoji: '🌹', token_value: 5 },
+  { gift_id: 'heart', display_name: 'Heart', emoji: '💗', token_value: 10 },
+  { gift_id: 'star', display_name: 'Star', emoji: '⭐', token_value: 15 },
+  { gift_id: 'fire', display_name: 'Fire', emoji: '🔥', token_value: 25 },
+  { gift_id: 'champagne', display_name: 'Champagne', emoji: '🍾', token_value: 50 },
+  { gift_id: 'diamond', display_name: 'Diamond', emoji: '💎', token_value: 100 },
+  { gift_id: 'crown', display_name: 'Crown', emoji: '👑', token_value: 250 },
+  { gift_id: 'rocket', display_name: 'Rocket', emoji: '🚀', token_value: 500 },
+] as const;
+
+/**
+ * Compute the RRR points price for a gift, applying the cross-redemption
+ * commission. Rounded up so the operator never quotes below the floor.
+ */
+export function rrrPointsPriceFor(gift: MicroGiftDef): number {
+  const tokenUsd = gift.token_value * GIFT_TOKEN_USD_VALUE;
+  const baseRrrPoints = tokenUsd / RRR_POINT_USD_VALUE;
+  return Math.ceil(baseRrrPoints * (1 + RRR_GIFT_COMMISSION_PCT));
+}
+
+/** Lookup helper. Returns undefined if `gift_id` is not in the catalogue. */
+export function findMicroGift(gift_id: string): MicroGiftDef | undefined {
+  return MICRO_GIFTS.find((g) => g.gift_id === gift_id);
+}
