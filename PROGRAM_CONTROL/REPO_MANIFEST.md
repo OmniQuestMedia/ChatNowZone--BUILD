@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/refactor-token-economy-dN8pg`
-**Commit:** `01978ef6af3ce14631d6027d405f312e888ff17e`
-**Generated:** 2026-04-27T02:53:26Z
+**Branch:** `claude/cyrano-layer-2-implementation-qM4fy`
+**Commit:** `15a0eded688ae469d7c94cec66b20067c607407f`
+**Generated:** 2026-04-27T03:13:36Z
 
 ## All Files
 
@@ -254,9 +254,15 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/TEMPLATES/OQMInc_REFERENCE_LIBRARY_MASTER_TEMPLATE.md`
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
 - `apps/cyrano-standalone/README.md`
+- `apps/cyrano-standalone/app/access-denied/page.tsx`
+- `apps/cyrano-standalone/app/api/auth/session/route.ts`
 - `apps/cyrano-standalone/app/layout.tsx`
 - `apps/cyrano-standalone/app/page.tsx`
+- `apps/cyrano-standalone/lib/cyrano-auth-client.ts`
 - `apps/cyrano-standalone/lib/cyrano-client.ts`
+- `apps/cyrano-standalone/lib/cyrano-session.ts`
+- `apps/cyrano-standalone/middleware.ts`
+- `apps/cyrano-standalone/next-env.d.ts`
 - `apps/cyrano-standalone/next.config.js`
 - `apps/cyrano-standalone/package.json`
 - `apps/cyrano-standalone/tsconfig.json`
@@ -396,6 +402,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/creator/statements.service.ts`
 - `services/core-api/src/creator/surfaces/dashboard.controller.ts`
 - `services/core-api/src/creator/surfaces/statements.service.ts`
+- `services/core-api/src/cyrano/cyrano-auth.controller.ts`
+- `services/core-api/src/cyrano/cyrano-auth.guard.ts`
+- `services/core-api/src/cyrano/cyrano-auth.module.ts`
+- `services/core-api/src/cyrano/cyrano-auth.service.ts`
+- `services/core-api/src/cyrano/cyrano-auth.types.ts`
 - `services/core-api/src/db.ts`
 - `services/core-api/src/dfsp/account-recovery-hold.service.ts`
 - `services/core-api/src/dfsp/checkout-confirmation.service.ts`
