@@ -11,6 +11,7 @@ import { THEME } from '../../../config/theme';
 import { heatColorFor } from '../../../config/theme';
 import { heatTierAriaLabel } from '../../../config/accessibility';
 import { el, RenderElement } from '../../../components/render-plan';
+import { renderSendGiftPanel } from '../../../components/send-gift-panel';
 import type { CreatorCommandCenterView } from '../../../types/creator-panel-contracts';
 
 export const CREATOR_CONTROL_PAGE_RULE_ID = 'CREATOR_CONTROL_PAGE_v1';
@@ -64,6 +65,7 @@ export function renderCreatorControlPage(
       renderBroadcastTiming(view),
       renderCyranoPanel(view),
       renderPersonaSwitcher(view),
+      renderSendGiftPanel({ creator_id: view.creator_id }).tree,
     ],
   );
 

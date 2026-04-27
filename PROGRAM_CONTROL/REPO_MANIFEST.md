@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/delete-finance-contracts-types-K2Iu3`
-**Commit:** `2f1497d5f79724338ed23c2ee15f2c35f13d1e23`
-**Generated:** 2026-04-26T23:37:43Z
-**Branch:** `claude/ffs-sensync-czt-velocityzone-upgrade-UEcUG`
-**Commit:** `b784177e4f2a1d7f7f38a7893e2ebc42f2aae887`
-**Generated:** 2026-04-27T01:05:10Z
+**Branch:** `claude/add-gift-controller-AaDf7`
+**Commit:** `d9a16775f23e4aea42554bd096ddb2616ca2fdc5`
+**Generated:** 2026-04-27T01:25:21Z
 
 ## All Files
 
@@ -424,6 +421,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/gateguard/gateguard.types.ts`
 - `services/core-api/src/gateguard/welfare-guardian.scorer.ts`
 - `services/core-api/src/geo/geo-pricing.service.ts`
+- `services/core-api/src/gifts/gift.controller.spec.ts`
+- `services/core-api/src/gifts/gift.controller.ts`
+- `services/core-api/src/gifts/gifts.module.ts`
+- `services/core-api/src/gifts/rrr-client.service.spec.ts`
+- `services/core-api/src/gifts/rrr-client.service.ts`
 - `services/core-api/src/governance/governance.config.ts`
 - `services/core-api/src/growth/growth.module.ts`
 - `services/core-api/src/growth/guarded-notification.service.ts`
@@ -654,6 +656,8 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/tokens/page.ts`
 - `ui/app/wallet/page.ts`
 - `ui/components/render-plan.ts`
+- `ui/components/send-gift-panel.spec.ts`
+- `ui/components/send-gift-panel.ts`
 - `ui/config/accessibility.ts`
 - `ui/config/build-config.ts`
 - `ui/config/seo.ts`
