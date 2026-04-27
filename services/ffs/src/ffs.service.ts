@@ -24,6 +24,10 @@ import { GovernanceConfig } from '../../core-api/src/governance/governance.confi
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
+import {
+  SENSYNC_FFS_BOOST_MAX,
+  SENSYNC_FFS_BOOST_MIN,
+} from './types/ffs.types';
 import type {
   AdaptiveWeights,
   AntiFlickerState,
@@ -182,6 +186,20 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       rawScore += partnerBonus;
     }
 
+    // SenSync™ optional boost — additive, separate from the 12-pt heart_rate
+    // component. Gated on `sensync_bpm !== undefined`; consent revocation is
+    // honoured by clearing `sensync_bpm` on the SENSYNC_CONSENT_REVOKED event
+    // (see subscribeNatsEvents). Formula: linear scale on HR-delta vs. the
+    // creator's calibrated baseline, normalised to INPUT_MAX.hr_delta_bpm.
+    //   boost = MIN + clamp01(hrDelta / 40) * (MAX - MIN)
+    //   sensync_bpm at baseline (delta 0)   → +10 (presence floor)
+    //   sensync_bpm at baseline + 40 BPM    → +25 (ceiling)
+    if (input.sensync_bpm !== undefined) {
+      const hrDelta = Math.max(0, input.sensync_bpm - input.heart_rate_baseline_bpm);
+      const t = this.norm(hrDelta, INPUT_MAX.hr_delta_bpm);
+      const boost =
+        SENSYNC_FFS_BOOST_MIN + t * (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN);
+      rawScore += boost;
     // Phase 3 — SenSync™ FFS boost. Applied only when the BPM_TO_FFS scope is
     // active upstream (the SenSync service refuses to publish to
     // SENSYNC_BPM_UPDATE without it, so by the time `sensync_boost_points` is
@@ -825,6 +843,19 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
+    // SenSync™ consent revoked — drop sensync_bpm so the boost stops next tick.
+    // Upstream gate prevents new BPM publishes after revoke; this clears any
+    // stale value already cached on `lastInput`.
+    this.nats.subscribe(NATS_TOPICS.SENSYNC_CONSENT_REVOKED, (payload) => {
+      const sessionId = payload['session_id'] as string | undefined;
+      if (!sessionId) return;
+      const last = this.lastInput.get(sessionId);
+      if (last && last.sensync_bpm !== undefined) {
+        const { sensync_bpm: _dropped, ...rest } = last;
+        this.lastInput.set(sessionId, rest);
+      }
+    });
+
     // Chat message ingested — bump chat velocity approximation
     this.nats.subscribe(NATS_TOPICS.CHAT_MESSAGE_INGESTED, (payload) => {
       const sessionId = payload['session_id'] as string | undefined;
@@ -839,7 +870,11 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log('FfsService: NATS subscriptions active', {
-      topics: [NATS_TOPICS.SENSYNC_BPM_UPDATE, NATS_TOPICS.CHAT_MESSAGE_INGESTED],
+      topics: [
+        NATS_TOPICS.SENSYNC_BPM_UPDATE,
+        NATS_TOPICS.SENSYNC_CONSENT_REVOKED,
+        NATS_TOPICS.CHAT_MESSAGE_INGESTED,
+      ],
     });
   }
 
