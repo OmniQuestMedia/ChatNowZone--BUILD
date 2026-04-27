@@ -5,6 +5,12 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/add-gift-controller-AaDf7`
 **Commit:** `5f026506a42060c1e4472c769c0bcc07fd07664d`
 **Generated:** 2026-04-27T01:17:58Z
+**Branch:** `claude/delete-finance-contracts-types-K2Iu3`
+**Commit:** `2f1497d5f79724338ed23c2ee15f2c35f13d1e23`
+**Generated:** 2026-04-26T23:37:43Z
+**Branch:** `claude/ffs-sensync-czt-velocityzone-upgrade-UEcUG`
+**Commit:** `b784177e4f2a1d7f7f38a7893e2ebc42f2aae887`
+**Generated:** 2026-04-27T01:05:10Z
 
 ## All Files
 
@@ -665,7 +671,6 @@ Auto-generated on every push. Do not edit manually.
 - `ui/types/admin-diamond-contracts.ts`
 - `ui/types/creator-control-contracts.ts`
 - `ui/types/creator-panel-contracts.ts`
-- `ui/types/finance-contracts.ts`
 - `ui/types/public-wallet-contracts.ts`
 - `ui/view-models/creator-control.presenter.ts`
 - `ui/view-models/diamond-concierge.presenter.ts`
