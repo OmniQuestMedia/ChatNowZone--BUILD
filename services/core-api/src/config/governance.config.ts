@@ -419,6 +419,11 @@ export const ZONE_MAP = {
   BIJOU: ['VIP_PLATINUM', 'VIP_DIAMOND'] as const,
   PRIVATE_CALL: ['VIP_PLATINUM', 'VIP_DIAMOND'] as const,
   DIAMOND_CONCIERGE: ['VIP_DIAMOND'] as const,
+  // CYRANO Layer 2 — standalone role-play platform.
+  // Spec maps "OmniPass+ and Diamond" to the upper-VIP pair. OmniPass·Plus is a
+  // pass-product name (see MEMBERSHIP.TIERS comment) that aligns with the
+  // VIP_PLATINUM membership tier in the canonical 5-tier set.
+  CYRANO_LAYER2: ['VIP_PLATINUM', 'VIP_DIAMOND'] as const,
 } as const;
 
 // Zones where a ShowZonePass can override tier-based denial
