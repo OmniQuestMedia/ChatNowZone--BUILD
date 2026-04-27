@@ -298,6 +298,17 @@ export const NATS_TOPICS = {
   CYRANO_LAYER2_SESSION_GRANTED:     'cyrano.layer2.session.granted',
   CYRANO_LAYER2_SESSION_DENIED:      'cyrano.layer2.session.denied',
 
+  // ── Cyrano Layer 4 (enterprise multi-tenant Whisper API) ─────────────────
+  CYRANO_LAYER4_TENANT_REGISTERED:   'cyrano.layer4.tenant.registered',
+  CYRANO_LAYER4_API_KEY_ISSUED:      'cyrano.layer4.api_key.issued',
+  CYRANO_LAYER4_API_KEY_REVOKED:     'cyrano.layer4.api_key.revoked',
+  CYRANO_LAYER4_PROMPT_GRANTED:      'cyrano.layer4.prompt.granted',
+  CYRANO_LAYER4_PROMPT_DENIED:       'cyrano.layer4.prompt.denied',
+  CYRANO_LAYER4_RATE_LIMITED:        'cyrano.layer4.rate_limited',
+  CYRANO_LAYER4_AUDIT_RECORDED:      'cyrano.layer4.audit.recorded',
+  CYRANO_LAYER4_VOICE_SYNTHESIZED:   'cyrano.layer4.voice.synthesized',
+  CYRANO_LAYER4_VOICE_SKIPPED:       'cyrano.layer4.voice.skipped',
+
   // ── Integration Hub (Business Plan B.3 + B.4 — cross-service wiring) ─────
   HUB_HIGH_HEAT_MONETIZATION:        'hub.high_heat.monetization',
   HUB_PAYOUT_SCALING_APPLIED:        'hub.payout.scaling_applied',
