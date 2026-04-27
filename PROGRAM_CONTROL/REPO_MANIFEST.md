@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-bundle-purchase-ynkrw`
-**Commit:** `92d16b1cfe654e96864b585e06a12b3605e41a2d`
-**Generated:** 2026-04-27T01:27:22Z
+**Branch:** `claude/add-wgs-fraud-monitoring-j6jy7`
+**Commit:** `afc893e32aa69b0913661732effe6e559ad9102b`
+**Generated:** 2026-04-27T01:39:12Z
 
 ## All Files
 
@@ -557,9 +557,14 @@ Auto-generated on every push. Do not edit manually.
 - `services/recovery/src/recovery.module.ts`
 - `services/recovery/src/recovery.service.ts`
 - `services/recovery/src/recovery.types.ts`
+- `services/rewards-api/ASSUMPTIONS.md`
+- `services/rewards-api/FLAGS.md`
 - `services/rewards-api/src/engine/points-calculator.logic.ts`
 - `services/rewards-api/src/index.ts`
 - `services/rewards-api/src/interfaces/redroom-rewards.ts`
+- `services/rewards-api/src/services/account-verification.service.ts`
+- `services/rewards-api/src/services/creator-gifting.service.ts`
+- `services/rewards-api/src/services/gate-guard-sentinel.service.ts`
 - `services/rewards-api/src/services/points-purchase.service.ts`
 - `services/rewards-api/src/services/redroom-ledger.service.ts`
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
@@ -623,6 +628,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/cyrano-prompt-templates.spec.ts`
 - `tests/integration/cyrano-service.spec.ts`
 - `tests/integration/diamond-concierge-service.spec.ts`
+- `tests/integration/gate-guard-sentinel.spec.ts`
 - `tests/integration/gateguard-middleware.spec.ts`
 - `tests/integration/gateguard-scorer.spec.ts`
 - `tests/integration/gateguard-service.spec.ts`
