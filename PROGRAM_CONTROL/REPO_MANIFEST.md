@@ -3,11 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `claude/creator-studio-rbac-system-Zy9dR`
-**Commit:** `749e14f9b49e5725aed2acc138485fbbd4a8456e`
-**Generated:** 2026-04-27T03:58:37Z
-**Branch:** `claude/cyrano-layer-2-implementation-qM4fy`
-**Commit:** `ffbf066223c9f622df327f5c01f16efc7aef5111`
-**Generated:** 2026-04-27T03:53:43Z
+**Commit:** `12ea9dfe518e54c0eadf6f5e60bcdff8575111f4`
+**Generated:** 2026-04-27T04:16:50Z
 
 ## All Files
 
@@ -346,9 +343,9 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
-- `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
 - `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
 - `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
+- `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
