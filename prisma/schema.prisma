@@ -1948,3 +1948,88 @@ model VelocityZoneEvent {
   @@index([status, starts_at, ends_at])
   @@map("velocityzone_events")
 }
+
+// ── Gamification (Phase G1) ─────────────────────────────────────────────────
+// Append-only storage for creator prize pools, per-game config, cooldown logs,
+// and RRR-burn payments. Edits produce a new row with a bumped `version`.
+
+model PrizePool {
+  pool_id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id        String   @db.Uuid
+  name              String   @db.VarChar(120)
+  /// Null = shared (applies to all games). Otherwise SPIN_WHEEL | SLOT_MACHINE | DICE.
+  scoped_game_type  String?  @db.VarChar(20)
+  version           String   @db.VarChar(50)
+  rule_applied_id   String   @default("PRIZE_POOL_v1") @db.VarChar(100)
+  is_active         Boolean  @default(true)
+  created_at        DateTime @default(now()) @db.Timestamptz
+
+  @@index([creator_id, is_active, scoped_game_type])
+  @@map("prize_pools")
+}
+
+model PrizePoolEntry {
+  entry_id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pool_id         String   @db.Uuid
+  prize_slot      String   @db.VarChar(40)
+  name            String   @db.VarChar(120)
+  description     String
+  /// COMMON | RARE | EPIC | LEGENDARY
+  rarity          String   @db.VarChar(20)
+  base_weight     Decimal  @db.Decimal(10, 4)
+  asset_url       String?  @db.VarChar(500)
+  is_active       Boolean  @default(true)
+  rule_applied_id String   @default("PRIZE_POOL_v1") @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+
+  @@index([pool_id, is_active])
+  @@map("prize_pool_entries")
+}
+
+model CreatorGameConfig {
+  config_id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id                 String   @db.Uuid
+  game_type                  String   @db.VarChar(20)
+  /// Comma-separated positive integers, 1–3 entries (e.g. "25,40,55").
+  token_tiers_csv            String   @db.VarChar(60)
+  prize_pool_id              String   @db.Uuid
+  cooldown_seconds_override  Int?
+  enabled                    Boolean  @default(true)
+  accepts_rrr_burn           Boolean  @default(false)
+  version                    String   @db.VarChar(50)
+  rule_applied_id            String   @default("CREATOR_GAME_CONFIG_v1") @db.VarChar(100)
+  created_at                 DateTime @default(now()) @db.Timestamptz
+
+  @@index([creator_id, game_type, enabled])
+  @@map("creator_game_configs")
+}
+
+model GameCooldownLog {
+  log_id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String   @db.Uuid
+  creator_id       String   @db.Uuid
+  game_type        String   @db.VarChar(20)
+  played_at_utc    DateTime @db.Timestamptz
+  next_play_at_utc DateTime @db.Timestamptz
+  rule_applied_id  String   @default("GAMIFICATION_COOLDOWN_v1") @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamptz
+
+  @@index([user_id, creator_id, game_type, next_play_at_utc])
+  @@map("game_cooldown_logs")
+}
+
+model RedRoomRewardsBurn {
+  burn_id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                String   @db.Uuid
+  creator_id             String   @db.Uuid
+  game_type              String   @db.VarChar(20)
+  rrr_points_burned      Int
+  czt_tokens_equivalent  Int
+  correlation_id         String   @unique @db.VarChar(200)
+  reason_code            String   @default("GAME_PLAY") @db.VarChar(40)
+  rule_applied_id        String   @default("RRR_BURN_v1") @db.VarChar(100)
+  burned_at_utc          DateTime @default(now()) @db.Timestamptz
+
+  @@index([user_id, burned_at_utc])
+  @@map("redroom_rewards_burns")
+}
