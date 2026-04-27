@@ -3,6 +3,19 @@
 // across services/ledger/*. Mirrors the Prisma models added in 20260424000000.
 
 /**
+ * Single CZT Token Economy — `token_type` is immutable across every ledger
+ * entry and every wallet row. The constant lives at the type layer so any code
+ * attempting to widen the alias fails the compile, and at the value layer so
+ * services can stamp the column on every write without inventing a literal.
+ *
+ * DB-layer guarantees: token_type CHECK constraints in migrations
+ * 20260426010000_czt_single_token_enforcement and
+ * 20260426200000_add_token_type_to_token_balances.
+ */
+export type TokenType = 'CZT';
+export const TOKEN_TYPE_CZT: TokenType = 'CZT';
+
+/**
  * LedgerBucket — the canonical three-bucket wallet partitioning.
  * Spend order is enforced by governance.config.LEDGER_SPEND_ORDER.
  */
@@ -32,7 +45,9 @@ export type ReasonCode =
   | 'REFUND';
 
 /**
- * Rate card tiers (REDBOOK §3). Tease Regular / ShowZone / Diamond Floor / VIP.
+ * Rate card tiers (REDBOOK §3). Tease Regular / Diamond Floor / VIP.
+ * NOTE: `tease_showzone` was retired with the Single CZT Economy spec
+ * (services/showzone/RETIRED.md). Do not re-add.
  */
 export type RateCardTier =
   | 'tease_regular'
@@ -71,6 +86,11 @@ export interface LedgerEntryInput {
   amount: number;                   // signed: +credit, -debit
   bucket: LedgerBucket;
   metadata?: Record<string, unknown>;
+  /**
+   * Optional on input — defaulted to TOKEN_TYPE_CZT by LedgerService.record().
+   * The value is rejected if it is anything other than 'CZT'.
+   */
+  tokenType?: TokenType;
 }
 
 export interface LedgerEntry extends LedgerEntryInput {
@@ -78,6 +98,8 @@ export interface LedgerEntry extends LedgerEntryInput {
   hashPrev: string | null;
   hashCurrent: string;
   createdAt: Date;
+  /** Always 'CZT'. Stamped by LedgerService.record() and pinned by DB CHECK. */
+  tokenType: TokenType;
 }
 
 export interface WalletSnapshot {

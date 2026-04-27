@@ -95,18 +95,6 @@ export function renderTokensPage(args: {
           ]),
         ],
       ),
-      el(
-        'section',
-        {
-          test_id: 'tokens-showzone',
-          classes: ['cnz-panel', 'cnz-panel--deprecated'],
-          aria: { 'aria-label': 'ShowZone Premium bundles (deprecated)' },
-        },
-        [
-          el('h2', {}, ['ShowZone Premium (Deprecated)']),
-          el('p', {}, ['ShowZone token bundles have been removed. All purchases use CZT.']),
-        ],
-      ),
     ],
   );
 
