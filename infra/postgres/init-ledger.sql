@@ -953,3 +953,174 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_content_suppression_queue_block_delete
 BEFORE DELETE ON content_suppression_queue
 FOR EACH ROW EXECUTE FUNCTION content_suppression_queue_block_delete();
+
+-- =============================================================================
+-- TABLE: prize_pools
+-- PURPOSE: Creator-authored prize pools (shared or per-game). Append-only.
+-- MUTATION POLICY: INSERT only. Tombstone via new row with is_active=false.
+-- WO: PHASE-G1
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS prize_pools (
+    pool_id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    creator_id        UUID         NOT NULL,
+    name              VARCHAR(120) NOT NULL,
+    scoped_game_type  VARCHAR(20)
+                          CHECK (scoped_game_type IS NULL OR
+                                 scoped_game_type IN ('SPIN_WHEEL', 'SLOT_MACHINE', 'DICE')),
+    version           VARCHAR(50)  NOT NULL,
+    rule_applied_id   VARCHAR(100) NOT NULL DEFAULT 'PRIZE_POOL_v1',
+    is_active         BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_prize_pools_creator_active
+    ON prize_pools (creator_id, is_active, scoped_game_type);
+COMMENT ON TABLE prize_pools IS
+    'Creator-authored prize pools (shared or scoped). Append-only (PHASE-G1).';
+
+CREATE OR REPLACE FUNCTION prize_pools_block_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'prize_pools is append-only: DELETE is not permitted (pool_id=%).', OLD.pool_id;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_prize_pools_block_delete
+BEFORE DELETE ON prize_pools
+FOR EACH ROW EXECUTE FUNCTION prize_pools_block_delete();
+
+-- =============================================================================
+-- TABLE: prize_pool_entries
+-- PURPOSE: Prize entries belonging to a pool. Each has rarity + base_weight.
+-- MUTATION POLICY: INSERT only. Re-version by inserting a new pool.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS prize_pool_entries (
+    entry_id        UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    pool_id         UUID         NOT NULL,
+    prize_slot      VARCHAR(40)  NOT NULL,
+    name            VARCHAR(120) NOT NULL,
+    description     TEXT         NOT NULL,
+    rarity          VARCHAR(20)  NOT NULL
+                        CHECK (rarity IN ('COMMON', 'RARE', 'EPIC', 'LEGENDARY')),
+    base_weight     NUMERIC(10, 4) NOT NULL CHECK (base_weight > 0),
+    asset_url       VARCHAR(500),
+    is_active       BOOLEAN      NOT NULL DEFAULT TRUE,
+    rule_applied_id VARCHAR(100) NOT NULL DEFAULT 'PRIZE_POOL_v1',
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_prize_pool_entries_pool_active
+    ON prize_pool_entries (pool_id, is_active);
+COMMENT ON TABLE prize_pool_entries IS
+    'Individual prize entries with rarity and base_weight. Append-only (PHASE-G1).';
+
+CREATE OR REPLACE FUNCTION prize_pool_entries_block_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'prize_pool_entries is append-only: % is not permitted (entry_id=%).',
+        TG_OP, OLD.entry_id;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_prize_pool_entries_block_mutation
+BEFORE UPDATE OR DELETE ON prize_pool_entries
+FOR EACH ROW EXECUTE FUNCTION prize_pool_entries_block_mutation();
+
+-- =============================================================================
+-- TABLE: creator_game_configs
+-- PURPOSE: Per-creator, per-game configuration: 1-3 token tiers, cooldown
+--          override, enable flag, RRR burn opt-in.
+-- MUTATION POLICY: INSERT only. New version supersedes prior row.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS creator_game_configs (
+    config_id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    creator_id                 UUID         NOT NULL,
+    game_type                  VARCHAR(20)  NOT NULL
+                                   CHECK (game_type IN ('SPIN_WHEEL', 'SLOT_MACHINE', 'DICE')),
+    token_tiers_csv            VARCHAR(60)  NOT NULL,
+    prize_pool_id              UUID         NOT NULL,
+    cooldown_seconds_override  INTEGER      CHECK (cooldown_seconds_override IS NULL OR
+                                                   cooldown_seconds_override >= 0),
+    enabled                    BOOLEAN      NOT NULL DEFAULT TRUE,
+    accepts_rrr_burn           BOOLEAN      NOT NULL DEFAULT FALSE,
+    version                    VARCHAR(50)  NOT NULL,
+    rule_applied_id            VARCHAR(100) NOT NULL DEFAULT 'CREATOR_GAME_CONFIG_v1',
+    created_at                 TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_creator_game_configs_creator_game
+    ON creator_game_configs (creator_id, game_type, enabled);
+COMMENT ON TABLE creator_game_configs IS
+    'Per-creator-per-game config: tiers, cooldown, enabled flag (PHASE-G1).';
+
+CREATE OR REPLACE FUNCTION creator_game_configs_block_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'creator_game_configs is append-only: % is not permitted (config_id=%).',
+        TG_OP, OLD.config_id;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_creator_game_configs_block_mutation
+BEFORE UPDATE OR DELETE ON creator_game_configs
+FOR EACH ROW EXECUTE FUNCTION creator_game_configs_block_mutation();
+
+-- =============================================================================
+-- TABLE: game_cooldown_logs
+-- PURPOSE: Append-only per-user-per-game cooldown ledger. Each play inserts
+--          one row; reads compute the latest next_play_at_utc.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS game_cooldown_logs (
+    log_id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id          UUID         NOT NULL,
+    creator_id       UUID         NOT NULL,
+    game_type        VARCHAR(20)  NOT NULL
+                        CHECK (game_type IN ('SPIN_WHEEL', 'SLOT_MACHINE', 'DICE')),
+    played_at_utc    TIMESTAMPTZ  NOT NULL,
+    next_play_at_utc TIMESTAMPTZ  NOT NULL,
+    rule_applied_id  VARCHAR(100) NOT NULL DEFAULT 'GAMIFICATION_COOLDOWN_v1',
+    created_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_game_cooldown_logs_lookup
+    ON game_cooldown_logs (user_id, creator_id, game_type, next_play_at_utc);
+COMMENT ON TABLE game_cooldown_logs IS
+    'Per-user-per-game cooldown ledger. Append-only (PHASE-G1).';
+
+CREATE OR REPLACE FUNCTION game_cooldown_logs_block_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'game_cooldown_logs is append-only: % is not permitted (log_id=%).',
+        TG_OP, OLD.log_id;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_game_cooldown_logs_block_mutation
+BEFORE UPDATE OR DELETE ON game_cooldown_logs
+FOR EACH ROW EXECUTE FUNCTION game_cooldown_logs_block_mutation();
+
+-- =============================================================================
+-- TABLE: redroom_rewards_burns
+-- PURPOSE: Local mirror of every RRR-point burn driven by a game play.
+--          correlation_id is the cross-system idempotency key.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS redroom_rewards_burns (
+    burn_id                UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id                UUID         NOT NULL,
+    creator_id             UUID         NOT NULL,
+    game_type              VARCHAR(20)  NOT NULL
+                              CHECK (game_type IN ('SPIN_WHEEL', 'SLOT_MACHINE', 'DICE')),
+    rrr_points_burned      INTEGER      NOT NULL CHECK (rrr_points_burned > 0),
+    czt_tokens_equivalent  INTEGER      NOT NULL CHECK (czt_tokens_equivalent > 0),
+    correlation_id         VARCHAR(200) NOT NULL UNIQUE,
+    reason_code            VARCHAR(40)  NOT NULL DEFAULT 'GAME_PLAY',
+    rule_applied_id        VARCHAR(100) NOT NULL DEFAULT 'RRR_BURN_v1',
+    burned_at_utc          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_redroom_rewards_burns_user_time
+    ON redroom_rewards_burns (user_id, burned_at_utc);
+COMMENT ON TABLE redroom_rewards_burns IS
+    'Local mirror of RRR-point burns driven by game plays. Append-only (PHASE-G1).';
+
+CREATE OR REPLACE FUNCTION redroom_rewards_burns_block_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'redroom_rewards_burns is append-only: % is not permitted (burn_id=%).',
+        TG_OP, OLD.burn_id;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_redroom_rewards_burns_block_mutation
+BEFORE UPDATE OR DELETE ON redroom_rewards_burns
+FOR EACH ROW EXECUTE FUNCTION redroom_rewards_burns_block_mutation();
