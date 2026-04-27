@@ -67,7 +67,13 @@ export const DIAMOND_TIER = {
   },
 } as const;
 
-// ─── SHOWZONE THEATRE PRICING ─────────────────────────────────────────────────
+// ─── SHOW_THEATRE VENUE PRICING ───────────────────────────────────────────────
+// Venue admission + multiplier constants for the SHOW_THEATRE venue (legacy
+// "ShowZone Theatre"). All values are denominated in CZT — there is no
+// separate ShowToken / SZT token type (retired by Single CZT Token Economy
+// v1; see services/showzone/RETIRED.md). Constant name retained because it is
+// read by services/bijou/PassPricingService and migrating it is a larger
+// follow-up not covered by this branch.
 export const SHOWZONE_PRICING = {
   PASS_BASE_CZT_TOKENS: 100, // Base pass price in CZT
   MIN_SEATS_TO_GO_LIVE: 20, // Auto-cancel if fewer seats sold at T-1hr
@@ -454,10 +460,15 @@ export const OBS = {
 } as const;
 
 // ─── REDBOOK RATE CARDS (Canonical Ledger — Payload 1) ───────────────────────
-// Source of truth for all CZT bundle pricing, ShowZone premium, and creator
-// payout rates consumed by services/ledger/. Values LOCKED per REDBOOK Section 3
-// + Diamond Tier pricing table. NEVER hardcode prices in service code — always
-// read from this constant. FIZ: commit required for any change.
+// Source of truth for all CZT bundle pricing and creator payout rates consumed
+// by services/ledger/. Values LOCKED per REDBOOK Section 3 + Diamond Tier
+// pricing table. NEVER hardcode prices in service code — always read from this
+// constant. FIZ: commit required for any change.
+//
+// NOTE (Single CZT Token Economy v1): TEASE_SHOWZONE bundles have been removed.
+// All purchases use CZT and a single bundle ladder. SHOW_THEATRE venue
+// admission pricing is resolved through services/bijou/PassPricingService
+// against SHOWZONE_PRICING (venue pricing constant, still denominated in CZT).
 export const REDBOOK_RATE_CARDS = {
   // Tease Phase regular bundles (guest-facing purchase rail).
   TEASE_REGULAR: [
@@ -466,12 +477,6 @@ export const REDBOOK_RATE_CARDS = {
     { tokens: 1_000, guest_usd: 119.99, member_usd: 107.99, creator_payout_per_token: 0.075 },
     { tokens: 5_000, guest_usd: 549.99, member_usd: 494.99, creator_payout_per_token: 0.08 },
     { tokens: 10_000, guest_usd: 999.99, member_usd: 899.99, creator_payout_per_token: 0.082 },
-  ] as const,
-
-  // ShowZone Premium bundles (theatre pass attendees).
-  TEASE_SHOWZONE: [
-    { tokens: 300, usd: 48.0, creator_payout_per_token: 0.08 },
-    { tokens: 1_000, usd: 145.0, creator_payout_per_token: 0.082 },
   ] as const,
 
   // Diamond Tier floor — matches DIAMOND_TIER volume brackets above.

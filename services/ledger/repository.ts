@@ -5,12 +5,13 @@
 // once the core-api wiring branch lands; for now the in-memory adapter is
 // authoritative for the test suite.
 
-import type {
-  LedgerEntry,
-  TokenExpirationRecord,
-  TokenExpirationStatus,
-  UserType,
-  WalletSnapshot,
+import {
+  TOKEN_TYPE_CZT,
+  type LedgerEntry,
+  type TokenExpirationRecord,
+  type TokenExpirationStatus,
+  type UserType,
+  type WalletSnapshot,
 } from './types';
 
 export interface LedgerRepository {
@@ -143,6 +144,7 @@ export class InMemoryLedgerRepository implements LedgerRepository {
 
     const persisted: LedgerEntry = {
       ...entry,
+      tokenType: entry.tokenType ?? TOKEN_TYPE_CZT,
       id: this.nextId('led'),
       createdAt: new Date(),
     };

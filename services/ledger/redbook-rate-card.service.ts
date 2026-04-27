@@ -5,7 +5,6 @@
 import {
   DIAMOND_TIER,
   REDBOOK_RATE_CARDS,
-  SHOWZONE_PRICING,
 } from '../core-api/src/config/governance.config';
 import type { HeatLevel, UserType, RateCardTier } from './types';
 import { GovernanceConfig } from '../core-api/src/governance/governance.config';
@@ -71,31 +70,6 @@ export class RedbookRateCardService {
   }
 
   /**
-   * @deprecated ShowZone has been removed. This method is retained for
-   * backward compatibility only and should not be called in new code.
-   * Resolve a ShowZone Premium bundle quote. Premium is single-tier per REDBOOK —
-   * same price for guests and members (entry is gated by a paid pass).
-   */
-  quoteTeaseShowzone(tokens: number): Omit<BundleQuote, 'tier'> & { tier: 'tease_showzone' } {
-    const row = REDBOOK_RATE_CARDS.TEASE_SHOWZONE.find((r) => r.tokens === tokens);
-    if (!row) {
-      throw new Error(
-        `REDBOOK ShowZone bundle not found for ${tokens} tokens — valid sizes: ` +
-          REDBOOK_RATE_CARDS.TEASE_SHOWZONE.map((r) => r.tokens).join(', '),
-      );
-    }
-    const unit = row.usd / row.tokens;
-    return {
-      tier: 'tease_showzone',
-      tokens: row.tokens,
-      priceUsd: row.usd,
-      creatorPayoutPerToken: row.creator_payout_per_token,
-      platformMarginPerToken: unit - row.creator_payout_per_token,
-      unitPriceUsd: unit,
-    };
-  }
-
-  /**
    * Resolve a Diamond Tier quote using volume + velocity lookup.
    * Volume bracket + velocity multiplier come from DIAMOND_TIER (governance).
    */
@@ -137,37 +111,14 @@ export class RedbookRateCardService {
   }
 
   /**
-   * @deprecated ShowZone has been removed.
-   * Compute a ShowZone pass price in CZT applying REDBOOK day/time/creator/advance
-   * multipliers. Returns the integer CZT cost rounded up (partial tokens are not
-   * issuable).
-   */
-  quoteShowzonePassCzt(args: {
-    baseCzt?: number;
-    dayMultiplier: number;
-    timeMultiplier: number;
-    creatorTierMultiplier: number;
-    advanceMultiplier: number;
-  }): number {
-    const base = args.baseCzt ?? SHOWZONE_PRICING.PASS_BASE_CZT_TOKENS;
-    const raw =
-      base *
-      args.dayMultiplier *
-      args.timeMultiplier *
-      args.creatorTierMultiplier *
-      args.advanceMultiplier;
-    return Math.ceil(raw);
-  }
-
-  /**
-   * All Tease bundle sizes for display/catalog.
+   * All Tease Regular bundle sizes for display/catalog.
+   * NOTE: ShowZone Premium bundles + ShowZone pass pricing have been removed
+   * with the Single CZT Token Economy spec. SHOW_THEATRE venue admission
+   * pricing now resolves through services/bijou/PassPricingService against
+   * the venue-pricing constant (still denominated in CZT).
    */
   listTeaseRegularBundles(): ReadonlyArray<{ tokens: number; guest_usd: number; member_usd: number }> {
     return REDBOOK_RATE_CARDS.TEASE_REGULAR;
-  }
-
-  listTeaseShowzoneBundles(): ReadonlyArray<{ tokens: number; usd: number }> {
-    return REDBOOK_RATE_CARDS.TEASE_SHOWZONE;
   }
 
   private resolveVelocity(lifespanDays: number): number {

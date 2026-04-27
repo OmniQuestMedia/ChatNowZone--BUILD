@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-prize-pool-management-RmG9y`
-**Commit:** `59d0854629c185943edb5b07d3140e37fc5787e0`
-**Generated:** 2026-04-27T02:03:20Z
+**Branch:** `claude/refactor-token-economy-dN8pg`
+**Commit:** `01978ef6af3ce14631d6027d405f312e888ff17e`
+**Generated:** 2026-04-27T02:53:26Z
 
 ## All Files
 
@@ -337,6 +337,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260426000000_ffs_sensync_velocityzone/migration.sql`
 - `prisma/migrations/20260426010000_czt_single_token_enforcement/migration.sql`
 - `prisma/migrations/20260426200000_add_token_type_to_token_balances/migration.sql`
+- `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`

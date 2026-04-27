@@ -35,17 +35,6 @@ describe('RedbookRateCardService — Tease Regular bundles', () => {
   });
 });
 
-describe('RedbookRateCardService — ShowZone Premium (deprecated)', () => {
-  it.each(REDBOOK_RATE_CARDS.TEASE_SHOWZONE.map((r) => r.tokens))(
-    'quotes ShowZone price for %i-token bundle (deprecated)',
-    (tokens) => {
-      const quote = svc.quoteTeaseShowzone(tokens);
-      const row = REDBOOK_RATE_CARDS.TEASE_SHOWZONE.find((r) => r.tokens === tokens)!;
-      expect(quote.priceUsd).toBe(row.usd);
-    },
-  );
-});
-
 describe('RedbookRateCardService — Diamond Tier', () => {
   it.each(DIAMOND_TIER.VOLUME_TIERS)('resolves the $min_tokens bracket', (bracket) => {
     const quote = svc.quoteDiamond(bracket.min_tokens, 14);
