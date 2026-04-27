@@ -33,6 +33,16 @@ const PERMISSION_MATRIX: Record<string, RbacRole> = {
   'audit_log:view': 'ADMIN',
   'worm:export': 'ADMIN',
   'geo_block:modify': 'ADMIN',
+
+  // ── RBAC-STUDIO-001 — additive studio permissions ─────────────────────
+  // Platform-side floor; studio-scoped role checks are layered on top via
+  // services/studio-affiliation/src/studio-rbac.guard.ts. PLATFORM_ADMIN
+  // (mapped to ADMIN here) inherits all five via role rank.
+  'studio:manage':            'CREATOR',
+  'studio:invite-creator':    'CREATOR',
+  'studio:view-affiliations': 'CREATOR',
+  'studio:upload-contract':   'CREATOR',
+  'studio:view-commission':   'CREATOR',
 };
 
 export interface RbacCheckResult {
