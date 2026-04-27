@@ -39,3 +39,36 @@ suggestions are more likely to convert.
 **Intent:** `CAT_CALLBACK` is only preferred over the top-weighted
 category when it is within 20 weight points of the maximum. Prevents
 low-relevance callbacks from dominating high-heat rooms.
+
+## FLAG-008: LAYER4_DEFAULT_RATE_LIMIT_PER_MINUTE
+**Value:** 600 requests/minute (10 rps sustained).
+**Intent:** Default per-tenant ceiling. Tenants override at registration
+time via `rate_limit_per_minute`. Defined in
+`cyrano-layer4-tenant.store.ts` as `DEFAULT_TENANT_RATE_LIMIT_PER_MINUTE`.
+
+## FLAG-009: LAYER4_BURST_WINDOW_MS
+**Value:** 1 000 ms.
+**Intent:** Per-API-key burst window. Each key is allowed
+`max(10, ceil(limit_per_minute / 60))` requests per second to prevent a
+single rogue key from exhausting the tenant's per-minute budget.
+Defined in `cyrano-layer4-rate-limiter.service.ts`.
+
+## FLAG-010: LAYER4_BURST_DEFAULT_CEILING
+**Value:** 10 requests/second/key.
+**Intent:** Lower-bound for the burst ceiling, regardless of the
+tenant's per-minute limit. Defined in
+`cyrano-layer4-rate-limiter.service.ts` as `DEFAULT_BURST_CEILING`.
+
+## FLAG-011: LAYER4_NON_ADULT_DOMAINS
+**Value:** `[TEACHING, COACHING, FIRST_RESPONDER, FACTORY_SAFETY, MEDICAL]`
+**Intent:** Tenants registered to these domains are forced to
+`content_mode = non_adult` regardless of caller request. Defined in
+`cyrano-layer4-tenant.store.ts` as `NON_ADULT_DOMAINS`.
+
+## FLAG-012: LAYER4_HIPAA_CONSENT_REQUIRED
+**Value:** `true` for `compliance_regime = HIPAA` or `GDPR`.
+**Intent:** Every Layer 4 prompt request from a HIPAA / GDPR tenant
+MUST attach `x-consent-receipt-id`. Voice synthesis under HIPAA also
+requires the receipt. Defined in
+`cyrano-layer4-enterprise.service.ts` and
+`cyrano-layer4-voice.bridge.ts`.

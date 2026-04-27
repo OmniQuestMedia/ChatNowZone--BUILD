@@ -70,6 +70,10 @@ const FIRST_RESPONDER_TEMPLATES: Partial<Record<CyranoCategory, CyranoPromptTemp
     `[${tone}] Confirm scene safety and run a structured handoff briefing.`,
   CAT_ENGAGEMENT: ({ tone }) =>
     `[${tone}] Ask the next decision-tree question (PLAN-A vs PLAN-B fork).`,
+  CAT_NARRATIVE: ({ tone }) =>
+    `[${tone}] Anchor the call narrative — restate the working hypothesis for the team.`,
+  CAT_CALLBACK: ({ tone }) =>
+    `[${tone}] Reference the last similar incident and the SOP that applied.`,
   CAT_RECOVERY: ({ tone }) =>
     `[${tone}] Pause for tactical breathing — re-establish situational awareness.`,
   CAT_SESSION_CLOSE: ({ tone }) =>
@@ -81,10 +85,36 @@ const FACTORY_SAFETY_TEMPLATES: Partial<Record<CyranoCategory, CyranoPromptTempl
     `[${tone}] Confirm PPE check and review the shift's hazard register.`,
   CAT_ENGAGEMENT: ({ tone }) =>
     `[${tone}] Ask the operator to verbalise the next checkpoint before action.`,
+  CAT_NARRATIVE: ({ tone }) =>
+    `[${tone}] Reinforce the shift narrative — restate the production goal and the safety margin.`,
+  CAT_CALLBACK: ({ tone }) =>
+    `[${tone}] Reference last shift's near-miss and the corrective action taken.`,
   CAT_RECOVERY: ({ tone }) =>
     `[${tone}] Halt the line — re-check the lockout/tagout state.`,
   CAT_SESSION_CLOSE: ({ tone }) =>
     `[${tone}] Capture the end-of-shift safety report.`,
+};
+
+/**
+ * Non-adult template overlay for the ADULT_ENTERTAINMENT domain. When an
+ * adult-domain tenant flips to `content_mode = 'non_adult'` (e.g. a creator
+ * preparing a streaming-safe demo), Layer 4 swaps in this overlay so
+ * adult-only categories stay suppressed and engagement/narrative copy
+ * remains contextual without explicit intimacy cues.
+ */
+const ADULT_DOMAIN_NON_ADULT_OVERLAY: Partial<Record<CyranoCategory, CyranoPromptTemplate>> = {
+  CAT_SESSION_OPEN: ({ tone }) =>
+    `[${tone}] Open warmly — greet the guest and frame this session as a stream-safe conversation.`,
+  CAT_ENGAGEMENT: ({ tone }) =>
+    `[${tone}] Keep the flow — ask one open, stream-safe question tied to their last reply.`,
+  CAT_NARRATIVE: ({ tone }) =>
+    `[${tone}] Reinforce the throughline without intimacy cues — keep the arc story-led.`,
+  CAT_CALLBACK: ({ tone }) =>
+    `[${tone}] Call back a non-intimate detail from the prior session.`,
+  CAT_RECOVERY: ({ tone }) =>
+    `[${tone}] Soft check-in — invite them to share what they want from the next 5 minutes.`,
+  CAT_SESSION_CLOSE: ({ tone }) =>
+    `[${tone}] Close warmly with a stream-safe sign-off and a hint at next time.`,
 };
 
 const MEDICAL_TEMPLATES: Partial<Record<CyranoCategory, CyranoPromptTemplate>> = {
@@ -119,4 +149,130 @@ const TEMPLATES_BY_DOMAIN: Record<CyranoDomain, Partial<Record<CyranoCategory, C
 export function resolvePromptTemplate(key: CyranoPromptKey): CyranoPromptTemplate | null {
   const domainTemplates = TEMPLATES_BY_DOMAIN[key.domain];
   return domainTemplates[key.category] ?? null;
+}
+
+/**
+ * Layer 4 specialised resolver. Adds the `content_mode` axis: an
+ * ADULT_ENTERTAINMENT domain may serve `adult` OR `non_adult` templates;
+ * every other domain is forced to `non_adult`. Adult-only categories
+ * (ESCALATION, MONETIZATION) are NEVER served when `content_mode` is
+ * `non_adult` even if the domain technically has them defined.
+ */
+export type CyranoLayer4ContentModeTemplate = 'adult' | 'non_adult';
+
+export interface CyranoLayer4PromptKey extends CyranoPromptKey {
+  content_mode: CyranoLayer4ContentModeTemplate;
+}
+
+const ADULT_ONLY_CATEGORIES: readonly CyranoCategory[] = [
+  'CAT_ESCALATION',
+  'CAT_MONETIZATION',
+] as const;
+
+/**
+ * Layer 4 extension-point registry. Tenants (or platform plug-ins) can
+ * register a non-adult domain overlay that takes priority over the
+ * canonical domain templates. The registry is keyed by
+ * `${domain}::${content_mode}::${category}` so a single tenant can plug
+ * in surgical overrides without touching the canonical templates above.
+ *
+ * The registry is intentionally module-scoped — Layer 4 is the only
+ * caller, and persistence across processes is out-of-scope for v1
+ * (a platform-level governance config table replaces it in v2).
+ */
+const LAYER4_DOMAIN_OVERLAYS = new Map<string, CyranoPromptTemplate>();
+
+function overlayKey(
+  domain: CyranoDomain,
+  content_mode: 'adult' | 'non_adult',
+  category: CyranoCategory,
+): string {
+  return `${domain}::${content_mode}::${category}`;
+}
+
+/**
+ * Register a non-adult overlay template for a (domain, category) pair.
+ * Adult-only categories are silently rejected (no override path).
+ */
+export function registerLayer4DomainOverlay(args: {
+  domain: CyranoDomain;
+  content_mode: 'adult' | 'non_adult';
+  category: CyranoCategory;
+  template: CyranoPromptTemplate;
+}): boolean {
+  if (
+    args.content_mode === 'non_adult' &&
+    (ADULT_ONLY_CATEGORIES as readonly CyranoCategory[]).includes(args.category)
+  ) {
+    return false;
+  }
+  LAYER4_DOMAIN_OVERLAYS.set(
+    overlayKey(args.domain, args.content_mode, args.category),
+    args.template,
+  );
+  return true;
+}
+
+/** Test seam — clear all overlays. */
+export function _resetLayer4DomainOverlays(): void {
+  LAYER4_DOMAIN_OVERLAYS.clear();
+}
+
+/** Domain-neutral fallback applied when the domain template pack is silent. */
+const NEUTRAL_FALLBACKS: Record<CyranoCategory, CyranoPromptTemplate> = {
+  CAT_SESSION_OPEN: ({ tone }) =>
+    `[${tone}] Open the session — set context and confirm the participant is ready.`,
+  CAT_ENGAGEMENT: ({ tone }) =>
+    `[${tone}] Ask one open question to keep the conversation moving forward.`,
+  CAT_ESCALATION: ({ tone }) =>
+    `[${tone}] Raise the urgency level — name the priority and request explicit acknowledgement.`,
+  CAT_NARRATIVE: ({ tone }) =>
+    `[${tone}] Restate the goal of this session in one sentence to anchor the participant.`,
+  CAT_CALLBACK: ({ tone }) =>
+    `[${tone}] Reference an earlier moment in the session to reinforce continuity.`,
+  CAT_RECOVERY: ({ tone }) =>
+    `[${tone}] Slow the pace and offer the participant space to reset.`,
+  CAT_MONETIZATION: ({ tone }) =>
+    `[${tone}] Surface the next paid action with a clear, specific call.`,
+  CAT_SESSION_CLOSE: ({ tone }) =>
+    `[${tone}] Close the session — summarise the takeaway and confirm the next step.`,
+};
+
+export function resolveLayer4PromptTemplate(
+  key: CyranoLayer4PromptKey,
+): CyranoPromptTemplate | null {
+  // Hard guard: adult-only categories require content_mode = adult.
+  if (
+    key.content_mode === 'non_adult' &&
+    (ADULT_ONLY_CATEGORIES as readonly CyranoCategory[]).includes(key.category)
+  ) {
+    return null;
+  }
+
+  // Hard guard: non-adult domains can never resolve the ADULT template
+  // pack regardless of content_mode (defence-in-depth).
+  if (key.domain !== 'ADULT_ENTERTAINMENT' && key.content_mode === 'adult') {
+    return null;
+  }
+
+  // Tenant / plug-in overlay takes priority over canonical templates.
+  const override = LAYER4_DOMAIN_OVERLAYS.get(
+    overlayKey(key.domain, key.content_mode, key.category),
+  );
+  if (override) return override;
+
+  // ADULT_ENTERTAINMENT in non-adult mode → use the explicit overlay.
+  if (key.domain === 'ADULT_ENTERTAINMENT' && key.content_mode === 'non_adult') {
+    return (
+      ADULT_DOMAIN_NON_ADULT_OVERLAY[key.category] ??
+      NEUTRAL_FALLBACKS[key.category] ??
+      null
+    );
+  }
+
+  // Domain-specific template, then domain-neutral fallback. Adult-only
+  // categories never reach the neutral fallback (already filtered above).
+  const dedicated = resolvePromptTemplate(key);
+  if (dedicated) return dedicated;
+  return NEUTRAL_FALLBACKS[key.category] ?? null;
 }
