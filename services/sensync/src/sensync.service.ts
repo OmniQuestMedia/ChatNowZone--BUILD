@@ -13,11 +13,14 @@
 //   • Hardware tiers: only VIP_DIAMOND may use hardware bridges. Other tiers
 //     receive TIER_SENSYNC_HARDWARE_DISABLED and the session is rejected.
 
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
+import { HardwareAdapterRegistry } from './adapters/hardware-adapter.registry';
+import { SenSyncRateLimitService } from './sensync-rate-limit.service';
+import { SenSyncMetrics } from './sensync.metrics';
 import {
   SENSYNC_BPM_MAX,
   SENSYNC_BPM_MIN,
@@ -53,13 +56,20 @@ export class SenSyncService implements OnModuleInit {
   constructor(
     private readonly nats: NatsService,
     private readonly prisma: PrismaService,
+    @Optional() private readonly rateLimiter?: SenSyncRateLimitService,
+    @Optional() private readonly metrics?: SenSyncMetrics,
+    @Optional() private readonly hardware?: HardwareAdapterRegistry,
   ) {}
 
   async onModuleInit(): Promise<void> {
     this.logger.log('SenSyncService: initialized', {
       consent_version: SENSYNC_CONSENT_VERSION,
       hardware_tiers: SENSYNC_HARDWARE_TIERS,
+      hardware_registry: this.hardware ? 'present' : 'absent',
+      rate_limit: this.rateLimiter ? 'enabled' : 'disabled',
+      metrics: this.metrics ? 'enabled' : 'disabled',
     });
+    this.bindHardwareAdapters();
   }
 
   // ── Public API ──────────────────────────────────────────────────────────────
@@ -75,6 +85,8 @@ export class SenSyncService implements OnModuleInit {
     tier: MembershipTier,
     bridge: SenSyncHardwareBridge,
     domain: SenSyncDomain = 'ADULT_ENTERTAINMENT',
+    vendor_token?: string,
+    device_id?: string,
   ): SenSyncSessionState | null {
     // Hardware bridges (Lovense, WebUSB, WebBluetooth) require VIP_DIAMOND.
     const isHardware = bridge !== 'PHONE_HAPTIC';
@@ -95,6 +107,21 @@ export class SenSyncService implements OnModuleInit {
 
     this.sessions.set(session_id, state);
     this.logger.log('SenSyncService: session opened', { session_id, tier, bridge, domain });
+
+    // Open the hardware adapter for this bridge if the registry is wired.
+    if (this.hardware) {
+      const adapter = this.hardware.resolve(bridge);
+      void adapter
+        .open({ session_id, creator_id, guest_id, tier, domain, vendor_token, device_id })
+        .catch((err: unknown) => {
+          this.logger.warn('SenSyncService: hardware adapter open failed', {
+            session_id,
+            bridge,
+            error: String(err),
+          });
+        });
+    }
+
     return state;
   }
 
@@ -162,6 +189,8 @@ export class SenSyncService implements OnModuleInit {
       ...record,
     } as unknown as Record<string, unknown>);
 
+    this.metrics?.recordConsentGranted();
+
     this.logger.log('SenSyncService: consent granted', {
       session_id: args.session_id,
       guest_id: args.guest_id,
@@ -219,6 +248,10 @@ export class SenSyncService implements OnModuleInit {
       rule_applied_id: SENSYNC_RULE_ID,
     } as unknown as Record<string, unknown>);
 
+    // Drop any in-process rate-limit/anomaly state for this session.
+    this.rateLimiter?.forget(args.session_id);
+    this.metrics?.recordConsentRevoked();
+
     this.logger.log('SenSyncService: consent revoked', {
       session_id: args.session_id,
       guest_id: args.guest_id,
@@ -247,7 +280,26 @@ export class SenSyncService implements OnModuleInit {
     const state = this.sessions.get(sample.session_id);
     if (!state) {
       this.logger.warn('SenSyncService: no active session', { session_id: sample.session_id });
+      this.metrics?.recordSampleRejected('NO_SESSION');
       return null;
+    }
+
+    // Rate-limit & anomaly gate (Phase 2.8).
+    if (this.rateLimiter) {
+      const decision = this.rateLimiter.admit(sample.session_id, sample.bpm_raw);
+      if (!decision.allowed) {
+        this.logger.warn('SenSyncService: sample rejected by rate-limit', {
+          session_id: sample.session_id,
+          reason_code: decision.reason_code,
+          observed_rate: decision.observed_rate,
+          observed_delta: decision.observed_delta,
+        });
+        if (decision.reason_code) {
+          this.metrics?.recordSampleRejected(decision.reason_code);
+          this.metrics?.recordRateLimitTrip(decision.reason_code);
+        }
+        return null;
+      }
     }
 
     // Consent gate — check ephemeral cache first, then fall back to DB so that
@@ -271,6 +323,7 @@ export class SenSyncService implements OnModuleInit {
         session_id: sample.session_id,
         guest_id: sample.guest_id,
       });
+      this.metrics?.recordSampleRejected('NO_CONSENT');
       return null;
     }
 
@@ -300,6 +353,8 @@ export class SenSyncService implements OnModuleInit {
       ...payload,
     } as unknown as Record<string, unknown>);
 
+    this.metrics?.recordSampleAdmitted(sample.bridge);
+
     return payload;
   }
 
@@ -311,8 +366,18 @@ export class SenSyncService implements OnModuleInit {
     if (state) {
       // Remove consent cache entries for this session.
       this.consentCache.delete(`${session_id}:${state.guest_id}`);
+      if (this.hardware) {
+        const adapter = this.hardware.resolve(state.bridge);
+        void adapter.close(session_id).catch((err: unknown) => {
+          this.logger.warn('SenSyncService: hardware adapter close failed', {
+            session_id,
+            error: String(err),
+          });
+        });
+      }
     }
     this.sessions.delete(session_id);
+    this.rateLimiter?.forget(session_id);
     this.logger.log('SenSyncService: session closed', { session_id });
   }
 
@@ -351,6 +416,9 @@ export class SenSyncService implements OnModuleInit {
         : NATS_TOPICS.SENSYNC_HARDWARE_DISCONNECTED;
 
     this.nats.publish(topic, { ...event } as unknown as Record<string, unknown>);
+
+    if (args.event_type === 'CONNECTED') this.metrics?.recordHardwareConnected(args.bridge);
+    else this.metrics?.recordHardwareDisconnected(args.bridge);
   }
 
   /**
@@ -393,6 +461,8 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_PURGE_REQUESTED, {
       ...purgeRequest,
     } as unknown as Record<string, unknown>);
+
+    this.metrics?.recordPurgeRequested();
 
     this.logger.log('SenSyncService: purge requested', {
       guest_id: args.guest_id,
@@ -441,6 +511,8 @@ export class SenSyncService implements OnModuleInit {
       ...purgeCompleted,
     } as unknown as Record<string, unknown>);
 
+    this.metrics?.recordPurgeCompleted();
+
     this.logger.log('SenSyncService: purge completed', {
       guest_id: args.guest_id,
       rows_affected: result.count,
@@ -470,6 +542,8 @@ export class SenSyncService implements OnModuleInit {
       ...rejection,
     } as unknown as Record<string, unknown>);
 
+    this.metrics?.recordSampleRejected(rejection.reason_code);
+
     this.logger.warn('SenSyncService: plausibility rejection', rejection);
   }
 
@@ -491,5 +565,40 @@ export class SenSyncService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.SENSYNC_TIER_DISABLED, {
       ...event,
     } as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Bridge every adapter's sample/event streams into the service:
+   *   • samples are routed through the consent + plausibility + rate-limit
+   *     gate via `submitSample()`,
+   *   • lifecycle events are translated into NATS hardware events and
+   *     adapter-quality metrics.
+   * Called once on module init.
+   */
+  private bindHardwareAdapters(): void {
+    if (!this.hardware) return;
+    for (const adapter of this.hardware.all()) {
+      adapter.onSample((sample) => {
+        void this._submitSample(sample);
+      });
+      adapter.onEvent((event) => {
+        const state = this.sessions.get(event.session_id);
+        if (!state) return;
+        if (event.event_type === 'CONNECTED' || event.event_type === 'DISCONNECTED') {
+          this.recordHardwareEvent({
+            session_id: event.session_id,
+            creator_id: state.creator_id,
+            guest_id: state.guest_id,
+            bridge: event.bridge,
+            event_type: event.event_type,
+          });
+        } else if (event.event_type === 'RECONNECT_ATTEMPT') {
+          this.metrics?.recordReconnectAttempt(event.bridge);
+        }
+        // Refresh the adapter's latency EWMA into metrics.
+        const health = adapter.getHealthSnapshot();
+        this.metrics?.setLatencyEwma(event.bridge, health.latency_ms_ewma);
+      });
+    }
   }
 }

@@ -15,6 +15,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
+import { resolvePromptTemplate, type CyranoTier } from './cyrano-prompt-templates';
 import {
   CYRANO_CATEGORIES,
   type CyranoCategory,
@@ -283,25 +284,17 @@ export class CyranoService {
     frame: CyranoInputFrame,
     tone: string,
   ): string {
-    const toneTag = `[${tone}]`;
-    switch (category) {
-      case 'CAT_SESSION_OPEN':
-        return `${toneTag} Open warmly — acknowledge the guest by name and set an expectation for this session.`;
-      case 'CAT_ENGAGEMENT':
-        return `${toneTag} Keep the flow — ask one open question tied to their last reply.`;
-      case 'CAT_ESCALATION':
-        return `${toneTag} The room is ${frame.heat.tier}. Escalate intimacy with a direct, on-brand line.`;
-      case 'CAT_NARRATIVE':
-        return `${toneTag} Reinforce the arc — reference the throughline you set up earlier.`;
-      case 'CAT_CALLBACK':
-        return `${toneTag} Call back a detail from prior sessions to cement the bond.`;
-      case 'CAT_RECOVERY':
-        return `${toneTag} Soft check-in — invite them to tell you what would make tonight memorable.`;
-      case 'CAT_MONETIZATION':
-        return `${toneTag} Make a confident, specific offer that matches room heat (${frame.heat.tier}).`;
-      case 'CAT_SESSION_CLOSE':
-        return `${toneTag} Close with anchored intimacy — name the highlight and hint at next time.`;
-    }
+    // Prefer the shared template engine — same templates are consumed by
+    // Layer 3 (HCZ) and Layer 4 (enterprise) so all surfaces stay aligned.
+    const domain: CyranoDomain = frame.domain ?? 'ADULT_ENTERTAINMENT';
+    const tier = frame.heat.tier as CyranoTier;
+    const template = resolvePromptTemplate({ category, domain, tier });
+    if (template) return template({ tone, tier });
+
+    // Domain template intentionally absent — fall back to a neutral phrasing
+    // that surfaces the category but does not assume the adult tone. Used by
+    // non-adult domains for categories with no dedicated template.
+    return `[${tone}] ${category.replace(/^CAT_/, '').toLowerCase().replace(/_/g, ' ')} — apply the appropriate domain script.`;
   }
 
   private publishDrop(drop: CyranoDropReason): void {
