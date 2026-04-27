@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/add-wgs-fraud-monitoring-j6jy7`
-**Commit:** `afc893e32aa69b0913661732effe6e559ad9102b`
-**Generated:** 2026-04-27T01:39:12Z
+**Branch:** `claude/add-prize-pool-management-RmG9y`
+**Commit:** `59d0854629c185943edb5b07d3140e37fc5787e0`
+**Generated:** 2026-04-27T02:03:20Z
 
 ## All Files
 
@@ -513,6 +513,24 @@ Auto-generated on every push. Do not edit manually.
 - `services/fraud-prevention/src/gateguard/RiskScoreMLInference.ts`
 - `services/fraud-prevention/src/interfaces/shared.ts`
 - `services/fraud-prevention/src/repositories/ChargebackRepository.ts`
+- `services/gamification/ASSUMPTIONS.md`
+- `services/gamification/FLAGS.md`
+- `services/gamification/README.md`
+- `services/gamification/src/controllers/gamification.controller.ts`
+- `services/gamification/src/dto/gamification.dto.ts`
+- `services/gamification/src/gamification.module.ts`
+- `services/gamification/src/index.ts`
+- `services/gamification/src/internal/weighted-selector.ts`
+- `services/gamification/src/services/analytics.service.ts`
+- `services/gamification/src/services/audit.service.ts`
+- `services/gamification/src/services/cooldown.service.ts`
+- `services/gamification/src/services/creator-game-config.service.ts`
+- `services/gamification/src/services/game-session.repository.ts`
+- `services/gamification/src/services/play-orchestrator.service.ts`
+- `services/gamification/src/services/prize-pool.service.ts`
+- `services/gamification/src/services/redroom-rewards-burn.service.ts`
+- `services/gamification/src/services/security.service.ts`
+- `services/gamification/src/types/gamification.types.ts`
 - `services/guest-heat/.env.example`
 - `services/guest-heat/ASSUMPTIONS.md`
 - `services/guest-heat/FLAGS.md`
@@ -628,6 +646,9 @@ Auto-generated on every push. Do not edit manually.
 - `tests/integration/cyrano-prompt-templates.spec.ts`
 - `tests/integration/cyrano-service.spec.ts`
 - `tests/integration/diamond-concierge-service.spec.ts`
+- `tests/integration/gamification-cooldown.spec.ts`
+- `tests/integration/gamification-prize-pool.spec.ts`
+- `tests/integration/gamification-weighted-selector.spec.ts`
 - `tests/integration/gate-guard-sentinel.spec.ts`
 - `tests/integration/gateguard-middleware.spec.ts`
 - `tests/integration/gateguard-scorer.spec.ts`
@@ -666,12 +687,16 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/admin/diamond/page.ts`
 - `ui/app/admin/recovery/page.ts`
 - `ui/app/creator/control/page.ts`
+- `ui/app/creator/gamification/page.ts`
 - `ui/app/diamond/purchase/page.ts`
 - `ui/app/tokens/page.ts`
 - `ui/app/wallet/page.ts`
+- `ui/components/dice-game.ts`
 - `ui/components/render-plan.ts`
 - `ui/components/send-gift-panel.spec.ts`
 - `ui/components/send-gift-panel.ts`
+- `ui/components/slot-machine.ts`
+- `ui/components/wheel-of-fortune.ts`
 - `ui/config/accessibility.ts`
 - `ui/config/build-config.ts`
 - `ui/config/seo.ts`
@@ -679,8 +704,10 @@ Auto-generated on every push. Do not edit manually.
 - `ui/types/admin-diamond-contracts.ts`
 - `ui/types/creator-control-contracts.ts`
 - `ui/types/creator-panel-contracts.ts`
+- `ui/types/gamification-contracts.ts`
 - `ui/types/public-wallet-contracts.ts`
 - `ui/view-models/creator-control.presenter.ts`
 - `ui/view-models/diamond-concierge.presenter.ts`
+- `ui/view-models/gamification.presenter.ts`
 - `ui/view-models/public-wallet.presenter.ts`
 - `yarn.lock`
