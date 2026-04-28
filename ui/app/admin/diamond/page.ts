@@ -633,7 +633,7 @@ function renderOperatorQuoteGenerator(
             el('dt', {}, ['Platform rate']),
             el('dd', {}, [`$${quote.platform_rate_usd.toFixed(4)}/CZT`]),
             el('dt', {}, ['Floor applied']),
-            el('dd', {}, [quote.platform_floor_applied ? `Yes ($${quote.platform_floor_per_token_usd})` : 'No']),
+            el('dd', {}, [formatFloorAppliedDisplay(quote.platform_floor_applied, quote.platform_floor_per_token_usd)]),
             el('dt', {}, ['USD total (cents)']),
             el('dd', {}, [quote.usd_total_cents]),
             el('dt', {}, ['Expires']),
@@ -759,4 +759,9 @@ function renderOperatorQuoteGenerator(
       quoteResult,
     ],
   );
+}
+
+/** Formats the "floor applied" display string for the operator quote result card. */
+function formatFloorAppliedDisplay(applied: boolean, floorRate: number): string {
+  return applied ? `Yes ($${floorRate.toFixed(4)}/CZT)` : 'No';
 }

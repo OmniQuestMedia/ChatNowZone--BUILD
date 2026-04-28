@@ -456,7 +456,7 @@ function renderRecentLedger(entries: WalletLedgerEntry[]): RenderElement {
                   correlation_id: e.correlation_id,
                 },
                 classes: [
-                  BigInt(e.amount_tokens) < 0n
+                  e.amount_tokens.startsWith('-')
                     ? 'cnz-table__row--debit'
                     : 'cnz-table__row--credit',
                 ],

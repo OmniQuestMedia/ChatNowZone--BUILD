@@ -425,7 +425,7 @@ export class DiamondConciergePresenter {
     return {
       tokens: quote.tokens,
       velocity_days: quote.velocity_days,
-      velocity_band: quote.velocity_band as import('../types/admin-diamond-contracts').DiamondVelocityBand,
+      velocity_band: quote.velocity_band as DiamondVelocityBand,
       base_rate_usd: quote.base_rate_usd,
       velocity_multiplier: quote.velocity_multiplier,
       platform_rate_usd: quote.platform_rate_usd,
