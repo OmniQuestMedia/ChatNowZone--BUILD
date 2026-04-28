@@ -1,3 +1,4 @@
+
 # ChatNow.Zone — UX Cross-Stack Alignment
 
 **Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
