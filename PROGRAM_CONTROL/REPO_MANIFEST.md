@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `OmniQuestMediaInc-patch-1`
-**Commit:** `9f70b59a5f10df633375bb2a3a31e0b7a40853a6`
-**Generated:** 2026-04-28T16:42:55Z
-**Branch:** `copilot/update-ux-cross-stack-alignment`
-**Commit:** `19d07ee9ceb0ef45b1a36d9cb4eed7e9d7d45e76`
-**Generated:** 2026-04-28T16:44:20Z
+**Branch:** `copilot/membership-lifecycle-view-vip-member`
+**Commit:** `0013c6a900e9c627ec3fffec5a78f00e3ed7c15c`
+**Generated:** 2026-04-28T17:20:31Z
 
 ## All Files
 
@@ -746,9 +743,11 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/admin/recovery/page.ts`
 - `ui/app/creator/control/page.ts`
 - `ui/app/creator/gamification/page.ts`
+- `ui/app/creator/pixel-legacy/page.ts`
 - `ui/app/creator/studio/page.ts`
 - `ui/app/diamond/purchase/page.ts`
 - `ui/app/tokens/page.ts`
+- `ui/app/vip/membership/page.ts`
 - `ui/app/wallet/page.ts`
 - `ui/components/dice-game.ts`
 - `ui/components/render-plan.ts`
@@ -764,9 +763,11 @@ Auto-generated on every push. Do not edit manually.
 - `ui/types/creator-control-contracts.ts`
 - `ui/types/creator-panel-contracts.ts`
 - `ui/types/gamification-contracts.ts`
+- `ui/types/membership-lifecycle-contracts.ts`
 - `ui/types/public-wallet-contracts.ts`
 - `ui/view-models/creator-control.presenter.ts`
 - `ui/view-models/diamond-concierge.presenter.ts`
 - `ui/view-models/gamification.presenter.ts`
+- `ui/view-models/membership.presenter.ts`
 - `ui/view-models/public-wallet.presenter.ts`
 - `yarn.lock`
