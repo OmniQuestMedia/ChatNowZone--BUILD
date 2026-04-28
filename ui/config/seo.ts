@@ -107,6 +107,26 @@ export const SEO: Record<string, SeoMetadata> = {
     robots: 'noindex,nofollow',
     keywords: [...COMMON_KEYWORDS, 'admin', 'recovery'],
   },
+  vip_membership: {
+    title: 'Membership · ChatNow.Zone',
+    description:
+      'Track your VIP membership status, renewal timeline, and recovery options — Token Bridge, Three-Fifths Exit, and CZT top-up.',
+    canonical_url: `https://${PRIMARY_DOMAIN}/vip/membership`,
+    og_image: `https://${PRIMARY_DOMAIN}/og/vip-membership.png`,
+    twitter_card: 'summary',
+    robots: 'noindex,nofollow', // authenticated route
+    keywords: [...COMMON_KEYWORDS, 'membership', 'VIP', 'renewal'],
+  },
+  creator_pixel_legacy: {
+    title: 'Pixel Legacy Onboarding · ChatNow.Zone',
+    description:
+      'Apply for one of the first 3,500 Pixel Legacy creator seats — $0.07–$0.09/token payout range and lifetime Cyrano™ membership.',
+    canonical_url: `https://${PRIMARY_DOMAIN}/creator/pixel-legacy`,
+    og_image: `https://${PRIMARY_DOMAIN}/og/creator-pixel-legacy.png`,
+    twitter_card: 'summary',
+    robots: 'noindex,nofollow', // authenticated creator route
+    keywords: [...COMMON_KEYWORDS, 'Pixel Legacy', 'creator', 'onboarding'],
+  },
 };
 
 export function buildJsonLd(): Record<string, unknown> {
