@@ -145,6 +145,59 @@ export interface DiamondCommandCenterView {
   rule_applied_id: string;
 }
 
+// ─── Core Surface 03 — Diamond Concierge Operator View extensions ─────────────
+
+/**
+ * High-heat VIP_DIAMOND queue row — surfaces active guest sessions that have
+ * reached INFERNO FFS heat, indicating potential for a high-value handoff.
+ * This queue is separate from the 48-hour expiry warning queue.
+ */
+export interface HighHeatVipRow {
+  session_id: string;
+  user_id: string;
+  wallet_id: string;
+  ffs_score: number; // 0..100; always >= INFERNO threshold (86)
+  ffs_tier: 'INFERNO';
+  remaining_tokens: string; // bigint as string
+  remaining_usd_cents: string; // bigint as string
+  velocity_band: DiamondVelocityBand;
+  detected_at_utc: string;
+  reason_code: 'HIGH_HEAT_VIP_DETECTED';
+}
+
+/**
+ * Operator quote input — the parameters an OQMI Diamond Concierge operator
+ * enters in the quote generator widget on /admin/diamond.
+ */
+export interface OperatorQuoteInput {
+  tokens: number;
+  velocity_days: number;
+  correlation_id: string; // links to an audit event or handoff session
+}
+
+/**
+ * Operator quote display — the rendered result of an operator-generated
+ * Diamond purchase quote. Extends DiamondPurchaseQuoteCard with operator
+ * context fields (correlation_id, step-up auth flag).
+ */
+export interface OperatorQuoteDisplay {
+  tokens: number;
+  velocity_days: number;
+  velocity_band: DiamondVelocityBand;
+  base_rate_usd: number;
+  velocity_multiplier: number;
+  platform_rate_usd: number;
+  platform_floor_applied: boolean;
+  platform_floor_per_token_usd: number;
+  usd_total_cents: string; // bigint as string
+  expires_at_utc: string;
+  extension_fee_usd: number;
+  recovery_fee_usd: number;
+  correlation_id: string;
+  step_up_auth_required: boolean; // always true for operator-generated quotes
+  rule_applied_id: string;
+}
+
 /** Dashboard payload for /admin/recovery. */
 export interface RecoveryCommandCenterView {
   generated_at_utc: string;

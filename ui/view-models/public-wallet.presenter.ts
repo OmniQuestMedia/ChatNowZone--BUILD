@@ -23,6 +23,8 @@ import type {
   WalletBucket,
   WalletBucketRow,
   WalletThreeBucketView,
+  WelfareGuardianBand,
+  TierBadgeProps,
 } from '../types/public-wallet-contracts';
 
 export const PUBLIC_PRESENTER_RULE_ID = 'PUBLIC_WALLET_UI_v1';
@@ -303,5 +305,46 @@ export class PublicWalletPresenter {
     if (days >= 90) return 'DAYS_90';
     if (days >= 30) return 'DAYS_30';
     return 'DAYS_14';
+  }
+
+  /**
+   * Maps a numeric Welfare Guardian cohort score (0–100) to a severity band.
+   * Thresholds align to GovernanceConfig welfare bands:
+   *   GREEN   0–49  — nominal
+   *   AMBER  50–69  — elevated watch
+   *   ORANGE 70–84  — intervention recommended
+   *   CRITICAL 85+  — active pause required
+   */
+  resolveWelfareGuardianBand(score: number): WelfareGuardianBand {
+    if (score >= 85) return 'CRITICAL';
+    if (score >= 70) return 'ORANGE';
+    if (score >= 50) return 'AMBER';
+    return 'GREEN';
+  }
+
+  /** Builds the tier badge for the wallet header. */
+  buildTierBadge(args: {
+    tier: GuestTier;
+    is_vip_diamond: boolean;
+    concierge_flag: boolean;
+  }): TierBadgeProps {
+    let display_label: string;
+    if (args.is_vip_diamond && args.concierge_flag) {
+      display_label = 'VIP Diamond — Concierge';
+    } else if (args.is_vip_diamond) {
+      display_label = 'VIP Diamond';
+    } else if (args.tier === 'DIAMOND') {
+      display_label = 'Diamond';
+    } else if (args.tier === 'MEMBER') {
+      display_label = 'Member';
+    } else {
+      display_label = 'Guest';
+    }
+    return {
+      tier: args.tier,
+      is_vip_diamond: args.is_vip_diamond,
+      concierge_flag: args.concierge_flag,
+      display_label,
+    };
   }
 }

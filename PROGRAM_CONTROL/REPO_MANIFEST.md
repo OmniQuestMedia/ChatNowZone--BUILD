@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-onboarding-gateflows-docs`
-**Commit:** `47005c99259447523f641fedd524ac50c8c27e8c`
-**Generated:** 2026-04-28T17:41:40Z
+**Branch:** `copilot/add-public-wallet-view`
+**Commit:** `7dddcaafab909ace4d33ccc459513d1a92ee29a7`
+**Generated:** 2026-04-28T17:59:13Z
 
 ## All Files
 

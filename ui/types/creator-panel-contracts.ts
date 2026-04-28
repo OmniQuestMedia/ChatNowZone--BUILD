@@ -73,6 +73,41 @@ export interface SessionMonitoringPanel {
   generated_at_utc: string;
 }
 
+// ─── Core Surface 02 — Creator Cyrano Control Panel extensions ───────────────
+
+/**
+ * CyranoSessionSummary — a compact status card shown at the top of the
+ * /creator/control command pane. Summarises the active Cyrano™ session state
+ * so the creator can see persona, latency, and suggestion count at a glance.
+ */
+export interface CyranoSessionSummary {
+  creator_id: string;
+  session_id: string | null;
+  active_persona_display_name: string | null;
+  suggestion_count: number;
+  latency_last_observed_ms: number | null;
+  latency_sla_ms: number;
+  latency_within_sla: boolean;
+  tier_context: FfsTier;
+  generated_at_utc: string;
+}
+
+/**
+ * Diamond Concierge handoff CTA card — rendered only when the FFS tier
+ * reaches INFERNO. Prompts the creator to initiate a high-value handoff
+ * to an OQMI Diamond Concierge operator.
+ */
+export interface DiamondHandoffCta {
+  session_id: string;
+  ffs_score: number;
+  ffs_tier: 'INFERNO'; // only emitted at INFERNO
+  estimated_volume_tokens: number | null; // derived from session velocity
+  floor_rate_usd: number; // $0.077
+  ceiling_rate_usd: number; // $0.090
+  handoff_quote_url: string; // deep-link to /admin/diamond?action=handoff&session={id}
+  reason_code: 'INFERNO_HANDOFF_ELIGIBLE';
+}
+
 /** Aggregate dashboard payload for /creator/control. */
 export interface CreatorCommandCenterView {
   creator_id: string;
