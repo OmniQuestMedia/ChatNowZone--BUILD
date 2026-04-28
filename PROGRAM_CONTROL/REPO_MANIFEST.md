@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
-**Commit:** `47fdf8ef697a4286cae87f1cfabc8562663c80ee`
-**Generated:** 2026-04-28T15:05:06Z
+**Branch:** `dependabot/npm_and_yarn/apps/cyrano-standalone/npm_and_yarn-5c623bd62f`
+**Commit:** `a6d269bc2c23e9c773ba53ad2a938dbadfb99542`
+**Generated:** 2026-04-28T15:53:18Z
 
 ## All Files
 
