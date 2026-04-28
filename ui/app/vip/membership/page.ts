@@ -25,8 +25,6 @@ import type {
   ThreeFifthsExitOfferCard,
   TokenBridgeOfferCard,
   TopUpCztSummary,
-  VipTier,
-  VIP_TIER_LABEL,
 } from '../../../types/membership-lifecycle-contracts';
 
 // Import the label map at runtime — it is a const object, not a type.

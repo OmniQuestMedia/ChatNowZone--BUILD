@@ -27,6 +27,7 @@ import type {
   PixelLegacySeatMeter,
 } from '../../../types/creator-panel-contracts';
 
+
 export const PIXEL_LEGACY_PAGE_RULE_ID = 'PIXEL_LEGACY_PAGE_v1';
 
 export interface PixelLegacyPageInputs {
@@ -173,7 +174,7 @@ function stepLabel(step: PixelLegacyApplicationStatus): string {
 
 function renderSeatMeter(meter: PixelLegacySeatMeter): RenderElement {
   const pct = meter.seats_total > 0
-    ? Math.round((meter.seats_taken / meter.seats_total) * 100)
+    ? Math.round((meter.seats_taken * 100) / meter.seats_total)
     : 0;
   return el(
     'section',

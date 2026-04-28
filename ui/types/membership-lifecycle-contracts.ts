@@ -87,18 +87,30 @@ export interface FfsHeatPoint {
 /**
  * Subset of governance constants required by MembershipPresenter.
  * Mirrors RECOVERY_ENGINE + MEMBERSHIP.STIPEND_CZT in governance.config.ts.
+ *
+ * Fields used in BigInt arithmetic are stored as integer percentages (e.g., 20
+ * for 20%) to eliminate floating-point conversion loss. Fields used only for
+ * display remain as decimal fractions.
  */
 export interface MembershipGovernanceSnapshot {
   /** Hours before expiry when the EXPIRY_WARNING banner fires. Default: 48. */
   expiry_warning_hours: number;
-  /** Token Bridge bonus percentage. RECOVERY_ENGINE.TOKEN_BRIDGE_BONUS_PCT. */
-  token_bridge_bonus_pct: number;
+  /**
+   * Token Bridge bonus as an integer percentage (e.g., 20 = 20%).
+   * RECOVERY_ENGINE.TOKEN_BRIDGE_BONUS_PCT × 100.
+   * Used directly in BigInt arithmetic; avoids floating-point conversion.
+   */
+  token_bridge_bonus_pct_int: number;
   /** Hours the bridged tokens are restricted post-bridge. */
   token_bridge_restriction_hours: number;
   /** Max waivers per guest per 365-day window. RECOVERY_ENGINE.TOKEN_BRIDGE_WAIVER_LIMIT. */
   token_bridge_waiver_limit_per_year: number;
-  /** Three-Fifths refund percentage. RECOVERY_ENGINE.THREE_FIFTHS_REFUND_PCT. */
-  three_fifths_refund_pct: number;
+  /**
+   * Three-Fifths refund as an integer percentage (e.g., 60 = 60%).
+   * RECOVERY_ENGINE.THREE_FIFTHS_REFUND_PCT × 100.
+   * Used directly in BigInt arithmetic; avoids floating-point conversion.
+   */
+  three_fifths_refund_pct_int: number;
   /** Lock hours after Three-Fifths Exit. RECOVERY_ENGINE.THREE_FIFTHS_LOCK_HOURS. */
   three_fifths_lock_hours: number;
   /** Monthly CZT stipend per VIP sub-tier. MEMBERSHIP.STIPEND_CZT. */

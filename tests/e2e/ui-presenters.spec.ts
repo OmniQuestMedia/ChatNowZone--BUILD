@@ -398,6 +398,7 @@ describe('MembershipPresenter — lifecycle status resolution', () => {
       now_utc: now,
     });
     expect(view.token_bridge_offer).not.toBeNull();
+    // DEFAULT_MEMBERSHIP_GOVERNANCE.token_bridge_bonus_pct_int = 20 → display as 0.20
     expect(view.token_bridge_offer!.bonus_pct).toBe(0.2);
     expect(view.token_bridge_offer!.bonus_tokens).toBe('200'); // 20% of 1000
   });
@@ -412,6 +413,7 @@ describe('MembershipPresenter — lifecycle status resolution', () => {
       now_utc: now,
     });
     expect(view.three_fifths_exit_offer).not.toBeNull();
+    // DEFAULT_MEMBERSHIP_GOVERNANCE.three_fifths_refund_pct_int = 60 → display as 0.60
     expect(view.three_fifths_exit_offer!.refund_pct).toBe(0.6);
     expect(view.three_fifths_exit_offer!.estimated_refund_usd_cents).toBe('6000'); // 60% of 10000
     expect(view.three_fifths_exit_offer!.policy_gated).toBe(true);

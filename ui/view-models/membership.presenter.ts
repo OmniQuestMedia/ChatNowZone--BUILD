@@ -23,10 +23,10 @@ export const MEMBERSHIP_PRESENTER_RULE_ID = 'MEMBERSHIP_LIFECYCLE_UI_v1';
 // presenter to be tested without pulling in the service bootstrap graph.
 export const DEFAULT_MEMBERSHIP_GOVERNANCE: MembershipGovernanceSnapshot = {
   expiry_warning_hours: 48,
-  token_bridge_bonus_pct: 0.2,
+  token_bridge_bonus_pct_int: 20,       // 20% — RECOVERY_ENGINE.TOKEN_BRIDGE_BONUS_PCT
   token_bridge_restriction_hours: 24,
   token_bridge_waiver_limit_per_year: 1,
-  three_fifths_refund_pct: 0.6,
+  three_fifths_refund_pct_int: 60,      // 60% — RECOVERY_ENGINE.THREE_FIFTHS_REFUND_PCT
   three_fifths_lock_hours: 24,
   stipend_czt: {
     VIP: 0,
@@ -179,12 +179,12 @@ export class MembershipPresenter {
     if (remaining_tokens === null || remaining_tokens <= 0n) return null;
 
     const bonus_tokens = (
-      (remaining_tokens * BigInt(Math.round(gov.token_bridge_bonus_pct * 100))) /
+      (remaining_tokens * BigInt(gov.token_bridge_bonus_pct_int)) /
       100n
     ).toString();
 
     return {
-      bonus_pct: gov.token_bridge_bonus_pct,
+      bonus_pct: gov.token_bridge_bonus_pct_int / 100,
       bonus_tokens,
       restriction_window_hours: gov.token_bridge_restriction_hours,
       waiver_eligible: !waiver_used,
@@ -206,12 +206,12 @@ export class MembershipPresenter {
 
     // Refund estimate: refund_pct of original purchase price in USD cents.
     const refund_cents = (
-      (original_purchase_usd_cents * BigInt(Math.round(gov.three_fifths_refund_pct * 100))) /
+      (original_purchase_usd_cents * BigInt(gov.three_fifths_refund_pct_int)) /
       100n
     ).toString();
 
     return {
-      refund_pct: gov.three_fifths_refund_pct,
+      refund_pct: gov.three_fifths_refund_pct_int / 100,
       lock_hours: gov.three_fifths_lock_hours,
       // Three-Fifths Exit always requires a policy gate per FIZ-002-REVISION.
       policy_gated: true,
