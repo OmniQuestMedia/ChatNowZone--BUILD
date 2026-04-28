@@ -284,6 +284,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/ROADMAP_MANIFEST.md`
 - `docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md`
 - `docs/UX_INTEGRATION_BRIEF.md`
+- `docs/UX_CROSS_STACK_ALIGNMENT.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
 - `docs/ux/01-presenter-contracts.md`

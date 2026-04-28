@@ -102,3 +102,7 @@ Grok is the cross-stack coordinator. RRR and Cyrano packets reconcile
 against this CNZ packet; where they diverge intentionally, the
 divergence is documented in §07 with the reason. Where they diverge
 unintentionally, this packet wins and the other two correct.
+
+The three-stack reconciliation record — shared components, compliance
+overlays, intentional divergences, gap register, and coordination
+protocol — lives in [`docs/UX_CROSS_STACK_ALIGNMENT.md`](UX_CROSS_STACK_ALIGNMENT.md).
