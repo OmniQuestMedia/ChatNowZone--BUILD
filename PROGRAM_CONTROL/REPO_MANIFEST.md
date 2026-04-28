@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/membership-lifecycle-view-vip-member`
 **Commit:** `7925810b0c861afc3f7bdb383205490541290525`
 **Generated:** 2026-04-28T17:23:54Z
+**Branch:** `copilot/add-shared-components-documentation`
+**Commit:** `4fca122c3da929def6e33c9322aafd2188f15c94`
+**Generated:** 2026-04-28T17:08:31Z
 
 ## All Files
 
@@ -287,6 +290,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/UX_INTEGRATION_BRIEF.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
+- `docs/ux/00-shared-components.md`
 - `docs/ux/01-presenter-contracts.md`
 - `docs/ux/02-endpoint-inventory.md`
 - `docs/ux/03-state-machines.md`
