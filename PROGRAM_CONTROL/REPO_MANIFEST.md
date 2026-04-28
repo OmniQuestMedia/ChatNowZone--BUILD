@@ -3,11 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/add-onboarding-gateflows-docs`
-**Commit:** `88a281c9ca868a3869725bc84e7ad30778a843b3`
-**Generated:** 2026-04-28T17:23:54Z
-**Branch:** `copilot/membership-lifecycle-view-vip-member`
-**Commit:** `a5f7f5ce96b1a4ba14e8c12b7aabaca543bb9f06`
-**Generated:** 2026-04-28T17:40:21Z
+**Commit:** `47005c99259447523f641fedd524ac50c8c27e8c`
+**Generated:** 2026-04-28T17:41:40Z
 
 ## All Files
 
@@ -290,8 +287,8 @@ Auto-generated on every push. Do not edit manually.
 - `docs/UX_INTEGRATION_BRIEF.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
-- `docs/ux/01-onboarding-gateflows.md`
 - `docs/ux/00-shared-components.md`
+- `docs/ux/01-onboarding-gateflows.md`
 - `docs/ux/01-presenter-contracts.md`
 - `docs/ux/02-endpoint-inventory.md`
 - `docs/ux/03-state-machines.md`
