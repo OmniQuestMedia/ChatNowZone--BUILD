@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `OmniQuestMediaInc-patch-1`
-**Commit:** `9f70b59a5f10df633375bb2a3a31e0b7a40853a6`
-**Generated:** 2026-04-28T16:42:55Z
-**Branch:** `copilot/update-ux-cross-stack-alignment`
-**Commit:** `19d07ee9ceb0ef45b1a36d9cb4eed7e9d7d45e76`
-**Generated:** 2026-04-28T16:44:20Z
+**Branch:** `copilot/add-onboarding-gateflows-docs`
+**Commit:** `88a281c9ca868a3869725bc84e7ad30778a843b3`
+**Generated:** 2026-04-28T17:23:54Z
 
 ## All Files
 
@@ -290,6 +287,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/UX_INTEGRATION_BRIEF.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
+- `docs/ux/01-onboarding-gateflows.md`
 - `docs/ux/01-presenter-contracts.md`
 - `docs/ux/02-endpoint-inventory.md`
 - `docs/ux/03-state-machines.md`
