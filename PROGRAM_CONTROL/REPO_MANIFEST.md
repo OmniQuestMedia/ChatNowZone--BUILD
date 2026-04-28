@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/update-artifact-action-T05ba`
-**Commit:** `a29a18698ce91e3da9778c54f91d88b37e54985a`
-**Generated:** 2026-04-27T15:13:08Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `47fdf8ef697a4286cae87f1cfabc8562663c80ee`
+**Generated:** 2026-04-28T15:05:06Z
 
 ## All Files
 
@@ -283,8 +283,19 @@ Auto-generated on every push. Do not edit manually.
 - `docs/REQUIREMENTS_MASTER.md`
 - `docs/ROADMAP_MANIFEST.md`
 - `docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md`
+- `docs/UX_INTEGRATION_BRIEF.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
+- `docs/ux/01-presenter-contracts.md`
+- `docs/ux/02-endpoint-inventory.md`
+- `docs/ux/03-state-machines.md`
+- `docs/ux/04-reason-code-catalog.md`
+- `docs/ux/05-tier-entitlements.md`
+- `docs/ux/06-idempotency-ratelimit.md`
+- `docs/ux/07-cross-stack-vocabulary.md`
+- `docs/ux/08-not-in-alpha.md`
+- `docs/ux/09-realtime-topology.md`
+- `docs/ux/10-compliance-overlays.md`
 - `finance/audit-dashboard.service.ts`
 - `finance/batch-payout.service.ts`
 - `finance/commission-splitting.service.ts`
