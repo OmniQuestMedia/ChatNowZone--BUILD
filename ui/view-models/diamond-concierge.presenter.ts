@@ -18,12 +18,16 @@ import type {
   DiamondVelocityBand,
   DiamondVelocityRow,
   GateGuardTelemetryRow,
+  HighHeatVipRow,
+  OperatorQuoteDisplay,
+  OperatorQuoteInput,
   RecoveryCommandCenterView,
   RecoveryStageTag,
   ThreeFifthsExitCtaCard,
   TokenBridgeCtaCard,
   WelfareGuardianPanel,
 } from '../types/admin-diamond-contracts';
+import { PublicWalletPresenter } from './public-wallet.presenter';
 
 export const DIAMOND_PRESENTER_RULE_ID = 'DIAMOND_CONCIERGE_UI_v1';
 export const RECOVERY_PRESENTER_RULE_ID = 'RECOVERY_UI_v1';
@@ -395,6 +399,46 @@ export class DiamondConciergePresenter {
     const absFrac = frac < 0n ? -frac : frac;
     const fracStr = absFrac.toString().padStart(2, '0');
     return `${neg ? '-' : ''}$${absWhole.toLocaleString('en-US')}.${fracStr}`;
+  }
+
+  /**
+   * Builds the High-Heat VIP_DIAMOND queue from a list of sessions that
+   * have been detected at INFERNO heat by the FFS engine.
+   * Sorted by FFS score descending so the hottest sessions surface first.
+   */
+  buildHighHeatVipQueue(rows: HighHeatVipRow[]): HighHeatVipRow[] {
+    return [...rows].sort((a, b) => b.ffs_score - a.ffs_score);
+  }
+
+  /**
+   * Operator quote display — wraps PublicWalletPresenter.buildDiamondQuote
+   * with operator-specific context fields (correlation_id, step-up auth flag).
+   * Throws the same errors as the underlying quote builder on invalid inputs.
+   */
+  buildOperatorQuote(input: OperatorQuoteInput, now_utc?: Date): OperatorQuoteDisplay {
+    const walletPresenter = new PublicWalletPresenter();
+    const quote = walletPresenter.buildDiamondQuote({
+      tokens: input.tokens,
+      velocity_days: input.velocity_days,
+      now_utc,
+    });
+    return {
+      tokens: quote.tokens,
+      velocity_days: quote.velocity_days,
+      velocity_band: quote.velocity_band as import('../types/admin-diamond-contracts').DiamondVelocityBand,
+      base_rate_usd: quote.base_rate_usd,
+      velocity_multiplier: quote.velocity_multiplier,
+      platform_rate_usd: quote.platform_rate_usd,
+      platform_floor_applied: quote.platform_floor_applied,
+      platform_floor_per_token_usd: quote.platform_floor_per_token_usd,
+      usd_total_cents: quote.usd_total_cents,
+      expires_at_utc: quote.expires_at_utc,
+      extension_fee_usd: quote.extension_fee_usd,
+      recovery_fee_usd: quote.recovery_fee_usd,
+      correlation_id: input.correlation_id,
+      step_up_auth_required: true,
+      rule_applied_id: 'DIAMOND_OPERATOR_QUOTE_v1',
+    };
   }
 }
 

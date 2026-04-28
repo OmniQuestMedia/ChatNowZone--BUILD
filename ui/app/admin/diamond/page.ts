@@ -1,16 +1,21 @@
 // PAYLOAD 7 — /admin/diamond Diamond Concierge Command Center page.
-// Returns a RenderPlan that the future Next.js renderer adapter consumes.
+// Core Surface 03 — Diamond Concierge Operator View.
+// Extends the existing command center with:
+//   • High-heat VIP_DIAMOND queue (INFERNO FFS detections, separate from 48h expiry queue)
+//   • Operator Quote Generator (volume + velocity + $0.077 floor, step-up auth gated)
 //
 // Surfaces (top → bottom):
 //   1. KPI strip (5 cards)
 //   2. Real-time liquidity panel (volume + velocity)
 //   3. 48h warning queue
 //   4. High-balance personal-touch queue
-//   5. Token Bridge one-click cards (Pillar 1)
-//   6. Three-Fifths Exit one-click cards (Pillar 2 — policy-gated)
-//   7. GateGuard live telemetry feed
-//   8. Welfare Guardian live panel
-//   9. Audit chain viewer (window of immutable events)
+//   5. High-heat VIP_DIAMOND queue (new)
+//   6. Operator Quote Generator (new)
+//   7. Token Bridge one-click cards (Pillar 1)
+//   8. Three-Fifths Exit one-click cards (Pillar 2 — policy-gated)
+//   9. GateGuard live telemetry feed
+//  10. Welfare Guardian live panel
+//  11. Audit chain viewer (window of immutable events)
 
 import {
   DiamondConciergePresenter,
@@ -23,6 +28,9 @@ import { el, RenderElement, RenderNode } from '../../../components/render-plan';
 import type {
   DiamondCommandCenterView,
   DiamondKpiCard,
+  HighHeatVipRow,
+  OperatorQuoteDisplay,
+  OperatorQuoteInput,
 } from '../../../types/admin-diamond-contracts';
 
 /* ── HANDOFF ──────────────────────────────────────────────────────────────
@@ -32,6 +40,8 @@ import type {
  *     RecoveryEngine.tokenBridgeOffer / threeFifthsExit.
  *   • Welfare Guardian Score live panel composes WELFARE_GUARDIAN_v1.
  *   • Audit chain viewer renders immutable AUDIT_IMMUTABLE_* events.
+ *   • High-heat VIP_DIAMOND queue surfaces INFERNO sessions for handoff.
+ *   • Operator Quote Generator: step-up auth gated, $0.077 floor enforced.
  * The platform is functionally complete for internal alpha.
  * Next (final): End-to-end validation + deployment prep (PAYLOAD 8).
  * ──────────────────────────────────────────────────────────────────────── */
@@ -46,14 +56,30 @@ export interface DiamondPageRender {
   rule_applied_id: string;
 }
 
-export function renderDiamondPage(inputs: DiamondCommandCenterInputs): DiamondPageRender {
+export function renderDiamondPage(
+  inputs: DiamondCommandCenterInputs & {
+    /** High-heat VIP_DIAMOND sessions detected at INFERNO FFS tier. */
+    high_heat_vip_rows?: HighHeatVipRow[];
+    /** Pre-computed operator quote to display, or null when no active input. */
+    operator_quote?: OperatorQuoteDisplay | null;
+    /** Inputs for the operator quote form (drives populated/empty state). */
+    operator_quote_input?: OperatorQuoteInput | null;
+  },
+): DiamondPageRender {
   const presenter = new DiamondConciergePresenter();
   const view = presenter.buildCommandCenterView(inputs);
+
+  const highHeatVipRows = presenter.buildHighHeatVipQueue(inputs.high_heat_vip_rows ?? []);
 
   const kpiStrip = renderKpiStrip(view.liquidity.kpis);
   const liquidityPanel = renderLiquidityPanel(view);
   const warningQueue = renderWarningQueue(view);
   const personalTouchQueue = renderPersonalTouchQueue(view);
+  const highHeatVipPanel = renderHighHeatVipQueue(highHeatVipRows);
+  const operatorQuotePanel = renderOperatorQuoteGenerator(
+    inputs.operator_quote_input ?? null,
+    inputs.operator_quote ?? null,
+  );
   const tokenBridgeCards = renderTokenBridgeCards(view);
   const threeFifthsCards = renderThreeFifthsCards(view);
   const gateGuardFeed = renderGateGuardFeed(view);
@@ -86,6 +112,8 @@ export function renderDiamondPage(inputs: DiamondCommandCenterInputs): DiamondPa
       liquidityPanel,
       warningQueue,
       personalTouchQueue,
+      highHeatVipPanel,
+      operatorQuotePanel,
       tokenBridgeCards,
       threeFifthsCards,
       gateGuardFeed,
@@ -464,6 +492,271 @@ function renderAuditChain(view: DiamondCommandCenterView): RenderElement {
           ),
         ),
       ]),
+    ],
+  );
+}
+
+/**
+ * High-heat VIP_DIAMOND queue — surfaces sessions where the guest has reached
+ * INFERNO FFS heat. Sorted by score descending. Empty state is rendered when
+ * no INFERNO sessions are active.
+ */
+function renderHighHeatVipQueue(rows: HighHeatVipRow[]): RenderElement {
+  if (rows.length === 0) {
+    return el(
+      'section',
+      {
+        test_id: 'admin-diamond-high-heat-vip',
+        classes: ['cnz-panel', 'cnz-panel--high-heat-vip', 'cnz-panel--empty'],
+        aria: { 'aria-label': 'High-heat VIP Diamond queue' },
+      },
+      [
+        el('h2', {}, ['High-Heat VIP Diamond Queue']),
+        el('p', { classes: ['cnz-panel__empty-msg'] }, [
+          'No INFERNO sessions detected. All VIP Diamond guests are below heat threshold.',
+        ]),
+      ],
+    );
+  }
+
+  return el(
+    'section',
+    {
+      test_id: 'admin-diamond-high-heat-vip',
+      classes: ['cnz-panel', 'cnz-panel--high-heat-vip', 'cnz-panel--inferno'],
+      aria: { 'aria-label': 'High-heat VIP Diamond queue' },
+      props: { nats_topic: 'cnz.ffs.vip.inferno' },
+    },
+    [
+      el('h2', {}, [`🔥 High-Heat VIP Diamond Queue (${rows.length})`]),
+      el('table', { classes: ['cnz-table', 'cnz-table--heat'] }, [
+        el('thead', {}, [
+          el('tr', {}, [
+            el('th', {}, ['Session']),
+            el('th', {}, ['User']),
+            el('th', {}, ['FFS Score']),
+            el('th', {}, ['Tokens']),
+            el('th', {}, ['USD Exposure']),
+            el('th', {}, ['Velocity']),
+            el('th', {}, ['Detected']),
+            el('th', {}, ['Action']),
+          ]),
+        ]),
+        el(
+          'tbody',
+          {},
+          rows.map((row) =>
+            el(
+              'tr',
+              {
+                test_id: `admin-diamond-high-heat-${row.session_id}`,
+                classes: ['cnz-table__row--inferno'],
+                props: {
+                  reason_code: row.reason_code,
+                  ffs_score: row.ffs_score,
+                },
+              },
+              [
+                el('td', {}, [row.session_id.slice(0, 8) + '…']),
+                el('td', {}, [row.user_id]),
+                el('td', {}, [`${row.ffs_score}/100`]),
+                el('td', {}, [row.remaining_tokens]),
+                el('td', {}, [row.remaining_usd_cents]),
+                el('td', {}, [row.velocity_band]),
+                el('td', {}, [row.detected_at_utc]),
+                el(
+                  'td',
+                  {},
+                  [
+                    el(
+                      'button',
+                      {
+                        test_id: `admin-diamond-high-heat-handoff-${row.session_id}`,
+                        classes: ['cnz-button', 'cnz-button--primary', 'cnz-button--sm'],
+                        on: { click: 'initiateHandoff' },
+                        props: {
+                          session_id: row.session_id,
+                          user_id: row.user_id,
+                          wallet_id: row.wallet_id,
+                        },
+                      },
+                      ['Handoff'],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ]),
+    ],
+  );
+}
+
+/**
+ * Operator Quote Generator — allows a Diamond Concierge operator to generate
+ * an authoritative Diamond purchase quote by entering token volume and velocity.
+ * Step-up auth is always required before any quote is actioned.
+ *
+ * When operator_quote is null the form is shown in empty/input state.
+ * When operator_quote is provided the calculated quote result is displayed.
+ */
+function renderOperatorQuoteGenerator(
+  input: OperatorQuoteInput | null,
+  quote: OperatorQuoteDisplay | null,
+): RenderElement {
+  const quoteResult = quote
+    ? el(
+        'div',
+        {
+          test_id: 'admin-diamond-operator-quote-result',
+          classes: ['cnz-quote-card'],
+          props: {
+            correlation_id: quote.correlation_id,
+            rule_applied_id: quote.rule_applied_id,
+            step_up_auth_required: quote.step_up_auth_required,
+          },
+        },
+        [
+          el('h3', {}, ['Quote Result']),
+          el('dl', { classes: ['cnz-stat-grid'] }, [
+            el('dt', {}, ['Tokens']),
+            el('dd', {}, [String(quote.tokens)]),
+            el('dt', {}, ['Velocity (days)']),
+            el('dd', {}, [String(quote.velocity_days)]),
+            el('dt', {}, ['Velocity band']),
+            el('dd', {}, [quote.velocity_band]),
+            el('dt', {}, ['Base rate']),
+            el('dd', {}, [`$${quote.base_rate_usd.toFixed(4)}/CZT`]),
+            el('dt', {}, ['Velocity multiplier']),
+            el('dd', {}, [String(quote.velocity_multiplier)]),
+            el('dt', {}, ['Platform rate']),
+            el('dd', {}, [`$${quote.platform_rate_usd.toFixed(4)}/CZT`]),
+            el('dt', {}, ['Floor applied']),
+            el('dd', {}, [quote.platform_floor_applied ? `Yes ($${quote.platform_floor_per_token_usd})` : 'No']),
+            el('dt', {}, ['USD total (cents)']),
+            el('dd', {}, [quote.usd_total_cents]),
+            el('dt', {}, ['Expires']),
+            el('dd', {}, [quote.expires_at_utc]),
+            el('dt', {}, ['Correlation ID']),
+            el('dd', { classes: ['cnz-table__hash'] }, [quote.correlation_id]),
+          ]),
+          el(
+            'div',
+            { classes: ['cnz-cta-row'] },
+            [
+              el(
+                'button',
+                {
+                  test_id: 'admin-diamond-operator-quote-confirm',
+                  classes: ['cnz-button', 'cnz-button--primary'],
+                  on: { click: 'confirmOperatorQuote' },
+                  props: {
+                    correlation_id: quote.correlation_id,
+                    step_up_auth_required: true,
+                  },
+                  aria: { 'aria-label': 'Confirm quote — requires step-up authentication' },
+                },
+                ['Confirm Quote (step-up auth required)'],
+              ),
+              el(
+                'button',
+                {
+                  test_id: 'admin-diamond-operator-quote-discard',
+                  classes: ['cnz-button', 'cnz-button--ghost'],
+                  on: { click: 'discardOperatorQuote' },
+                },
+                ['Discard'],
+              ),
+            ],
+          ),
+        ],
+      )
+    : el('p', { classes: ['cnz-panel__empty-msg'] }, [
+        'Enter token volume and velocity days above to generate a quote.',
+      ]);
+
+  return el(
+    'section',
+    {
+      test_id: 'admin-diamond-operator-quote',
+      classes: ['cnz-panel', 'cnz-panel--operator-quote'],
+      aria: { 'aria-label': 'Operator Diamond quote generator' },
+    },
+    [
+      el('h2', {}, ['Operator Quote Generator']),
+      el('p', { classes: ['cnz-panel__subtext'] }, [
+        `Rate: $0.077 floor / volume + velocity tiers. Step-up auth required to confirm.`,
+      ]),
+      el(
+        'form',
+        {
+          test_id: 'admin-diamond-operator-quote-form',
+          classes: ['cnz-form'],
+          on: { submit: 'submitOperatorQuoteForm' },
+          props: {
+            correlation_id: input?.correlation_id ?? '',
+          },
+        },
+        [
+          el('div', { classes: ['cnz-form__field'] }, [
+            el('label', { props: { htmlFor: 'operator-quote-tokens' } }, ['Token volume']),
+            el('input', {
+              test_id: 'admin-diamond-operator-quote-tokens',
+              props: {
+                id: 'operator-quote-tokens',
+                type: 'number',
+                name: 'tokens',
+                min: 10000,
+                step: 1000,
+                placeholder: '10000',
+                value: input?.tokens ?? '',
+                required: true,
+              },
+            }),
+          ]),
+          el('div', { classes: ['cnz-form__field'] }, [
+            el('label', { props: { htmlFor: 'operator-quote-velocity' } }, ['Velocity (days)']),
+            el('input', {
+              test_id: 'admin-diamond-operator-quote-velocity',
+              props: {
+                id: 'operator-quote-velocity',
+                type: 'number',
+                name: 'velocity_days',
+                min: 14,
+                step: 1,
+                placeholder: '30',
+                value: input?.velocity_days ?? '',
+                required: true,
+              },
+            }),
+          ]),
+          el('div', { classes: ['cnz-form__field'] }, [
+            el('label', { props: { htmlFor: 'operator-quote-correlation' } }, ['Correlation ID']),
+            el('input', {
+              test_id: 'admin-diamond-operator-quote-correlation',
+              props: {
+                id: 'operator-quote-correlation',
+                type: 'text',
+                name: 'correlation_id',
+                placeholder: 'e.g. HANDOFF-SESSION-abc123',
+                value: input?.correlation_id ?? '',
+                required: true,
+              },
+            }),
+          ]),
+          el(
+            'button',
+            {
+              test_id: 'admin-diamond-operator-quote-submit',
+              classes: ['cnz-button', 'cnz-button--primary'],
+              props: { type: 'submit' },
+            },
+            ['Generate Quote'],
+          ),
+        ],
+      ),
+      quoteResult,
     ],
   );
 }

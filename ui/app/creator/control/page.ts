@@ -1,6 +1,8 @@
 // PAYLOAD 7 — /creator/control CreatorControl.Zone command center page.
-// Single-pane workstation: Broadcast Timing, Session Monitoring, Cyrano panel,
-// Room-Heat meter, persona switcher, payout rate indicator.
+// Core Surface 02 — Creator Cyrano Control Panel.
+// Adds CyranoSessionSummary widget and Diamond Concierge handoff CTA (+modal)
+// on top of the existing heat meter, session monitoring, broadcast timing,
+// Cyrano panel, and persona switcher.
 
 import {
   CreatorControlPresenter,
@@ -12,22 +14,41 @@ import { heatColorFor } from '../../../config/theme';
 import { heatTierAriaLabel } from '../../../config/accessibility';
 import { el, RenderElement } from '../../../components/render-plan';
 import { renderSendGiftPanel } from '../../../components/send-gift-panel';
-import type { CreatorCommandCenterView } from '../../../types/creator-panel-contracts';
+import type { CreatorCommandCenterView, CyranoSessionSummary, DiamondHandoffCta } from '../../../types/creator-panel-contracts';
 
 export const CREATOR_CONTROL_PAGE_RULE_ID = 'CREATOR_CONTROL_PAGE_v1';
 
 export interface CreatorControlPageRender {
   metadata: typeof SEO.creator_control;
   view: CreatorCommandCenterView;
+  cyrano_summary: CyranoSessionSummary;
+  handoff_cta: DiamondHandoffCta | null;
   tree: RenderElement;
   rule_applied_id: string;
 }
 
 export function renderCreatorControlPage(
-  inputs: CreatorCommandCenterInputs,
+  inputs: CreatorCommandCenterInputs & {
+    /** When true the handoff quote modal is initially open. Default false. */
+    handoff_modal_open?: boolean;
+    /** Estimated token volume for the handoff quote (optional, from session velocity). */
+    handoff_estimated_tokens?: number | null;
+  },
 ): CreatorControlPageRender {
   const presenter = new CreatorControlPresenter();
+  const now = inputs.now_utc ?? new Date();
   const view = presenter.buildCommandCenterView(inputs);
+
+  const cyrano_summary = presenter.buildCyranoSessionSummary(inputs, now);
+
+  const handoff_cta = inputs.active_session_id
+    ? presenter.buildHandoffCta(
+        inputs.active_session_id,
+        inputs.latest_heat?.score ?? 0,
+        inputs.latest_heat?.tier ?? 'COLD',
+        inputs.handoff_estimated_tokens ?? null,
+      )
+    : null;
 
   const tree = el(
     'main',
@@ -60,6 +81,10 @@ export function renderCreatorControlPage(
           renderPayoutChip(view),
         ]),
       ]),
+      renderCyranoSessionSummary(cyrano_summary),
+      handoff_cta
+        ? renderHandoffCta(handoff_cta, inputs.handoff_modal_open ?? false)
+        : null,
       renderHeatMeter(view),
       renderSessionMonitoring(view),
       renderBroadcastTiming(view),
@@ -72,6 +97,8 @@ export function renderCreatorControlPage(
   return {
     metadata: SEO.creator_control,
     view,
+    cyrano_summary,
+    handoff_cta,
     tree,
     rule_applied_id: CREATOR_CONTROL_PAGE_RULE_ID,
   };
@@ -328,6 +355,149 @@ function renderPersonaSwitcher(view: CreatorCommandCenterView): RenderElement {
             ],
           ),
         ),
+      ),
+    ],
+  );
+}
+
+/**
+ * CyranoSessionSummary — compact status card at the top of the command pane.
+ * Shows persona, suggestion count, and SLA latency at a glance.
+ */
+function renderCyranoSessionSummary(summary: CyranoSessionSummary): RenderElement {
+  const latencyOk = summary.latency_within_sla;
+  const latencyDisplay =
+    summary.latency_last_observed_ms !== null
+      ? `${summary.latency_last_observed_ms}ms`
+      : '—';
+
+  return el(
+    'section',
+    {
+      test_id: 'creator-control-cyrano-summary',
+      classes: ['cnz-panel', 'cnz-panel--cyrano-summary'],
+      aria: { 'aria-label': 'Cyrano session summary' },
+      props: { nats_topic: 'cnz.cyrano.summary' },
+    },
+    [
+      el('header', { classes: ['cnz-panel__header'] }, [
+        el('h2', {}, ['Cyrano™ Session']),
+        el(
+          'span',
+          {
+            test_id: 'creator-control-cyrano-summary-latency',
+            classes: [
+              'cnz-cyrano-summary__latency',
+              latencyOk ? 'cnz-status--ok' : 'cnz-status--warn',
+            ],
+          },
+          [`Latency: ${latencyDisplay} / SLA ${summary.latency_sla_ms}ms`],
+        ),
+      ]),
+      el('dl', { classes: ['cnz-stat-grid', 'cnz-stat-grid--inline'] }, [
+        el('dt', {}, ['Persona']),
+        el(
+          'dd',
+          { test_id: 'creator-control-cyrano-summary-persona' },
+          [summary.active_persona_display_name ?? 'None active'],
+        ),
+        el('dt', {}, ['Suggestions']),
+        el(
+          'dd',
+          { test_id: 'creator-control-cyrano-summary-count' },
+          [String(summary.suggestion_count)],
+        ),
+        el('dt', {}, ['Heat tier']),
+        el('dd', {}, [summary.tier_context]),
+      ]),
+    ],
+  );
+}
+
+/**
+ * Diamond Concierge handoff CTA — shown only at INFERNO heat.
+ * Includes a modal with the handoff quote URL and floor/ceiling rate context.
+ * The modal is rendered collapsed by default; open via handoff_modal_open input.
+ */
+function renderHandoffCta(cta: DiamondHandoffCta, modalOpen: boolean): RenderElement {
+  return el(
+    'section',
+    {
+      test_id: 'creator-control-handoff-cta',
+      classes: ['cnz-panel', 'cnz-panel--handoff', 'cnz-panel--inferno'],
+      aria: { 'aria-label': 'Diamond Concierge high-heat handoff' },
+      props: {
+        session_id: cta.session_id,
+        ffs_score: cta.ffs_score,
+        reason_code: cta.reason_code,
+      },
+    },
+    [
+      el('header', { classes: ['cnz-panel__header'] }, [
+        el('h2', {}, ['🔥 INFERNO — Diamond Concierge Handoff Available']),
+        el('p', { classes: ['cnz-panel__subtext'] }, [
+          `Session heat at ${cta.ffs_score}/100. A Diamond Concierge can maximise revenue.`,
+        ]),
+      ]),
+      el('dl', { classes: ['cnz-stat-grid', 'cnz-stat-grid--inline'] }, [
+        el('dt', {}, ['Floor rate']),
+        el('dd', {}, [`$${cta.floor_rate_usd.toFixed(3)}/CZT`]),
+        el('dt', {}, ['Ceiling rate']),
+        el('dd', {}, [`$${cta.ceiling_rate_usd.toFixed(3)}/CZT`]),
+        ...(cta.estimated_volume_tokens !== null
+          ? [
+              el('dt', {}, ['Est. volume']),
+              el('dd', {}, [`${cta.estimated_volume_tokens.toLocaleString('en-US')} CZT`]),
+            ]
+          : []),
+      ]),
+      el(
+        'button',
+        {
+          test_id: 'creator-control-handoff-open-modal',
+          classes: ['cnz-button', 'cnz-button--primary', 'cnz-button--revenue'],
+          on: { click: 'openHandoffQuoteModal' },
+          props: { session_id: cta.session_id },
+        },
+        ['Request Diamond Concierge Handoff'],
+      ),
+      el(
+        'div',
+        {
+          test_id: 'creator-control-handoff-modal',
+          classes: ['cnz-modal', modalOpen ? 'cnz-modal--open' : 'cnz-modal--hidden'],
+          aria: { 'aria-modal': 'true', role: 'dialog' },
+          props: { open: modalOpen },
+        },
+        [
+          el('header', { classes: ['cnz-modal__header'] }, [
+            el('h3', {}, ['Confirm Handoff to Diamond Concierge']),
+            el(
+              'button',
+              {
+                test_id: 'creator-control-handoff-modal-close',
+                classes: ['cnz-button', 'cnz-button--ghost'],
+                on: { click: 'closeHandoffQuoteModal' },
+              },
+              ['Cancel'],
+            ),
+          ]),
+          el('p', {}, [
+            'Initiating a handoff will connect your session with an OQMI Diamond Concierge ' +
+              'who will manage the high-value guest relationship. ' +
+              'Your payout rate is preserved at the REDBOOK scale.',
+          ]),
+          el(
+            'a',
+            {
+              test_id: 'creator-control-handoff-quote-link',
+              classes: ['cnz-button', 'cnz-button--primary'],
+              props: { href: cta.handoff_quote_url },
+              on: { click: 'navigateToHandoffQuote' },
+            },
+            ['View handoff quote →'],
+          ),
+        ],
       ),
     ],
   );

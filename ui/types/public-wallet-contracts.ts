@@ -91,3 +91,74 @@ export interface WalletThreeBucketView {
   generated_at_utc: string;
   rule_applied_id: string;
 }
+
+// ─── Core Surface 01 — Public Wallet View extensions ─────────────────────────
+
+/**
+ * Page-level state for the Public Wallet View.
+ * The renderer selects which template to mount based on this value.
+ * NATS events may push transitions (e.g. SUCCESS → WELFARE_GUARDIAN_PAUSE).
+ */
+export type PublicWalletViewState =
+  | 'LOADING'
+  | 'EMPTY'
+  | 'SUCCESS'
+  | 'WELFARE_GUARDIAN_PAUSE'
+  | 'GATE_GUARD_DENY';
+
+/**
+ * Welfare Guardian score band — maps a numeric cohort score (0–100) to
+ * a visual severity band rendered as a coloured status bar on the wallet.
+ * Bands are aligned to GovernanceConfig welfare thresholds.
+ */
+export type WelfareGuardianBand = 'GREEN' | 'AMBER' | 'ORANGE' | 'CRITICAL';
+
+/**
+ * Single ledger entry row rendered in the Recent Activity section of /wallet.
+ * Amounts are bigint-as-string for JSON safety.
+ */
+export interface WalletLedgerEntry {
+  ledger_id: string;
+  occurred_at_utc: string;
+  description: string;
+  bucket: WalletBucket;
+  amount_tokens: string; // bigint as string; negative = debit
+  running_balance_tokens: string; // bigint as string
+  reason_code: string;
+  correlation_id: string;
+}
+
+/**
+ * FFS (Flicker n'Flame Score) band hint surfaced on the guest wallet.
+ * When the creator's room is INFERNO the wallet shows an ambient indicator
+ * so the guest knows the session is at peak engagement.
+ * This is READ-ONLY data pushed via NATS — the wallet never modifies FFS.
+ */
+export interface FfsBandHint {
+  session_id: string;
+  tier: 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+  score: number; // 0..100
+  is_inferno: boolean;
+}
+
+/**
+ * Tier badge displayed in the wallet header.
+ * For VIP_DIAMOND guests a gold badge with an optional Concierge flag is shown.
+ */
+export interface TierBadgeProps {
+  tier: GuestTier;
+  is_vip_diamond: boolean;
+  concierge_flag: boolean; // true when a Diamond Concierge is assigned to this wallet
+  display_label: string; // e.g. "VIP Diamond — Concierge"
+}
+
+/**
+ * Bill 149 compliance disclosure overlay.
+ * Must be rendered whenever AI-generated content (Cyrano copy) is visible to
+ * the guest. Carries the canonical disclosure text and acknowledgement state.
+ */
+export interface Bill149OverlayProps {
+  disclosure_text: string;
+  acknowledged: boolean; // drives show/hide; never stored server-side in render plan
+  rule_reference: 'BILL_149_DISCLOSURE_v1';
+}

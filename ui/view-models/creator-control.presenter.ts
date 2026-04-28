@@ -14,7 +14,9 @@ import type {
 import type {
   BroadcastTimingDashboard,
   CreatorCommandCenterView,
+  CyranoSessionSummary,
   CyranoWhisperPanel,
+  DiamondHandoffCta,
   FfsMeter,
   PayoutRateIndicator,
   SessionMonitoringPanel,
@@ -293,6 +295,57 @@ export class CreatorControlPresenter {
       scaling_pct_applied: scaling * 100,
       captured_at_utc: now.toISOString(),
       reason_code: 'PAYOUT_SCALING_APPLIED',
+    };
+  }
+
+  /**
+   * Builds a compact CyranoSessionSummary card for the top of the creator
+   * command pane. Derived entirely from inputs already present in
+   * CreatorCommandCenterInputs — no new data source required.
+   */
+  buildCyranoSessionSummary(inputs: CreatorCommandCenterInputs, now: Date): CyranoSessionSummary {
+    const activePersona = inputs.cyrano_personas.find((p) => p.active);
+    const latestSuggestion = inputs.cyrano_suggestions
+      .slice()
+      .sort((a, b) => b.emitted_at_utc.localeCompare(a.emitted_at_utc))[0];
+    const latencyObs = latestSuggestion?.latency_ms ?? null;
+    const withinSla =
+      latencyObs !== null ? latencyObs <= inputs.cyrano_latency_sla_ms : true;
+
+    return {
+      creator_id: inputs.creator_id,
+      session_id: inputs.active_session_id,
+      active_persona_display_name: activePersona?.display_name ?? null,
+      suggestion_count: inputs.cyrano_suggestions.length,
+      latency_last_observed_ms: latencyObs,
+      latency_sla_ms: inputs.cyrano_latency_sla_ms,
+      latency_within_sla: withinSla,
+      tier_context: inputs.latest_heat?.tier ?? 'COLD',
+      generated_at_utc: now.toISOString(),
+    };
+  }
+
+  /**
+   * Builds the Diamond Concierge handoff CTA.
+   * Returns null when the FFS tier is not INFERNO — the CTA must only appear
+   * at peak heat to avoid trivialising the high-value handoff workflow.
+   */
+  buildHandoffCta(
+    session_id: string,
+    ffs_score: number,
+    ffs_tier: FfsTier,
+    estimated_volume_tokens: number | null,
+  ): DiamondHandoffCta | null {
+    if (ffs_tier !== 'INFERNO') return null;
+    return {
+      session_id,
+      ffs_score,
+      ffs_tier: 'INFERNO',
+      estimated_volume_tokens,
+      floor_rate_usd: REDBOOK_PAYOUT_FLOOR,
+      ceiling_rate_usd: REDBOOK_PAYOUT_CEILING,
+      handoff_quote_url: `/admin/diamond?action=handoff&session=${encodeURIComponent(session_id)}`,
+      reason_code: 'INFERNO_HANDOFF_ELIGIBLE',
     };
   }
 }
