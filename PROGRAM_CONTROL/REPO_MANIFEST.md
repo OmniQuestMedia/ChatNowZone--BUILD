@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/add-public-wallet-view`
 **Commit:** `06bb503e9ef52202f78958acd03c2e92f024da2c`
 **Generated:** 2026-04-28T17:56:31Z
+**Branch:** `copilot/add-onboarding-gateflows-docs`
+**Commit:** `47005c99259447523f641fedd524ac50c8c27e8c`
+**Generated:** 2026-04-28T17:41:40Z
 
 ## All Files
 
@@ -287,6 +290,8 @@ Auto-generated on every push. Do not edit manually.
 - `docs/UX_INTEGRATION_BRIEF.md`
 - `docs/compliance/evidence_templates/NCII_TAKEDOWN_LOG.md`
 - `docs/doctrine/COPILOT_GUARDRAILS.md`
+- `docs/ux/00-shared-components.md`
+- `docs/ux/01-onboarding-gateflows.md`
 - `docs/ux/01-presenter-contracts.md`
 - `docs/ux/02-endpoint-inventory.md`
 - `docs/ux/03-state-machines.md`
@@ -743,9 +748,11 @@ Auto-generated on every push. Do not edit manually.
 - `ui/app/admin/recovery/page.ts`
 - `ui/app/creator/control/page.ts`
 - `ui/app/creator/gamification/page.ts`
+- `ui/app/creator/pixel-legacy/page.ts`
 - `ui/app/creator/studio/page.ts`
 - `ui/app/diamond/purchase/page.ts`
 - `ui/app/tokens/page.ts`
+- `ui/app/vip/membership/page.ts`
 - `ui/app/wallet/page.ts`
 - `ui/components/dice-game.ts`
 - `ui/components/render-plan.ts`
@@ -761,9 +768,11 @@ Auto-generated on every push. Do not edit manually.
 - `ui/types/creator-control-contracts.ts`
 - `ui/types/creator-panel-contracts.ts`
 - `ui/types/gamification-contracts.ts`
+- `ui/types/membership-lifecycle-contracts.ts`
 - `ui/types/public-wallet-contracts.ts`
 - `ui/view-models/creator-control.presenter.ts`
 - `ui/view-models/diamond-concierge.presenter.ts`
 - `ui/view-models/gamification.presenter.ts`
+- `ui/view-models/membership.presenter.ts`
 - `ui/view-models/public-wallet.presenter.ts`
 - `yarn.lock`

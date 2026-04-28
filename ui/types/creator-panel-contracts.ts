@@ -122,3 +122,92 @@ export interface CreatorCommandCenterView {
   generated_at_utc: string;
   rule_applied_id: string;
 }
+
+// ─── Screen 05 — Pixel Legacy Application contracts ────────────────────────
+// Source of truth: PIXEL-LEGACY-001 directive, docs/ux/03-state-machines.md §10,
+// docs/ux/05-tier-entitlements.md §Creator types.
+
+/**
+ * Lifecycle status of a creator's Pixel Legacy application.
+ * Matches the state machine in docs/ux/03-state-machines.md §10.
+ */
+export type PixelLegacyApplicationStatus = 'DRAFT' | 'APPLIED' | 'REVIEWED' | 'GRANTED' | 'DENIED';
+
+/** Seat availability meter — 3,500 lifetime cap. */
+export interface PixelLegacySeatMeter {
+  /** Number of seats already granted. */
+  seats_taken: number;
+  /** Platform cap — canonical value is 3,500. */
+  seats_total: number;
+  /** Derived: seats_total − seats_taken. */
+  seats_remaining: number;
+  /** True when seats_taken >= seats_total. */
+  cap_reached: boolean;
+}
+
+/**
+ * One portfolio / proof-of-work entry submitted with the application.
+ * Creators provide at least one entry (required by the application form).
+ */
+export interface PixelLegacyPortfolioEntry {
+  entry_id: string;
+  /** Creator-provided label, e.g. "My Twitch channel". */
+  label: string;
+  /** Public URL pointing to the creator's portfolio or social presence. */
+  url: string;
+}
+
+/** Benefits summary shown to the applicant before and after grant. */
+export interface PixelLegacyBenefits {
+  /** Minimum per-token payout in USD ($0.07 floor for Pixel Legacy). */
+  payout_range_min_usd: number;
+  /** Maximum per-token payout in USD ($0.09 ceiling — RATE_INFERNO). */
+  payout_range_max_usd: number;
+  /** True — Pixel Legacy creators carry a lifetime Cyrano membership flag. */
+  lifetime_cyrano: boolean;
+  /** The month at which the Pixel Legacy Signing Bonus is triggered (month 4). */
+  signing_bonus_month: number;
+  /** Display badge label rendered on the creator's profile. */
+  badge_label: 'Pixel Legacy';
+}
+
+/**
+ * Top-level view model for /creator/pixel-legacy — the Pixel Legacy Onboarding page.
+ * Consumed by renderPixelLegacyPage; built by PixelLegacyPresenter.buildView().
+ */
+export interface PixelLegacyApplicationView {
+  /**
+   * Stable application identifier assigned on first submission.
+   * Null when status is DRAFT (application not yet submitted).
+   */
+  application_id: string | null;
+  creator_id: string;
+  display_name: string;
+  /** Current application lifecycle state. */
+  status: PixelLegacyApplicationStatus;
+  /** Live seat-availability meter (refreshed at view-generation time). */
+  seat_meter: PixelLegacySeatMeter;
+  /** Portfolio / proof-of-work entries provided by the creator. */
+  portfolio_entries: PixelLegacyPortfolioEntry[];
+  /** Free-text proof statement supplied by the creator in the form. */
+  proof_statement: string;
+  /** ISO-8601 timestamp of submission. Null when status is DRAFT. */
+  submitted_at_utc: string | null;
+  /** ISO-8601 timestamp when the review decision was recorded. Null until reviewed. */
+  reviewed_at_utc: string | null;
+  /**
+   * Platform reason code for denial. Only populated on DENIED status.
+   * Maps to the reason-code catalog in docs/ux/04-reason-code-catalog.md.
+   */
+  denial_reason_code: string | null;
+  /** Benefits preview — shown pre-grant to explain what the creator receives. */
+  benefits: PixelLegacyBenefits;
+  /**
+   * True once GRANTED — signals the renderer to unlock the creator's Cyrano panel CTA.
+   * Always false until status = GRANTED.
+   */
+  cyrano_panel_unlocked: boolean;
+  /** ISO-8601 timestamp when this view was generated. */
+  generated_at_utc: string;
+  rule_applied_id: string;
+}
