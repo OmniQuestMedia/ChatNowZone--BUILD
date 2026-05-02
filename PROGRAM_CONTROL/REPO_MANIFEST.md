@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `2067f975a8f2efe2066cd7b5c26a0af046279dbb`
-**Generated:** 2026-05-02T19:31:03Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `180cae06d9c6c7004543bcc5559c2159ac6a6da8`
+**Generated:** 2026-05-02T21:55:15Z
 
 ## All Files
 
@@ -74,6 +74,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-002.md`
+- `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-003.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PV-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/THREAD11-COPILOT-INTAKE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-AUDIT-001.md`

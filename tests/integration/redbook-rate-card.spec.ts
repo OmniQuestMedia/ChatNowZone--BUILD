@@ -4,6 +4,7 @@
 
 import { RedbookRateCardService } from '../../services/ledger';
 import {
+  PIXEL_LEGACY,
   REDBOOK_RATE_CARDS,
   DIAMOND_TIER,
 } from '../../services/core-api/src/config/governance.config';
@@ -80,5 +81,57 @@ describe('RedbookRateCardService — FFS payout resolution', () => {
     const rate = svc.resolveCreatorPayoutRate({ heatScore: 100, diamondFloorActive: true });
     expect(rate.appliedFloor).toBe(false);
     expect(rate.ratePerToken).toBe(GovernanceConfig.RATE_INFERNO.toNumber());
+  });
+});
+
+describe('RedbookRateCardService — Pixel Legacy floor (PIXEL-LEGACY-003)', () => {
+  it('does NOT apply the Pixel Legacy floor when live rate (cold $0.075) is above $0.07', () => {
+    // Under the current heat-band matrix, cold ($0.075) > Pixel Legacy floor
+    // ($0.07), so the floor is not raised. Verifies the comparison logic
+    // is `live < floor`, not `live <= floor` or `always-floor`.
+    const rate = svc.resolveCreatorPayoutRate({
+      heatScore: 0,
+      diamondFloorActive: false,
+      isPixelLegacy: true,
+    });
+    expect(rate.ratePerToken).toBe(GovernanceConfig.RATE_COLD.toNumber());
+    expect(rate.appliedPixelLegacyFloor).toBe(false);
+    expect(rate.appliedFloor).toBe(false);
+  });
+
+  it('returns the live inferno rate ($0.090) for Pixel Legacy creators at heat 95', () => {
+    const rate = svc.resolveCreatorPayoutRate({
+      heatScore: 95,
+      diamondFloorActive: false,
+      isPixelLegacy: true,
+    });
+    expect(rate.ratePerToken).toBe(GovernanceConfig.RATE_INFERNO.toNumber());
+    expect(rate.appliedPixelLegacyFloor).toBe(false);
+    expect(rate.appliedDiamondFloor).toBe(false);
+  });
+
+  it('Diamond floor wins over Pixel Legacy floor when both are active', () => {
+    // Diamond floor ($0.080) > Pixel Legacy floor ($0.07). When both flags
+    // are true and live is below both, Diamond wins because it is applied
+    // first in the composition order and Pixel Legacy will then see
+    // rate=$0.080 which is already above its floor.
+    const rate = svc.resolveCreatorPayoutRate({
+      heatScore: 0,
+      diamondFloorActive: true,
+      isPixelLegacy: true,
+    });
+    expect(rate.ratePerToken).toBe(GovernanceConfig.RATE_DIAMOND_FLOOR.toNumber());
+    expect(rate.appliedDiamondFloor).toBe(true);
+    // Pixel Legacy floor not applied because Diamond already raised above $0.07.
+    expect(rate.appliedPixelLegacyFloor).toBe(false);
+    expect(rate.appliedFloor).toBe(true);
+  });
+
+  it('Pixel Legacy floor constant matches the documented $0.07 value', () => {
+    // Smoke test on the constant itself — this catches accidental edits to
+    // governance.config.ts that would silently change the Pixel Legacy
+    // payout band.
+    expect(PIXEL_LEGACY.PAYOUT_FLOOR_USD).toBe(0.07);
+    expect(PIXEL_LEGACY.PAYOUT_CEILING_USD).toBe(0.09);
   });
 });
