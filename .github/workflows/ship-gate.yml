@@ -1,0 +1,109 @@
+# Ship-Gate Verifier — Canonical Corpus L0 invariants
+#
+# Runs PROGRAM_CONTROL/ship-gate-verifier.ts on every push to main, every PR
+# targeting main, and on a 20-minute cron. The verifier walks every L0
+# invariant against the live tree and exits non-zero on any failure, so this
+# job acts as the gate that keeps the Alpha-readiness counter ticking.
+#
+# Cadence math (per CEO target 2,000 green runs by 2026-06-01):
+#   - 2,000 runs / ~30 days = ~67 runs/day required
+#   - 20-min cron alone:    72 runs/day  ← already covers the floor
+#   - PR + push runs:       additional buffer (no cancel-in-progress)
+#
+# The verifier is filesystem-only (no network, no DB, no secrets), so this
+# workflow runs without any auth context and without the deploy-side
+# secret env. Target runtime is under 60 seconds.
+
+name: Ship-Gate Verifier
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Every 20 minutes. Scheduled runs always check main's state.
+    - cron: '*/20 * * * *'
+  # Manual trigger for ad-hoc invariant audits.
+  workflow_dispatch:
+
+# Read-only — the verifier never mutates the repo or any external system.
+permissions:
+  contents: read
+
+# Each PR / branch gets its own concurrency group. We deliberately do NOT
+# cancel-in-progress: every successful run counts toward the 2,000-run
+# Alpha-readiness target.
+concurrency:
+  group: ship-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ship-gate:
+    name: Canonical Corpus L0 Invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3.8.2
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      # --ignore-scripts skips `prisma generate` from postinstall. The
+      # verifier is filesystem-only and does not need the Prisma client.
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Run ship-gate verifier (human-readable output to log)
+        id: verify
+        run: yarn ship-gate
+
+      # Always run, even if the previous step failed, so the JSON report is
+      # available as an artifact for failure investigation.
+      - name: Generate JSON report
+        if: always()
+        run: yarn ship-gate --json > ship-gate-report.json || true
+
+      - name: Append summary to Actions UI
+        if: always()
+        run: |
+          if [ ! -s ship-gate-report.json ]; then
+            echo "# Ship-Gate report unavailable" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          SUMMARY=$(jq -r '.summary // "UNKNOWN"' ship-gate-report.json)
+          PASS=$(jq -r '.passed // 0' ship-gate-report.json)
+          FAIL=$(jq -r '.failed // 0' ship-gate-report.json)
+          SKIP=$(jq -r '.skipped // 0' ship-gate-report.json)
+          TOTAL=$(jq -r '.total // 0' ship-gate-report.json)
+          TS=$(jq -r '.generated_at_utc // "?"' ship-gate-report.json)
+          {
+            echo "# Ship-Gate: $SUMMARY"
+            echo
+            echo "- Generated: \`$TS\`"
+            echo "- Pass: **$PASS**"
+            echo "- Fail: **$FAIL**"
+            echo "- Skip: **$SKIP**"
+            echo "- Total: **$TOTAL**"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$FAIL" -gt 0 ]; then
+            {
+              echo
+              echo "## Failures"
+              jq -r '.results[] | select(.status == "FAIL") | "### " + .id + " — " + .description + "\n" + ((.evidence // []) | map("- " + .) | join("\n")) + (if .remediation then "\n- Remediation: " + .remediation else "" end)' ship-gate-report.json
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload JSON report artifact
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: ship-gate-report-${{ github.run_id }}
+          path: ship-gate-report.json
+          retention-days: 30
+          if-no-files-found: warn
