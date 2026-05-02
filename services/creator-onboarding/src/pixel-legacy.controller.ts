@@ -1,34 +1,33 @@
 // services/creator-onboarding/src/pixel-legacy.controller.ts
-// PIXEL-LEGACY-001 — Pixel Legacy onboarding HTTP surface.
+// PIXEL-LEGACY-002 — read-only HTTP surface for the FCFS gateway.
 //
 // Endpoints:
-//   POST /pixel-legacy/apply         creator submits / re-submits
-//   POST /pixel-legacy/review        operator GRANT or DENY (RBAC-gated in service)
-//   GET  /pixel-legacy/seat-meter    seat-availability snapshot (public)
-//   GET  /pixel-legacy/:creator_id   full PixelLegacyApplicationView for the UI
+//   GET  /pixel-legacy/seat-meter         public seat-availability snapshot
+//                                         (clamped at MARKETING_SEAT_CAP).
+//   GET  /pixel-legacy/:creator_id        creator's Pixel Legacy status
+//                                         (drives the /creator/pixel-legacy
+//                                         status page).
 //
-// Auth posture (interim):
-//   reviewer_id and caller_role on the review endpoint are accepted from the
-//   request body. The service routes the role check through the canonical
-//   RbacGuard, so role-based denial uses the same role-rank logic as the rest
-//   of the codebase. This matches the existing pattern in studio.controller
-//   and creator-onboarding.controller. Once the platform auth middleware
-//   lands and attaches a verified user to the request, both fields will be
-//   sourced from req.user and the body fields will be removed. Tracked under
-//   PIXEL-LEGACY-006 alongside the step-up auth modal flow.
+// There is no apply or review endpoint — Pixel Legacy is granted automatically
+// at onboarding completion via CreatorOnboardingService.complete() →
+// PixelLegacyService.tryGrantSeatOnOnboarding().
+//
+// Auth posture (interim, tracked PIXEL-LEGACY-006):
+//   /pixel-legacy/:creator_id currently allows reads by creator_id alone.
+//   Once the platform auth middleware lands and attaches a verified user to
+//   the request, the controller will enforce that the caller is either the
+//   creator themselves or a permitted operator before returning the status
+//   shape. The status payload at present is a small set of public-derivable
+//   facts (is_pixel_legacy boolean + seat number) — much less sensitive than
+//   the application proof statements + portfolio entries that the v1 surface
+//   exposed, so the auth gap is lower-urgency than it was under -001.
 
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { Controller, Get, Logger, Param } from '@nestjs/common';
+import { PixelLegacyService } from './pixel-legacy.service';
 import {
-  PixelLegacyApplicationView,
-  PixelLegacyService,
-} from './pixel-legacy.service';
-import {
-  ApplyPixelLegacyDto,
-  PixelLegacyApplicationPublic,
-  PixelLegacySeatAllocationPublic,
-  ReviewPixelLegacyDto,
+  PixelLegacyCreatorStatusPublic,
+  PixelLegacySeatMeterPublic,
 } from './dto/pixel-legacy.dto';
-import { PIXEL_LEGACY } from '../../core-api/src/config/governance.config';
 
 @Controller('pixel-legacy')
 export class PixelLegacyController {
@@ -36,53 +35,15 @@ export class PixelLegacyController {
 
   constructor(private readonly pixelLegacy: PixelLegacyService) {}
 
-  @Post('apply')
-  async apply(@Body() dto: ApplyPixelLegacyDto): Promise<PixelLegacyApplicationPublic> {
-    this.logger.log('PixelLegacyController.apply', {
-      creator_id: dto.creator_id,
-      portfolio_count: dto.portfolio_entries?.length ?? 0,
-      correlation_id: dto.correlation_id,
-    });
-    return this.pixelLegacy.applyForPixelLegacy(dto);
-  }
-
-  @Post('review')
-  async review(@Body() dto: ReviewPixelLegacyDto): Promise<{
-    application: PixelLegacyApplicationPublic;
-    seat_allocation: PixelLegacySeatAllocationPublic | null;
-  }> {
-    this.logger.log('PixelLegacyController.review', {
-      application_id: dto.application_id,
-      decision: dto.decision,
-      reviewer_id: dto.reviewer_id,
-      caller_role: dto.caller_role,
-      correlation_id: dto.correlation_id,
-    });
-    return this.pixelLegacy.reviewApplication(dto);
-  }
-
   @Get('seat-meter')
-  async seatMeter(): Promise<{
-    seats_taken: number;
-    seats_total: number;
-    seats_remaining: number;
-    cap_reached: boolean;
-    rule_applied_id: string;
-  }> {
-    const meter = await this.pixelLegacy.getSeatMeter();
-    return { ...meter, rule_applied_id: PIXEL_LEGACY.RULE_APPLIED_ID };
+  async seatMeter(): Promise<PixelLegacySeatMeterPublic> {
+    return this.pixelLegacy.getSeatMeter();
   }
 
-  /**
-   * Returns the full PixelLegacyApplicationView for the UI binding at
-   * ui/app/creator/pixel-legacy/page.ts. For first-time visits with no
-   * application row yet, returns a synthetic DRAFT view so the UI has a
-   * coherent shape to render the apply form against.
-   */
   @Get(':creator_id')
-  async getViewByCreator(
+  async getCreatorStatus(
     @Param('creator_id') creatorId: string,
-  ): Promise<PixelLegacyApplicationView> {
-    return this.pixelLegacy.buildApplicationView(creatorId);
+  ): Promise<PixelLegacyCreatorStatusPublic> {
+    return this.pixelLegacy.getCreatorStatus(creatorId);
   }
 }

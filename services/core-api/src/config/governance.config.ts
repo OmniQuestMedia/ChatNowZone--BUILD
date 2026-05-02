@@ -493,17 +493,26 @@ export const REDBOOK_RATE_CARDS = {
   VIP_BASELINE_PER_TOKEN: 0.12,
 } as const;
 
-// ─── PIXEL-LEGACY-001 — Pixel Legacy creator type ────────────────────────────
-// Backs the first-3,500-creator-seat program. PIXEL_LEGACY creators receive a
-// guaranteed payout floor of $0.07/CZT (vs the STANDARD RATE_COLD of $0.075,
-// which can drop further during Tease bundles to $0.065). The floor applies
-// per-token; ceiling matches RATE_INFERNO at $0.090. The lifetime Cyrano
-// membership flag on a Creator row is mirrored from the seat allocation and
-// honoured by services/core-api/src/cyrano/cyrano-auth.service.ts (when the
-// CYRANO-ACCESS-POLICY-001 directive lands).
+// ─── PIXEL-LEGACY-002 — first-come-first-served gateway ─────────────────────
+// Supersedes the -001 application model. The first 3,500 creators completing
+// onboarding receive the PIXEL_LEGACY seat automatically; after the actual
+// gateway closes, all new creators are STANDARD. The MARKETING_SEAT_CAP
+// (3,000) is the publicly displayed value — UI seat-meter clamps at this cap,
+// while the system silently accepts up to SEAT_CAP (3,500). The 500-seat
+// buffer is internal/operational and never surfaced to guests or applicants.
+//
+// PIXEL_LEGACY creators receive a guaranteed payout floor of $0.07/CZT (vs
+// the STANDARD RATE_COLD of $0.075, which can drop further during Tease
+// bundles to $0.065). Ceiling matches RATE_INFERNO at $0.090. The lifetime
+// Cyrano membership flag on a Creator row is mirrored from the seat
+// allocation and honoured by services/core-api/src/cyrano/cyrano-auth.service.ts
+// (when the CYRANO-ACCESS-POLICY-001 directive lands).
 export const PIXEL_LEGACY = {
-  /** Lifetime cap — locked by CEO (2026-04-28). */
+  /** Actual gateway cap — first 3,500 onboardings receive PIXEL_LEGACY. */
   SEAT_CAP: 3500,
+  /** UI-displayed cap — public seat meter clamps here. The 500-seat buffer
+   *  between MARKETING_SEAT_CAP and SEAT_CAP is internal and never surfaced. */
+  MARKETING_SEAT_CAP: 3000,
   /** Guaranteed minimum per-token payout in USD for PIXEL_LEGACY creators. */
   PAYOUT_FLOOR_USD: 0.07,
   /** Maximum per-token payout in USD — matches RATE_INFERNO. */
@@ -515,7 +524,10 @@ export const PIXEL_LEGACY = {
    *  positive 64-bit integer; chosen to be deterministic and unlikely to
    *  collide with other advisory locks in the system. */
   SEAT_ALLOCATION_ADVISORY_LOCK_KEY: 4242004500,
-  RULE_APPLIED_ID: 'PIXEL_LEGACY_v1',
+  /** Annotation written into pixel_legacy_seat_allocations.rule_applied_id
+   *  for grants made under the FCFS gateway model. Pre-existing rows from
+   *  the -001 era retain rule_applied_id = 'PIXEL_LEGACY_v1'. */
+  RULE_APPLIED_ID: 'PIXEL_LEGACY_v2',
 } as const;
 
 // ─── RECOVERY ENGINE — Unified Customer Service (REDBOOK §5) ─────────────────

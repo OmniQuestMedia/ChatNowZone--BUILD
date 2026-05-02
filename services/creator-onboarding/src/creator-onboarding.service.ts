@@ -29,6 +29,7 @@ import { NotificationEngine } from '../../notification/src/notification.service'
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import { StudioService } from '../../studio-affiliation/src/studio.service';
 import { checkEmailDomain } from './email-domain.policy';
+import { PixelLegacyService } from './pixel-legacy.service';
 import {
   OnboardingPublic,
   StartOnboardingDto,
@@ -63,6 +64,7 @@ export class CreatorOnboardingService {
     private readonly audit: ImmutableAuditService,
     private readonly notifications: NotificationEngine,
     private readonly studios: StudioService,
+    private readonly pixelLegacy: PixelLegacyService,
   ) {}
 
   // ────────────────────────────────────────────────────────────────────────
@@ -312,6 +314,29 @@ export class CreatorOnboardingService {
       correlation_id,
       rule_applied_id: this.RULE_ID,
     });
+
+    // PIXEL-LEGACY-002 — try to grant a Pixel Legacy seat automatically.
+    // The first 3,500 onboardings receive PIXEL_LEGACY; the rest stay
+    // STANDARD silently. tryGrantSeatOnOnboarding is idempotent on
+    // creator_id, so a re-completion of an already-onboarded creator is
+    // safe. Failures here MUST NOT block the onboarding completion — the
+    // creator is fully onboarded as STANDARD even if the gateway path
+    // errors. We log + swallow.
+    try {
+      await this.pixelLegacy.tryGrantSeatOnOnboarding({
+        creator_id,
+        granted_by: 'onboarding.complete',
+        organization_id: onboarding.organization_id,
+        tenant_id: onboarding.tenant_id,
+        correlation_id: `pixel_legacy_${correlation_id}`,
+      });
+    } catch (err) {
+      this.logger.error('CreatorOnboardingService.complete: Pixel Legacy gateway failed (non-blocking)', {
+        creator_id,
+        correlation_id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
 
     return toOnboardingPublic(updated);
   }

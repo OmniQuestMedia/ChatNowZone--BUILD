@@ -1,106 +1,80 @@
 // services/creator-onboarding/src/pixel-legacy.service.ts
-// PIXEL-LEGACY-001 — Pixel Legacy creator onboarding + seat-cap allocation.
+// PIXEL-LEGACY-002 — first-come-first-served gateway (supersedes -001).
+//
+// There is no application or operator-review flow. The first 3,500 creators
+// completing onboarding receive a PIXEL_LEGACY seat automatically; after
+// that the gateway closes and all new creators stay STANDARD (the default).
+// The public seat meter clamps at MARKETING_SEAT_CAP (3,000); the actual
+// gateway closes at SEAT_CAP (3,500).
 //
 // Surface:
-//   applyForPixelLegacy()    — creator submits / updates an application
-//   reviewApplication()      — operator GRANT or DENY (RBAC: pixel_legacy:seat:allocate)
-//   buildApplicationView()   — full PixelLegacyApplicationView for the UI binding
-//   getSeatMeter()           — aggregate seat-availability snapshot for the UI
-//   getApplication()         — load a creator's application (raw row)
-//   isPixelLegacy()          — fast lookup used by payout + Cyrano resolvers
+//   tryGrantSeatOnOnboarding()  — automatic, called by CreatorOnboardingService
+//                                 when an onboarding flips to COMPLETE.
+//                                 Idempotent on creator_id (re-completion of
+//                                 onboarding for an existing seat-holder
+//                                 returns the existing seat without rewriting).
+//   getCreatorStatus()          — drives the /creator/pixel-legacy status page
+//                                 (PixelLegacyStatusView in the UI contract).
+//   getSeatMeter()              — public seat-availability snapshot (clamped
+//                                 to MARKETING_SEAT_CAP).
+//   isPixelLegacy()             — fast lookup used by payout + Cyrano resolvers.
 //
-// Concurrency invariant on grantSeat():
-//   The 3,500-seat cap is enforced inside a single Prisma $transaction guarded
-//   by a Postgres advisory lock (PIXEL_LEGACY.SEAT_ALLOCATION_ADVISORY_LOCK_KEY).
-//   Two concurrent applications cannot both observe seats_taken = 3,499 and
-//   both succeed — the lock serializes them. The append-only trigger on
-//   pixel_legacy_seat_allocations is the second line of defence.
+// Concurrency invariant on tryGrantSeatOnOnboarding:
+//   The seat allocation runs inside a Prisma $transaction guarded by a
+//   Postgres advisory lock (PIXEL_LEGACY.SEAT_ALLOCATION_ADVISORY_LOCK_KEY).
+//   Two concurrent onboarding completions cannot both observe seats_taken
+//   = 3,499 and both succeed — the lock serializes them. The append-only
+//   trigger on pixel_legacy_seat_allocations is the second line of defence.
 //
 // NATS publish ordering:
-//   Domain events are collected inside the transaction and emitted only AFTER
-//   the transaction commits successfully. A rollback never broadcasts a ghost
-//   event to subscribers.
-//
-// Auth:
-//   Body-supplied reviewer_id / caller_role is INTERIM. Once the platform
-//   auth middleware lands, both fields will come from the authenticated
-//   session and the Controller will set them on the dto from req.user.
-//   Tracked: PIXEL-LEGACY-006 (step-up auth modal flow).
+//   Domain events are collected inside the transaction and emitted only
+//   AFTER the transaction commits successfully. A rollback never broadcasts
+//   a ghost grant or gateway-closed event to subscribers.
 
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import type { PixelLegacyApplication, PixelLegacySeatAllocation } from '@prisma/client';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import type { PixelLegacySeatAllocation } from '@prisma/client';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { ImmutableAuditService } from '../../core-api/src/audit/immutable-audit.service';
-import { RbacGuard, RbacRole } from '../../core-api/src/auth/rbac.guard';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import { PIXEL_LEGACY } from '../../core-api/src/config/governance.config';
 import {
-  ApplyPixelLegacyDto,
-  PixelLegacyApplicationPublic,
-  PixelLegacyPortfolioEntryDto,
+  PixelLegacyCreatorStatusPublic,
   PixelLegacySeatAllocationPublic,
-  ReviewPixelLegacyDto,
-  toApplicationPublic,
+  PixelLegacySeatMeterPublic,
   toSeatAllocationPublic,
 } from './dto/pixel-legacy.dto';
 
 export const PIXEL_LEGACY_RULE_ID = PIXEL_LEGACY.RULE_APPLIED_ID;
-export const PIXEL_LEGACY_SEAT_PERMISSION = 'pixel_legacy:seat:allocate';
 
-/**
- * Full view shape consumed by ui/app/creator/pixel-legacy/page.ts.
- * Structurally matches ui/types/creator-panel-contracts.ts
- * PixelLegacyApplicationView. Kept as a local interface so the service
- * package does not take a runtime dependency on the ui/ tree.
- */
-export interface PixelLegacyApplicationView {
-  application_id: string | null;
-  creator_id: string;
-  display_name: string;
-  status: 'DRAFT' | 'APPLIED' | 'REVIEWED' | 'GRANTED' | 'DENIED';
-  seat_meter: {
-    seats_taken: number;
-    seats_total: number;
-    seats_remaining: number;
-    cap_reached: boolean;
-  };
-  portfolio_entries: PixelLegacyPortfolioEntryDto[];
-  proof_statement: string;
-  submitted_at_utc: string | null;
-  reviewed_at_utc: string | null;
-  denial_reason_code: string | null;
-  benefits: {
-    payout_range_min_usd: number;
-    payout_range_max_usd: number;
-    lifetime_cyrano: boolean;
-    signing_bonus_month: number;
-    badge_label: 'Pixel Legacy';
-  };
-  cyrano_panel_unlocked: boolean;
-  generated_at_utc: string;
-  rule_applied_id: string;
-}
-
-/** Domain event collected inside a transaction; published only after commit. */
 interface PendingNatsEvent {
   topic: string;
   payload: Record<string, unknown>;
+}
+
+export interface TryGrantParams {
+  creator_id: string;
+  granted_by: string;
+  organization_id: string;
+  tenant_id: string;
+  correlation_id: string;
+}
+
+export interface TryGrantResult {
+  granted: boolean;
+  /** 1..3500 when granted; null otherwise. */
+  seat_number: number | null;
+  /** True iff this call allocated the final seat (3,500). */
+  gateway_closed: boolean;
+  /** True iff the creator already had a seat — call was idempotent. */
+  idempotent_replay: boolean;
+  rule_applied_id: string;
 }
 
 @Injectable()
 export class PixelLegacyService {
   private readonly logger = new Logger(PixelLegacyService.name);
   private readonly RULE_ID = PIXEL_LEGACY_RULE_ID;
-  private readonly rbac = new RbacGuard();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -112,27 +86,40 @@ export class PixelLegacyService {
   // Reads
   // ────────────────────────────────────────────────────────────────────────
 
-  async getApplication(creatorId: string): Promise<PixelLegacyApplicationPublic | null> {
-    const row = await this.prisma.pixelLegacyApplication.findUnique({
-      where: { creator_id: creatorId },
-    });
-    return row ? toApplicationPublic(row) : null;
-  }
+  async getSeatMeter(): Promise<PixelLegacySeatMeterPublic> {
+    const actual = await this.prisma.pixelLegacySeatAllocation.count();
+    const marketingCap = PIXEL_LEGACY.MARKETING_SEAT_CAP;
+    const realCap = PIXEL_LEGACY.SEAT_CAP;
 
-  async getSeatMeter(): Promise<{
-    seats_taken: number;
-    seats_total: number;
-    seats_remaining: number;
-    cap_reached: boolean;
-  }> {
-    const seats_taken = await this.prisma.pixelLegacySeatAllocation.count();
-    const seats_total = PIXEL_LEGACY.SEAT_CAP;
-    const seats_remaining = Math.max(0, seats_total - seats_taken);
+    const seats_taken = Math.min(actual, marketingCap);
+    const seats_remaining = Math.max(0, marketingCap - actual);
     return {
       seats_taken,
-      seats_total,
+      seats_total: marketingCap,
       seats_remaining,
-      cap_reached: seats_taken >= seats_total,
+      cap_reached: actual >= marketingCap,
+      gateway_open: actual < realCap,
+      rule_applied_id: this.RULE_ID,
+    };
+  }
+
+  async getCreatorStatus(creatorId: string): Promise<PixelLegacyCreatorStatusPublic> {
+    const [creator, seat] = await Promise.all([
+      this.prisma.creator.findUnique({ where: { id: creatorId } }),
+      this.prisma.pixelLegacySeatAllocation.findUnique({ where: { creator_id: creatorId } }),
+    ]);
+    if (!creator) {
+      throw new NotFoundException(`CREATOR_NOT_FOUND: ${creatorId}`);
+    }
+
+    return {
+      creator_id: creatorId,
+      is_pixel_legacy: creator.creator_type === 'PIXEL_LEGACY',
+      seat_number: seat?.seat_number ?? null,
+      granted_at_utc: seat?.granted_at_utc.toISOString() ?? null,
+      lifetime_cyrano: creator.lifetime_cyrano_membership,
+      rule_applied_id: this.RULE_ID,
+      generated_at_utc: new Date().toISOString(),
     };
   }
 
@@ -144,320 +131,61 @@ export class PixelLegacyService {
     return seat !== null;
   }
 
-  /**
-   * Builds the full PixelLegacyApplicationView for /creator/pixel-legacy.
-   * For first-time visits with no application row, returns a synthetic DRAFT
-   * view so the UI has a coherent shape to render the apply form against.
-   * Throws CREATOR_NOT_FOUND when the creator_id does not exist — the UI
-   * should never bind for a non-existent creator.
-   */
-  async buildApplicationView(creatorId: string): Promise<PixelLegacyApplicationView> {
-    const [creator, application, seatCount] = await Promise.all([
-      this.prisma.creator.findUnique({ where: { id: creatorId } }),
-      this.prisma.pixelLegacyApplication.findUnique({ where: { creator_id: creatorId } }),
-      this.prisma.pixelLegacySeatAllocation.count(),
-    ]);
-    if (!creator) {
-      throw new NotFoundException(`CREATOR_NOT_FOUND: ${creatorId}`);
-    }
-
-    const seats_total = PIXEL_LEGACY.SEAT_CAP;
-    const seat_meter = {
-      seats_taken: seatCount,
-      seats_total,
-      seats_remaining: Math.max(0, seats_total - seatCount),
-      cap_reached: seatCount >= seats_total,
-    };
-
-    const benefits = {
-      payout_range_min_usd: PIXEL_LEGACY.PAYOUT_FLOOR_USD,
-      payout_range_max_usd: PIXEL_LEGACY.PAYOUT_CEILING_USD,
-      lifetime_cyrano: true,
-      signing_bonus_month: PIXEL_LEGACY.SIGNING_BONUS_MONTH,
-      badge_label: 'Pixel Legacy' as const,
-    };
-    const generated_at_utc = new Date().toISOString();
-
-    if (!application) {
-      return {
-        application_id: null,
-        creator_id: creatorId,
-        display_name: creatorId, // Display name is captured at apply-time; fall back to id for first-time view.
-        status: 'DRAFT',
-        seat_meter,
-        portfolio_entries: [],
-        proof_statement: '',
-        submitted_at_utc: null,
-        reviewed_at_utc: null,
-        denial_reason_code: null,
-        benefits,
-        cyrano_panel_unlocked: false,
-        generated_at_utc,
-        rule_applied_id: this.RULE_ID,
-      };
-    }
-
-    return {
-      application_id: application.application_id,
-      creator_id: application.creator_id,
-      display_name: application.display_name,
-      status: application.status,
-      seat_meter,
-      portfolio_entries: (application.portfolio_entries as unknown as PixelLegacyPortfolioEntryDto[]) ?? [],
-      proof_statement: application.proof_statement,
-      submitted_at_utc: application.submitted_at_utc?.toISOString() ?? null,
-      reviewed_at_utc: application.reviewed_at_utc?.toISOString() ?? null,
-      denial_reason_code: application.denial_reason_code,
-      benefits,
-      cyrano_panel_unlocked: application.status === 'GRANTED',
-      generated_at_utc,
-      rule_applied_id: this.RULE_ID,
-    };
-  }
-
   // ────────────────────────────────────────────────────────────────────────
   // Writes
   // ────────────────────────────────────────────────────────────────────────
 
-  async applyForPixelLegacy(dto: ApplyPixelLegacyDto): Promise<PixelLegacyApplicationPublic> {
-    this.assertPortfolioBounded(dto.portfolio_entries);
-    this.assertProofStatementBounded(dto.proof_statement);
-    this.assertDisplayNameBounded(dto.display_name);
-
-    // Explicit creator existence check — surface CREATOR_NOT_FOUND rather
-    // than letting Prisma raise a raw foreign-key violation from upsert.
-    const creatorExists = await this.prisma.creator.findUnique({
-      where: { id: dto.creator_id },
-      select: { id: true },
-    });
-    if (!creatorExists) {
-      throw new NotFoundException(`CREATOR_NOT_FOUND: ${dto.creator_id}`);
-    }
-
-    const existing = await this.prisma.pixelLegacyApplication.findUnique({
-      where: { creator_id: dto.creator_id },
-    });
-
-    if (existing && existing.status !== 'DRAFT' && existing.status !== 'APPLIED') {
-      throw new ConflictException(
-        `PIXEL_LEGACY_APPLICATION_LOCKED: application is in terminal state ${existing.status}`,
-      );
-    }
-
-    const application_id = existing?.application_id ?? `PXL-${randomUUID()}`;
-    const now = new Date();
-
-    const row = await this.prisma.pixelLegacyApplication.upsert({
-      where: { creator_id: dto.creator_id },
-      create: {
-        application_id,
-        creator_id: dto.creator_id,
-        display_name: dto.display_name,
-        status: 'APPLIED',
-        proof_statement: dto.proof_statement,
-        portfolio_entries: dto.portfolio_entries as unknown as object,
-        submitted_at_utc: now,
-        organization_id: dto.organization_id,
-        tenant_id: dto.tenant_id,
-        correlation_id: dto.correlation_id,
-        reason_code: 'PIXEL_LEGACY_APPLICATION_SUBMITTED',
-        rule_applied_id: this.RULE_ID,
-      },
-      update: {
-        status: 'APPLIED',
-        display_name: dto.display_name,
-        proof_statement: dto.proof_statement,
-        portfolio_entries: dto.portfolio_entries as unknown as object,
-        submitted_at_utc: existing?.submitted_at_utc ?? now,
-        correlation_id: dto.correlation_id,
-        reason_code: 'PIXEL_LEGACY_APPLICATION_RESUBMITTED',
-      },
-    });
-
-    this.logger.log('PixelLegacyService: application submitted', {
-      application_id,
-      creator_id: dto.creator_id,
-      correlation_id: dto.correlation_id,
-      rule_applied_id: this.RULE_ID,
-    });
-
-    // Single non-transactional write; safe to publish synchronously after
-    // the upsert returns.
-    this.nats.publish(NATS_TOPICS.PIXEL_LEGACY_APPLICATION_SUBMITTED, {
-      application_id,
-      creator_id: dto.creator_id,
-      actor_id: dto.creator_id,
-      actor_role: 'creator',
-      submitted_at_utc: now.toISOString(),
-      correlation_id: dto.correlation_id,
-      reason_code: row.reason_code,
-      rule_applied_id: this.RULE_ID,
-    });
-
-    return toApplicationPublic(row);
-  }
-
-  async reviewApplication(dto: ReviewPixelLegacyDto): Promise<{
-    application: PixelLegacyApplicationPublic;
-    seat_allocation: PixelLegacySeatAllocationPublic | null;
-  }> {
-    // Route the role check through the canonical RbacGuard against the
-    // 'pixel_legacy:seat:allocate' permission. NOTE: caller_role and
-    // reviewer_id are accepted from the request body for now (interim).
-    // Once the platform auth middleware lands they come from req.user;
-    // tracked under PIXEL-LEGACY-006 alongside the step-up auth wiring.
-    const rbacResult = this.rbac.check({
-      actor_id: dto.reviewer_id,
-      actor_role: dto.caller_role as RbacRole,
-      permission: PIXEL_LEGACY_SEAT_PERMISSION,
-    });
-    if (!rbacResult.permitted) {
-      throw new ForbiddenException(
-        `PIXEL_LEGACY_REVIEW_UNAUTHORIZED: ${rbacResult.failure_reason ?? 'INSUFFICIENT_ROLE'} ` +
-          `(actor_role=${dto.caller_role}, required=${rbacResult.required_role})`,
-      );
-    }
-
-    const application = await this.prisma.pixelLegacyApplication.findUnique({
-      where: { application_id: dto.application_id },
-    });
-    if (!application) {
-      throw new NotFoundException(`PIXEL_LEGACY_APPLICATION_NOT_FOUND: ${dto.application_id}`);
-    }
-    if (application.status !== 'APPLIED' && application.status !== 'REVIEWED') {
-      throw new ConflictException(
-        `PIXEL_LEGACY_REVIEW_INVALID_STATE: application is ${application.status}, expected APPLIED or REVIEWED`,
-      );
-    }
-
-    if (dto.decision === 'DENY') {
-      if (!dto.denial_reason_code) {
-        throw new BadRequestException('PIXEL_LEGACY_DENIAL_REQUIRES_REASON_CODE');
-      }
-      const { application: deniedRow, events } = await this.recordDenial(application, dto);
-      this.publishAfterCommit(events);
-      return { application: toApplicationPublic(deniedRow), seat_allocation: null };
-    }
-
-    // GRANT path — concurrency-safe seat allocation inside a transaction.
-    const { application: applicationRow, seat, events } = await this.grantSeatAtomic(
-      application,
-      dto,
-    );
-    this.publishAfterCommit(events);
-
-    return {
-      application: toApplicationPublic(applicationRow),
-      seat_allocation: seat ? toSeatAllocationPublic(seat) : null,
-    };
-  }
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Internal — denial path
-  // ────────────────────────────────────────────────────────────────────────
-
-  private async recordDenial(
-    application: PixelLegacyApplication,
-    dto: ReviewPixelLegacyDto,
-  ): Promise<{ application: PixelLegacyApplication; events: PendingNatsEvent[] }> {
-    const now = new Date();
-    const updated = await this.prisma.pixelLegacyApplication.update({
-      where: { application_id: dto.application_id },
-      data: {
-        status: 'DENIED',
-        reviewed_at_utc: now,
-        reviewed_by: dto.reviewer_id,
-        denial_reason_code: dto.denial_reason_code,
-        correlation_id: dto.correlation_id,
-        reason_code: 'PIXEL_LEGACY_APPLICATION_DENIED',
-      },
-    });
-
-    this.logger.log('PixelLegacyService: application denied', {
-      application_id: dto.application_id,
-      reviewer_id: dto.reviewer_id,
-      denial_reason_code: dto.denial_reason_code,
-      correlation_id: dto.correlation_id,
-      rule_applied_id: this.RULE_ID,
-    });
-
-    return {
-      application: updated,
-      events: [
-        {
-          topic: NATS_TOPICS.PIXEL_LEGACY_APPLICATION_DENIED,
-          payload: {
-            application_id: dto.application_id,
-            creator_id: application.creator_id,
-            actor_id: dto.reviewer_id,
-            actor_role: dto.caller_role.toLowerCase(),
-            reviewed_at_utc: now.toISOString(),
-            denial_reason_code: dto.denial_reason_code,
-            correlation_id: dto.correlation_id,
-            reason_code: 'PIXEL_LEGACY_APPLICATION_DENIED',
-            rule_applied_id: this.RULE_ID,
-          },
-        },
-      ],
-    };
-  }
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Internal — grant path with atomic seat allocation
-  // ────────────────────────────────────────────────────────────────────────
-
-  private async grantSeatAtomic(
-    application: PixelLegacyApplication,
-    dto: ReviewPixelLegacyDto,
-  ): Promise<{
-    application: PixelLegacyApplication;
-    seat: PixelLegacySeatAllocation | null;
-    events: PendingNatsEvent[];
-  }> {
-    const now = new Date();
+  /**
+   * Atomically grants a Pixel Legacy seat to the creator iff the gateway is
+   * open. Idempotent: re-completion of onboarding for an existing seat-holder
+   * returns the existing seat without re-writing.
+   *
+   * Designed to be called from CreatorOnboardingService.complete() once the
+   * onboarding row flips to COMPLETE — the seat is automatic.
+   */
+  async tryGrantSeatOnOnboarding(params: TryGrantParams): Promise<TryGrantResult> {
     const lockKey = PIXEL_LEGACY.SEAT_ALLOCATION_ADVISORY_LOCK_KEY;
     const cap = PIXEL_LEGACY.SEAT_CAP;
+    const now = new Date();
 
-    return this.prisma.$transaction(async (tx) => {
-      // Advisory lock — released automatically on COMMIT/ROLLBACK. Two
-      // concurrent grants will serialize through this lock.
+    const { result, events } = await this.prisma.$transaction(async (tx) => {
+      // Advisory lock — released on COMMIT/ROLLBACK. Serializes concurrent
+      // onboarding completions through this allocation path.
       await tx.$queryRaw`SELECT pg_advisory_xact_lock(${lockKey}::bigint)`;
+
+      // Idempotent replay — creator already has a seat (e.g. onboarding
+      // re-completion). Return the existing seat unchanged.
+      const existingSeat = await tx.pixelLegacySeatAllocation.findUnique({
+        where: { creator_id: params.creator_id },
+      });
+      if (existingSeat) {
+        return {
+          result: {
+            granted: true,
+            seat_number: existingSeat.seat_number,
+            gateway_closed: false,
+            idempotent_replay: true,
+            rule_applied_id: this.RULE_ID,
+          } as TryGrantResult,
+          events: [] as PendingNatsEvent[],
+        };
+      }
 
       const seats_taken = await tx.pixelLegacySeatAllocation.count();
       if (seats_taken >= cap) {
-        // Cap reached — flip the application to DENIED with the canonical
-        // reason. The UI seat meter will reflect cap_reached = true.
-        const denied = await tx.pixelLegacyApplication.update({
-          where: { application_id: dto.application_id },
-          data: {
-            status: 'DENIED',
-            reviewed_at_utc: now,
-            reviewed_by: dto.reviewer_id,
-            denial_reason_code: 'PIXEL_LEGACY_SEAT_CAP_REACHED',
-            correlation_id: dto.correlation_id,
-            reason_code: 'PIXEL_LEGACY_SEAT_CAP_REACHED',
-          },
-        });
-
+        // Gateway closed — creator silently stays STANDARD. No event,
+        // no error, no application-style denial. The marketing copy
+        // ("Pixel Legacy seats are filled — you are a Standard creator")
+        // is rendered by the UI based on the seat-meter.
         return {
-          application: denied,
-          seat: null,
-          events: [
-            {
-              topic: NATS_TOPICS.PIXEL_LEGACY_APPLICATION_DENIED,
-              payload: {
-                application_id: dto.application_id,
-                creator_id: application.creator_id,
-                actor_id: dto.reviewer_id,
-                actor_role: dto.caller_role.toLowerCase(),
-                reviewed_at_utc: now.toISOString(),
-                denial_reason_code: 'PIXEL_LEGACY_SEAT_CAP_REACHED',
-                correlation_id: dto.correlation_id,
-                reason_code: 'PIXEL_LEGACY_SEAT_CAP_REACHED',
-                rule_applied_id: this.RULE_ID,
-              },
-            },
-          ],
+          result: {
+            granted: false,
+            seat_number: null,
+            gateway_closed: true,
+            idempotent_replay: false,
+            rule_applied_id: this.RULE_ID,
+          } as TryGrantResult,
+          events: [] as PendingNatsEvent[],
         };
       }
 
@@ -466,19 +194,19 @@ export class PixelLegacyService {
       const seat = await tx.pixelLegacySeatAllocation.create({
         data: {
           seat_number,
-          creator_id: application.creator_id,
-          application_id: dto.application_id,
-          granted_by: dto.reviewer_id,
+          creator_id: params.creator_id,
+          granted_by: params.granted_by,
           granted_at_utc: now,
-          organization_id: dto.organization_id,
-          tenant_id: dto.tenant_id,
-          correlation_id: dto.correlation_id,
+          organization_id: params.organization_id,
+          tenant_id: params.tenant_id,
+          correlation_id: params.correlation_id,
+          rule_applied_id: this.RULE_ID,
         },
       });
 
       // Mirror the grant onto the Creator row for fast profile reads.
       await tx.creator.update({
-        where: { id: application.creator_id },
+        where: { id: params.creator_id },
         data: {
           creator_type: 'PIXEL_LEGACY',
           pixel_legacy_granted_at: now,
@@ -486,88 +214,93 @@ export class PixelLegacyService {
         },
       });
 
-      const granted = await tx.pixelLegacyApplication.update({
-        where: { application_id: dto.application_id },
-        data: {
-          status: 'GRANTED',
-          reviewed_at_utc: now,
-          reviewed_by: dto.reviewer_id,
-          denial_reason_code: null,
-          correlation_id: dto.correlation_id,
-          reason_code: 'PIXEL_LEGACY_APPLICATION_GRANTED',
+      const events: PendingNatsEvent[] = [
+        {
+          topic: NATS_TOPICS.PIXEL_LEGACY_SEAT_GRANTED,
+          payload: {
+            creator_id: params.creator_id,
+            seat_number,
+            actor_id: params.granted_by,
+            actor_role: 'system',
+            granted_at_utc: now.toISOString(),
+            correlation_id: params.correlation_id,
+            reason_code: 'PIXEL_LEGACY_SEAT_GRANTED',
+            rule_applied_id: this.RULE_ID,
+          },
         },
-      });
+      ];
 
-      this.logger.log('PixelLegacyService: seat granted', {
-        application_id: dto.application_id,
-        creator_id: application.creator_id,
-        seat_number,
-        reviewer_id: dto.reviewer_id,
-        correlation_id: dto.correlation_id,
-        rule_applied_id: this.RULE_ID,
-      });
+      // Last seat allocated — gateway closes. Fire the ops event so
+      // downstream dashboards can flag the milestone.
+      const isLastSeat = seat_number === cap;
+      if (isLastSeat) {
+        events.push({
+          topic: NATS_TOPICS.PIXEL_LEGACY_GATEWAY_CLOSED,
+          payload: {
+            final_seat_number: seat_number,
+            final_creator_id: params.creator_id,
+            closed_at_utc: now.toISOString(),
+            correlation_id: params.correlation_id,
+            reason_code: 'PIXEL_LEGACY_GATEWAY_CLOSED',
+            rule_applied_id: this.RULE_ID,
+          },
+        });
+      }
 
       return {
-        application: granted,
+        result: {
+          granted: true,
+          seat_number,
+          gateway_closed: isLastSeat,
+          idempotent_replay: false,
+          rule_applied_id: this.RULE_ID,
+        } as TryGrantResult,
+        events,
         seat,
-        events: [
-          {
-            topic: NATS_TOPICS.PIXEL_LEGACY_SEAT_GRANTED,
-            payload: {
-              application_id: dto.application_id,
-              creator_id: application.creator_id,
-              seat_number,
-              actor_id: dto.reviewer_id,
-              actor_role: dto.caller_role.toLowerCase(),
-              granted_at_utc: now.toISOString(),
-              correlation_id: dto.correlation_id,
-              reason_code: 'PIXEL_LEGACY_SEAT_GRANTED',
-              rule_applied_id: this.RULE_ID,
-            },
-          },
-        ],
       };
     });
+
+    // Publish only after the transaction commits successfully.
+    this.publishAfterCommit(events);
+
+    if (result.granted && !result.idempotent_replay) {
+      this.logger.log('PixelLegacyService: seat granted on onboarding completion', {
+        creator_id: params.creator_id,
+        seat_number: result.seat_number,
+        gateway_closed: result.gateway_closed,
+        correlation_id: params.correlation_id,
+        rule_applied_id: this.RULE_ID,
+      });
+    } else if (!result.granted) {
+      this.logger.log('PixelLegacyService: gateway closed — creator stays STANDARD', {
+        creator_id: params.creator_id,
+        correlation_id: params.correlation_id,
+        rule_applied_id: this.RULE_ID,
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Convenience read used by tests and ops surfaces — returns the raw seat
+   * allocation if it exists. Most callers should use isPixelLegacy() or
+   * getCreatorStatus() instead.
+   */
+  async getSeatAllocation(creatorId: string): Promise<PixelLegacySeatAllocationPublic | null> {
+    const seat = await this.prisma.pixelLegacySeatAllocation.findUnique({
+      where: { creator_id: creatorId },
+    });
+    return seat ? toSeatAllocationPublic(seat) : null;
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // Post-commit publishing
+  // Internal
   // ────────────────────────────────────────────────────────────────────────
 
   private publishAfterCommit(events: PendingNatsEvent[]): void {
     for (const event of events) {
       this.nats.publish(event.topic, event.payload);
-    }
-  }
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Validation guards
-  // ────────────────────────────────────────────────────────────────────────
-
-  private assertPortfolioBounded(entries: PixelLegacyPortfolioEntryDto[]): void {
-    if (!Array.isArray(entries) || entries.length === 0) {
-      throw new BadRequestException('PIXEL_LEGACY_PORTFOLIO_REQUIRED');
-    }
-    if (entries.length > 20) {
-      throw new BadRequestException('PIXEL_LEGACY_PORTFOLIO_TOO_LARGE');
-    }
-  }
-
-  private assertProofStatementBounded(statement: string): void {
-    if (typeof statement !== 'string' || statement.trim().length === 0) {
-      throw new BadRequestException('PIXEL_LEGACY_PROOF_STATEMENT_REQUIRED');
-    }
-    if (statement.length > 2000) {
-      throw new BadRequestException('PIXEL_LEGACY_PROOF_STATEMENT_TOO_LONG');
-    }
-  }
-
-  private assertDisplayNameBounded(displayName: string): void {
-    if (typeof displayName !== 'string' || displayName.trim().length === 0) {
-      throw new BadRequestException('PIXEL_LEGACY_DISPLAY_NAME_REQUIRED');
-    }
-    if (displayName.length > 100) {
-      throw new BadRequestException('PIXEL_LEGACY_DISPLAY_NAME_TOO_LONG');
     }
   }
 }

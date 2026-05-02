@@ -127,37 +127,30 @@ export interface CreatorCommandCenterView {
 // Source of truth: PIXEL-LEGACY-001 directive, docs/ux/03-state-machines.md §10,
 // docs/ux/05-tier-entitlements.md §Creator types.
 
-/**
- * Lifecycle status of a creator's Pixel Legacy application.
- * Matches the state machine in docs/ux/03-state-machines.md §10.
- */
-export type PixelLegacyApplicationStatus = 'DRAFT' | 'APPLIED' | 'REVIEWED' | 'GRANTED' | 'DENIED';
+// ─── PIXEL-LEGACY-002: first-come-first-served gateway view ─────────────────
+// Supersedes the v1 application/review contract. Pixel Legacy is granted
+// automatically when a creator completes onboarding while the gateway is
+// open; there is no apply form, no portfolio, no proof statement, no operator
+// review. The /creator/pixel-legacy page becomes a status display.
 
-/** Seat availability meter — 3,500 lifetime cap. */
+/** Public seat-availability meter — UI-displayed value clamped at the
+ *  marketing cap (3,000). The actual gateway closes at 3,500 (internal). */
 export interface PixelLegacySeatMeter {
-  /** Number of seats already granted. */
+  /** Marketing-clamped count: min(actual_grants, MARKETING_SEAT_CAP). */
   seats_taken: number;
-  /** Platform cap — canonical value is 3,500. */
+  /** Marketing cap — canonical value is 3,000. */
   seats_total: number;
   /** Derived: seats_total − seats_taken. */
   seats_remaining: number;
-  /** True when seats_taken >= seats_total. */
+  /** True when seats_taken >= seats_total (i.e. UI shows "100%"). */
   cap_reached: boolean;
+  /** True iff new onboardings can still receive a Pixel Legacy seat. May
+   *  remain true even after cap_reached, while the internal 500-seat buffer
+   *  drains from MARKETING_SEAT_CAP up to SEAT_CAP. */
+  gateway_open: boolean;
 }
 
-/**
- * One portfolio / proof-of-work entry submitted with the application.
- * Creators provide at least one entry (required by the application form).
- */
-export interface PixelLegacyPortfolioEntry {
-  entry_id: string;
-  /** Creator-provided label, e.g. "My Twitch channel". */
-  label: string;
-  /** Public URL pointing to the creator's portfolio or social presence. */
-  url: string;
-}
-
-/** Benefits summary shown to the applicant before and after grant. */
+/** Benefits summary shown alongside the status. */
 export interface PixelLegacyBenefits {
   /** Minimum per-token payout in USD ($0.07 floor for Pixel Legacy). */
   payout_range_min_usd: number;
@@ -172,40 +165,29 @@ export interface PixelLegacyBenefits {
 }
 
 /**
- * Top-level view model for /creator/pixel-legacy — the Pixel Legacy Onboarding page.
- * Consumed by renderPixelLegacyPage; built by PixelLegacyPresenter.buildView().
+ * Top-level view model for /creator/pixel-legacy — status display, not a form.
+ * Consumed by renderPixelLegacyPage. The page renders three layouts based on
+ * is_pixel_legacy + gateway_open:
+ *   - is_pixel_legacy === true                  → "You are Pixel Legacy creator #N"
+ *   - is_pixel_legacy === false && gateway_open  → "You are Standard. Pixel Legacy is filled / not (yet) yours."
+ *   - is_pixel_legacy === false && !gateway_open → "Pixel Legacy seats are filled."
  */
-export interface PixelLegacyApplicationView {
-  /**
-   * Stable application identifier assigned on first submission.
-   * Null when status is DRAFT (application not yet submitted).
-   */
-  application_id: string | null;
+export interface PixelLegacyStatusView {
   creator_id: string;
   display_name: string;
-  /** Current application lifecycle state. */
-  status: PixelLegacyApplicationStatus;
-  /** Live seat-availability meter (refreshed at view-generation time). */
+  /** True iff this creator currently holds a Pixel Legacy seat. */
+  is_pixel_legacy: boolean;
+  /** 1..3500 when granted; null otherwise. */
+  seat_number: number | null;
+  /** ISO-8601 timestamp of grant; null when not granted. */
+  granted_at_utc: string | null;
+  /** Live seat-availability meter (clamped at marketing cap). */
   seat_meter: PixelLegacySeatMeter;
-  /** Portfolio / proof-of-work entries provided by the creator. */
-  portfolio_entries: PixelLegacyPortfolioEntry[];
-  /** Free-text proof statement supplied by the creator in the form. */
-  proof_statement: string;
-  /** ISO-8601 timestamp of submission. Null when status is DRAFT. */
-  submitted_at_utc: string | null;
-  /** ISO-8601 timestamp when the review decision was recorded. Null until reviewed. */
-  reviewed_at_utc: string | null;
-  /**
-   * Platform reason code for denial. Only populated on DENIED status.
-   * Maps to the reason-code catalog in docs/ux/04-reason-code-catalog.md.
-   */
-  denial_reason_code: string | null;
-  /** Benefits preview — shown pre-grant to explain what the creator receives. */
+  /** Static benefits — same values regardless of grant state, surfaced for
+   *  comparison in the "What you'd get" panel of the unfilled view. */
   benefits: PixelLegacyBenefits;
-  /**
-   * True once GRANTED — signals the renderer to unlock the creator's Cyrano panel CTA.
-   * Always false until status = GRANTED.
-   */
+  /** True iff is_pixel_legacy — signals the renderer to unlock the Cyrano
+   *  panel CTA. */
   cyrano_panel_unlocked: boolean;
   /** ISO-8601 timestamp when this view was generated. */
   generated_at_utc: string;
