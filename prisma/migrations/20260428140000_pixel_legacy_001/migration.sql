@@ -12,14 +12,22 @@
 --         append-only (UPDATE/DELETE blocked by trigger) — they are the
 --         lifetime audit trail of which creator received which numbered
 --         seat. No data destroyed; existing creators default to STANDARD.
+--         Every DDL statement is guarded so a partial-failure rerun is safe.
 -- CORRELATION_ID: PIXEL-LEGACY-001-INITIAL-MIGRATION-20260428
 -- RULE_APPLIED_ID: PIXEL_LEGACY_v1
 
--- ── Enums ────────────────────────────────────────────────────────────────
-CREATE TYPE "CreatorType" AS ENUM ('STANDARD', 'PIXEL_LEGACY');
-CREATE TYPE "PixelLegacyApplicationStatus" AS ENUM (
-  'DRAFT', 'APPLIED', 'REVIEWED', 'GRANTED', 'DENIED'
-);
+-- ── Enums (idempotent) ───────────────────────────────────────────────────
+DO $$ BEGIN
+  CREATE TYPE "CreatorType" AS ENUM ('STANDARD', 'PIXEL_LEGACY');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "PixelLegacyApplicationStatus" AS ENUM (
+    'DRAFT', 'APPLIED', 'REVIEWED', 'GRANTED', 'DENIED'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ── creators: add creator_type, pixel_legacy_granted_at, lifetime_cyrano ─
 ALTER TABLE "creators"
@@ -31,10 +39,11 @@ CREATE INDEX IF NOT EXISTS "creators_creator_type_idx"
   ON "creators" ("creator_type");
 
 -- ── pixel_legacy_applications ────────────────────────────────────────────
-CREATE TABLE "pixel_legacy_applications" (
+CREATE TABLE IF NOT EXISTS "pixel_legacy_applications" (
   "id"                 TEXT                            NOT NULL PRIMARY KEY,
   "application_id"     TEXT                            NOT NULL UNIQUE,
   "creator_id"         TEXT                            NOT NULL UNIQUE,
+  "display_name"       VARCHAR(100)                    NOT NULL DEFAULT '',
   "status"             "PixelLegacyApplicationStatus"  NOT NULL DEFAULT 'DRAFT',
   "proof_statement"    TEXT                            NOT NULL DEFAULT '',
   "portfolio_entries"  JSONB                           NOT NULL DEFAULT '[]'::jsonb,
@@ -54,14 +63,14 @@ CREATE TABLE "pixel_legacy_applications" (
     FOREIGN KEY ("creator_id") REFERENCES "creators" ("id") ON DELETE RESTRICT
 );
 
-CREATE INDEX "pixel_legacy_applications_status_idx"
+CREATE INDEX IF NOT EXISTS "pixel_legacy_applications_status_idx"
   ON "pixel_legacy_applications" ("status");
 
-CREATE INDEX "pixel_legacy_applications_correlation_id_idx"
+CREATE INDEX IF NOT EXISTS "pixel_legacy_applications_correlation_id_idx"
   ON "pixel_legacy_applications" ("correlation_id");
 
 -- ── pixel_legacy_seat_allocations (append-only audit trail) ──────────────
-CREATE TABLE "pixel_legacy_seat_allocations" (
+CREATE TABLE IF NOT EXISTS "pixel_legacy_seat_allocations" (
   "id"               TEXT         NOT NULL PRIMARY KEY,
   -- 1..3500. Application-enforced range; unique for atomic allocation.
   "seat_number"      INTEGER      NOT NULL UNIQUE
@@ -81,10 +90,10 @@ CREATE TABLE "pixel_legacy_seat_allocations" (
     FOREIGN KEY ("creator_id") REFERENCES "creators" ("id") ON DELETE RESTRICT
 );
 
-CREATE INDEX "pixel_legacy_seat_allocations_correlation_id_idx"
+CREATE INDEX IF NOT EXISTS "pixel_legacy_seat_allocations_correlation_id_idx"
   ON "pixel_legacy_seat_allocations" ("correlation_id");
 
-CREATE INDEX "pixel_legacy_seat_allocations_granted_at_utc_idx"
+CREATE INDEX IF NOT EXISTS "pixel_legacy_seat_allocations_granted_at_utc_idx"
   ON "pixel_legacy_seat_allocations" ("granted_at_utc");
 
 -- ── Append-only enforcement on pixel_legacy_seat_allocations ─────────────
@@ -104,10 +113,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS "trg_pixel_legacy_seat_allocations_no_update"
+  ON "pixel_legacy_seat_allocations";
 CREATE TRIGGER "trg_pixel_legacy_seat_allocations_no_update"
 BEFORE UPDATE ON "pixel_legacy_seat_allocations"
 FOR EACH ROW EXECUTE FUNCTION "fn_pixel_legacy_seat_allocations_block_update_delete"();
 
+DROP TRIGGER IF EXISTS "trg_pixel_legacy_seat_allocations_no_delete"
+  ON "pixel_legacy_seat_allocations";
 CREATE TRIGGER "trg_pixel_legacy_seat_allocations_no_delete"
 BEFORE DELETE ON "pixel_legacy_seat_allocations"
 FOR EACH ROW EXECUTE FUNCTION "fn_pixel_legacy_seat_allocations_block_update_delete"();

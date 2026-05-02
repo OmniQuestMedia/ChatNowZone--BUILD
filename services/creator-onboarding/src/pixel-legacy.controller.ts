@@ -3,12 +3,25 @@
 //
 // Endpoints:
 //   POST /pixel-legacy/apply         creator submits / re-submits
-//   POST /pixel-legacy/review        operator GRANT or DENY (RBAC-gated)
-//   GET  /pixel-legacy/seat-meter    seat-availability snapshot
-//   GET  /pixel-legacy/:creator_id   creator's application + seat (presenter)
+//   POST /pixel-legacy/review        operator GRANT or DENY (RBAC-gated in service)
+//   GET  /pixel-legacy/seat-meter    seat-availability snapshot (public)
+//   GET  /pixel-legacy/:creator_id   full PixelLegacyApplicationView for the UI
+//
+// Auth posture (interim):
+//   reviewer_id and caller_role on the review endpoint are accepted from the
+//   request body. The service routes the role check through the canonical
+//   RbacGuard, so role-based denial uses the same role-rank logic as the rest
+//   of the codebase. This matches the existing pattern in studio.controller
+//   and creator-onboarding.controller. Once the platform auth middleware
+//   lands and attaches a verified user to the request, both fields will be
+//   sourced from req.user and the body fields will be removed. Tracked under
+//   PIXEL-LEGACY-006 alongside the step-up auth modal flow.
 
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
-import { PixelLegacyService } from './pixel-legacy.service';
+import {
+  PixelLegacyApplicationView,
+  PixelLegacyService,
+} from './pixel-legacy.service';
 import {
   ApplyPixelLegacyDto,
   PixelLegacyApplicationPublic,
@@ -60,11 +73,16 @@ export class PixelLegacyController {
     return { ...meter, rule_applied_id: PIXEL_LEGACY.RULE_APPLIED_ID };
   }
 
+  /**
+   * Returns the full PixelLegacyApplicationView for the UI binding at
+   * ui/app/creator/pixel-legacy/page.ts. For first-time visits with no
+   * application row yet, returns a synthetic DRAFT view so the UI has a
+   * coherent shape to render the apply form against.
+   */
   @Get(':creator_id')
-  async getByCreator(
+  async getViewByCreator(
     @Param('creator_id') creatorId: string,
-  ): Promise<PixelLegacyApplicationPublic | { found: false }> {
-    const row = await this.pixelLegacy.getApplication(creatorId);
-    return row ?? { found: false };
+  ): Promise<PixelLegacyApplicationView> {
+    return this.pixelLegacy.buildApplicationView(creatorId);
   }
 }

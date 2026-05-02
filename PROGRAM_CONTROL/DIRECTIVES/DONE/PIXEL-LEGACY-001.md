@@ -43,15 +43,24 @@ Migration: `prisma/migrations/20260428140000_pixel_legacy_001/migration.sql`. Ev
 
 `services/creator-onboarding/src/pixel-legacy.service.ts`:
 
-- `applyForPixelLegacy(dto)` — creator-initiated apply / re-submit. Bounds: ≤ 20 portfolio entries, ≤ 2000-char proof statement.
-- `reviewApplication(dto)` — operator GRANT / DENY. RBAC-gated (`COMPLIANCE` | `ADMIN`). DENY requires `denial_reason_code`. GRANT runs the seat-allocation transaction.
+- `applyForPixelLegacy(dto)` — creator-initiated apply / re-submit. Bounds: ≤ 20 portfolio entries, ≤ 2000-char proof statement, ≤ 100-char display_name. Pre-checks `creator_id` exists and surfaces `CREATOR_NOT_FOUND` rather than letting Prisma raise a raw foreign-key error.
+- `reviewApplication(dto)` — operator GRANT / DENY. Role check routed through canonical `RbacGuard.check()` against permission `pixel_legacy:seat:allocate` (required role: `COMPLIANCE`+). DENY requires `denial_reason_code`. GRANT runs the seat-allocation transaction.
+- `buildApplicationView(creatorId)` — full `PixelLegacyApplicationView` shape consumed directly by `ui/app/creator/pixel-legacy/page.ts`. Returns synthetic `DRAFT` view for first-time visits with no application row.
 - `getSeatMeter()` — `{ seats_taken, seats_total: 3500, seats_remaining, cap_reached }`. Drives the UI's seat-availability bar.
-- `getApplication(creatorId)` — load presenter view.
+- `getApplication(creatorId)` — load raw application DTO.
 - `isPixelLegacy(creatorId)` — fast lookup used by the payout calculator and the Cyrano resolver.
 
 ## Concurrency invariant
 
 The 3,500-seat cap is enforced inside a single Prisma `$transaction` guarded by a Postgres advisory lock (`PIXEL_LEGACY.SEAT_ALLOCATION_ADVISORY_LOCK_KEY = 4242004500`). Two concurrent grants serialize through the lock; whichever side observes `seats_taken >= 3500` flips its application to `DENIED` with `denial_reason_code = 'PIXEL_LEGACY_SEAT_CAP_REACHED'`. The append-only trigger on `pixel_legacy_seat_allocations` is the second line of defence — manual `UPDATE` / `DELETE` against the table fails with a clear error.
+
+## NATS publish ordering
+
+Domain events are collected inside the transaction and published only **after** the transaction commits successfully. A rollback never broadcasts a ghost `pixel_legacy.seat.granted` or `pixel_legacy.application.denied` event to subscribers — NATS subscribers and the database stay in lock-step.
+
+## Auth posture (interim)
+
+`reviewer_id` and `caller_role` on the review endpoint are accepted from the request body. The service routes the role check through the canonical `RbacGuard` against permission `pixel_legacy:seat:allocate` (added to `PERMISSION_MATRIX`), unifying with the rest of the codebase's role-rank logic. Body-supplied identity matches the existing pattern in `studio.controller` and `creator-onboarding.controller`. Once the platform auth middleware lands and attaches a verified user to the request, both fields will come from `req.user` and the body fields will be removed. Tracked under `PIXEL-LEGACY-006` alongside the step-up auth modal flow.
 
 ## Audit + NATS
 

@@ -1324,6 +1324,10 @@ model PixelLegacyApplication {
   // Stable application identifier surfaced to UI on first submission.
   application_id      String                       @unique
   creator_id          String                       @unique
+  // Display name captured at apply time (the UI's PixelLegacyApplicationView
+  // surfaces this above the status tracker). Persisted on the application row
+  // so the presenter does not need a separate creator-profile lookup.
+  display_name        String                       @db.VarChar(100)
   status              PixelLegacyApplicationStatus @default(DRAFT)
   proof_statement     String                       @db.Text
   // Array of { entry_id, label, url } — bound by ui/types/creator-panel-contracts.ts
