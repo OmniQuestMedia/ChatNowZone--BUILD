@@ -107,7 +107,7 @@ export class RedbookRateCardService {
    * triggers (cold $0.075 > floor $0.07). It is wired here defensively so
    * any future sub-$0.075 payout path (e.g. Tease bundles flowing through
    * this resolver, special promos) automatically protects Pixel Legacy
-   * creators per PIXEL-LEGACY-002. The `appliedFloor` boolean stays
+   * creators per PIXEL-LEGACY-003. The `appliedFloor` boolean stays
    * coarse — it indicates "any floor was raised above live" without
    * differentiating which one. Metadata downstream (PayoutService) carries
    * the precise rate + which floor type produced it.
