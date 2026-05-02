@@ -4,6 +4,7 @@
 
 import {
   DIAMOND_TIER,
+  PIXEL_LEGACY,
   REDBOOK_RATE_CARDS,
 } from '../core-api/src/config/governance.config';
 import type { HeatLevel, UserType, RateCardTier } from './types';
@@ -96,18 +97,56 @@ export class RedbookRateCardService {
 
   /**
    * Resolve the live creator payout rate for a session close.
-   * Room-Heat wins unless the Diamond floor ($0.080) is higher.
+   *
+   * Floor composition (highest applicable floor wins):
+   *   1. Live FFS heat rate (cold $0.075 .. inferno $0.090)
+   *   2. Diamond floor ($0.080) — when diamondFloorActive
+   *   3. Pixel Legacy floor ($0.07) — when isPixelLegacy
+   *
+   * Under the current heat-band rate matrix the Pixel Legacy floor never
+   * triggers (cold $0.075 > floor $0.07). It is wired here defensively so
+   * any future sub-$0.075 payout path (e.g. Tease bundles flowing through
+   * this resolver, special promos) automatically protects Pixel Legacy
+   * creators per PIXEL-LEGACY-002. The `appliedFloor` boolean stays
+   * coarse — it indicates "any floor was raised above live" without
+   * differentiating which one. Metadata downstream (PayoutService) carries
+   * the precise rate + which floor type produced it.
    */
   resolveCreatorPayoutRate(args: {
     heatScore: number;
     diamondFloorActive: boolean;
-  }): { level: HeatLevel; ratePerToken: number; appliedFloor: boolean } {
+    isPixelLegacy?: boolean;
+  }): {
+    level: HeatLevel;
+    ratePerToken: number;
+    appliedFloor: boolean;
+    appliedDiamondFloor: boolean;
+    appliedPixelLegacyFloor: boolean;
+  } {
     const live = resolveHeatRate(args.heatScore);
-    const floor = GovernanceConfig.RATE_DIAMOND_FLOOR.toNumber();
-    if (args.diamondFloorActive && live.ratePerToken < floor) {
-      return { level: live.level, ratePerToken: floor, appliedFloor: true };
+    const diamondFloor = GovernanceConfig.RATE_DIAMOND_FLOOR.toNumber();
+    const pixelLegacyFloor = PIXEL_LEGACY.PAYOUT_FLOOR_USD;
+
+    let rate = live.ratePerToken;
+    let appliedDiamondFloor = false;
+    let appliedPixelLegacyFloor = false;
+
+    if (args.diamondFloorActive && rate < diamondFloor) {
+      rate = diamondFloor;
+      appliedDiamondFloor = true;
     }
-    return { ...live, appliedFloor: false };
+    if (args.isPixelLegacy && rate < pixelLegacyFloor) {
+      rate = pixelLegacyFloor;
+      appliedPixelLegacyFloor = true;
+    }
+
+    return {
+      level: live.level,
+      ratePerToken: rate,
+      appliedFloor: appliedDiamondFloor || appliedPixelLegacyFloor,
+      appliedDiamondFloor,
+      appliedPixelLegacyFloor,
+    };
   }
 
   /**

@@ -4,6 +4,10 @@
 // with the computed USD-equivalent payout recorded in CZT.
 // Full FFS engine is in services/ffs/; this module provides the
 // deterministic plumbing those consumers will call into.
+//
+// PIXEL-LEGACY-003 — accepts isPixelLegacy on the input and forwards it
+// to the rate-card resolver so the $0.07 Pixel Legacy floor protects
+// Pixel Legacy creators when the live rate would otherwise drop below.
 
 import type { LedgerService } from './ledger.service';
 import type { HeatLevel, LedgerBucket } from './types';
@@ -15,6 +19,7 @@ export interface SessionCloseInput {
   grossCzt: number;                    // total CZT earned this session (integer)
   heatScore: number;                   // 0–100 — from FFS scorer
   diamondFloorActive: boolean;         // true when creator has Diamond floor guarantee
+  isPixelLegacy?: boolean;             // true when creator is PIXEL_LEGACY type — applies the $0.07 floor
 }
 
 export interface SessionPayoutResult {
@@ -23,7 +28,9 @@ export interface SessionPayoutResult {
   ratePerToken: number;
   payoutUsd: number;                   // for reporting
   payoutCzt: number;                   // what was credited to the wallet
-  appliedFloor: boolean;
+  appliedFloor: boolean;               // any floor was raised above live
+  appliedDiamondFloor: boolean;        // Diamond floor specifically
+  appliedPixelLegacyFloor: boolean;    // Pixel Legacy floor specifically
   correlationId: string;
 }
 
@@ -49,6 +56,7 @@ export class PayoutService {
     const rate = this.rateCards.resolveCreatorPayoutRate({
       heatScore: input.heatScore,
       diamondFloorActive: input.diamondFloorActive,
+      isPixelLegacy: input.isPixelLegacy,
     });
 
     // Payout USD is grossCzt * ratePerToken; but we credit the creator wallet
@@ -70,7 +78,9 @@ export class PayoutService {
           ffs_score: input.heatScore,
           heat_level: rate.level,
           rate_per_token: rate.ratePerToken,
-          applied_diamond_floor: rate.appliedFloor,
+          applied_diamond_floor: rate.appliedDiamondFloor,
+          applied_pixel_legacy_floor: rate.appliedPixelLegacyFloor,
+          is_pixel_legacy: input.isPixelLegacy ?? false,
           payout_usd: payoutUsd,
         },
       });
@@ -83,6 +93,8 @@ export class PayoutService {
       payoutUsd,
       payoutCzt,
       appliedFloor: rate.appliedFloor,
+      appliedDiamondFloor: rate.appliedDiamondFloor,
+      appliedPixelLegacyFloor: rate.appliedPixelLegacyFloor,
       correlationId,
     };
   }
