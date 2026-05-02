@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-public-wallet-view`
-**Commit:** `7dddcaafab909ace4d33ccc459513d1a92ee29a7`
-**Generated:** 2026-04-28T17:59:13Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `5a191eb784df6cd512005ba03484aee9fd6fb62d`
+**Generated:** 2026-05-02T06:30:36Z
 
 ## All Files
 
@@ -360,6 +360,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260427000000_single_czt_enforcement_v1/migration.sql`
 - `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
+- `prisma/migrations/20260428130000_legal_hold_correlation_id/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
