@@ -1,0 +1,26 @@
+{
+  "name": "chatnow-zone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChatNow.Zone primary Next.js app — host for the page builders in ui/app/.",
+  "scripts": {
+    "dev": "next dev -p 3200",
+    "build": "next build",
+    "start": "next start -p 3200",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "next": "^16.2.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20 <23"
+  }
+}
