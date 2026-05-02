@@ -22,7 +22,7 @@
 //   the application proof statements + portfolio entries that the v1 surface
 //   exposed, so the auth gap is lower-urgency than it was under -001.
 
-import { Controller, Get, Logger, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PixelLegacyService } from './pixel-legacy.service';
 import {
   PixelLegacyCreatorStatusPublic,
@@ -31,8 +31,6 @@ import {
 
 @Controller('pixel-legacy')
 export class PixelLegacyController {
-  private readonly logger = new Logger(PixelLegacyController.name);
-
   constructor(private readonly pixelLegacy: PixelLegacyService) {}
 
   @Get('seat-meter')

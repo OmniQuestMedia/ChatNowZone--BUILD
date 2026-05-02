@@ -322,13 +322,19 @@ export class CreatorOnboardingService {
     // safe. Failures here MUST NOT block the onboarding completion — the
     // creator is fully onboarded as STANDARD even if the gateway path
     // errors. We log + swallow.
+    //
+    // We pass the existing onboarding correlation_id through unmodified
+    // (it's already specific to this completion call as
+    // `onboard_complete_<UUID>` ≈ 53 chars). Prefixing would push it past
+    // the VARCHAR(64) limit on pixel_legacy_seat_allocations.correlation_id
+    // and crash every grant.
     try {
       await this.pixelLegacy.tryGrantSeatOnOnboarding({
         creator_id,
         granted_by: 'onboarding.complete',
         organization_id: onboarding.organization_id,
         tenant_id: onboarding.tenant_id,
-        correlation_id: `pixel_legacy_${correlation_id}`,
+        correlation_id,
       });
     } catch (err) {
       this.logger.error('CreatorOnboardingService.complete: Pixel Legacy gateway failed (non-blocking)', {

@@ -123,11 +123,8 @@ export interface CreatorCommandCenterView {
   rule_applied_id: string;
 }
 
-// ─── Screen 05 — Pixel Legacy Application contracts ────────────────────────
-// Source of truth: PIXEL-LEGACY-001 directive, docs/ux/03-state-machines.md §10,
-// docs/ux/05-tier-entitlements.md §Creator types.
-
 // ─── PIXEL-LEGACY-002: first-come-first-served gateway view ─────────────────
+// Source of truth: PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-002.md.
 // Supersedes the v1 application/review contract. Pixel Legacy is granted
 // automatically when a creator completes onboarding while the gateway is
 // open; there is no apply form, no portfolio, no proof statement, no operator

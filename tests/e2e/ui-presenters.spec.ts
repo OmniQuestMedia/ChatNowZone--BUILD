@@ -987,10 +987,10 @@ describe('MembershipPage — render plan structure', () => {
   });
 });
 
-// ─── Screen 05 — PixelLegacyPage ──────────────────────────────────────────
+// ─── Screen 05 — PixelLegacyPage (PIXEL-LEGACY-002 status display) ────────
 
 import { renderPixelLegacyPage } from '../../ui/app/creator/pixel-legacy/page';
-import type { PixelLegacyApplicationView } from '../../ui/types/creator-panel-contracts';
+import type { PixelLegacyStatusView } from '../../ui/types/creator-panel-contracts';
 
 const PIXEL_LEGACY_BENEFITS = {
   payout_range_min_usd: 0.07,
@@ -1000,123 +1000,124 @@ const PIXEL_LEGACY_BENEFITS = {
   badge_label: 'Pixel Legacy' as const,
 };
 
-const PIXEL_LEGACY_SEAT_METER = {
+/** Marketing-cap-clamped meter (3,000) with the gateway still open. */
+const SEAT_METER_OPEN = {
   seats_taken: 1200,
-  seats_total: 3500,
-  seats_remaining: 2300,
+  seats_total: 3000,
+  seats_remaining: 1800,
   cap_reached: false,
+  gateway_open: true,
+};
+
+/** Marketing cap saturated; gateway closed. */
+const SEAT_METER_CLOSED = {
+  seats_taken: 3000,
+  seats_total: 3000,
+  seats_remaining: 0,
+  cap_reached: true,
+  gateway_open: false,
 };
 
 function buildPixelLegacyView(
-  overrides: Partial<PixelLegacyApplicationView> = {},
-): PixelLegacyApplicationView {
+  overrides: Partial<PixelLegacyStatusView> = {},
+): PixelLegacyStatusView {
   return {
-    application_id: null,
     creator_id: 'creator-pl-001',
     display_name: 'Test Creator',
-    status: 'DRAFT',
-    seat_meter: PIXEL_LEGACY_SEAT_METER,
-    portfolio_entries: [],
-    proof_statement: '',
-    submitted_at_utc: null,
-    reviewed_at_utc: null,
-    denial_reason_code: null,
+    is_pixel_legacy: false,
+    seat_number: null,
+    granted_at_utc: null,
+    seat_meter: SEAT_METER_OPEN,
     benefits: PIXEL_LEGACY_BENEFITS,
     cyrano_panel_unlocked: false,
-    generated_at_utc: '2026-04-28T00:00:00Z',
-    rule_applied_id: 'PIXEL_LEGACY_PAGE_v1',
+    generated_at_utc: '2026-05-02T00:00:00Z',
+    rule_applied_id: 'PIXEL_LEGACY_v2',
     ...overrides,
   };
 }
 
-describe('PixelLegacyPage — render plan structure', () => {
-  it('renders all core sections in DRAFT state', () => {
+describe('PixelLegacyPage — render plan structure (FCFS gateway)', () => {
+  it('renders the GATEWAY_OPEN branch when not granted and gateway is open', () => {
     const render = renderPixelLegacyPage({ view: buildPixelLegacyView() });
     const ids = collectTestIds(render.tree);
     expect(ids).toContain('pixel-legacy-page');
     expect(ids).toContain('pixel-legacy-header');
-    expect(ids).toContain('pixel-legacy-status-tracker');
     expect(ids).toContain('pixel-legacy-seat-meter');
+    expect(ids).toContain('pixel-legacy-unfilled-panel');
     expect(ids).toContain('pixel-legacy-benefits');
-    expect(ids).toContain('pixel-legacy-application-form');
-    expect(ids).toContain('pixel-legacy-submit');
+    // Granted panel + Cyrano CTA must not appear pre-grant.
+    expect(ids).not.toContain('pixel-legacy-granted-panel');
+    expect(ids).not.toContain('pixel-legacy-open-cyrano');
   });
 
-  it('shows the DENIED state node when status is DENIED', () => {
+  it('renders the GATEWAY_CLOSED branch with cap-reached notice', () => {
     const render = renderPixelLegacyPage({
-      view: buildPixelLegacyView({ status: 'DENIED', denial_reason_code: 'SEAT_CAP_REACHED' }),
+      view: buildPixelLegacyView({ seat_meter: SEAT_METER_CLOSED }),
     });
     const ids = collectTestIds(render.tree);
-    expect(ids).toContain('pixel-legacy-status-denied');
-    expect(ids).not.toContain('pixel-legacy-step-applied');
+    expect(ids).toContain('pixel-legacy-unfilled-panel');
+    expect(ids).toContain('pixel-legacy-cap-reached-notice');
+    const bar = findByTestId(render.tree, 'pixel-legacy-seat-bar');
+    expect(bar?.props?.cap_reached).toBe(true);
+    expect(bar?.props?.gateway_open).toBe(false);
+    expect(bar?.props?.pct_filled).toBe(100);
   });
 
-  it('renders the granted panel and Cyrano CTA when GRANTED + unlocked', () => {
+  it('renders the GRANTED branch with seat number and Cyrano CTA when unlocked', () => {
     const render = renderPixelLegacyPage({
       view: buildPixelLegacyView({
-        application_id: 'app-granted-001',
-        status: 'GRANTED',
+        is_pixel_legacy: true,
+        seat_number: 1234,
+        granted_at_utc: '2026-04-30T12:00:00Z',
         cyrano_panel_unlocked: true,
-        reviewed_at_utc: '2026-04-20T00:00:00Z',
       }),
     });
     const ids = collectTestIds(render.tree);
     expect(ids).toContain('pixel-legacy-granted-panel');
+    expect(ids).toContain('pixel-legacy-seat-number');
     expect(ids).toContain('pixel-legacy-open-cyrano');
-    expect(ids).toContain('pixel-legacy-application-id');
-    // Form submit button must not appear after grant
-    expect(ids).not.toContain('pixel-legacy-submit');
+    // Unfilled panel must not appear once granted.
+    expect(ids).not.toContain('pixel-legacy-unfilled-panel');
+    const seatNumberEl = findByTestId(render.tree, 'pixel-legacy-seat-number');
+    expect(seatNumberEl?.children?.[0]).toBe('1234');
   });
 
-  it('seat meter reflects correct proportions', () => {
+  it('does not render the Cyrano CTA when granted but cyrano_panel_unlocked=false', () => {
     const render = renderPixelLegacyPage({
       view: buildPixelLegacyView({
-        seat_meter: { seats_taken: 3500, seats_total: 3500, seats_remaining: 0, cap_reached: true },
+        is_pixel_legacy: true,
+        seat_number: 7,
+        granted_at_utc: '2026-04-30T12:00:00Z',
+        cyrano_panel_unlocked: false,
       }),
     });
     const ids = collectTestIds(render.tree);
-    expect(ids).toContain('pixel-legacy-cap-reached-notice');
+    expect(ids).toContain('pixel-legacy-granted-panel');
+    expect(ids).not.toContain('pixel-legacy-open-cyrano');
+  });
+
+  it('seat meter reflects correct proportions in the open branch', () => {
+    const render = renderPixelLegacyPage({ view: buildPixelLegacyView() });
     const bar = findByTestId(render.tree, 'pixel-legacy-seat-bar');
-    expect(bar?.props?.cap_reached).toBe(true);
-    expect(bar?.props?.pct_filled).toBe(100);
+    expect(bar?.props?.cap_reached).toBe(false);
+    expect(bar?.props?.gateway_open).toBe(true);
+    expect(bar?.props?.seats_taken).toBe(1200);
+    expect(bar?.props?.seats_total).toBe(3000);
+    expect(bar?.props?.pct_filled).toBe(40);
   });
 
-  it('renders portfolio entries when present', () => {
-    const render = renderPixelLegacyPage({
-      view: buildPixelLegacyView({
-        portfolio_entries: [
-          { entry_id: 'e-1', label: 'Twitch', url: 'https://twitch.tv/example' },
-          { entry_id: 'e-2', label: 'YouTube', url: 'https://youtube.com/example' },
-        ],
-      }),
-    });
-    const ids = collectTestIds(render.tree);
-    expect(ids).toContain('pixel-legacy-portfolio-e-1');
-    expect(ids).toContain('pixel-legacy-portfolio-e-2');
-    expect(ids).toContain('pixel-legacy-add-portfolio-entry');
-  });
-
-  it('benefits preview shows correct payout range', () => {
+  it('benefits panel shows the correct payout range and lifetime Cyrano flag', () => {
     const render = renderPixelLegacyPage({ view: buildPixelLegacyView() });
     const rangeEl = findByTestId(render.tree, 'pixel-legacy-payout-range');
     expect(rangeEl).toBeDefined();
     expect(rangeEl!.children?.[0]).toContain('$0.07');
     expect(rangeEl!.children?.[0]).toContain('$0.09');
+    const cyranoEl = findByTestId(render.tree, 'pixel-legacy-cyrano-benefit');
+    expect(cyranoEl?.children?.[0]).toContain('Lifetime');
   });
 
-  it('returns noindex SEO metadata', () => {
+  it('returns the canonical SEO metadata for /creator/pixel-legacy', () => {
     const render = renderPixelLegacyPage({ view: buildPixelLegacyView() });
-    expect(render.metadata.robots).toBe('noindex,nofollow');
     expect(render.metadata.canonical_url).toContain('/creator/pixel-legacy');
-  });
-
-  it('status tracker shows APPLIED / REVIEWED / GRANTED steps', () => {
-    const render = renderPixelLegacyPage({
-      view: buildPixelLegacyView({ status: 'REVIEWED' }),
-    });
-    const ids = collectTestIds(render.tree);
-    expect(ids).toContain('pixel-legacy-step-applied');
-    expect(ids).toContain('pixel-legacy-step-reviewed');
-    expect(ids).toContain('pixel-legacy-step-granted');
   });
 });

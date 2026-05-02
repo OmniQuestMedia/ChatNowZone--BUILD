@@ -32,10 +32,8 @@
 //   a ghost grant or gateway-closed event to subscribers.
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import type { PixelLegacySeatAllocation } from '@prisma/client';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NatsService } from '../../core-api/src/nats/nats.service';
-import { ImmutableAuditService } from '../../core-api/src/audit/immutable-audit.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
 import { PIXEL_LEGACY } from '../../core-api/src/config/governance.config';
 import {
@@ -64,7 +62,13 @@ export interface TryGrantResult {
   granted: boolean;
   /** 1..3500 when granted; null otherwise. */
   seat_number: number | null;
-  /** True iff this call allocated the final seat (3,500). */
+  /** True iff the gateway is no longer accepting new grants at the moment
+   *  this call returns — composes two cases: (a) this call allocated the
+   *  final seat (3,500) and just closed the gateway, OR (b) the gateway
+   *  was already closed when called and the creator stays STANDARD. False
+   *  on idempotent replay (the creator already had a seat; we cannot tell
+   *  the gateway state cheaply and the answer is not actionable for
+   *  callers). */
   gateway_closed: boolean;
   /** True iff the creator already had a seat — call was idempotent. */
   idempotent_replay: boolean;
@@ -79,7 +83,6 @@ export class PixelLegacyService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly nats: NatsService,
-    private readonly audit: ImmutableAuditService,
   ) {}
 
   // ────────────────────────────────────────────────────────────────────────
