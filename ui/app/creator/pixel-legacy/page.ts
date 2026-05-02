@@ -1,66 +1,66 @@
-// Screen 05 — /creator/pixel-legacy Pixel Legacy Onboarding page.
-// Role: Creator (applicant).
-// Purpose: Apply for and track Pixel Legacy status.
+// Screen 05 (PIXEL-LEGACY-002) — /creator/pixel-legacy status page.
+// Role: Creator (read-only).
+// Purpose: Display the creator's Pixel Legacy status. There is NO application
+//   form — Pixel Legacy is granted automatically when a creator completes
+//   onboarding while the gateway is open (first 3,500 onboardings).
 //
-// Presenter binding: PixelLegacyApplicationView (from creator-panel-contracts.ts).
-// States handled: DRAFT | APPLIED | REVIEWED | GRANTED | DENIED
+// Presenter binding: PixelLegacyStatusView (from creator-panel-contracts.ts).
 //
-// Layout (top → bottom):
-//   1. Status tracker (Applied → Reviewed → Granted / Denied)
-//   2. Seat availability meter (3,500 cap)
-//   3. Benefits preview ($0.07–$0.09/token + lifetime Cyrano™)
-//   4. Application form (portfolio entries + proof statement)
-//   5. Post-grant: Cyrano panel unlock CTA
-//
-// Interactions:
-//   • Form submission → GateGuard pre-process + audit write
-//   • On GRANTED → auto-unlock creator Cyrano panel
+// Layout — three branches:
+//   (A) is_pixel_legacy === true
+//       "You are Pixel Legacy creator #N" + benefits summary + Cyrano CTA.
+//   (B) is_pixel_legacy === false && seat_meter.gateway_open === true
+//       "Welcome — Pixel Legacy onboarding is still open." + benefits preview
+//       + seat-availability meter.
+//   (C) is_pixel_legacy === false && seat_meter.gateway_open === false
+//       "Pixel Legacy seats are filled. You are a Standard creator."
 
 import { SEO } from '../../../config/seo';
 import { THEME } from '../../../config/theme';
 import { el, RenderElement } from '../../../components/render-plan';
 import type {
-  PixelLegacyApplicationStatus,
-  PixelLegacyApplicationView,
   PixelLegacyBenefits,
-  PixelLegacyPortfolioEntry,
   PixelLegacySeatMeter,
+  PixelLegacyStatusView,
 } from '../../../types/creator-panel-contracts';
 
-
-export const PIXEL_LEGACY_PAGE_RULE_ID = 'PIXEL_LEGACY_PAGE_v1';
+export const PIXEL_LEGACY_PAGE_RULE_ID = 'PIXEL_LEGACY_PAGE_v2';
 
 export interface PixelLegacyPageInputs {
-  /** Pre-built view model from the presenter / API response. */
-  view: PixelLegacyApplicationView;
+  view: PixelLegacyStatusView;
 }
 
 export interface PixelLegacyPageRender {
   metadata: typeof SEO.creator_pixel_legacy;
-  view: PixelLegacyApplicationView;
+  view: PixelLegacyStatusView;
   tree: RenderElement;
   rule_applied_id: string;
 }
 
 export function renderPixelLegacyPage(inputs: PixelLegacyPageInputs): PixelLegacyPageRender {
   const { view } = inputs;
+  const branch: 'GRANTED' | 'GATEWAY_OPEN' | 'GATEWAY_CLOSED' =
+    view.is_pixel_legacy
+      ? 'GRANTED'
+      : view.seat_meter.gateway_open
+        ? 'GATEWAY_OPEN'
+        : 'GATEWAY_CLOSED';
 
   const tree = el(
     'main',
     {
       test_id: 'pixel-legacy-page',
       classes: ['cnz-creator-pixel-legacy', 'cnz-theme-dark'],
-      props: { mode: THEME.default_mode, status: view.status },
-      aria: { 'aria-label': 'Pixel Legacy creator onboarding' },
+      props: { mode: THEME.default_mode, branch },
+      aria: { 'aria-label': 'Pixel Legacy creator status' },
     },
     [
-      renderHeader(view),
-      renderStatusTracker(view.status),
+      renderHeader(view, branch),
       renderSeatMeter(view.seat_meter),
-      renderBenefitsPreview(view.benefits),
-      view.status === 'GRANTED'
+      branch === 'GRANTED'
         ? renderGrantedPanel(view)
-        : renderApplicationForm(view),
+        : renderUnfilledPanel(view, branch),
+      renderBenefitsPanel(view.benefits, branch),
     ],
   );
 
@@ -72,21 +72,42 @@ export function renderPixelLegacyPage(inputs: PixelLegacyPageInputs): PixelLegac
   };
 }
 
-// ─── Page header ───────────────────────────────────────────────────────────
+// ─── Header ────────────────────────────────────────────────────────────────
 
-function renderHeader(view: PixelLegacyApplicationView): RenderElement {
+function renderHeader(
+  view: PixelLegacyStatusView,
+  branch: 'GRANTED' | 'GATEWAY_OPEN' | 'GATEWAY_CLOSED',
+): RenderElement {
+  const headline =
+    branch === 'GRANTED'
+      ? 'Pixel Legacy'
+      : branch === 'GATEWAY_OPEN'
+        ? 'Pixel Legacy'
+        : 'Pixel Legacy';
+
+  const subtitle =
+    branch === 'GRANTED'
+      ? `You are Pixel Legacy creator #${view.seat_number ?? '—'}.`
+      : branch === 'GATEWAY_OPEN'
+        ? 'Onboarding is still open. Complete your onboarding to claim a seat.'
+        : 'Pixel Legacy seats are filled — you are a Standard creator.';
+
   return el(
     'header',
     {
       test_id: 'pixel-legacy-header',
-      classes: ['cnz-pixel-legacy__header'],
+      classes: ['cnz-pixel-legacy__header', `cnz-pixel-legacy__header--${branch.toLowerCase()}`],
     },
     [
-      el('h1', {}, ['Pixel Legacy']),
-      el('p', { classes: ['cnz-pixel-legacy__subtitle'] }, [
-        'Secure one of the first 3,500 creator seats — earn at the full payout range ' +
-          'with a lifetime Cyrano™ membership.',
-      ]),
+      el('h1', {}, [headline]),
+      el(
+        'p',
+        {
+          test_id: 'pixel-legacy-subtitle',
+          classes: ['cnz-pixel-legacy__subtitle'],
+        },
+        [subtitle],
+      ),
       el(
         'span',
         {
@@ -100,88 +121,19 @@ function renderHeader(view: PixelLegacyApplicationView): RenderElement {
   );
 }
 
-// ─── Status tracker ────────────────────────────────────────────────────────
-
-const STATUS_STEPS: PixelLegacyApplicationStatus[] = [
-  'APPLIED',
-  'REVIEWED',
-  'GRANTED',
-];
-
-function renderStatusTracker(status: PixelLegacyApplicationStatus): RenderElement {
-  const isDenied = status === 'DENIED';
-  return el(
-    'section',
-    {
-      test_id: 'pixel-legacy-status-tracker',
-      classes: ['cnz-panel', 'cnz-panel--status-tracker'],
-      aria: { 'aria-label': 'Application status tracker' },
-    },
-    [
-      el('h2', {}, ['Application status']),
-      isDenied
-        ? el(
-            'div',
-            {
-              test_id: 'pixel-legacy-status-denied',
-              classes: ['cnz-status--danger'],
-            },
-            ['Application not approved — contact support if you have questions.'],
-          )
-        : el(
-            'ol',
-            {
-              classes: ['cnz-status-steps'],
-              aria: { role: 'list', 'aria-label': 'Application progress steps' },
-            },
-            STATUS_STEPS.map((step) => {
-              const isPast = isStepCompleted(step, status);
-              const isCurrent = step === status;
-              return el(
-                'li',
-                {
-                  test_id: `pixel-legacy-step-${step.toLowerCase()}`,
-                  classes: [
-                    'cnz-status-steps__item',
-                    isPast ? 'cnz-status-steps__item--complete' : '',
-                    isCurrent ? 'cnz-status-steps__item--current' : '',
-                  ].filter(Boolean),
-                  aria: { role: 'listitem' },
-                },
-                [stepLabel(step)],
-              );
-            }),
-          ),
-    ],
-  );
-}
-
-function isStepCompleted(step: PixelLegacyApplicationStatus, current: PixelLegacyApplicationStatus): boolean {
-  const order: PixelLegacyApplicationStatus[] = ['DRAFT', 'APPLIED', 'REVIEWED', 'GRANTED'];
-  return order.indexOf(step) < order.indexOf(current);
-}
-
-function stepLabel(step: PixelLegacyApplicationStatus): string {
-  switch (step) {
-    case 'APPLIED':   return 'Applied';
-    case 'REVIEWED':  return 'Reviewed';
-    case 'GRANTED':   return 'Granted';
-    default:          return step;
-  }
-}
-
-// ─── Seat availability meter ───────────────────────────────────────────────
+// ─── Seat meter ────────────────────────────────────────────────────────────
 
 function renderSeatMeter(meter: PixelLegacySeatMeter): RenderElement {
-  const pct = meter.seats_total > 0
-    ? Math.round((meter.seats_taken * 100) / meter.seats_total)
-    : 0;
+  const pct =
+    meter.seats_total > 0 ? Math.round((meter.seats_taken * 100) / meter.seats_total) : 0;
   return el(
     'section',
     {
       test_id: 'pixel-legacy-seat-meter',
       classes: ['cnz-panel', 'cnz-panel--seat-meter'],
-      aria: { 'aria-label': `Pixel Legacy seat availability: ${meter.seats_remaining} of ${meter.seats_total} remaining` },
+      aria: {
+        'aria-label': `Pixel Legacy seat availability: ${meter.seats_remaining} of ${meter.seats_total} remaining`,
+      },
     },
     [
       el('h2', {}, ['Seat availability']),
@@ -196,6 +148,7 @@ function renderSeatMeter(meter: PixelLegacySeatMeter): RenderElement {
             seats_remaining: meter.seats_remaining,
             pct_filled: pct,
             cap_reached: meter.cap_reached,
+            gateway_open: meter.gateway_open,
           },
           aria: {
             role: 'progressbar',
@@ -222,16 +175,102 @@ function renderSeatMeter(meter: PixelLegacySeatMeter): RenderElement {
               test_id: 'pixel-legacy-cap-reached-notice',
               classes: ['cnz-status--warn'],
             },
-            ['All Pixel Legacy seats have been claimed. Standard creator onboarding is still open.'],
+            ['Pixel Legacy seats are filled. Standard creator onboarding is still open.'],
           )
         : null,
     ].filter(Boolean) as RenderElement[],
   );
 }
 
-// ─── Benefits preview ──────────────────────────────────────────────────────
+// ─── Granted panel ─────────────────────────────────────────────────────────
 
-function renderBenefitsPreview(benefits: PixelLegacyBenefits): RenderElement {
+function renderGrantedPanel(view: PixelLegacyStatusView): RenderElement {
+  return el(
+    'section',
+    {
+      test_id: 'pixel-legacy-granted-panel',
+      classes: ['cnz-panel', 'cnz-panel--granted'],
+      aria: { 'aria-label': 'Pixel Legacy granted — creator access unlocked' },
+    },
+    [
+      el('h2', {}, ['Welcome, Pixel Legacy creator']),
+      el(
+        'p',
+        { test_id: 'pixel-legacy-granted-blurb' },
+        [
+          `Congratulations, ${view.display_name}. You are Pixel Legacy creator ` +
+            `#${view.seat_number ?? '—'}. Your profile badge is active and your ` +
+            'Cyrano™ lifetime membership has been unlocked.',
+        ],
+      ),
+      el('dl', { classes: ['cnz-stat-grid'] }, [
+        el('dt', {}, ['Seat number']),
+        el(
+          'dd',
+          { test_id: 'pixel-legacy-seat-number' },
+          [String(view.seat_number ?? '—')],
+        ),
+        el('dt', {}, ['Granted on']),
+        el(
+          'dd',
+          { test_id: 'pixel-legacy-granted-at' },
+          [view.granted_at_utc?.slice(0, 10) ?? '—'],
+        ),
+      ]),
+      view.cyrano_panel_unlocked
+        ? el(
+            'button',
+            {
+              test_id: 'pixel-legacy-open-cyrano',
+              classes: ['cnz-button', 'cnz-button--primary'],
+              on: { click: 'navigateToCyranoPanel' },
+              props: { creator_id: view.creator_id },
+            },
+            ['Open Cyrano™ Panel'],
+          )
+        : null,
+    ].filter(Boolean) as RenderElement[],
+  );
+}
+
+// ─── Unfilled panel (gateway open or closed) ───────────────────────────────
+
+function renderUnfilledPanel(
+  view: PixelLegacyStatusView,
+  branch: 'GATEWAY_OPEN' | 'GATEWAY_CLOSED',
+): RenderElement {
+  const message =
+    branch === 'GATEWAY_OPEN'
+      ? 'Complete your onboarding to claim a seat. Pixel Legacy seats are first-come-first-served — no application required.'
+      : 'Pixel Legacy seats are filled. You are a Standard creator and your earnings + Cyrano access flow through the standard tier.';
+  return el(
+    'section',
+    {
+      test_id: 'pixel-legacy-unfilled-panel',
+      classes: ['cnz-panel', `cnz-panel--${branch.toLowerCase()}`],
+      aria: { 'aria-label': 'Pixel Legacy status' },
+    },
+    [
+      el('h2', {}, ['Your status']),
+      el(
+        'p',
+        {
+          test_id: 'pixel-legacy-unfilled-blurb',
+          classes: branch === 'GATEWAY_CLOSED' ? ['cnz-status--warn'] : [],
+        },
+        [message],
+      ),
+    ],
+  );
+}
+
+// ─── Benefits panel ────────────────────────────────────────────────────────
+
+function renderBenefitsPanel(
+  benefits: PixelLegacyBenefits,
+  branch: 'GRANTED' | 'GATEWAY_OPEN' | 'GATEWAY_CLOSED',
+): RenderElement {
+  const heading = branch === 'GRANTED' ? 'Your benefits' : 'What Pixel Legacy includes';
   return el(
     'section',
     {
@@ -240,7 +279,7 @@ function renderBenefitsPreview(benefits: PixelLegacyBenefits): RenderElement {
       aria: { 'aria-label': 'Pixel Legacy creator benefits' },
     },
     [
-      el('h2', {}, ['Benefits']),
+      el('h2', {}, [heading]),
       el(
         'span',
         {
@@ -272,190 +311,5 @@ function renderBenefitsPreview(benefits: PixelLegacyBenefits): RenderElement {
         ),
       ]),
     ],
-  );
-}
-
-// ─── Application form ──────────────────────────────────────────────────────
-
-function renderApplicationForm(view: PixelLegacyApplicationView): RenderElement {
-  const isSubmitted = view.status !== 'DRAFT';
-  return el(
-    'section',
-    {
-      test_id: 'pixel-legacy-application-form',
-      classes: ['cnz-panel', 'cnz-panel--application'],
-      aria: { 'aria-label': 'Pixel Legacy application form' },
-    },
-    [
-      el('h2', {}, ['Your application']),
-      isSubmitted
-        ? el(
-            'p',
-            {
-              test_id: 'pixel-legacy-submitted-notice',
-              classes: ['cnz-status--ok'],
-            },
-            [
-              `Application submitted ${view.submitted_at_utc?.slice(0, 10) ?? '—'}. ` +
-                'You will be notified by email when it is reviewed.',
-            ],
-          )
-        : null,
-      renderPortfolioEntries(view.portfolio_entries, isSubmitted),
-      renderProofStatement(view.proof_statement, isSubmitted),
-      isSubmitted
-        ? null
-        : el(
-            'button',
-            {
-              test_id: 'pixel-legacy-submit',
-              classes: ['cnz-button', 'cnz-button--primary'],
-              on: { click: 'submitPixelLegacyApplication' },
-              props: { creator_id: view.creator_id },
-            },
-            ['Submit application'],
-          ),
-    ].filter(Boolean) as RenderElement[],
-  );
-}
-
-function renderPortfolioEntries(entries: PixelLegacyPortfolioEntry[], readOnly: boolean): RenderElement {
-  return el(
-    'div',
-    {
-      test_id: 'pixel-legacy-portfolio',
-      classes: ['cnz-pixel-legacy__portfolio'],
-    },
-    [
-      el('h3', {}, ['Portfolio / proof of work']),
-      entries.length === 0
-        ? el(
-            'p',
-            { classes: ['cnz-panel--empty'] },
-            ['Add at least one portfolio link before submitting.'],
-          )
-        : el(
-            'ul',
-            { classes: ['cnz-list'] },
-            entries.map((entry) =>
-              el(
-                'li',
-                {
-                  test_id: `pixel-legacy-portfolio-${entry.entry_id}`,
-                  classes: ['cnz-list__item'],
-                  props: { entry_id: entry.entry_id },
-                },
-                [
-                  el('strong', {}, [entry.label]),
-                  el(
-                    'a',
-                    {
-                      classes: ['cnz-link'],
-                      props: { href: entry.url, rel: 'noopener noreferrer', target: '_blank' },
-                    },
-                    [entry.url],
-                  ),
-                  readOnly
-                    ? null
-                    : el(
-                        'button',
-                        {
-                          test_id: `pixel-legacy-remove-entry-${entry.entry_id}`,
-                          classes: ['cnz-button', 'cnz-button--ghost', 'cnz-button--sm'],
-                          on: { click: 'removePortfolioEntry' },
-                          props: { entry_id: entry.entry_id },
-                        },
-                        ['Remove'],
-                      ),
-                ].filter(Boolean) as RenderElement[],
-              ),
-            ),
-          ),
-      readOnly
-        ? null
-        : el(
-            'button',
-            {
-              test_id: 'pixel-legacy-add-portfolio-entry',
-              classes: ['cnz-button', 'cnz-button--ghost'],
-              on: { click: 'addPortfolioEntry' },
-            },
-            ['+ Add portfolio link'],
-          ),
-    ].filter(Boolean) as RenderElement[],
-  );
-}
-
-function renderProofStatement(statement: string, readOnly: boolean): RenderElement {
-  return el(
-    'div',
-    {
-      test_id: 'pixel-legacy-proof-statement',
-      classes: ['cnz-pixel-legacy__proof'],
-    },
-    [
-      el('h3', {}, ['Proof statement']),
-      el('p', { classes: ['cnz-pixel-legacy__proof-hint'] }, [
-        'Describe your creator background, audience, and why you are applying for Pixel Legacy status.',
-      ]),
-      readOnly
-        ? el(
-            'blockquote',
-            {
-              test_id: 'pixel-legacy-proof-text',
-              classes: ['cnz-pixel-legacy__proof-text'],
-            },
-            [statement || '—'],
-          )
-        : el(
-            'textarea',
-            {
-              test_id: 'pixel-legacy-proof-textarea',
-              classes: ['cnz-textarea'],
-              props: { value: statement, maxlength: 2000, required: true },
-              on: { input: 'updateProofStatement' },
-              aria: { 'aria-label': 'Proof statement text area' },
-            },
-            [],
-          ),
-    ],
-  );
-}
-
-// ─── Post-grant panel ──────────────────────────────────────────────────────
-
-function renderGrantedPanel(view: PixelLegacyApplicationView): RenderElement {
-  return el(
-    'section',
-    {
-      test_id: 'pixel-legacy-granted-panel',
-      classes: ['cnz-panel', 'cnz-panel--granted'],
-      aria: { 'aria-label': 'Pixel Legacy granted — creator access unlocked' },
-    },
-    [
-      el('h2', {}, ['🎉 Pixel Legacy granted']),
-      el('p', {}, [
-        `Congratulations, ${view.display_name}! You are now a Pixel Legacy creator. ` +
-          'Your profile badge is active and your Cyrano™ lifetime membership has been unlocked.',
-      ]),
-      el('dl', { classes: ['cnz-stat-grid'] }, [
-        el('dt', {}, ['Application ID']),
-        el('dd', { test_id: 'pixel-legacy-application-id' }, [view.application_id ?? '—']),
-        el('dt', {}, ['Decision date']),
-        el('dd', {}, [view.reviewed_at_utc?.slice(0, 10) ?? '—']),
-      ]),
-      view.cyrano_panel_unlocked
-        ? el(
-            'button',
-            {
-              test_id: 'pixel-legacy-open-cyrano',
-              classes: ['cnz-button', 'cnz-button--primary'],
-              on: { click: 'navigateToCyranoPanel' },
-              props: { creator_id: view.creator_id },
-            },
-            ['Open Cyrano™ Panel'],
-          )
-        : null,
-    ].filter(Boolean) as RenderElement[],
   );
 }

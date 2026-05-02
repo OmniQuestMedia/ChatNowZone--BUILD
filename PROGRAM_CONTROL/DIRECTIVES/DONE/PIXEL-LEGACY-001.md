@@ -1,6 +1,8 @@
 # PIXEL-LEGACY-001 — Pixel Legacy creator type, 3,500 seat cap, $0.07 payout floor
 
-**Status:** DONE — 2026-04-28
+**Status:** SUPERSEDED — 2026-05-02 by [`PIXEL-LEGACY-002.md`](PIXEL-LEGACY-002.md). The application/review workflow described below was replaced by a first-come-first-served gateway. The schema, service, controller, and UI page that this directive shipped have been substantially rewritten. This file is retained for audit history; do not implement against it.
+
+**Original status:** DONE — 2026-04-28
 **Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
 **Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc. (CEO instruction 2026-04-28)
 **Commit prefix:** `FIZ: + GOV:` (touches creator schema + payout floor; governance doctrine; Cyrano lifetime flag)

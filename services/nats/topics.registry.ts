@@ -331,10 +331,11 @@ export const NATS_TOPICS = {
   CREATOR_ONBOARDING_AFFILIATED:     'creator.onboarding.affiliated',
   CREATOR_ONBOARDING_COMPLETED:      'creator.onboarding.completed',
 
-  // ── PIXEL-LEGACY-001: Pixel Legacy creator type + 3,500 seat cap ─────────
-  PIXEL_LEGACY_APPLICATION_SUBMITTED: 'pixel_legacy.application.submitted',
-  PIXEL_LEGACY_APPLICATION_DENIED:    'pixel_legacy.application.denied',
-  PIXEL_LEGACY_SEAT_GRANTED:          'pixel_legacy.seat.granted',
+  // ── PIXEL-LEGACY-002: first-come-first-served Pixel Legacy gateway ──────
+  PIXEL_LEGACY_SEAT_GRANTED:    'pixel_legacy.seat.granted',
+  // Fires once when seat 3,500 (the actual gateway cap, not the marketing
+  // cap of 3,000) is allocated. Useful for ops dashboards.
+  PIXEL_LEGACY_GATEWAY_CLOSED:  'pixel_legacy.gateway.closed',
 } as const;
 
 export type NatsTopic = typeof NATS_TOPICS[keyof typeof NATS_TOPICS];
