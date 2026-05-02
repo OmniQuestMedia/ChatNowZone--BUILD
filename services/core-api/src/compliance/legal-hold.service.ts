@@ -21,6 +21,7 @@ export interface LegalHoldRecord {
   lifted_by: string | null;
   lifted_at_utc: string | null;
   reason_code: string;
+  correlation_id: string;
   rule_applied_id: string;
 }
 
@@ -43,6 +44,7 @@ export class LegalHoldService {
     subject_type: HoldSubjectType;
     applied_by: string;
     reason_code: string;
+    correlation_id: string;
   }): Promise<LegalHoldRecord> {
     const now = new Date();
     const hold_id = randomUUID();
@@ -55,6 +57,7 @@ export class LegalHoldService {
         applied_by: params.applied_by,
         applied_at_utc: now,
         reason_code: params.reason_code,
+        correlation_id: params.correlation_id,
         rule_applied_id: this.RULE_ID,
       },
     });
@@ -68,6 +71,7 @@ export class LegalHoldService {
       lifted_by: null,
       lifted_at_utc: null,
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     };
 
@@ -77,16 +81,23 @@ export class LegalHoldService {
       subject_type: params.subject_type,
       applied_by: params.applied_by,
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
+    // AuditBridgeService consumes this topic and reads `correlation_id`,
+    // `actor_id`, and `actor_role` for immutable-audit emission. `applied_by`
+    // is kept for backwards-compatible consumers; `actor_id` mirrors it.
     this.nats.publish(NATS_TOPICS.LEGAL_HOLD_APPLIED, {
       hold_id,
       subject_id: params.subject_id,
       subject_type: params.subject_type,
       applied_by: params.applied_by,
+      actor_id: params.applied_by,
+      actor_role: 'compliance',
       applied_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
@@ -104,6 +115,7 @@ export class LegalHoldService {
     subject_type: HoldSubjectType;
     lifted_by: string;
     reason_code: string;
+    correlation_id: string;
     caller_role: string;
   }): Promise<LegalHoldRecord> {
     if (params.caller_role !== 'COMPLIANCE') {
@@ -146,6 +158,7 @@ export class LegalHoldService {
       lifted_by: params.lifted_by,
       lifted_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id: hold.correlation_id,
       rule_applied_id: this.RULE_ID,
     };
 
@@ -155,16 +168,28 @@ export class LegalHoldService {
       subject_type: params.subject_type,
       lifted_by: params.lifted_by,
       reason_code: params.reason_code,
+      correlation_id_apply: hold.correlation_id,
+      correlation_id_lift: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
+    // AuditBridgeService reads `correlation_id` (canonical for THIS event —
+    // the lift action) plus `actor_id` and `actor_role`. The granular
+    // `correlation_id_apply` / `correlation_id_lift` fields are retained
+    // so downstream consumers can correlate the lift back to the original
+    // apply event without losing either id.
     this.nats.publish(NATS_TOPICS.LEGAL_HOLD_LIFTED, {
       hold_id: hold.hold_id,
       subject_id: params.subject_id,
       subject_type: params.subject_type,
       lifted_by: params.lifted_by,
+      actor_id: params.lifted_by,
+      actor_role: 'compliance',
       lifted_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
+      correlation_id_apply: hold.correlation_id,
+      correlation_id_lift: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
