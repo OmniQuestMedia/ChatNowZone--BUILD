@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `fea18b69c0c7e9fcac310e127aaf5d26d4aa8a03`
-**Generated:** 2026-05-02T19:20:52Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `c6e28449fcaf3f3170dc60e5faa637f42827766c`
+**Generated:** 2026-05-02T19:24:09Z
 
 ## All Files
 
@@ -30,6 +30,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/workflows/populate-issues.yml`
 - `.github/workflows/protect-ref-branches.yml`
 - `.github/workflows/repo-manifest.yml`
+- `.github/workflows/ship-gate.yml`
 - `.github/workflows/super-linter.yml`
 - `.gitignore`
 - `.markdownlintignore`
