@@ -288,9 +288,11 @@ model LegalHold {
   lifted_by       String?
   lifted_at_utc   DateTime?
   reason_code     String
+  correlation_id  String    @db.VarChar(64)
   rule_applied_id String
   created_at      DateTime  @default(now())
 
+  @@index([correlation_id], map: "legal_holds_correlation_id_idx")
   @@map("legal_holds")
 }
 

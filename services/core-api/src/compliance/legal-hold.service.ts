@@ -21,6 +21,7 @@ export interface LegalHoldRecord {
   lifted_by: string | null;
   lifted_at_utc: string | null;
   reason_code: string;
+  correlation_id: string;
   rule_applied_id: string;
 }
 
@@ -43,6 +44,7 @@ export class LegalHoldService {
     subject_type: HoldSubjectType;
     applied_by: string;
     reason_code: string;
+    correlation_id: string;
   }): Promise<LegalHoldRecord> {
     const now = new Date();
     const hold_id = randomUUID();
@@ -55,6 +57,7 @@ export class LegalHoldService {
         applied_by: params.applied_by,
         applied_at_utc: now,
         reason_code: params.reason_code,
+        correlation_id: params.correlation_id,
         rule_applied_id: this.RULE_ID,
       },
     });
@@ -68,6 +71,7 @@ export class LegalHoldService {
       lifted_by: null,
       lifted_at_utc: null,
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     };
 
@@ -77,6 +81,7 @@ export class LegalHoldService {
       subject_type: params.subject_type,
       applied_by: params.applied_by,
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
@@ -87,6 +92,7 @@ export class LegalHoldService {
       applied_by: params.applied_by,
       applied_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
@@ -104,6 +110,7 @@ export class LegalHoldService {
     subject_type: HoldSubjectType;
     lifted_by: string;
     reason_code: string;
+    correlation_id: string;
     caller_role: string;
   }): Promise<LegalHoldRecord> {
     if (params.caller_role !== 'COMPLIANCE') {
@@ -146,6 +153,7 @@ export class LegalHoldService {
       lifted_by: params.lifted_by,
       lifted_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id: hold.correlation_id,
       rule_applied_id: this.RULE_ID,
     };
 
@@ -155,6 +163,8 @@ export class LegalHoldService {
       subject_type: params.subject_type,
       lifted_by: params.lifted_by,
       reason_code: params.reason_code,
+      correlation_id_apply: hold.correlation_id,
+      correlation_id_lift: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
@@ -165,6 +175,8 @@ export class LegalHoldService {
       lifted_by: params.lifted_by,
       lifted_at_utc: now.toISOString(),
       reason_code: params.reason_code,
+      correlation_id_apply: hold.correlation_id,
+      correlation_id_lift: params.correlation_id,
       rule_applied_id: this.RULE_ID,
     });
 
