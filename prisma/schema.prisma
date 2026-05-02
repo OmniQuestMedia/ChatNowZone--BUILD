@@ -1277,6 +1277,14 @@ model Creator {
   // this column mirrors it after the StudioAffiliation is created. Permanent
   // once set — no regeneration policy is enforced at the application layer.
   affiliation_number String? @db.VarChar(9)
+  // PIXEL-LEGACY-001: creator type classification. STANDARD by default;
+  // promoted to PIXEL_LEGACY only via PixelLegacyService.grantSeat() inside
+  // the seat-cap concurrency-safe transaction. The two timestamp/flag fields
+  // mirror the seat allocation for fast profile reads (denormalised; the
+  // pixel_legacy_seat_allocations row is source-of-truth).
+  creator_type                CreatorType @default(STANDARD)
+  pixel_legacy_granted_at     DateTime?   @db.Timestamptz
+  lifetime_cyrano_membership  Boolean     @default(false)
   organization_id String   @db.VarChar(100)
   tenant_id       String   @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
@@ -1284,9 +1292,89 @@ model Creator {
 
   studio_affiliations StudioAffiliation[]
   studio_onboarding   CreatorOnboarding?
+  pixel_legacy_application PixelLegacyApplication?
+  pixel_legacy_seat        PixelLegacySeatAllocation?
 
   @@index([affiliation_number])
+  @@index([creator_type])
   @@map("creators")
+}
+
+// ─── PIXEL-LEGACY-001: Pixel Legacy creator type, 3,500 seat cap ────────
+// Spec: services/creator-onboarding/src/pixel-legacy.service.ts. Append-only
+// writes carry correlation_id + reason_code + rule_applied_id (Canonical L0).
+// Seat allocations are append-only (no UPDATE / DELETE) — enforced by the
+// migration SQL trigger.
+
+enum CreatorType {
+  STANDARD
+  PIXEL_LEGACY
+}
+
+enum PixelLegacyApplicationStatus {
+  DRAFT
+  APPLIED
+  REVIEWED
+  GRANTED
+  DENIED
+}
+
+model PixelLegacyApplication {
+  id                  String                       @id @default(uuid())
+  // Stable application identifier surfaced to UI on first submission.
+  application_id      String                       @unique
+  creator_id          String                       @unique
+  // Display name captured at apply time (the UI's PixelLegacyApplicationView
+  // surfaces this above the status tracker). Persisted on the application row
+  // so the presenter does not need a separate creator-profile lookup.
+  display_name        String                       @db.VarChar(100)
+  status              PixelLegacyApplicationStatus @default(DRAFT)
+  proof_statement     String                       @db.Text
+  // Array of { entry_id, label, url } — bound by ui/types/creator-panel-contracts.ts
+  // PixelLegacyPortfolioEntry. JSON for flexibility; size-bounded by the controller.
+  portfolio_entries   Json                         @default("[]")
+  submitted_at_utc    DateTime?                    @db.Timestamptz
+  reviewed_at_utc     DateTime?                    @db.Timestamptz
+  reviewed_by         String?                      @db.VarChar(100)
+  // Populated only on DENIED status; maps to docs/ux/04-reason-code-catalog.md.
+  denial_reason_code  String?                      @db.VarChar(64)
+  organization_id     String                       @db.VarChar(100)
+  tenant_id           String                       @db.VarChar(100)
+  correlation_id      String                       @db.VarChar(64)
+  reason_code         String                       @db.VarChar(64)
+  rule_applied_id     String                       @default("PIXEL_LEGACY_v1") @db.VarChar(100)
+  created_at          DateTime                     @default(now()) @db.Timestamptz
+  updated_at          DateTime                     @updatedAt @db.Timestamptz
+
+  creator             Creator                      @relation(fields: [creator_id], references: [id])
+
+  @@index([status])
+  @@index([correlation_id])
+  @@map("pixel_legacy_applications")
+}
+
+model PixelLegacySeatAllocation {
+  id              String   @id @default(uuid())
+  // 1..3500. Unique → one creator per seat. Allocated atomically inside
+  // PixelLegacyService.grantSeat() under a Postgres advisory lock so concurrent
+  // applications can't double-allocate the same seat number.
+  seat_number     Int      @unique
+  creator_id      String   @unique
+  application_id  String
+  granted_by      String   @db.VarChar(100)
+  granted_at_utc  DateTime @db.Timestamptz
+  organization_id String   @db.VarChar(100)
+  tenant_id       String   @db.VarChar(100)
+  correlation_id  String   @db.VarChar(64)
+  reason_code     String   @default("PIXEL_LEGACY_SEAT_GRANTED") @db.VarChar(64)
+  rule_applied_id String   @default("PIXEL_LEGACY_v1") @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+
+  creator         Creator  @relation(fields: [creator_id], references: [id])
+
+  @@index([correlation_id])
+  @@index([granted_at_utc])
+  @@map("pixel_legacy_seat_allocations")
 }
 
 // ─── RBAC-STUDIO-001: Studio Onboarding + Affiliation + RBAC ────────────

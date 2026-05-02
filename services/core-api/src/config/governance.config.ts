@@ -493,6 +493,31 @@ export const REDBOOK_RATE_CARDS = {
   VIP_BASELINE_PER_TOKEN: 0.12,
 } as const;
 
+// ─── PIXEL-LEGACY-001 — Pixel Legacy creator type ────────────────────────────
+// Backs the first-3,500-creator-seat program. PIXEL_LEGACY creators receive a
+// guaranteed payout floor of $0.07/CZT (vs the STANDARD RATE_COLD of $0.075,
+// which can drop further during Tease bundles to $0.065). The floor applies
+// per-token; ceiling matches RATE_INFERNO at $0.090. The lifetime Cyrano
+// membership flag on a Creator row is mirrored from the seat allocation and
+// honoured by services/core-api/src/cyrano/cyrano-auth.service.ts (when the
+// CYRANO-ACCESS-POLICY-001 directive lands).
+export const PIXEL_LEGACY = {
+  /** Lifetime cap — locked by CEO (2026-04-28). */
+  SEAT_CAP: 3500,
+  /** Guaranteed minimum per-token payout in USD for PIXEL_LEGACY creators. */
+  PAYOUT_FLOOR_USD: 0.07,
+  /** Maximum per-token payout in USD — matches RATE_INFERNO. */
+  PAYOUT_CEILING_USD: 0.09,
+  /** Month at which the PIXEL_LEGACY_SIGNING_BONUS triggers (subject to creator
+   *  status checks; trigger logic ships in a follow-up directive). */
+  SIGNING_BONUS_MONTH: 4,
+  /** Postgres advisory-lock key for the seat-allocation transaction. Any
+   *  positive 64-bit integer; chosen to be deterministic and unlikely to
+   *  collide with other advisory locks in the system. */
+  SEAT_ALLOCATION_ADVISORY_LOCK_KEY: 4242004500,
+  RULE_APPLIED_ID: 'PIXEL_LEGACY_v1',
+} as const;
+
 // ─── RECOVERY ENGINE — Unified Customer Service (REDBOOK §5) ─────────────────
 // Drives Recovery Engine workflows in services/ledger/recovery.service.ts.
 // Revisions require REDBOOK: commit + CEO sign-off.

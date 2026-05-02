@@ -43,6 +43,12 @@ const PERMISSION_MATRIX: Record<string, RbacRole> = {
   'studio:view-affiliations': 'CREATOR',
   'studio:upload-contract':   'CREATOR',
   'studio:view-commission':   'CREATOR',
+
+  // ── PIXEL-LEGACY-001 — seat allocation permission ─────────────────────
+  // Surfaced on /admin/pixel-legacy review actions. Step-up auth wiring
+  // (PIXEL-LEGACY-006 follow-up) will additionally require a verified
+  // step-up challenge before the grant proceeds.
+  'pixel_legacy:seat:allocate': 'COMPLIANCE',
 };
 
 export interface RbacCheckResult {
