@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `38bc84867a5e3b8776813e0a9ab795486809df47`
-**Generated:** 2026-05-02T09:13:05Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `53ac15e0959392b72caa2d271139606c60b197e8`
+**Generated:** 2026-05-02T13:42:46Z
 
 ## All Files
 
@@ -72,6 +72,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/NATS-DFSP001-TOPICS.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-002.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PV-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/THREAD11-COPILOT-INTAKE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-AUDIT-001.md`
@@ -363,6 +364,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
 - `prisma/migrations/20260428130000_legal_hold_correlation_id/migration.sql`
 - `prisma/migrations/20260428140000_pixel_legacy_001/migration.sql`
+- `prisma/migrations/20260502000000_pixel_legacy_002_fcfs_gateway/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
