@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `d1e20b45b4659e3b7106b153a5c14f2ea885b2a1`
-**Generated:** 2026-05-02T19:26:34Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `5ece2eea4d9958ed09174dfe70b72ddf62dac93d`
+**Generated:** 2026-05-02T19:29:58Z
 
 ## All Files
 
@@ -256,6 +256,16 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/OSS_REF_BRANCH_SEEDS/refs-oss-zoom-clone/REFS_MANIFEST.md`
 - `REFERENCE_LIBRARY/TEMPLATES/OQMInc_REFERENCE_LIBRARY_MASTER_TEMPLATE.md`
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
+- `apps/chatnow-zone/README.md`
+- `apps/chatnow-zone/app/creator/pixel-legacy/page.tsx`
+- `apps/chatnow-zone/app/layout.tsx`
+- `apps/chatnow-zone/app/page.tsx`
+- `apps/chatnow-zone/lib/pixel-legacy-presenter.ts`
+- `apps/chatnow-zone/lib/render-plan-to-react.tsx`
+- `apps/chatnow-zone/next-env.d.ts`
+- `apps/chatnow-zone/next.config.js`
+- `apps/chatnow-zone/package.json`
+- `apps/chatnow-zone/tsconfig.json`
 - `apps/cyrano-standalone/README.md`
 - `apps/cyrano-standalone/app/access-denied/page.tsx`
 - `apps/cyrano-standalone/app/api/auth/session/route.ts`
