@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `87433d7f9d9fc5dc455930b9c2c4d8d9a6d05dc3`
-**Generated:** 2026-05-02T08:07:48Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `e2d012d9fe58f7553189da79965474799896c237`
+**Generated:** 2026-05-02T08:17:14Z
 
 ## All Files
 
@@ -71,6 +71,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/MOD-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/NATS-DFSP001-TOPICS.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PV-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/THREAD11-COPILOT-INTAKE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/TOK-AUDIT-001.md`
@@ -361,6 +362,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260427100000_sensync_consent_scopes_ttl/migration.sql`
 - `prisma/migrations/20260427120000_studio_onboarding_rbac/migration.sql`
 - `prisma/migrations/20260428130000_legal_hold_correlation_id/migration.sql`
+- `prisma/migrations/20260428140000_pixel_legacy_001/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -518,8 +520,12 @@ Auto-generated on every push. Do not edit manually.
 - `services/creator-onboarding/src/creator-onboarding.module.ts`
 - `services/creator-onboarding/src/creator-onboarding.service.ts`
 - `services/creator-onboarding/src/dto/onboarding.dto.ts`
+- `services/creator-onboarding/src/dto/pixel-legacy.dto.ts`
 - `services/creator-onboarding/src/email-domain.policy.spec.ts`
 - `services/creator-onboarding/src/email-domain.policy.ts`
+- `services/creator-onboarding/src/pixel-legacy.controller.ts`
+- `services/creator-onboarding/src/pixel-legacy.service.spec.ts`
+- `services/creator-onboarding/src/pixel-legacy.service.ts`
 - `services/cyrano/.env.example`
 - `services/cyrano/ASSUMPTIONS.md`
 - `services/cyrano/FLAGS.md`
