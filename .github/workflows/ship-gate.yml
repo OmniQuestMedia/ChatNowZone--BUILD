@@ -54,10 +54,18 @@ jobs:
           node-version: '20'
           cache: 'yarn'
 
-      # --ignore-scripts skips `prisma generate` from postinstall. The
-      # verifier is filesystem-only and does not need the Prisma client.
+      # Plain `yarn install --frozen-lockfile` to align with every other
+      # workflow in this repo (ci.yml, deploy.yml, copilot-setup-steps.yml).
+      # The previous `--ignore-scripts` flag was wrong: even though the
+      # verifier itself is filesystem-only and never imports @prisma/client,
+      # skipping the postinstall left the Prisma client unpopulated and
+      # ts-node would choke on type resolution in the project's dep graph
+      # the moment it touched the project tsconfig (which it still tries
+      # to read for its own discovery, even with --project pointing
+      # elsewhere). Letting `prisma generate` run is the cheap and right
+      # answer.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --frozen-lockfile
 
       # Diagnostic: capture environment + version info before the verifier runs.
       # The first three CI runs of this workflow failed with no obvious cause
