@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
-**Commit:** `f795de2754f98f39c30f661a72dc84a23a5ef591`
-**Generated:** 2026-05-03T04:17:34Z
+**Commit:** `021e126a90fdde321c1345b5f7701cc4a0dac677`
+**Generated:** 2026-05-03T04:20:55Z
 
 ## All Files
 
@@ -267,6 +267,7 @@ Auto-generated on every push. Do not edit manually.
 - `apps/chatnow-zone/app/wallet/page.tsx`
 - `apps/chatnow-zone/lib/pixel-legacy-presenter.ts`
 - `apps/chatnow-zone/lib/render-plan-to-react.tsx`
+- `apps/chatnow-zone/lib/resolve-tier.ts`
 - `apps/chatnow-zone/next-env.d.ts`
 - `apps/chatnow-zone/next.config.js`
 - `apps/chatnow-zone/package.json`
