@@ -1,16 +1,25 @@
 // apps/chatnow-zone/app/diamond/purchase/page.tsx
 // Wires ui/app/diamond/purchase/page.ts (Diamond Tier purchase quote) into
 // Next.js App Router. The page builder computes the volume + velocity
-// quote from DIAMOND_TIER constants, so no API fetch is required.
+// quote from DIAMOND_TIER constants via PublicWalletPresenter, so no API
+// fetch is required.
+//
+// The Diamond entry threshold (minimum tokens to qualify) is derived from
+// DEFAULT_GOVERNANCE_SNAPSHOT.diamond_volume_tiers[0].min_tokens — the same
+// value the presenter enforces. Hard-coding the floor here would drift
+// silently if REDBOOK is re-tuned.
 //
 // Query parameters:
-//   ?tokens=<count>            CZT volume to quote (default 10_000)
+//   ?tokens=<count>            CZT volume to quote (default = entry threshold)
 //   ?velocity_days=<days>      lifespan in days (default 30; range 14..366)
 
 import { renderDiamondPurchasePage } from '@cnz/ui/app/diamond/purchase/page';
+import { DEFAULT_GOVERNANCE_SNAPSHOT } from '@cnz/ui/view-models/public-wallet.presenter';
 import { renderPlanToReact } from '../../../lib/render-plan-to-react';
 
 export const dynamic = 'force-dynamic';
+
+const DIAMOND_MIN_TOKENS = DEFAULT_GOVERNANCE_SNAPSHOT.diamond_volume_tiers[0].min_tokens;
 
 interface SearchParams {
   tokens?: string;
@@ -18,9 +27,9 @@ interface SearchParams {
 }
 
 function resolveTokens(raw: string | undefined): number {
-  if (!raw) return 10_000;
+  if (!raw) return DIAMOND_MIN_TOKENS;
   const n = Number(raw);
-  return Number.isInteger(n) && n >= 10_000 ? n : 10_000;
+  return Number.isInteger(n) && n >= DIAMOND_MIN_TOKENS ? n : DIAMOND_MIN_TOKENS;
 }
 
 function resolveVelocity(raw: string | undefined): number {
