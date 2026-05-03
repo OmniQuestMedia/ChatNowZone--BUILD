@@ -1124,3 +1124,88 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_redroom_rewards_burns_block_mutation
 BEFORE UPDATE OR DELETE ON redroom_rewards_burns
 FOR EACH ROW EXECUTE FUNCTION redroom_rewards_burns_block_mutation();
+
+-- =============================================================================
+-- TABLE: legal_holds
+-- PURPOSE: Compliance §7 — append-only registry of legal holds applied to
+--          subjects (users, content, sessions). DELETE is forbidden.
+--          UPDATE is permitted ONLY on (lifted_by, lifted_at_utc) and only
+--          for rows that are not already lifted, mirroring LegalHoldService.
+-- WO: AUDIT-002 / FIZ: legal_holds.correlation_id (CORRELATION_ID:
+--     LEGAL-HOLD-CORRELATION-ID-MIGRATION-20260428).
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS legal_holds (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    hold_id         VARCHAR(200) NOT NULL UNIQUE,
+    subject_id      VARCHAR(200) NOT NULL,
+    subject_type    VARCHAR(40)  NOT NULL,
+    applied_by      VARCHAR(200) NOT NULL,
+    applied_at_utc  TIMESTAMPTZ  NOT NULL,
+    lifted_by       VARCHAR(200),
+    lifted_at_utc   TIMESTAMPTZ,
+    reason_code     VARCHAR(100) NOT NULL,
+    correlation_id  VARCHAR(64)  NOT NULL,
+    rule_applied_id VARCHAR(100) NOT NULL,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS legal_holds_subject_idx
+    ON legal_holds (subject_type, subject_id);
+CREATE INDEX IF NOT EXISTS legal_holds_correlation_id_idx
+    ON legal_holds (correlation_id);
+
+COMMENT ON TABLE legal_holds IS
+    'Compliance §7 append-only legal holds registry. DELETE is prohibited. '
+    'UPDATE is restricted to the lift transition (lifted_by, lifted_at_utc) '
+    'and only when the row is not already lifted.';
+
+-- Enforce append-only with a single-shot lift transition. INSERT is open;
+-- DELETE is rejected; UPDATE may only touch (lifted_by, lifted_at_utc) and
+-- only when the row is currently un-lifted (lifted_at_utc IS NULL).
+CREATE OR REPLACE FUNCTION legal_holds_guard_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RAISE EXCEPTION
+            'legal_holds is append-only: DELETE is not permitted (hold_id=%).',
+            OLD.hold_id;
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+        IF OLD.lifted_at_utc IS NOT NULL THEN
+            RAISE EXCEPTION
+                'legal_holds is append-only: UPDATE on already-lifted hold is not permitted (hold_id=%).',
+                OLD.hold_id;
+        END IF;
+
+        IF NEW.id IS DISTINCT FROM OLD.id
+            OR NEW.hold_id IS DISTINCT FROM OLD.hold_id
+            OR NEW.subject_id IS DISTINCT FROM OLD.subject_id
+            OR NEW.subject_type IS DISTINCT FROM OLD.subject_type
+            OR NEW.applied_by IS DISTINCT FROM OLD.applied_by
+            OR NEW.applied_at_utc IS DISTINCT FROM OLD.applied_at_utc
+            OR NEW.reason_code IS DISTINCT FROM OLD.reason_code
+            OR NEW.correlation_id IS DISTINCT FROM OLD.correlation_id
+            OR NEW.rule_applied_id IS DISTINCT FROM OLD.rule_applied_id
+            OR NEW.created_at IS DISTINCT FROM OLD.created_at
+        THEN
+            RAISE EXCEPTION
+                'legal_holds is append-only: only (lifted_by, lifted_at_utc) may be updated (hold_id=%).',
+                OLD.hold_id;
+        END IF;
+
+        IF NEW.lifted_by IS NULL OR NEW.lifted_at_utc IS NULL THEN
+            RAISE EXCEPTION
+                'legal_holds: lift transition requires both lifted_by and lifted_at_utc (hold_id=%).',
+                OLD.hold_id;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_legal_holds_guard_mutation ON legal_holds;
+CREATE TRIGGER trg_legal_holds_guard_mutation
+BEFORE UPDATE OR DELETE ON legal_holds
+FOR EACH ROW EXECUTE FUNCTION legal_holds_guard_mutation();

@@ -25,6 +25,7 @@
     "incremental": true,
     "noFallthroughCasesInSwitch": false,
     "jsx": "preserve",
+    "ignoreDeprecations": "5.0",
     "plugins": [{ "name": "next" }]
   },
   "include": [

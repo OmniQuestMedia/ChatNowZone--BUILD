@@ -76,6 +76,7 @@ const checks: Array<() => CheckResult> = [
       'call_sessions',
       'voucher_vault',
       'content_suppression_queue',
+      'legal_holds',
     ];
     const missing = tables.filter((t) => !sql.includes(t));
     return {
@@ -170,10 +171,10 @@ const checks: Array<() => CheckResult> = [
   },
   () => {
     const recovery = readSafe('services/recovery/src/recovery.service.ts') ?? '';
-    const ok =
-      recovery.includes('FIZ-002-REVISION-2026-04-11') &&
-      recovery.includes('TOKEN_BRIDGE_BONUS_PCT: 0.20') &&
-      recovery.includes('THREE_FIFTHS_REFUND_PCT: 0.60');
+    // Prettier may collapse trailing zeros (0.20 → 0.2). Match either form.
+    const tokenBridgeOk = /TOKEN_BRIDGE_BONUS_PCT:\s*0\.20?\b/.test(recovery);
+    const threeFifthsOk = /THREE_FIFTHS_REFUND_PCT:\s*0\.60?\b/.test(recovery);
+    const ok = recovery.includes('FIZ-002-REVISION-2026-04-11') && tokenBridgeOk && threeFifthsOk;
     return {
       id: 'GATE-3',
       category: 'Welfare + safety',

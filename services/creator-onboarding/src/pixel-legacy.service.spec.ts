@@ -18,10 +18,7 @@ interface PrismaTracker {
   publishedPayloads: Record<string, unknown>[];
 }
 
-function makeService(opts: {
-  prisma: unknown;
-  tracker?: PrismaTracker;
-}): PixelLegacyService {
+function makeService(opts: { prisma: unknown; tracker?: PrismaTracker }): PixelLegacyService {
   const tracker = opts.tracker ?? { publishedTopics: [], publishedPayloads: [] };
   const nats = {
     publish: (topic: string, payload: Record<string, unknown>) => {
@@ -29,8 +26,7 @@ function makeService(opts: {
       tracker.publishedPayloads.push(payload);
     },
   } as never;
-  const audit = {} as never;
-  return new PixelLegacyService(opts.prisma as never, nats, audit);
+  return new PixelLegacyService(opts.prisma as never, nats);
 }
 
 describe('PixelLegacyService.tryGrantSeatOnOnboarding (FCFS)', () => {
