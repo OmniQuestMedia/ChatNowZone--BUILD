@@ -59,9 +59,37 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
 
+      # Diagnostic: capture environment + version info before the verifier runs.
+      # The first three CI runs of this workflow failed with no obvious cause
+      # in the verifier itself (verifier exits 0 GREEN locally). Print enough
+      # context here so the next failure has something to diff against.
+      - name: Diagnostics
+        run: |
+          echo "=== Environment ==="
+          node --version
+          yarn --version
+          ls -la node_modules/.bin/ts-node || echo "ts-node binary missing"
+          ./node_modules/.bin/ts-node --version || echo "ts-node --version failed"
+          echo
+          echo "=== Workflow context ==="
+          echo "PWD: $(pwd)"
+          echo "Files: $(ls)"
+          echo
+          echo "=== Ship-gate config ==="
+          cat package.json | grep -A1 ship-gate || true
+          echo
+          echo "=== PROGRAM_CONTROL/tsconfig.json ==="
+          cat PROGRAM_CONTROL/tsconfig.json || echo "tsconfig missing"
+
       - name: Run ship-gate verifier (human-readable output to log)
         id: verify
-        run: yarn ship-gate
+        run: |
+          set +e
+          yarn ship-gate 2>&1 | tee ship-gate-output.txt
+          EXIT=${PIPESTATUS[0]}
+          echo
+          echo "=== ship-gate exit code: $EXIT ==="
+          exit $EXIT
 
       # Always run, even if the previous step failed, so the JSON report is
       # available as an artifact for failure investigation.
@@ -99,11 +127,16 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Upload JSON report artifact
+      - name: Upload reports + raw output artifact
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ship-gate-report-${{ github.run_id }}
-          path: ship-gate-report.json
+          # Include both the JSON report (when present) and the captured
+          # run output, so failures that crash before producing the JSON
+          # still leave evidence behind.
+          path: |
+            ship-gate-report.json
+            ship-gate-output.txt
           retention-days: 30
           if-no-files-found: warn
