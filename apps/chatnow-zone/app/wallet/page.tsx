@@ -14,18 +14,22 @@
 //   2. Replace the synthetic block here with a fetch + parse
 //   3. Remove the demo-data banner
 //
+// The wallet presenter recognizes three tiers — GUEST, MEMBER (any paid
+// VIP), DIAMOND. The 6-value MembershipTier enum is collapsed onto these
+// three when rendering. The is_vip_diamond flag is derived from
+// tier === 'DIAMOND' against the contract enum value.
+//
 // Query parameters (interim, will move to req.user once auth lands):
 //   ?user=<user_id>            user id (placeholder routing only)
-//   ?tier=<guest|silver|gold|platinum|diamond>  default 'guest'
+//   ?tier=<guest|silver|gold|platinum|diamond>  default 'guest';
+//                                                mapped per resolveTier()
 //   ?welfare_score=<0..100>    drives Welfare Guardian band colour
 
 import { renderWalletPage } from '@cnz/ui/app/wallet/page';
+import type { GuestTier } from '@cnz/ui/types/public-wallet-contracts';
 import { renderPlanToReact } from '../../lib/render-plan-to-react';
 
 export const dynamic = 'force-dynamic';
-
-type GuestTier = 'guest' | 'silver' | 'gold' | 'platinum' | 'diamond';
-const ALLOWED_TIERS: readonly GuestTier[] = ['guest', 'silver', 'gold', 'platinum', 'diamond'];
 
 interface SearchParams {
   user?: string;
@@ -33,11 +37,26 @@ interface SearchParams {
   welfare_score?: string;
 }
 
+/**
+ * Maps the user-facing 6-value MembershipTier query token to the 3-band
+ * GuestTier the presenter consumes. See tokens/page.tsx for the full table.
+ */
 function resolveTier(raw: string | undefined): GuestTier {
-  if (raw && (ALLOWED_TIERS as readonly string[]).includes(raw)) {
-    return raw as GuestTier;
+  switch (raw?.trim().toLowerCase()) {
+    case 'diamond':
+      return 'DIAMOND';
+    case 'vip':
+    case 'silver':
+    case 'gold':
+    case 'platinum':
+      return 'MEMBER';
+    case 'guest':
+    case undefined:
+    case '':
+      return 'GUEST';
+    default:
+      return 'GUEST';
   }
-  return 'guest';
 }
 
 function resolveScore(raw: string | undefined): number | undefined {
@@ -72,7 +91,7 @@ export default async function WalletPage({
     tier,
     balances: SYNTHETIC_BALANCES,
     welfare_score: welfareScore,
-    is_vip_diamond: tier === 'diamond',
+    is_vip_diamond: tier === 'DIAMOND',
   });
 
   return (
