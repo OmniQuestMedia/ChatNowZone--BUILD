@@ -123,13 +123,20 @@ export class ZoneAccessService {
 
   /**
    * Check if the user has an active ShowZonePass for the given zone.
+   * ShowZonePass is only persisted for the Prisma-modeled override zones
+   * (SHOW_THEATRE / BIJOU). Standalone zones such as CYRANO_LAYER2 always
+   * resolve to false without a DB round-trip.
    */
   private async hasActiveShowZonePass(userId: string, zone: ZoneAccessZone): Promise<boolean> {
+    const passOverrideZones: readonly string[] = SHOW_ZONE_PASS_OVERRIDE_ZONES;
+    if (!passOverrideZones.includes(zone)) {
+      return false;
+    }
     const now = new Date();
     const pass = await this.prisma.showZonePass.findFirst({
       where: {
         user_id: userId,
-        zone,
+        zone: zone as Exclude<ZoneAccessZone, 'CYRANO_LAYER2'>,
         valid_from: { lte: now },
         valid_until: { gte: now },
       },
