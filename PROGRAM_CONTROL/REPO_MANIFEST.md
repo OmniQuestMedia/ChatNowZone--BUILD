@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `be6cc7d156a3f839cdcb370291a1ef1d5d6e44dc`
-**Generated:** 2026-05-02T21:56:05Z
+**Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
+**Commit:** `4346877901aea14952e69ca4f877f40c0f3c5072`
+**Generated:** 2026-05-03T04:05:18Z
 
 ## All Files
 
@@ -259,8 +259,11 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
 - `apps/chatnow-zone/README.md`
 - `apps/chatnow-zone/app/creator/pixel-legacy/page.tsx`
+- `apps/chatnow-zone/app/diamond/purchase/page.tsx`
 - `apps/chatnow-zone/app/layout.tsx`
 - `apps/chatnow-zone/app/page.tsx`
+- `apps/chatnow-zone/app/tokens/page.tsx`
+- `apps/chatnow-zone/app/wallet/page.tsx`
 - `apps/chatnow-zone/lib/pixel-legacy-presenter.ts`
 - `apps/chatnow-zone/lib/render-plan-to-react.tsx`
 - `apps/chatnow-zone/next-env.d.ts`
