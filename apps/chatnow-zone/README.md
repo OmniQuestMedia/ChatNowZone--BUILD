@@ -58,17 +58,16 @@ Next.js:
 | Route | Page builder | Notes |
 |-------|-------------|-------|
 | `/` | (inline placeholder) | Replaced by the marketing landing once Creative ships visual direction. |
-| `/creator/pixel-legacy` | `ui/app/creator/pixel-legacy/page.ts` | FCFS gateway status display. |
+| `/tokens` | `ui/app/tokens/page.ts` | REDBOOK §3 bundles. Public. Self-contained — no API fetch. Query: `?tier=`, `?promoted=`. |
+| `/diamond/purchase` | `ui/app/diamond/purchase/page.ts` | Diamond volume + velocity quote. Public. Self-contained — no API fetch. Query: `?tokens=`, `?velocity_days=`. |
+| `/wallet` | `ui/app/wallet/page.ts` | Three-bucket wallet. **Stub** — synthetic balances + demo banner; wallet read endpoint not yet built (`WALLET-READ-API-001` follow-up). Query: `?user=`, `?tier=`, `?welfare_score=`. |
+| `/creator/pixel-legacy` | `ui/app/creator/pixel-legacy/page.ts` | FCFS gateway status display. Real API fetch. Query: `?creator=`. |
 
 Routes still to wire:
 
-- `/wallet`, `/tokens`, `/diamond/purchase` (public/VIP surfaces)
 - `/creator/control` (CreatorControl.Zone)
 - `/admin/diamond`, `/admin/recovery` (operator surfaces)
 - `/vip/membership` (VIP membership lifecycle)
-
-Each route is its own small follow-up PR — the renderer is generic, so the
-work per route is just (route file + presenter + view-shape adapter).
 
 ## Out of scope for the bootstrap
 
