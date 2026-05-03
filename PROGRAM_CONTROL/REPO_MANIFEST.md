@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `claude/alpha-testing-ui-prep-0ZxB1`
-**Commit:** `4e3e9f07809a0423a0a9dacf3e4ed0b3986402ca`
-**Generated:** 2026-05-03T04:11:17Z
+**Commit:** `d0e0149ac2d1fc757560da6be6b85aa4c32cacaa`
+**Generated:** 2026-05-03T04:13:06Z
 
 ## All Files
 
@@ -237,6 +237,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/fix-yarn-lockfile-ci.md`
 - `PROGRAM_CONTROL/REPO_MANIFEST.md`
 - `PROGRAM_CONTROL/ship-gate-verifier.ts`
+- `PROGRAM_CONTROL/tsconfig.json`
 - `README.md`
 - `REFERENCE_LIBRARY/00_THREAD_BOOTSTRAP.md`
 - `REFERENCE_LIBRARY/01_CANONICAL_LOCKS.md`
