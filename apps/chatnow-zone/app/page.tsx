@@ -18,6 +18,24 @@ export default function Page() {
         <h2 style={{ fontSize: 16, color: '#a8a8b0' }}>Wired routes (bootstrap)</h2>
         <ul style={{ lineHeight: 1.8 }}>
           <li>
+            <a href="/tokens" style={{ color: '#7ec1ff' }}>
+              /tokens
+            </a>{' '}
+            — REDBOOK §3 token bundle rate card (public)
+          </li>
+          <li>
+            <a href="/diamond/purchase" style={{ color: '#7ec1ff' }}>
+              /diamond/purchase
+            </a>{' '}
+            — Diamond Tier volume + velocity quote (public)
+          </li>
+          <li>
+            <a href="/wallet" style={{ color: '#7ec1ff' }}>
+              /wallet
+            </a>{' '}
+            — Three-bucket wallet (DEMO data — wallet read endpoint not wired yet)
+          </li>
+          <li>
             <a href="/creator/pixel-legacy" style={{ color: '#7ec1ff' }}>
               /creator/pixel-legacy
             </a>{' '}
