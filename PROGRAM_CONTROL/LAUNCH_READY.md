@@ -21,6 +21,6 @@ ZONE_MAP and service logic updated accordingly, and the repo is ready for Alpha 
 2. **Payment processor testing** — verify Stripe / processor integration end-to-end with test cards across all billing intervals (MONTHLY, QUARTERLY, SEMI_ANNUAL, ANNUAL).
 3. **CEO launch clearance sign-off** — CEO must sign clearance artifact in `PROGRAM_CONTROL/CLEARANCES/` before any GOV gate is cleared for production.
 4. **`legal_holds.correlation_id` migration** — author and execute the FIZ/GOV-scoped schema migration to add `correlation_id` to `legal_holds` (flagged in `OQMI_SYSTEM_STATE.md` §7).
-5. **Wave B–H directives** — remaining items in `docs/REQUIREMENTS_MASTER.md` (Risk Engine, OBS Broadcast Kernel, FairPay + NOWPayouts, RedBook, Black-Glass Interface, pixel_legacy rate-lock) require directive authoring in Claude Chat before execution.
+5. **Wave B–H directives** — remaining items in `docs/REQUIREMENTS_MASTER.md` (Risk Engine, OBS Broadcast Kernel, FairPay + NOWPayouts, RedBook, pixel_legacy rate-lock) require directive authoring in Claude Chat before execution. The G101+ "Black-Glass Interface" line item was retired 2026-05-06 — see `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`.
 6. **GateGuard Sentinel LOI + federated lookup** — GGS scaffold is complete; LOI and federated AV lookup remain NEEDS_DIRECTIVE.
 7. **Hard launch deadline** — 2026-10-01 per `OQMI_SYSTEM_STATE.md` §1.

@@ -159,7 +159,7 @@ Grok is the designated cross-stack wireframe coordinator (per [`docs/UX_INTEGRAT
 **Merge path for cross-stack UX changes:**
 
 - Vocabulary changes: `GOV:` directive → glossary update → §07 update → notify all stack owners
-- New shared component: `UI:` directive (or `BG:` for Black-Glass) → component authored → §3 updated here
+- New shared component: `UI:` directive → component authored → §3 updated here
 - New intentional divergence: `GOV:` directive → §5 updated here
 - Compliance overlay changes: `GOV:` or `FIZ:` directive → §04 (reason codes) + §10 (overlays) updated → §4 updated here
 

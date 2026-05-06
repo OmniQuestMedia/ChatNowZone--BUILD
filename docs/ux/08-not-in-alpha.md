@@ -12,9 +12,15 @@ includes one of these, integration review will reject it.
 
 | Item | Status | Reason |
 |------|--------|--------|
-| **Black-Glass Interface** (G101+) | Deferred to v2 | Visual treatment is a post-Alpha workstream. Alpha ships on the existing dark-mode tokens in `ui/config/theme.ts`. |
 | Light-mode theme | Deferred to v2 | Alpha is dark-mode default per `THEME.default_mode = 'dark'`. |
 | Custom illustrations beyond the empty-state set | Out of scope for Alpha | Empty-state illustrations are in scope (3–5 reusable). Hero illustrations are not. |
+
+> The G101+ "Black-Glass Interface" doctrine that previously appeared
+> here was retired 2026-05-06. Alpha ships on the canonical dark-mode
+> tokens in `ui/config/theme.ts`; per-surface UI work is tracked under
+> the existing `UI:` commit prefix. See
+> `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md` for
+> rationale.
 
 ---
 

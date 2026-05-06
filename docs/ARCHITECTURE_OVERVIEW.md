@@ -163,8 +163,6 @@ Every commit is bound to:
 
 ## 9. Open work (not in PAYLOADs 1–8)
 
-- Black-Glass Interface (G101+) — full visual treatment of the rendered
-  HTML / OBS overlays.
 - Cyrano Layer 2 — LLM + Prisma memory persistence.
 - FairPay + NOWPayouts wiring — D006, E002.
 - OBS Broadcast Kernel — D004 SRT/RTMP edge transport (scaffold + bridge

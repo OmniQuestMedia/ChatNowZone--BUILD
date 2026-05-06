@@ -141,10 +141,11 @@ Snapshot at 2026-04-25 (Payload 7 + 8):
 - **PAYLOAD 7 (Frontend polish + Diamond Concierge UI)** — DONE.
 - **PAYLOAD 8 (E2E validation + ship-gate verifier)** — DONE.
 
-Remaining `NEEDS_DIRECTIVE` items (deferred to post-alpha): Black-Glass
-Interface (G101+), Cyrano Layer 2, FairPay + NOWPayouts wiring, OBS
-Broadcast Kernel hardening, `legal_holds.correlation_id` migration.
-See `docs/REQUIREMENTS_MASTER.md` for the live matrix.
+Remaining `NEEDS_DIRECTIVE` items (deferred to post-alpha): Cyrano
+Layer 2, FairPay + NOWPayouts wiring, and OBS Broadcast Kernel
+edge-transport hardening. See `docs/REQUIREMENTS_MASTER.md` for the
+live matrix. The G101+ "Black-Glass Interface" doctrine was retired
+2026-05-06 — see `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`.
 
 ---
 

@@ -233,7 +233,7 @@ whenever financial-integrity invariants are touched (see §FIZ below).
 | INFRA: | Docker, CI, deploy, env config, platform infrastructure |
 | DB: | Schema, migrations, seed data |
 | API: | Cross-domain REST/GraphQL surface |
-| UI: | Front-end work outside Black-Glass (admin panels, internal tools) |
+| UI: | All front-end work — admin panels, creator surfaces, public-facing UI |
 | TEST: | Test-only changes |
 
 ### Domain-scoped (most-specific-wins)
@@ -253,10 +253,10 @@ whenever financial-integrity invariants are touched (see §FIZ below).
 | REDBOOK: | RedBook incident / safety playbooks and scenario classifier |
 | PAY: | NOWPayouts integration layer (yields to `FIZ:` when ledger/balance touched; dual-prefix `PAY: + FIZ:` is acceptable) |
 | COMP: | Sovereign CaC / Compliance Stack / jurisdictional rule configuration |
-| BG: | Black-Glass Interface — primary front-end surface (UI: used only for non-Black-Glass surfaces) |
 
 ### Retired prefix enums (do NOT use)
 
+- `BG:` — "Black-Glass Interface" doctrine retired 2026-05-06; all UI work uses the `UI:` prefix. See `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`.
 - Old OQMI v2.0 enum from root `OQMI_SYSTEM_STATE.md` — superseded by this table
 - RRR-GOV-002 §3.5 enum (`SVC:`, `DB:`-as-sole, `API:`-as-sole, `TEST:` without scope) — superseded; in particular `SVC:` is retired (route to the relevant domain prefix, `INFRA:`, or `API:`)
 

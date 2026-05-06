@@ -51,7 +51,6 @@ is owned by a single named operator who reports back into
 - [ ] Reveal-day timeline rehearsed (T-72h, T-48h, T-24h, T-2h, T-0)
 - [ ] Press kit (REDBOOK rate cards + Diamond Tier table + Welfare Guardian Score positioning)
 - [ ] Founding-creator OnePagers (250 cohort) staged for distribution at T-0
-- [ ] Black-Glass Interface demo loop ready (placeholder until G101+ ships)
 - [ ] Bill 149 (Ontario) AI disclosure on every AI-assisted creator surface (`OBS.BILL_149_DISCLOSURE_PREFIX`)
 
 ### Gates
