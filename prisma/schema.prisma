@@ -293,6 +293,7 @@ model LegalHold {
   created_at      DateTime  @default(now())
 
   @@index([correlation_id], map: "legal_holds_correlation_id_idx")
+  @@index([subject_type, subject_id], map: "legal_holds_subject_idx")
   @@map("legal_holds")
 }
 

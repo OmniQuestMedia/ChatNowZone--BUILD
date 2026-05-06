@@ -60,12 +60,17 @@ on intent alone.
       `verifyChainIntegrity` walks the chain.
 - [ ] **WORM export** — `WormExportService.export` emits a signed bundle
       with the chain state at point of export.
-- [x] **Legal hold** — `LegalHoldService.trigger` requires step-up auth;
-      `legal_holds` table is append-only at the Postgres tier (lift
-      transition restricted to `lifted_by` / `lifted_at_utc` on
-      un-lifted rows; trigger installed by migration
-      `20260503000000_legal_holds_append_only_trigger`); every INSERT and
-      UPDATE carries `correlation_id` (covered by
+- [x] **Legal hold** — `LegalHoldService.applyHold` / `liftHold` are the
+      canonical service entry points; the RBAC `legal_hold:trigger`
+      permission gates the controller layer and requires step-up auth
+      (see `services/core-api/src/auth/rbac.service.ts` —
+      `'legal_hold:trigger': 'TAKEDOWN_SUBMISSION'`). Service-tier:
+      `liftHold` rejects any caller whose `caller_role` is not
+      `COMPLIANCE`. DB-tier: `legal_holds` is append-only at the
+      Postgres tier (lift transition restricted to `lifted_by` /
+      `lifted_at_utc` on un-lifted rows; trigger installed by migration
+      `20260503000000_legal_holds_append_only_trigger`); every INSERT
+      and UPDATE carries `correlation_id` (covered by
       `tests/integration/legal-hold-correlation-id.spec.ts`).
 - [ ] **Geo fencing + sovereign CAC** — block list applied before any
       mutation; blocked actions never reach GateGuard.

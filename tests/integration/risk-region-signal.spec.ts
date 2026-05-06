@@ -83,4 +83,20 @@ describe('RegionSignalService — deterministic risk scoring', () => {
     // Spread to drop the readonly tuple identity.
     expect({ ...a, flags: [...a.flags] }).toEqual({ ...b, flags: [...b.flags] });
   });
+
+  it('throws when correlationId is missing — GateGuard envelope is required', () => {
+    const svc = new RegionSignalService();
+    const baseInput = {
+      ipCountry: 'CA',
+      billingCountry: 'CA',
+      binCountry: 'CA',
+      isVpnDetected: false,
+    };
+    expect(() =>
+      svc.getConfidenceScore({ ...baseInput, correlationId: undefined as unknown as string }),
+    ).toThrow(/correlationId is required/);
+    expect(() => svc.getConfidenceScore({ ...baseInput, correlationId: '   ' })).toThrow(
+      /correlationId is required/,
+    );
+  });
 });
