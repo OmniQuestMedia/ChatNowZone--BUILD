@@ -2,6 +2,8 @@
 
 **Date:** May 6, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)
+**Date:** May 3, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied
 
 All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
@@ -19,8 +21,8 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 
 # OQMI System State — Backlog Snapshot
 
-**Snapshot date:** 2026-04-25 (PAYLOAD 7 + 8 — Frontend Polish + Ship-Gate Verification)
-**Branch of record:** `claude/frontend-polish-concierge-ui-mlqrR`
+**Snapshot date:** 2026-05-03 (Post-Payload-9 hygiene — legal_holds trigger + Risk/OBS hardening)
+**Branch of record:** `claude/post-payload9-hygiene-YCgdU`
 **Authority:** OmniQuest Media Inc. — OQMI_GOVERNANCE.md (Canonical Corpus v10)
 **Launch posture:** **ChatNow.Zone Core — Launch Ready (Alpha)**
 
@@ -72,7 +74,8 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 
 ## 3. Requirements Master — Status Distribution
 
-Counts from `docs/REQUIREMENTS_MASTER.md` (114 tracked rows):
+Counts from `docs/REQUIREMENTS_MASTER.md` (102 tracked rows; recount
+2026-05-03):
 
 | Status          | Count |
 | --------------- | ----: |
@@ -81,6 +84,16 @@ Counts from `docs/REQUIREMENTS_MASTER.md` (114 tracked rows):
 | IN_PROGRESS     |     4 |
 | NEEDS_DIRECTIVE |    64 |
 | RETIRED         |     9 |
+| DONE            |     6 |
+| QUEUED          |    11 |
+| IN_PROGRESS     |     3 |
+| VERIFY          |     7 |
+| NEEDS_DIRECTIVE |    72 |
+| DEFERRED        |     1 |
+| CLARIFY         |     2 |
+
+(`RETIRED` rows removed from the table after 2026-04-25 retired-tier
+sweep; nine entries were physically deleted, not re-tagged.)
 
 > Distribution updated 2026-05-06 (Payload 10 — Backend Closure). Nine
 > NEEDS_DIRECTIVE rows promoted to DONE: PAY-006, PAY-008, PAY-011, TOK-009,
@@ -101,13 +114,19 @@ H-LAUNCH-READY sign-off directive):
 | NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with AUDIT*IMMUTABLE*\* topics + PAYLOAD 10 RISK_ENGINE / PAYOUT_RATE_LOCKED / OBS_HEAT_ESCALATION topics                                     |
 | OBS Broadcast Kernel                       | D004         | DONE — PAYLOAD 10 AudioSignalService gates Flicker n'Flame escalation above COLD on a positive vocal signal (PAY-008); OBSBridgeService key/lifecycle intact                        |
 | FairPay + NOWPayouts                       | D006, E002   | DONE (FairPay) — PAYLOAD 10 PayoutRateLockService captures rate at purchase (PAY-006/011); NOWPayouts batch settlement remains scaffold                                            |
+| Risk Engine                                | D002         | DONE (scaffold v1) — `RegionSignalService` deterministic, NATS-driven (`risk.region_signal.emitted`), GateGuard-pre-processed; full Mini Credit Bureau still NEEDS_DIRECTIVE      |
+| NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with AUDIT*IMMUTABLE*\* topics                                                                                                               |
+| OBS Broadcast Kernel                       | D004         | DONE (scaffold v1) — `OBSBridgeService` carries `correlation_id` + `reason_code` on every NATS emission; SRT/RTMP edge transport NEEDS_DIRECTIVE                                  |
+| FairPay + NOWPayouts                       | D006, E002   | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | RedBook                                    | E001         | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | Compliance Stack                           | D008         | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | GateGuard Sentinel                         | E003         | NEEDS_DIRECTIVE                                                                                                                                                                   |
-| Flicker n'Flame Scoring (FFS)                           | PAYLOAD 5    | DONE (scaffold) — deterministic tier computation + NATS emission, persistence NEEDS_DIRECTIVE                                                                                     |
+| Flicker n'Flame Scoring (FFS)              | PAYLOAD 5    | DONE (scaffold) — deterministic tier computation + NATS emission, persistence NEEDS_DIRECTIVE                                                                                     |
 | CreatorControl.Zone                        | PAYLOAD 5    | DONE (scaffold) — Broadcast Timing + Session Monitoring copilots, single-pane snapshot; frontend NEEDS_DIRECTIVE                                                                  |
 | Cyrano Layer 1                             | PAYLOAD 5    | DONE — 8-category whisper engine, memory, personas, latency SLO. PAYLOAD 10 added Layer 2 LLM provider abstraction (CYR-006: `CyranoLlmProvider` + `InMemoryCyranoLlmProvider`) and Prisma-backed session memory (CYR-007). Anthropic Claude provider lands in Payload 11. |
 | Integration Hub                            | PAYLOAD 5    | DONE (scaffold) — Ledger↔GateGuard, Recovery↔Diamond Concierge, Flicker n'Flame Scoring↔CreatorControl+Cyrano handoffs                                                                          |
+| Cyrano Layer 1                             | PAYLOAD 5    | DONE (scaffold) — 8-category whisper engine, memory, personas, latency SLO; Layer 2 (LLM + Prisma memory) NEEDS_DIRECTIVE                                                         |
+| Integration Hub                            | PAYLOAD 5    | DONE (scaffold) — Ledger↔GateGuard, Recovery↔Diamond Concierge, Flicker n'Flame Scoring↔CreatorControl+Cyrano handoffs                                                            |
 | Black-Glass Interface                      | G101+        | NEEDS_DIRECTIVE — visual treatment deferred to post-alpha (Payload 7 ships brand tokens + dark-mode default)                                                                      |
 | Banned-entity residual purge               | C001 (§12)   | DONE — purge/redact sweep completed 2026-04-24                                                                                                                                    |
 | Immutable Audit Architecture               | PAYLOAD-6    | DONE — hash-chain + WORM export + Canonical Compliance Checklist                                                                                                                  |
@@ -133,6 +152,9 @@ Enforced via Postgres triggers in `infra/postgres/init-ledger.sql` on:
 - `voucher_vault` (lines 892–920)
 - `content_suppression_queue` (lines 925–955)
 - `identity_verification` DELETE-blocked (lines 396–420)
+- `legal_holds` (lines 1128–end; lift transition allowed only on un-lifted
+  rows touching `lifted_by` / `lifted_at_utc` exclusively — installed by
+  migration `20260503000000_legal_holds_append_only_trigger`)
 
 Migration-level triggers also present on `schedule_audit_log`
 (`prisma/migrations/20260412000000_gz_scheduling_module/migration.sql`,
@@ -152,6 +174,16 @@ Verified via `grep` in `prisma/schema.prisma`:
 - **`LegalHold`:** `reason_code` AND `correlation_id` both present after
   migration `20260428130000_legal_hold_correlation_id`. Verified during
   Payload 10 audit on 2026-05-06.
+- **`LegalHold`:** `correlation_id` and `reason_code` both present.
+  `correlation_id VARCHAR(64) NOT NULL` was added by migration
+  `20260428130000_legal_hold_correlation_id`; the database-tier
+  append-only / lift-transition guard was added by migration
+  `20260503000000_legal_holds_append_only_trigger` and mirrored into
+  `infra/postgres/init-ledger.sql`. Service-tier coverage:
+  `tests/integration/legal-hold-correlation-id.spec.ts`.
+
+**Remediation status:** CLOSED — §7 / Wave H legal_holds gap closed
+2026-05-03 under correlation_id `LEGAL-HOLDS-APPEND-ONLY-TRIGGER-20260503`.
 
 ### 5.3 Network isolation — Postgres (5432) / Redis (6379)
 
@@ -249,15 +281,15 @@ report-back files. `grep -rni "Navigator\|Jaime Watt"` outside the
 
 ## 8. Payload 9 — Build-Complete Deliverables (2026-04-24)
 
-| Artifact | Path | Purpose |
-| --- | --- | --- |
-| Deployment pipeline | `.github/workflows/deploy.yml` | Build, typecheck, lint, test, Prisma push, SQL-schema validation, Docker compose config validation, readiness gate |
-| Production compose | `docker-compose.yml` | Canonical bring-up with FT-033 intact, env-var driven secrets, Payload 1–8 feature flags |
-| Integration Hub v2 | `services/integration-hub/src/hub.service.ts` | `forwardGuardedLedgerRequest` (GateGuard pre-processor), `emitRecoveryExpiryWarning`, `emitDiamondConciergeHandoff`, `processHighHeatSession` |
-| Launch manifest | `PROGRAM_CONTROL/LAUNCH_MANIFEST.md` | Pixel Legacy onboarding, Mic Drop Reveal, 3,000-creator rate-lock, GateGuard LOI data package |
-| Pre-launch checklist | `docs/PRE_LAUNCH_CHECKLIST.md` | CEO sign-off, compliance, infra, observability, go/no-go |
-| Architecture overview | `docs/ARCHITECTURE_OVERVIEW.md` | Full system map, cross-Payload invariants, cross-service wiring |
-| Root README update | `README.md` | Final "How to Run" + architecture summary |
+| Artifact              | Path                                          | Purpose                                                                                                                                       |
+| --------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deployment pipeline   | `.github/workflows/deploy.yml`                | Build, typecheck, lint, test, Prisma push, SQL-schema validation, Docker compose config validation, readiness gate                            |
+| Production compose    | `docker-compose.yml`                          | Canonical bring-up with FT-033 intact, env-var driven secrets, Payload 1–8 feature flags                                                      |
+| Integration Hub v2    | `services/integration-hub/src/hub.service.ts` | `forwardGuardedLedgerRequest` (GateGuard pre-processor), `emitRecoveryExpiryWarning`, `emitDiamondConciergeHandoff`, `processHighHeatSession` |
+| Launch manifest       | `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`          | Pixel Legacy onboarding, Mic Drop Reveal, 3,000-creator rate-lock, GateGuard LOI data package                                                 |
+| Pre-launch checklist  | `docs/PRE_LAUNCH_CHECKLIST.md`                | CEO sign-off, compliance, infra, observability, go/no-go                                                                                      |
+| Architecture overview | `docs/ARCHITECTURE_OVERVIEW.md`               | Full system map, cross-Payload invariants, cross-service wiring                                                                               |
+| Root README update    | `README.md`                                   | Final "How to Run" + architecture summary                                                                                                     |
 
 ## 9. Contact / Authority
 

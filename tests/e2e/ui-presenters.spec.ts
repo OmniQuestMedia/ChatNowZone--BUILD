@@ -21,6 +21,13 @@ import {
   heatTierAriaLabel,
   resolveBreakpoint,
 } from '../../ui/config/accessibility';
+import {
+  MembershipPresenter,
+  DEFAULT_MEMBERSHIP_GOVERNANCE,
+} from '../../ui/view-models/membership.presenter';
+import { renderMembershipPage } from '../../ui/app/vip/membership/page';
+import { renderPixelLegacyPage } from '../../ui/app/creator/pixel-legacy/page';
+import type { PixelLegacyStatusView } from '../../ui/types/creator-panel-contracts';
 
 describe('THEME + accessibility primitives', () => {
   it('defaults to dark mode (adult-platform standard)', () => {
@@ -483,11 +490,20 @@ describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
       obs_ready: true,
       chat_aggregator_ready: true,
       active_session_id: 'sess-abc',
-      latest_heat: { session_id: 'sess-abc', creator_id: 'creator-2', tier: 'HOT', score: 75, components: { tipper_pressure: 30, velocity: 30, vip_presence: 15 }, captured_at_utc: '2026-04-25T12:00:00Z' },
+      latest_heat: {
+        session_id: 'sess-abc',
+        creator_id: 'creator-2',
+        tier: 'HOT',
+        score: 75,
+        components: { tipper_pressure: 30, velocity: 30, vip_presence: 15 },
+        captured_at_utc: '2026-04-25T12:00:00Z',
+      },
       latest_nudge: null,
       broadcast_windows: [],
       cyrano_suggestions: [],
-      cyrano_personas: [{ persona_id: 'p-1', display_name: 'Aria', tone: 'warm', style_notes: '', active: true }],
+      cyrano_personas: [
+        { persona_id: 'p-1', display_name: 'Aria', tone: 'warm', style_notes: '', active: true },
+      ],
       cyrano_latency_sla_ms: 2000,
       creator_base_payout_rate_per_token_usd: 0.075,
     });
@@ -504,7 +520,14 @@ describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
       obs_ready: true,
       chat_aggregator_ready: true,
       active_session_id: 'sess-hot',
-      latest_heat: { session_id: 'sess-hot', creator_id: 'creator-3', tier: 'HOT', score: 80, components: { tipper_pressure: 35, velocity: 30, vip_presence: 15 }, captured_at_utc: '2026-04-25T12:00:00Z' },
+      latest_heat: {
+        session_id: 'sess-hot',
+        creator_id: 'creator-3',
+        tier: 'HOT',
+        score: 80,
+        components: { tipper_pressure: 35, velocity: 30, vip_presence: 15 },
+        captured_at_utc: '2026-04-25T12:00:00Z',
+      },
       latest_nudge: null,
       broadcast_windows: [],
       cyrano_suggestions: [],
@@ -523,7 +546,14 @@ describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
       obs_ready: true,
       chat_aggregator_ready: true,
       active_session_id: 'sess-inferno',
-      latest_heat: { session_id: 'sess-inferno', creator_id: 'creator-4', tier: 'INFERNO', score: 92, components: { tipper_pressure: 40, velocity: 38, vip_presence: 14 }, captured_at_utc: '2026-04-25T12:00:00Z' },
+      latest_heat: {
+        session_id: 'sess-inferno',
+        creator_id: 'creator-4',
+        tier: 'INFERNO',
+        score: 92,
+        components: { tipper_pressure: 40, velocity: 38, vip_presence: 14 },
+        captured_at_utc: '2026-04-25T12:00:00Z',
+      },
       latest_nudge: null,
       broadcast_windows: [],
       cyrano_suggestions: [],
@@ -549,7 +579,14 @@ describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
       obs_ready: false,
       chat_aggregator_ready: false,
       active_session_id: 'sess-inf2',
-      latest_heat: { session_id: 'sess-inf2', creator_id: 'creator-5', tier: 'INFERNO', score: 88, components: { tipper_pressure: 38, velocity: 36, vip_presence: 14 }, captured_at_utc: '2026-04-25T13:00:00Z' },
+      latest_heat: {
+        session_id: 'sess-inf2',
+        creator_id: 'creator-5',
+        tier: 'INFERNO',
+        score: 88,
+        components: { tipper_pressure: 38, velocity: 36, vip_presence: 14 },
+        captured_at_utc: '2026-04-25T13:00:00Z',
+      },
       latest_nudge: null,
       broadcast_windows: [],
       cyrano_suggestions: [],
@@ -733,7 +770,11 @@ describe('Surface 03 — Diamond Concierge Operator View — new features', () =
       },
       audit_window: [],
       operator_quote: quote,
-      operator_quote_input: { tokens: 30_000, velocity_days: 30, correlation_id: 'HANDOFF-TEST-001' },
+      operator_quote_input: {
+        tokens: 30_000,
+        velocity_days: 30,
+        correlation_id: 'HANDOFF-TEST-001',
+      },
     });
     expect(findByTestId(render.tree, 'admin-diamond-operator-quote-result')).toBeDefined();
     expect(findByTestId(render.tree, 'admin-diamond-operator-quote-confirm')).toBeDefined();
@@ -758,20 +799,50 @@ describe('Surface 03 — Diamond Concierge Operator View — new features', () =
   it('buildHighHeatVipQueue sorts by ffs_score descending', () => {
     const presenter = new DiamondConciergePresenter();
     const rows = presenter.buildHighHeatVipQueue([
-      { session_id: 's-a', user_id: 'u-a', wallet_id: 'w-a', ffs_score: 88, ffs_tier: 'INFERNO', remaining_tokens: '100', remaining_usd_cents: '770', velocity_band: 'DAYS_30', detected_at_utc: '2026-04-25T12:00:00Z', reason_code: 'HIGH_HEAT_VIP_DETECTED' },
-      { session_id: 's-b', user_id: 'u-b', wallet_id: 'w-b', ffs_score: 99, ffs_tier: 'INFERNO', remaining_tokens: '200', remaining_usd_cents: '1540', velocity_band: 'DAYS_14', detected_at_utc: '2026-04-25T11:00:00Z', reason_code: 'HIGH_HEAT_VIP_DETECTED' },
-      { session_id: 's-c', user_id: 'u-c', wallet_id: 'w-c', ffs_score: 92, ffs_tier: 'INFERNO', remaining_tokens: '150', remaining_usd_cents: '1155', velocity_band: 'DAYS_90', detected_at_utc: '2026-04-25T11:30:00Z', reason_code: 'HIGH_HEAT_VIP_DETECTED' },
+      {
+        session_id: 's-a',
+        user_id: 'u-a',
+        wallet_id: 'w-a',
+        ffs_score: 88,
+        ffs_tier: 'INFERNO',
+        remaining_tokens: '100',
+        remaining_usd_cents: '770',
+        velocity_band: 'DAYS_30',
+        detected_at_utc: '2026-04-25T12:00:00Z',
+        reason_code: 'HIGH_HEAT_VIP_DETECTED',
+      },
+      {
+        session_id: 's-b',
+        user_id: 'u-b',
+        wallet_id: 'w-b',
+        ffs_score: 99,
+        ffs_tier: 'INFERNO',
+        remaining_tokens: '200',
+        remaining_usd_cents: '1540',
+        velocity_band: 'DAYS_14',
+        detected_at_utc: '2026-04-25T11:00:00Z',
+        reason_code: 'HIGH_HEAT_VIP_DETECTED',
+      },
+      {
+        session_id: 's-c',
+        user_id: 'u-c',
+        wallet_id: 'w-c',
+        ffs_score: 92,
+        ffs_tier: 'INFERNO',
+        remaining_tokens: '150',
+        remaining_usd_cents: '1155',
+        velocity_band: 'DAYS_90',
+        detected_at_utc: '2026-04-25T11:30:00Z',
+        reason_code: 'HIGH_HEAT_VIP_DETECTED',
+      },
     ]);
     expect(rows[0].ffs_score).toBe(99);
     expect(rows[1].ffs_score).toBe(92);
     expect(rows[2].ffs_score).toBe(88);
-// ─── Screen 04 — MembershipPresenter ──────────────────────────────────────
+  });
+});
 
-import {
-  MembershipPresenter,
-  DEFAULT_MEMBERSHIP_GOVERNANCE,
-} from '../../ui/view-models/membership.presenter';
-import { renderMembershipPage } from '../../ui/app/vip/membership/page';
+// ─── Screen 04 — MembershipPresenter ──────────────────────────────────────
 
 describe('MembershipPresenter — lifecycle status resolution', () => {
   const presenter = new MembershipPresenter();
@@ -928,9 +999,7 @@ describe('MembershipPage — render plan structure', () => {
         { bucket: 'membership', balance_tokens: 200n, spend_priority: 2 },
         { bucket: 'bonus', balance_tokens: 50n, spend_priority: 3 },
       ],
-      ffs_heat_history: [
-        { captured_at_utc: '2026-04-01T00:00:00Z', score: 80, tier: 'HOT' },
-      ],
+      ffs_heat_history: [{ captured_at_utc: '2026-04-01T00:00:00Z', score: 80, tier: 'HOT' }],
       now_utc: new Date('2026-04-01T00:00:00Z'),
     });
 
@@ -988,9 +1057,6 @@ describe('MembershipPage — render plan structure', () => {
 });
 
 // ─── Screen 05 — PixelLegacyPage (PIXEL-LEGACY-002 status display) ────────
-
-import { renderPixelLegacyPage } from '../../ui/app/creator/pixel-legacy/page';
-import type { PixelLegacyStatusView } from '../../ui/types/creator-panel-contracts';
 
 const PIXEL_LEGACY_BENEFITS = {
   payout_range_min_usd: 0.07,
