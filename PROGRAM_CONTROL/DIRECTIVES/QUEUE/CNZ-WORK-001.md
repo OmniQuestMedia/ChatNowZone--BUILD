@@ -84,7 +84,7 @@ Tasks are grouped into Waves. Waves execute roughly sequentially but tasks withi
 - **Wave D — Verification & Extension of L0 Spine** (the eight existing services)
 - **Wave E — Net-New L0 Build** (P0 stack assets not yet in repo)
 - **Wave F — Plan IP Layer** (P1 stack assets, clarify-blocked)
-- **Wave G — XL Decomposition Outputs** (Cyrano layers, Black-Glass decomposed pieces)
+- **Wave G — XL Decomposition Outputs** (Cyrano layers; the Black-Glass Interface decomposition slot was retired 2026-05-06 — see `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`)
 - **Wave H — Hardening & Pre-Launch Cleanup**
 
 Each Wave terminates in a `CNZ-WORK-001-CHORE-<wave>` cleanup task. The next Wave does not open until the cleanup task is DONE.
@@ -380,17 +380,15 @@ Directive: Once CEO has answered R-CLARIFY-007 (which Cyrano layers in launch sc
 ```
 
 ```
-CNZ-WORK-001-B003: Resolve XL decomposition for R-108 Black-Glass Interface
+CNZ-WORK-001-B003: RETIRED 2026-05-06 — Black-Glass Interface decomposition slot
 Wave: B
-Priority: P0
-Scope: S
-Agent: claude-in-chat
-Depends-on: B001 (specifically R-CLARIFY-012), A001
-CEO_GATE: YES
-FIZ: NO
+Status: RETIRED
 Source: Deficit doc R-108, §5.3
-Status: QUEUED
-Directive: Once CEO has answered R-CLARIFY-012 (frontend repo location), decompose Black-Glass Interface scope into per-feature M/L tasks. Each feature becomes its own CNZ-WORK-001-G0NN row. Compliance gates UI, RBAC enforcement, kill switch UI, consent workflow UI, age gate UI, wallet integrity UI per Corpus Ch.6 are minimum decomposition units.
+Directive: The G101+ "Black-Glass Interface" doctrine is no longer a launch
+requirement. Per-surface UI work is tracked under the existing `UI:` commit
+prefix; there is no separate visual-doctrine workstream. See
+`archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md` for
+rationale and replacement path.
 ```
 
 -----
@@ -865,7 +863,10 @@ Directive: Confirm Plan IP services have tests, integration with the L0 spine, O
 
 ### WAVE G — XL DECOMPOSITION OUTPUTS
 
-These are placeholder slots. Actual rows authored by tasks B002 (Cyrano) and B003 (Black-Glass) once R-CLARIFY answers land.
+These are placeholder slots. Actual Cyrano rows are authored by task
+B002 once R-CLARIFY answers land. The Black-Glass Interface
+decomposition slot (CNZ-WORK-001-G101..G199 + B003) was retired
+2026-05-06 — see `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`.
 
 ```
 CNZ-WORK-001-G001..GNNN: Cyrano per-layer tasks
@@ -876,11 +877,14 @@ Directive: Per-layer Cyrano build tasks land here once B002 completes. Each laye
 ```
 
 ```
-CNZ-WORK-001-G101..G199: Black-Glass Interface per-feature tasks
+CNZ-WORK-001-G101..G199: RETIRED 2026-05-06 — Black-Glass per-feature slot
 Wave: G
-Source: Decomposition by B003 from R-108
-Status: PENDING-DECOMPOSITION
-Directive: Per-feature Black-Glass build tasks land here once B003 completes. Compliance gates UI, RBAC enforcement, kill switch UI, consent workflow UI, age gate UI, wallet integrity UI per Corpus Ch.6 are minimum decomposition units.
+Source: Decomposition by B003 (also retired) from R-108
+Status: RETIRED
+Directive: The G101+ "Black-Glass Interface" doctrine is no longer a
+launch requirement. Per-surface UI work is tracked under the existing
+`UI:` commit prefix. See
+`archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md`.
 ```
 
 ```
@@ -996,7 +1000,7 @@ CEO_GATE: YES
 FIZ: NO
 Source: Corpus L0 ship-gate doctrine; Deficit doc §5.4
 Status: QUEUED
-Directive: Audit launch-blocking set against Corpus L0 ship gate: Three-Bucket Wallet (D001), Risk Engine (D002), NATS Fabric (D003), OBS Broadcast Kernel (D004), FairPay + NOWPayouts (D006, E002), RedBook (E001), Compliance Stack (D008), GateGuard Sentinel (E003), Black-Glass Interface (G101+), banned-entity residual deletion (C001, §12). Produce sign-off REPORT_BACK. CEO signs before launch.
+Directive: Audit launch-blocking set against Corpus L0 ship gate: Three-Bucket Wallet (D001), Risk Engine (D002), NATS Fabric (D003), OBS Broadcast Kernel (D004), FairPay + NOWPayouts (D006, E002), RedBook (E001), Compliance Stack (D008), GateGuard Sentinel (E003), banned-entity residual deletion (C001, §12). Produce sign-off REPORT_BACK. CEO signs before launch. (The G101+ "Black-Glass Interface" line was retired 2026-05-06 — see `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/`.)
 ```
 
 ```
@@ -1053,7 +1057,7 @@ Quick lookup. Every deficit doc row (Thread 18, 36 rows) maps to one or more tas
 |R-105 HeartZone IoT Loop            |D005                |clarify-blocked                           |
 |R-106 Bijou.Zone Theatre            |D007                |clarify-blocked                           |
 |R-107 Sovereign CaC                 |D008                |merged with R-007                         |
-|R-108 UI / Black-Glass              |B003 → G101..G199   |XL decomposition                          |
+|R-108 UI                            |RETIRED 2026-05-06   |Black-Glass doctrine archived (UI tracked under `UI:` prefix) |
 |R-CLARIFY-001..012                  |B001                |consolidated decision pass                |
 |Cleanup 4.1 (DIRECTIVES status)     |A001, A011          |                                          |
 |Cleanup 4.2 (services inventory)    |A001                |                                          |

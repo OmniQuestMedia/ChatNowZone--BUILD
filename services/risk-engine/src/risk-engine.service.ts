@@ -65,8 +65,9 @@ export class RiskEngineService {
 
     // Region — invoke the existing pure helper. Defensive defaults: missing
     // region data scores 0 (low risk) so the engine never falsely escalates
-    // when telemetry is incomplete.
-    const regionScore = await this.scoreRegion(input.region);
+    // when telemetry is incomplete. The caller's correlation_id is forwarded
+    // so RegionSignalService can bind its NATS audit event to the same chain.
+    const regionScore = await this.scoreRegion(input.region, input.correlationId);
 
     // Behavioural — bounded contributions per signal, summed and clamped.
     const behaviouralResult = this.scoreBehavioural(input);
@@ -152,14 +153,20 @@ export class RiskEngineService {
 
   // ─── Scoring internals ────────────────────────────────────────────────────
 
-  private async scoreRegion(region?: RegionSignals): Promise<{
+  private async scoreRegion(
+    region: RegionSignals | undefined,
+    correlationId: string,
+  ): Promise<{
     score: number;
     contributions: Record<string, number>;
   }> {
     if (!region) {
       return { score: 0, contributions: {} };
     }
-    const r = await this.regionSignal.getConfidenceScore(region);
+    // `await` is preserved so test fakes that return Promises resolve correctly;
+    // the production implementation is synchronous and `await` on a non-Promise
+    // simply returns the value.
+    const r = await this.regionSignal.getConfidenceScore({ ...region, correlationId });
     // Confidence 1.0 → 0 risk. Confidence 0.0 → 35 risk pts.
     const score = Math.round((1 - Math.max(0, Math.min(1, r.confidence))) * 35);
     const contributions: Record<string, number> = {

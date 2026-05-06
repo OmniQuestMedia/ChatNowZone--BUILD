@@ -1,10 +1,10 @@
 // PAYLOAD 7 — Canonical brand + theme tokens for ChatNow.Zone.
 // Adult-platform standard: dark mode is the default + only canonical theme.
-// "Black-Glass Interface" doctrine: matte black surfaces, glass overlays,
-// muted accents with a single hot accent for revenue cues. The full Black-Glass
-// build is tracked under G101+ in REQUIREMENTS_MASTER and remains
-// NEEDS_DIRECTIVE; this token set is the pre-launch baseline that downstream
-// renderers (Next.js, server-rendered email, OBS overlays) consume.
+// Visual stack: matte dark surfaces, raised overlays, muted accents with a
+// single hot accent for revenue cues. This token set is the canonical
+// alpha-launch baseline that downstream renderers (Next.js, server-rendered
+// email, OBS overlays) consume. Per-surface UI work is tracked under the
+// `UI:` commit prefix; there is no separate visual-doctrine workstream.
 
 export type ThemeMode = 'dark' | 'light';
 

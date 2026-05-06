@@ -90,7 +90,7 @@ If you are not in a workspace checkout, HARD_STOP.
   - `BIJOU:` Theatre architecture
   - `CRM:` CRM objects / schema
   - `INFRA:` Docker, network, env config
-  - `UI:` Frontend / Black-Glass
+  - `UI:` Frontend (admin panels, creator surfaces, public-facing UI)
   - `GOV:` Compliance / Sovereign CaC
   - `CHORE:` Tooling, linting, formatting
   - `GGS:` GateGuard Sentinel™ core service

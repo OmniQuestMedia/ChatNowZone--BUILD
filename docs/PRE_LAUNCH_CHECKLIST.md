@@ -76,12 +76,6 @@ on intent alone.
       `lifted_at_utc` on un-lifted rows; trigger installed by migration
       `20260503000000_legal_holds_append_only_trigger`); every INSERT
       and UPDATE carries `correlation_id` (covered by
-- [x] **Legal hold** — `LegalHoldService.trigger` requires step-up auth;
-      `legal_holds` table is append-only at the Postgres tier (lift
-      transition restricted to `lifted_by` / `lifted_at_utc` on
-      un-lifted rows; trigger installed by migration
-      `20260503000000_legal_holds_append_only_trigger`); every INSERT and
-      UPDATE carries `correlation_id` (covered by
       `tests/integration/legal-hold-correlation-id.spec.ts`).
 - [ ] **Geo fencing + sovereign CAC** — block list applied before any
       mutation; blocked actions never reach GateGuard.

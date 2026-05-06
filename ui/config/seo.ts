@@ -30,7 +30,7 @@ export const SEO: Record<string, SeoMetadata> = {
   home: {
     title: 'ChatNow.Zone — Live creator platform',
     description:
-      'ChatNow.Zone is the OmniQuest Media Inc. live creator platform — token economy, FairPay payouts, and Black-Glass concierge for premium guests.',
+      'ChatNow.Zone is the OmniQuest Media Inc. live creator platform — token economy, FairPay payouts, and a premium concierge experience for VIP guests.',
     canonical_url: `https://${PRIMARY_DOMAIN}/`,
     og_image: `https://${PRIMARY_DOMAIN}/og/home.png`,
     twitter_card: 'summary_large_image',

@@ -371,7 +371,6 @@ export const NATS_TOPICS = {
   OBS_AUDIO_SIGNAL_PRESENT:      'obs.audio.signal.present',
   OBS_AUDIO_SIGNAL_ABSENT:       'obs.audio.signal.absent',
   OBS_HEAT_ESCALATION_BLOCKED:   'obs.heat.escalation.blocked',
-  PIXEL_LEGACY_GATEWAY_CLOSED: 'pixel_legacy.gateway.closed',
 } as const;
 
 export type NatsTopic = (typeof NATS_TOPICS)[keyof typeof NATS_TOPICS];
