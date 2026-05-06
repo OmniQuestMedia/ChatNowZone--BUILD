@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/scrape-g101-blackglass-YCgdU`
-**Commit:** `e7dd6e8896377547bad4cc81ee5de6a65fa7ff2d`
-**Generated:** 2026-05-06T11:08:31Z
+**Branch:** `copilot/cleanup-and-housekeeping-phase-0`
+**Commit:** `61ba2d6b2e6a8c036042d79a2363c0d1736507ce`
+**Generated:** 2026-05-06T15:35:17Z
 
 ## All Files
 
@@ -14,6 +14,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/CODEOWNERS`
 - `.github/ISSUE_TEMPLATE/directive.yml`
 - `.github/copilot-instructions.md`
+- `.github/dependabot.yml`
 - `.github/linters/.markdown-lint.yml`
 - `.github/linters/.yaml-lint.yml`
 - `.github/refs-branch-policy.md`
@@ -85,10 +86,12 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.1.md`
 - `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`
 - `PROGRAM_CONTROL/LAUNCH_READY.md`
 - `PROGRAM_CONTROL/REPORT_BACK/ADD-CLEARANCE-CONFIRMATION.md`
@@ -302,6 +305,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/DIRECTIVE_TEMPLATE.md`
 - `docs/DOMAIN_GLOSSARY.md`
 - `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
+- `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
 - `docs/PRE_LAUNCH_CHECKLIST.md`
 - `docs/REQUIREMENTS_MASTER.md`
 - `docs/ROADMAP_MANIFEST.md`
