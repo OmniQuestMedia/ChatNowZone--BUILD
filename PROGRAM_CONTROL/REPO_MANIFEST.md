@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/scrape-g101-blackglass-YCgdU`
-**Commit:** `e7dd6e8896377547bad4cc81ee5de6a65fa7ff2d`
-**Generated:** 2026-05-06T11:08:31Z
+**Branch:** `copilot/gov-add-oqmi-infrastructure-policy`
+**Commit:** `d0db666fa18aafd43d0ef51afcecf0f6b9b3f135`
+**Generated:** 2026-05-06T15:26:52Z
 
 ## All Files
 
@@ -140,6 +140,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-002-TYPEFIX.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-003-TYPEFIX-FINAL.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-004-RECONCILIATION-SERVICE.md`
+- `PROGRAM_CONTROL/REPORT_BACK/INFRA-POLICY-ADD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/KYC-001-PUBLISH-GATE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/LEGAL-HOLD-DB-MIGRATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/M5-VOICE-SAMPLE-COLLECTION-EXEC.md`
@@ -302,6 +303,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/DIRECTIVE_TEMPLATE.md`
 - `docs/DOMAIN_GLOSSARY.md`
 - `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
+- `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
 - `docs/PRE_LAUNCH_CHECKLIST.md`
 - `docs/REQUIREMENTS_MASTER.md`
 - `docs/ROADMAP_MANIFEST.md`
