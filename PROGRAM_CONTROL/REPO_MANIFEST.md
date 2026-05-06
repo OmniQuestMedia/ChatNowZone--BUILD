@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/cleanup-and-housekeeping-phase-0`
-**Commit:** `329430e7cef4798d6511e681c15d8733d2642e42`
-**Generated:** 2026-05-06T15:49:48Z
+**Branch:** `dependabot/npm_and_yarn/prisma/client-6.19.3`
+**Commit:** `746a7dcf4f541273ad7401303c9a8007a32a9857`
+**Generated:** 2026-05-06T15:53:28Z
 
 ## All Files
 
