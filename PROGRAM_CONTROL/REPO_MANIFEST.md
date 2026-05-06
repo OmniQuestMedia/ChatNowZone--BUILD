@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/cleanup-and-housekeeping-phase-0`
 **Commit:** `61ba2d6b2e6a8c036042d79a2363c0d1736507ce`
 **Generated:** 2026-05-06T15:35:17Z
+**Branch:** `copilot/bootstrap-docs-policies`
+**Commit:** `07e0024d8ca5a43a1d4fcc0230910bd9c8c3667b`
+**Generated:** 2026-05-06T15:38:11Z
 
 ## All Files
 
@@ -143,6 +146,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-002-TYPEFIX.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-003-TYPEFIX-FINAL.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-004-RECONCILIATION-SERVICE.md`
+- `PROGRAM_CONTROL/REPORT_BACK/INFRA-POLICY-ADD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/KYC-001-PUBLISH-GATE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/LEGAL-HOLD-DB-MIGRATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/M5-VOICE-SAMPLE-COLLECTION-EXEC.md`
@@ -159,6 +163,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-BACKEND-CLOSURE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-2-REDBOOK-RECOVERY-DASHBOARD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md`
+- `PROGRAM_CONTROL/REPORT_BACK/PHASE-0-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3A-BASELINE-SCOPING-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-2-PRISMA-DEDUP-INVESTIGATION-2026-04-26.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3B-4-AMBIGUITY-RESEARCH-2026-04-26.md`
@@ -292,6 +297,7 @@ Auto-generated on every push. Do not edit manually.
 - `apps/cyrano-standalone/package.json`
 - `apps/cyrano-standalone/tsconfig.json`
 - `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md`
+- `archive/INFRA-PRE-2026-05-06/ARCHIVE_MANIFEST.md`
 - `archive/LEGACY_CONFIGS_2026-04/.eslintrc.js`
 - `archive/LEGACY_CONFIGS_2026-04/.gitignore`
 - `archive/LEGACY_CONFIGS_2026-04/.prettierrc`
@@ -306,6 +312,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/DOMAIN_GLOSSARY.md`
 - `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
 - `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
+- `docs/POLICIES/README.md`
 - `docs/PRE_LAUNCH_CHECKLIST.md`
 - `docs/REQUIREMENTS_MASTER.md`
 - `docs/ROADMAP_MANIFEST.md`
@@ -630,6 +637,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/src/guest-heat.service.ts`
 - `services/guest-heat/src/guest-heat.types.ts`
 - `services/guest-heat/src/performance-timer.service.ts`
+- `services/integration-hub/WEBHOOK_CONTRACTS.md`
+- `services/integration-hub/src/ecommszone/INTEGRATION_AUDIT.md`
+- `services/integration-hub/src/ecommszone/ecommszone-client.interface.ts`
 - `services/integration-hub/src/hub.module.ts`
 - `services/integration-hub/src/hub.service.ts`
 - `services/ledger/index.ts`
