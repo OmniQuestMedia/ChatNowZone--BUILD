@@ -8,6 +8,7 @@ You are not allowed to guess, synthesize, infer, or "summarize from prior report
 **State Tracker:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
 **Active Charter:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
 **Naming Authority (commit prefixes, glossary):** `docs/DOMAIN_GLOSSARY.md`
+**Infrastructure & Security Policy:** `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` (INFRA_v1.0 — effective 2026-05-06)
 **Infrastructure & Security Policy:** `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
 
 > **MANDATORY:** All infrastructure/security changes MUST cite `rule_applied_id` from
