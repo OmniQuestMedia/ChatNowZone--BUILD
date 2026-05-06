@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `dependabot/npm_and_yarn/types/jest-30.0.0`
-**Commit:** `e27d69d59c93ff0c33343c1dc44322af45e9061b`
-**Generated:** 2026-05-06T15:51:49Z
-**Branch:** `dependabot/github_actions/actions/setup-node-6.4.0`
-**Commit:** `58303299ae0c51dd28ef151a08e386791eb33aeb`
-**Generated:** 2026-05-06T16:02:33Z
+**Branch:** `dependabot/npm_and_yarn/nestjs/typeorm-11.0.1`
+**Commit:** `c4aac66a74058bd92e08aa481cc8d7bcd546e5bf`
+**Generated:** 2026-05-06T16:04:27Z
 
 ## All Files
 
