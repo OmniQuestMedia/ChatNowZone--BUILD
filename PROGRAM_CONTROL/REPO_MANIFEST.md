@@ -3,11 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/cleanup-and-housekeeping-phase-0`
-**Commit:** `61ba2d6b2e6a8c036042d79a2363c0d1736507ce`
-**Generated:** 2026-05-06T15:35:17Z
-**Branch:** `copilot/bootstrap-docs-policies`
-**Commit:** `07e0024d8ca5a43a1d4fcc0230910bd9c8c3667b`
-**Generated:** 2026-05-06T15:38:11Z
+**Commit:** `329430e7cef4798d6511e681c15d8733d2642e42`
+**Generated:** 2026-05-06T15:49:48Z
 
 ## All Files
 
