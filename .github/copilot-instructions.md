@@ -9,6 +9,12 @@ You are not allowed to guess, synthesize, infer, or "summarize from prior report
 **Active Charter:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
 **Naming Authority (commit prefixes, glossary):** `docs/DOMAIN_GLOSSARY.md`
 **Infrastructure & Security Policy:** `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` (INFRA_v1.0 — effective 2026-05-06)
+**Infrastructure & Security Policy:** `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
+
+> **MANDATORY:** All infrastructure/security changes MUST cite `rule_applied_id` from
+> `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` §11 in the commit message.
+> Canada-only data residency is enforced for all production workloads (PIPEDA invariant —
+> `INFRA_v1.0-INV-01`). No production data may be stored outside Canadian regions.
 
 NOTE — Doctrine consolidation (2026-04-23 per CNZ-WORK-001-A003/A005/A006):
 The prior root-level `Sovereign_Kernel.md.pdf` is RETIRED — moved to

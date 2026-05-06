@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/bootstrap-docs-policies`
 **Commit:** `f5656397477dbaad43be69449bfc9f7f95e7314a`
 **Generated:** 2026-05-06T15:31:41Z
+**Branch:** `copilot/gov-add-oqmi-infrastructure-policy`
+**Commit:** `d0db666fa18aafd43d0ef51afcecf0f6b9b3f135`
+**Generated:** 2026-05-06T15:26:52Z
 
 ## All Files
 
@@ -140,6 +143,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-002-TYPEFIX.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-003-TYPEFIX-FINAL.md`
 - `PROGRAM_CONTROL/REPORT_BACK/INFRA-004-RECONCILIATION-SERVICE.md`
+- `PROGRAM_CONTROL/REPORT_BACK/INFRA-POLICY-ADD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/KYC-001-PUBLISH-GATE-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/LEGAL-HOLD-DB-MIGRATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/M5-VOICE-SAMPLE-COLLECTION-EXEC.md`

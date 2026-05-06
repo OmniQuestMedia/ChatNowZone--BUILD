@@ -25,6 +25,7 @@ tree.
 - **Architecture overview (Payloads 1–8):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md).
 - **Pre-launch L0 checklist:** [`docs/PRE_LAUNCH_CHECKLIST.md`](docs/PRE_LAUNCH_CHECKLIST.md).
 - **Engineering docs root:** [`docs/`](docs/) — `DOMAIN_GLOSSARY.md`, `REQUIREMENTS_MASTER.md`, `MEMBERSHIP_LIFECYCLE_POLICY.md`, `ROADMAP_MANIFEST.md`, compliance, doctrine.
+- **⚠️ Infrastructure & Security Policy:** [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) — Canada-only data residency (PIPEDA), immutable 3-2-1 backups (WORM), zero-trust architecture, AI advisory-only invariant, ransomware defense. **All infrastructure/security changes MUST cite `rule_applied_id` from §11.**
 - **Agent instructions (GitHub Copilot + Claude Code):** [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 - **Backlog snapshot:** [`OQMI_SYSTEM_STATE.md`](OQMI_SYSTEM_STATE.md) (repo root — periodic snapshot of ship-gate and invariant-audit status).
 - **Architecture overview (Payload 9):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md) — full system map + cross-Payload invariants.
