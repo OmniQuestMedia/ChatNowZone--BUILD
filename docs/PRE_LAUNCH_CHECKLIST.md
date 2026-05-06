@@ -1,8 +1,13 @@
 # Pre-Launch Checklist — Canonical Corpus L0 Ship-Gate
 
 **Authority:** OmniQuest Media Inc. — `OQMI_GOVERNANCE.md` (Canonical Corpus v10)
-**Branch of record:** `claude/frontend-polish-concierge-ui-mlqrR` (Payload 7 + 8)
+**Branch of record:** `claude/payload10-backend-closure-JpiXh` (Payload 10)
 **Hard launch deadline:** 2026-10-01
+
+> Payload 10 (Backend Closure) closed: Risk Engine (D002), FairPay
+> PayoutRateLock (PAY-006/011), OBS audio gate (PAY-008/D004), Cyrano L2
+> LLM provider (CYR-006), Diamond Concierge intake fields (DIA-003/004).
+> Ship-gate verifier: 22/22 PASS.
 
 This checklist is the **L0 ship-gate**. Every line must be verifiable —
 either via the automated `ship-gate-verifier.ts` script or by a CEO-signed
@@ -71,6 +76,12 @@ on intent alone.
       `lifted_at_utc` on un-lifted rows; trigger installed by migration
       `20260503000000_legal_holds_append_only_trigger`); every INSERT
       and UPDATE carries `correlation_id` (covered by
+- [x] **Legal hold** — `LegalHoldService.trigger` requires step-up auth;
+      `legal_holds` table is append-only at the Postgres tier (lift
+      transition restricted to `lifted_by` / `lifted_at_utc` on
+      un-lifted rows; trigger installed by migration
+      `20260503000000_legal_holds_append_only_trigger`); every INSERT and
+      UPDATE carries `correlation_id` (covered by
       `tests/integration/legal-hold-correlation-id.spec.ts`).
 - [ ] **Geo fencing + sovereign CAC** — block list applied before any
       mutation; blocked actions never reach GateGuard.

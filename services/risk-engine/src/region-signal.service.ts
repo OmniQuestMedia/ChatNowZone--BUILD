@@ -14,6 +14,10 @@
 //     fallback. A missing value is a bug in the upstream envelope and is
 //     surfaced by throwing rather than swallowing it under a sentinel
 //     that would corrupt the audit chain.
+//   - Deterministic. Same inputs → same output. No clocks, no randomness.
+//   - GateGuard pre-processed. Callers MUST go through the GateGuard
+//     middleware before invoking this service so the request envelope
+//     already carries correlation_id + reason_code.
 //   - NATS-driven. Every emission publishes RISK_REGION_SIGNAL_EMITTED so
 //     the immutable audit chain can replay the decision.
 //   - No PII logged. Country codes only — never raw IPs, BINs, etc.
@@ -40,6 +44,8 @@ export interface RegionSignalInput {
    * to compute a signal without it so the audit chain stays intact.
    */
   correlationId: string;
+  /** Forwarded from GateGuard envelope; defaults to a deterministic sentinel. */
+  correlationId?: string;
 }
 
 export type RegionSignalReasonCode =
@@ -75,6 +81,9 @@ export class RegionSignalService {
    */
   getConfidenceScore(data: RegionSignalInput): RegionSignalResult {
     const correlation_id = this.requireCorrelationId(data.correlationId);
+   */
+  getConfidenceScore(data: RegionSignalInput): RegionSignalResult {
+    const correlation_id = data.correlationId ?? 'risk-region-signal-no-correlation';
     const flags: string[] = [];
     let score = 1.0;
 

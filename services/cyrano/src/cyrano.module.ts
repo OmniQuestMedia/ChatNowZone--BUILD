@@ -17,6 +17,7 @@ import { CyranoLayer4VoiceBridge } from './cyrano-layer4-voice.bridge';
 import { CyranoService } from './cyrano.service';
 import { PersonaManager } from './persona.manager';
 import { SessionMemoryStore } from './session-memory.store';
+import { InMemoryCyranoLlmProvider } from './llm-provider.in-memory';
 
 @Module({
   imports: [NatsModule],
@@ -26,6 +27,10 @@ import { SessionMemoryStore } from './session-memory.store';
     PersonaManager,
     CyranoService,
     CyranoLayer3HczService,
+    // Payload 10 — Cyrano L2 LLM provider abstraction (CYR-006).
+    // The in-memory stub backs tests / CI; production wiring swaps in the
+    // Anthropic Claude provider against the same CyranoLlmProvider interface.
+    InMemoryCyranoLlmProvider,
     // Layer 4 v1
     CyranoLayer4TenantStore,
     CyranoLayer4ApiKeyService,
@@ -40,6 +45,7 @@ import { SessionMemoryStore } from './session-memory.store';
     PersonaManager,
     CyranoService,
     CyranoLayer3HczService,
+    InMemoryCyranoLlmProvider,
     CyranoLayer4TenantStore,
     CyranoLayer4ApiKeyService,
     CyranoLayer4RateLimiterService,

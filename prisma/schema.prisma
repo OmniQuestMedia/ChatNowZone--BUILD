@@ -54,10 +54,104 @@ model Transaction {
   gross_amount_cents BigInt
   currency         String   @default("USD") @db.Char(3)
   metadata         Json?
+  // PAY-006 / PAY-011 (Payload 10) — purchase-moment Flicker n'Flame Scoring
+  // (FFS) tier and the immutable creator payout rate that was locked when this
+  // transaction was initiated. Once written these columns are append-only at
+  // the application layer (PayoutRateLock service refuses to overwrite a
+  // locked rate). DB-level immutability lives on the PayoutRateLock table.
+  heat_score_at_tip      Int?
+  payout_rate_applied    Decimal? @db.Decimal(8, 6)
+  // TOK-009 — true when this purchase qualifies for the 10K+ CZT bulk
+  // Diamond floor guarantee. Mirrors PayoutRateLock.diamond_floor_active.
+  diamond_floor_active   Boolean  @default(false)
+  // PAY-006 — id of the immutable PayoutRateLock row written at tx_initiated.
+  payout_rate_lock_id    String?  @db.Uuid
+  // Risk Engine (D002 / Payload 10) — id of the RiskEngineDecision row
+  // produced when this transaction was evaluated. Null on legacy rows.
+  risk_decision_id       String?  @db.Uuid
+  correlation_id         String?  @db.VarChar(128)
+  reason_code            String?  @db.VarChar(64)
   created_at       DateTime @default(now()) @db.Timestamptz
   updated_at       DateTime @default(now()) @db.Timestamptz
 
+  @@index([heat_score_at_tip])
+  @@index([payout_rate_lock_id])
+  @@index([risk_decision_id])
   @@map("transactions")
+}
+
+// ─── PAYLOAD 10 — Risk Engine (D002) ────────────────────────────────────────
+// Append-only decision record produced by services/risk-engine/. Every
+// purchase / spend / Diamond intake routed through the engine writes one row
+// here BEFORE GateGuard sees it. The composite_score + tier are the source of
+// truth for downstream services.
+
+model RiskEngineDecision {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Cross-service correlation (one per business attempt). Unique to prevent
+  // double-write of the same evaluation.
+  correlation_id        String   @unique @db.VarChar(128)
+  // Subject of the evaluation — typically the guest user. Diamond Concierge
+  // intake also tags the agent_id on the evaluation envelope.
+  subject_user_id       String   @db.Uuid
+  intent                String   @db.VarChar(40)        // PURCHASE | SPEND | DIAMOND_INTAKE | EXTENSION | RECOVERY
+  // Composite score 0..100. Higher == riskier.
+  composite_score       Int
+  // Resolved tier: GREEN | AMBER | RED | CRITICAL
+  tier                  String   @db.VarChar(20)
+  // Per-signal contributions (region, behavioural, intoxication, coercion …).
+  signal_breakdown      Json
+  // Final decision: PASS | REVIEW | BLOCK | ESCALATE
+  decision              String   @db.VarChar(20)
+  // Free-form reasoning surface (max 5 reason codes).
+  reason_codes          Json     @default("[]")
+  // Optional Diamond Concierge agent who initiated the evaluation.
+  agent_id              String?  @db.Uuid
+  reason_code           String   @db.VarChar(100)
+  rule_applied_id       String   @default("RISK_ENGINE_v1") @db.VarChar(100)
+  evaluated_at          DateTime @default(now()) @db.Timestamptz
+
+  @@index([subject_user_id, evaluated_at])
+  @@index([tier])
+  @@index([decision])
+  @@map("risk_engine_decisions")
+}
+
+// ─── PAYLOAD 10 — FairPay Payout Rate Lock (PAY-006 / PAY-011) ──────────────
+// Immutable row written at tx_initiated capturing the live FFS tier + rate +
+// floor flags. The PayoutService refuses to compute a payout from anything
+// other than this row once it exists. Append-only — no UPDATE / DELETE.
+
+model PayoutRateLock {
+  id                       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id           String   @unique @db.VarChar(128)
+  transaction_id           String?  @db.Uuid
+  wallet_id                String   @db.VarChar(128)
+  creator_id               String   @db.Uuid
+  // Heat score (0..100) and resolved tier at the moment of capture.
+  heat_score               Int
+  heat_tier                String   @db.VarChar(20)        // COLD | WARM | HOT | INFERNO
+  // The locked creator payout rate per CZT (USD). Writers consult REDBOOK +
+  // GovernanceConfig + Pixel Legacy / Diamond floor; the resolved value lands
+  // here and is then immutable.
+  rate_per_token_usd       Decimal  @db.Decimal(8, 6)
+  // Floor metadata so audit jobs can reconstruct which floor applied.
+  diamond_floor_active     Boolean  @default(false)
+  pixel_legacy_floor_active Boolean @default(false)
+  // True when any floor raised the live rate above what FFS would have produced.
+  floor_applied            Boolean  @default(false)
+  // Captured CZT volume — locked alongside the rate so a payout cannot be
+  // re-quoted post-hoc with a different bucket sizing.
+  amount_czt               Int
+  reason_code              String   @default("PAYOUT_RATE_LOCKED") @db.VarChar(64)
+  rule_applied_id          String   @default("FAIRPAY_RATE_LOCK_v1") @db.VarChar(100)
+  organization_id          String   @db.VarChar(100)
+  tenant_id                String   @db.VarChar(100)
+  locked_at                DateTime @default(now()) @db.Timestamptz
+
+  @@index([creator_id, locked_at])
+  @@index([transaction_id])
+  @@map("payout_rate_locks")
 }
 
 model AuditEvent {
@@ -345,7 +439,26 @@ model RiskAssessment {
   weight_config_version     String
   organization_id           String
   tenant_id                 String
+  // ─── Diamond Concierge intake risk (DIA-003 / DIA-004 — Payload 10) ────────
+  // Populated when the assessment is generated as part of a Diamond Concierge
+  // call. All fields are optional so non-Concierge purchase paths continue to
+  // write without a Diamond intake. account_signal_snapshot is the auto-
+  // populated bundle (DIA-004).
+  intoxication_flag         Boolean? @default(false)
+  belligerence_flag         Boolean? @default(false)
+  coercion_flag             Boolean? @default(false)
+  duress_flag               Boolean? @default(false)
+  account_signal_snapshot   Json?
+  go_no_go_decision         String?  @db.VarChar(20) // APPROVE | MODIFY | DEFER | DECLINE
+  modified_amount           Decimal? @db.Decimal(12, 2)
+  agent_id                  String?  @db.Uuid
+  assessment_timestamp      DateTime?
+  correlation_id            String?  @db.VarChar(128)
+  reason_code               String?  @db.VarChar(100)
+  rule_applied_id           String?  @db.VarChar(100)
 
+  @@index([go_no_go_decision])
+  @@index([agent_id])
   @@map("risk_assessments")
 }
 
@@ -1073,6 +1186,9 @@ enum ZoneAccessZone {
   BIJOU
   PRIVATE_CALL
   DIAMOND_CONCIERGE
+  // CYRANO_LAYER2 — VIP_PLATINUM/VIP_DIAMOND-only standalone Cyrano audio venue
+  // (CYR-003). Surfaced in governance.config ZONE_MAP and zone-access service.
+  CYRANO_LAYER2
 }
 
 model ShowZonePass {

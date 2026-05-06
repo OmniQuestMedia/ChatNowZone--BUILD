@@ -846,8 +846,9 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       if (!sessionId) return;
       const last = this.lastInput.get(sessionId);
       if (last && last.sensync_bpm !== undefined) {
-        const { sensync_bpm: _dropped, ...rest } = last;
-        this.lastInput.set(sessionId, rest);
+        const next = { ...last };
+        delete (next as Partial<typeof last>).sensync_bpm;
+        this.lastInput.set(sessionId, next);
       }
     });
 

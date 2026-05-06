@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `claude/post-payload9-hygiene-YCgdU`
 **Commit:** `4df72e33203ca3f8e2ff29fdec0e0b28b596a7a3`
 **Generated:** 2026-05-06T04:53:13Z
+**Branch:** `claude/payload10-backend-closure-JpiXh`
+**Commit:** `dd638fec2d0482fc0cf9d4e4f70c035d306b16f4`
+**Generated:** 2026-05-06T10:50:23Z
 
 ## All Files
 
@@ -72,6 +75,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/MOD-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/NATS-DFSP001-TOPICS.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PAY-RATES-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/DONE/PAYLOAD-10-BACKEND-CLOSURE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-002.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/PIXEL-LEGACY-003.md`
@@ -152,6 +156,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/OBS-001-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-001-CANONICAL-LEDGER-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-ALIGNMENT-SWEEP.md`
+- `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-BACKEND-CLOSURE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-2-REDBOOK-RECOVERY-DASHBOARD.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-3-GATEGUARD-SENTINEL-PREPROCESSOR.md`
 - `PROGRAM_CONTROL/REPORT_BACK/PHASE-3A-BASELINE-SCOPING-2026-04-26.md`
@@ -384,6 +389,7 @@ Auto-generated on every push. Do not edit manually.
 - `prisma/migrations/20260428140000_pixel_legacy_001/migration.sql`
 - `prisma/migrations/20260502000000_pixel_legacy_002_fcfs_gateway/migration.sql`
 - `prisma/migrations/20260503000000_legal_holds_append_only_trigger/migration.sql`
+- `prisma/migrations/20260503000000_payload10_backend_closure/migration.sql`
 - `prisma/migrations/migration_lock.toml`
 - `prisma/schema.prisma`
 - `prisma/seed.test.ts`
@@ -566,6 +572,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/cyrano.module.ts`
 - `services/cyrano/src/cyrano.service.ts`
 - `services/cyrano/src/cyrano.types.ts`
+- `services/cyrano/src/llm-provider.in-memory.ts`
+- `services/cyrano/src/llm-provider.interface.ts`
 - `services/cyrano/src/persona.manager.ts`
 - `services/cyrano/src/session-memory.store.ts`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
@@ -624,6 +632,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/integration-hub/src/hub.service.ts`
 - `services/ledger/index.ts`
 - `services/ledger/ledger.service.ts`
+- `services/ledger/payout-rate-lock.service.ts`
 - `services/ledger/payout.service.ts`
 - `services/ledger/recovery.service.ts`
 - `services/ledger/redbook-rate-card.service.ts`
@@ -639,6 +648,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/nats/topics.registry.ts`
 - `services/notification/src/notification.module.ts`
 - `services/notification/src/notification.service.ts`
+- `services/obs-bridge/src/audio-signal.service.ts`
 - `services/obs-bridge/src/chat-aggregator.service.ts`
 - `services/obs-bridge/src/obs-bridge.module.ts`
 - `services/obs-bridge/src/obs-bridge.service.ts`
@@ -661,6 +671,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/rewards-api/src/services/redroom-ledger.service.ts`
 - `services/rewards-api/src/white-label/partner-config.schema.ts`
 - `services/risk-engine/src/region-signal.service.ts`
+- `services/risk-engine/src/risk-engine.service.ts`
+- `services/risk-engine/src/risk-engine.types.ts`
 - `services/risk-engine/src/risk.module.ts`
 - `services/sensync/.env.example`
 - `services/sensync/ASSUMPTIONS.md`
@@ -719,6 +731,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/e2e/diamond-recovery-flows.spec.ts`
 - `tests/e2e/full-token-purchase-flow.spec.ts`
 - `tests/e2e/high-heat-cyrano-payout-flow.spec.ts`
+- `tests/e2e/payload10-backend-closure.spec.ts`
 - `tests/e2e/rbac-step-up-enforcement.spec.ts`
 - `tests/e2e/ship-gate-verifier.spec.ts`
 - `tests/e2e/ui-presenters.spec.ts`
