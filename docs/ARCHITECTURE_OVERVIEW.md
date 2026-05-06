@@ -1,9 +1,10 @@
-# Architecture Overview — ChatNow.Zone (Payloads 1 → 8)
+# Architecture Overview — ChatNow.Zone (Payloads 1 → 10)
 
 **Authority:** OmniQuest Media Inc. — Canonical Corpus v10
-**Status at 2026-04-25:** Functionally complete for internal alpha
-(PAYLOAD 7 frontend polish + PAYLOAD 8 ship-gate verification landed).
-**Branch of record:** `claude/frontend-polish-concierge-ui-mlqrR`.
+**Status at 2026-05-06:** Functionally complete for alpha launch
+(PAYLOAD 7 frontend polish + PAYLOAD 8 ship-gate verification +
+PAYLOAD 9 deployment pipeline + PAYLOAD 10 backend closure landed).
+**Branch of record:** `claude/payload10-backend-closure-JpiXh`.
 
 This document is the single, top-level map of the ChatNow.Zone build.
 For per-service detail, follow the links into `services/*/` and
@@ -14,6 +15,27 @@ For per-service detail, follow the links into `services/*/` and
 
 ## 1. Domain layers
 
+| Layer                | Path                                                         | Purpose                                                                                                                                                            |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Governance constants | `services/core-api/src/config/governance.config.ts`          | Single source of truth for REDBOOK rate cards, Diamond Tier table, Recovery Engine rules, ledger spend order.                                                      |
+| Canonical Ledger     | `services/ledger/`                                           | Three-bucket wallet, append-only hash chain, idempotent spend, payout.                                                                                             |
+| Diamond Concierge    | `services/diamond-concierge/`                                | Volume + velocity pricing, safety-net metadata, liquidity snapshot.                                                                                                |
+| Recovery Engine      | `services/recovery/` + `services/ledger/recovery.service.ts` | Token Bridge, Three-Fifths Exit, expiration distribution.                                                                                                          |
+| GateGuard Sentinel   | `services/core-api/src/gateguard/`                           | Pre-processor for every PURCHASE / SPEND / PAYOUT; Welfare Guardian Score.                                                                                         |
+| Risk Engine          | `services/risk-engine/`                                      | PAYLOAD 10 — composite scoring (region + behavioural + Diamond Concierge intake) → append-only `risk_engine_decisions`.                                            |
+| FairPay rate lock    | `services/ledger/payout-rate-lock.service.ts`                | PAYLOAD 10 — captures live FFS rate at purchase (PAY-006); PayoutService honours the lock at session close.                                                        |
+| OBS audio gate       | `services/obs-bridge/src/audio-signal.service.ts`            | PAYLOAD 10 — silent-room enforcement; blocks Flicker n'Flame escalation above COLD without a positive vocal sample (PAY-008).                                      |
+| RBAC + step-up       | `services/core-api/src/auth/`                                | Role decision + audit + step-up coordination.                                                                                                                      |
+| Compliance           | `services/core-api/src/compliance/`                          | Audit chain, geo fencing, sovereign CAC, legal hold, WORM export.                                                                                                  |
+| Immutable audit      | `services/core-api/src/audit/`                               | Hash-chained ledger of every sensitive action; integrity verifier.                                                                                                 |
+| Flicker n'Flame Scoring            | `services/creator-control/src/ffs.engine.ts`           | Deterministic tier computation from telemetry.                                                                                                                     |
+| Creator Control      | `services/creator-control/`                                  | Broadcast Timing + Session Monitoring copilots, single-pane snapshot.                                                                                              |
+| Cyrano Layer 1       | `services/cyrano/`                                           | 8-category whisper engine, persona memory, latency SLO.                                                                                                            |
+| Integration Hub      | `services/integration-hub/`                                  | Wires Ledger ↔ GateGuard, Recovery ↔ Concierge, Flicker n'Flame Scoring ↔ CreatorControl + Cyrano.                                                                               |
+| Notification         | `services/notification/`                                     | 48h warnings, personal-touch follow-ups, dispatcher abstraction.                                                                                                   |
+| UI layer             | `ui/`                                                        | Type contracts + view-model presenters + page render plans for `/admin/diamond`, `/admin/recovery`, `/creator/control`, `/tokens`, `/diamond/purchase`, `/wallet`. |
+| Tests                | `tests/integration/` + `tests/e2e/`                          | Jest integration suite + Payload-8 end-to-end flows.                                                                                                               |
+| Program control      | `PROGRAM_CONTROL/`                                           | Directive queue / in-progress / done; report-backs; ship-gate verifier.                                                                                            |
 | Layer                   | Path                                                         | Purpose                                                                                                                                                            |
 | ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Governance constants    | `services/core-api/src/config/governance.config.ts`          | Single source of truth for REDBOOK rate cards, Diamond Tier table, Recovery Engine rules, ledger spend order.                                                      |
@@ -45,6 +67,8 @@ For per-service detail, follow the links into `services/*/` and
 | 6       | Immutable Audit          | Append-only hash-chain + WORM export + Canonical Compliance Checklist.                            |
 | 7       | Frontend Polish          | Diamond Concierge UI + CreatorControl pages + guest rate cards + dark mode + SEO + accessibility. |
 | 8       | E2E Validation           | Ship-gate verifier + comprehensive end-to-end tests + final docs.                                 |
+| 9       | Deployment Pipeline      | Production compose + ship-gate CI gating + Integration Hub v2 + LAUNCH_MANIFEST.                  |
+| 10      | Backend Closure          | Risk Engine (D002) production + FairPay PayoutRateLock (PAY-006/011) + OBS audio gate (PAY-008) + Cyrano L2 LLM provider (CYR-006) + Diamond Concierge intake fields (DIA-003/004). |
 
 ## 3. Real-time fabric (NATS)
 

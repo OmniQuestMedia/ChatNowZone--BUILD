@@ -4,4 +4,5 @@ export * from './repository';
 export * from './redbook-rate-card.service';
 export * from './ledger.service';
 export * from './payout.service';
+export * from './payout-rate-lock.service';
 export * from './recovery.service';

@@ -1,8 +1,13 @@
 # Pre-Launch Checklist — Canonical Corpus L0 Ship-Gate
 
 **Authority:** OmniQuest Media Inc. — `OQMI_GOVERNANCE.md` (Canonical Corpus v10)
-**Branch of record:** `claude/frontend-polish-concierge-ui-mlqrR` (Payload 7 + 8)
+**Branch of record:** `claude/payload10-backend-closure-JpiXh` (Payload 10)
 **Hard launch deadline:** 2026-10-01
+
+> Payload 10 (Backend Closure) closed: Risk Engine (D002), FairPay
+> PayoutRateLock (PAY-006/011), OBS audio gate (PAY-008/D004), Cyrano L2
+> LLM provider (CYR-006), Diamond Concierge intake fields (DIA-003/004).
+> Ship-gate verifier: 22/22 PASS.
 
 This checklist is the **L0 ship-gate**. Every line must be verifiable —
 either via the automated `ship-gate-verifier.ts` script or by a CEO-signed

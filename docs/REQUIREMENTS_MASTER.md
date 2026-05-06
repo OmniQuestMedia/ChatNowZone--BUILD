@@ -42,7 +42,7 @@
 | TOK-006 | Token origin tagging (PURCHASED / GIFTED) on CZT only. Critical for refund calc and ASC 606 breakage. | CHANGED | DONE | TOK-AUDIT-001 | YES |
 | TOK-007 | Premium environment pricing: replace SZT-gating with CZT quantity threshold checks per venue | CHANGED | NEEDS_DIRECTIVE | — | NO |
 | TOK-008 | Bundle ladder: rearchitect to CZT-only single-currency ladder. Remove all SZT entries. CZT quantities CEO-confirmed before build. | CHANGED | CLARIFY | — | YES |
-| TOK-009 | Diamond floor guarantee: 10,000+ CZT bulk purchase floors creator payout at RATE_WARM ($0.080) regardless of heat. Store diamond_floor_active bool on purchase record. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+| TOK-009 | Diamond floor guarantee: 10,000+ CZT bulk purchase floors creator payout at RATE_WARM ($0.080) regardless of heat. Store diamond_floor_active bool on purchase record. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | YES |
 | TOK-010 | CZT-only wallet Prisma schema: remove show_token_balance, szt_*, venue_scarcity_*, wristband_token_* columns. Rename standard_token_balance to czt_balance. Origin tag at DB level. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
 
 ---
@@ -58,12 +58,12 @@
 | PAY-003 | RATE_HOT: heat 61-85 = $0.085/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
 | PAY-004 | RATE_INFERNO: heat 86-100 = $0.090/CZT | NET-NEW | QUEUED | PAY-RATES-001 | YES |
 | PAY-005 | RATE_DIAMOND_FLOOR: $0.080 minimum on 10,000+ CZT bulk. Higher rate applies if heat warrants. | NET-NEW | QUEUED | PAY-RATES-001 | YES |
-| PAY-006 | Purchase-moment lock: Flicker n'Flame Scoring multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
+| PAY-006 | Purchase-moment lock: Flicker n'Flame Scoring multiplier captured at tx_initiated. Rate stored immutably on transaction record. Cannot be recalculated at delivery. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | YES |
 | PAY-007 | Human-action only guardrail: block clipboard paste on all tip/CZT-spend UI. Keyboard and touch only. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
-| PAY-008 | Audio modulation check: rate escalation above RATE_COLD requires active audio signal. Silent room cannot accumulate heat above Cold. Enforce in OBS kernel. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+| PAY-008 | Audio modulation check: rate escalation above RATE_COLD requires active audio signal. Silent room cannot accumulate heat above Cold. Enforce in OBS kernel. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | NO |
 | PAY-009 | Purchase-response correlation: guest CZT purchase events are dominant weight in Flicker n'Flame Scoring composite. Passive presence does not elevate heat. | NET-NEW | NEEDS_DIRECTIVE | — | YES |
 | PAY-010 | 100% tip pass-through: VERIFY platform_deduction = 0 on all tip transactions after CZT migration. Add test coverage. | VERIFY | VERIFY | — | YES |
-| PAY-011 | Tip transaction record: add heat_score_at_tip (int) and payout_rate_applied (decimal) fields. | CHANGED | NEEDS_DIRECTIVE | — | YES |
+| PAY-011 | Tip transaction record: add heat_score_at_tip (int) and payout_rate_applied (decimal) fields. | CHANGED | DONE | PAYLOAD-10-BACKEND-CLOSURE | YES |
 | PAY-012 | Creator rate display: show live rate range ($0.075-$0.090), current Flicker n'Flame Scoring tier, and active rate. Not a static number. | CHANGED | NEEDS_DIRECTIVE | — | NO |
 | PAY-013 | Remove founding creator static rate assignment at registration. Superseded by Pixel Legacy + Tease rate. | SUPERSEDED | DONE | TOK-RETIRE-001 | YES |
 
@@ -113,8 +113,8 @@ Lives at services/cyrano/**
 | CYR-003 | L2 Consumer Audio Platform: standalone audio session type within CNZ. Voice-native. Persona management. Gold/Diamond gating. Year 3+ standalone fork path preserved. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-004 | L3 HCZ Whisper Intelligence: RedBook scenario classifier feeds Cyrano prompt engine. Agent-facing overlay. No Guest surface. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-005 | L4 Enterprise B2B Whisper API: clean external API, key-gated, rate-limited. Year 3+. Architecture must support from launch. | DEFERRED | DEFERRED | — | NO |
-| CYR-006 | LLM integration layer: Anthropic Claude API. Abstracted behind provider interface for future swapping. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
-| CYR-007 | Session memory store: persistent narrative memory keyed on (creator_id, guest_id). Versioned. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+| CYR-006 | LLM integration layer: Anthropic Claude API. Abstracted behind provider interface for future swapping. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | NO |
+| CYR-007 | Session memory store: persistent narrative memory keyed on (creator_id, guest_id). Versioned. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | NO |
 | CYR-008 | Persona management system: creator-defined personas, versioned, multiple active, switch without losing context. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 | CYR-009 | Prompt template engine: maps (heat_tier, chat_sentiment, tipping_velocity_band) to narrative categories. Config-driven. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 
@@ -130,8 +130,8 @@ routing, reporting, and documentation.**
 |----|-------------|-----|--------|-----------|-----|
 | DIA-001 | Reclassify Diamond Concierge as Security and Fraud function in all routing, reporting, documentation. | CHANGED | NEEDS_DIRECTIVE | — | NO |
 | DIA-002 | Operating window: 11AM-11PM per Guest billing-address TZ. Last new booking: 10:30PM. Server-side enforcement. | CHANGED | NEEDS_DIRECTIVE | — | NO |
-| DIA-003 | Transaction record schema: add mandatory risk assessment fields — intoxication_flag, belligerence_flag, coercion_flag, duress_flag, account_signal_snapshot (JSONB), go_no_go_decision (enum: APPROVE/MODIFY/DEFER/DECLINE), modified_amount (decimal nullable), agent_id (FK), assessment_timestamp. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
-| DIA-004 | Account signal auto-population at call initiation: dispute_history_count, session_spend_velocity, account_tenure_days, spend_tenure_ratio, geographic_anomaly_flag, prior_flagged_count. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
+| DIA-003 | Transaction record schema: add mandatory risk assessment fields — intoxication_flag, belligerence_flag, coercion_flag, duress_flag, account_signal_snapshot (JSONB), go_no_go_decision (enum: APPROVE/MODIFY/DEFER/DECLINE), modified_amount (decimal nullable), agent_id (FK), assessment_timestamp. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | NO |
+| DIA-004 | Account signal auto-population at call initiation: dispute_history_count, session_spend_velocity, account_tenure_days, spend_tenure_ratio, geographic_anomaly_flag, prior_flagged_count. | NET-NEW | DONE | PAYLOAD-10-BACKEND-CLOSURE | NO |
 | DIA-005 | Diamond qualification: zero chargebacks/disputes/refunds/flags + willingness to purchase min 10,000 CZT + lifetime spend $8,000-$10,000 cumulative + agent review. | NET-NEW | NEEDS_DIRECTIVE | — | NO |
 
 ---

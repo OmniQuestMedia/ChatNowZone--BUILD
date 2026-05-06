@@ -443,6 +443,80 @@ const checks: Array<() => CheckResult> = [
           : [`Missing: ${missing.join(', ')}`],
     };
   },
+
+  // ── 12. PAYLOAD 10 — BACKEND CLOSURE ──────────────────────────────────────
+  () => {
+    const required = [
+      'services/risk-engine/src/risk-engine.service.ts',
+      'services/risk-engine/src/risk-engine.types.ts',
+      'services/ledger/payout-rate-lock.service.ts',
+      'services/obs-bridge/src/audio-signal.service.ts',
+      'services/cyrano/src/llm-provider.interface.ts',
+      'services/cyrano/src/llm-provider.in-memory.ts',
+      'prisma/migrations/20260503000000_payload10_backend_closure/migration.sql',
+      'tests/e2e/payload10-backend-closure.spec.ts',
+    ];
+    const missing = required.filter((p) => !exists(p));
+    return {
+      id: 'PAY10-1',
+      category: 'Payload 10 backend closure',
+      description:
+        'Risk Engine + FairPay rate lock + OBS audio gate + Cyrano LLM provider + migration + E2E test all present',
+      status: missing.length === 0 ? 'PASS' : 'FAIL',
+      evidence:
+        missing.length === 0
+          ? ['All Payload-10 backend closure files present']
+          : [`Missing: ${missing.join(', ')}`],
+    };
+  },
+  () => {
+    const sql = readSafe(
+      'prisma/migrations/20260503000000_payload10_backend_closure/migration.sql',
+    ) ?? '';
+    const checks = [
+      'risk_engine_decisions',
+      'payout_rate_locks',
+      'risk_engine_decisions_no_mutation',
+      'payout_rate_locks_no_mutation',
+      'go_no_go_decision',
+      'heat_score_at_tip',
+      'payout_rate_applied',
+    ];
+    const missing = checks.filter((c) => !sql.includes(c));
+    return {
+      id: 'PAY10-2',
+      category: 'Payload 10 backend closure',
+      description:
+        'Migration adds Risk Engine + Rate Lock tables, append-only triggers, and Diamond Concierge fields',
+      status: missing.length === 0 ? 'PASS' : 'FAIL',
+      evidence:
+        missing.length === 0
+          ? ['Every Payload-10 SQL element present']
+          : [`Missing markers: ${missing.join(', ')}`],
+    };
+  },
+  () => {
+    const topics = readSafe('services/nats/topics.registry.ts') ?? '';
+    const required = [
+      'RISK_ENGINE_DECISION_PASS',
+      'RISK_ENGINE_DECISION_BLOCK',
+      'AUDIT_IMMUTABLE_RISK_ENGINE',
+      'PAYOUT_RATE_LOCKED',
+      'AUDIT_IMMUTABLE_PAYOUT_LOCK',
+      'OBS_HEAT_ESCALATION_BLOCKED',
+    ];
+    const missing = required.filter((t) => !topics.includes(t));
+    return {
+      id: 'PAY10-3',
+      category: 'Payload 10 backend closure',
+      description: 'NATS topic registry contains every Payload-10 backend topic',
+      status: missing.length === 0 ? 'PASS' : 'FAIL',
+      evidence:
+        missing.length === 0
+          ? ['All Payload-10 NATS topics registered']
+          : [`Missing topics: ${missing.join(', ')}`],
+    };
+  },
 ];
 
 export function runShipGate(): ShipGateReport {
