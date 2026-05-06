@@ -444,7 +444,79 @@ const checks: Array<() => CheckResult> = [
     };
   },
 
-  // ── 12. PAYLOAD 10 — BACKEND CLOSURE ──────────────────────────────────────
+  // ── 12. INFRA_v1.0 — INFRASTRUCTURE & SECURITY POLICY ────────────────────
+  () => {
+    // Canada residency: policy doc must exist and declare ca-central-1.
+    const policy =
+      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const docPresent = policy.length > 0;
+    const caRegionPresent = policy.includes('ca-central-1');
+    const ok = docPresent && caRegionPresent;
+    return {
+      id: 'INFRA-1',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md present and mandates ca-central-1 Canada residency',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        docPresent
+          ? 'docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md exists'
+          : 'docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md MISSING',
+        caRegionPresent
+          ? 'ca-central-1 declared as primary region'
+          : 'ca-central-1 not referenced — Canada residency unconfirmed',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Create docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md with ca-central-1 mandate',
+    };
+  },
+  () => {
+    // WORM backups: policy must mandate S3_OBJECT_LOCK + 90-day retention.
+    const policy =
+      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const wormOk = policy.includes('S3_OBJECT_LOCK') && policy.includes('WORM_RETENTION_DAYS: 90');
+    return {
+      id: 'INFRA-2',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'INFRA policy mandates S3 Object Lock (WORM) with 90-day minimum retention',
+      status: wormOk ? 'PASS' : 'FAIL',
+      evidence: [
+        policy.includes('S3_OBJECT_LOCK')
+          ? 'S3_OBJECT_LOCK referenced in policy'
+          : 'S3_OBJECT_LOCK not referenced',
+        policy.includes('WORM_RETENTION_DAYS: 90')
+          ? 'WORM_RETENTION_DAYS: 90 declared'
+          : 'WORM_RETENTION_DAYS: 90 not declared',
+      ],
+      remediation: wormOk
+        ? undefined
+        : 'Add S3_OBJECT_LOCK and WORM_RETENTION_DAYS: 90 to infrastructure policy §3.2',
+    };
+  },
+  () => {
+    // PII reference-only: policy must declare PII_REFERENCE_ONLY principle.
+    const policy =
+      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const piiOk = policy.includes('PII_REFERENCE_ONLY');
+    return {
+      id: 'INFRA-3',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description: 'INFRA policy declares PII_REFERENCE_ONLY data handling principle',
+      status: piiOk ? 'PASS' : 'FAIL',
+      evidence: [
+        piiOk
+          ? 'PII_REFERENCE_ONLY principle declared in policy §4.1'
+          : 'PII_REFERENCE_ONLY not declared — PII handling unspecified',
+      ],
+      remediation: piiOk
+        ? undefined
+        : 'Add PII_REFERENCE_ONLY principle to infrastructure policy §4',
+    };
+  },
+
+  // ── 13. PAYLOAD 10 — BACKEND CLOSURE ──────────────────────────────────────
   () => {
     const required = [
       'services/risk-engine/src/risk-engine.service.ts',

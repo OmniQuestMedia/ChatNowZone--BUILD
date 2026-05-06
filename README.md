@@ -18,6 +18,8 @@ tree.
 ## Authoritative docs
 
 - **Governance doctrine:** [`PROGRAM_CONTROL/OQMI_GOVERNANCE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) — invariants, agent roles, PR-lifecycle authority.
+- **Infrastructure & Security policy:** [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) — INFRA_v1.0 — Canada residency, WORM backups, PII handling, network isolation, zero-trust, secret management, partner contracts.
+- **Policy index:** [`docs/POLICIES/`](docs/POLICIES/) — all active OQMInc platform policies.
 - **Coding doctrine:** [`PROGRAM_CONTROL/OQMI_SYSTEM_STATE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md) — OQMI Coding Doctrine v2.0.
 - **Program control pipeline:** [`PROGRAM_CONTROL/`](PROGRAM_CONTROL/) — directive queue, in-progress, done, report-backs, repo manifest, ship-gate verifier.
 - **Architecture overview (Payloads 1–8):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md).
