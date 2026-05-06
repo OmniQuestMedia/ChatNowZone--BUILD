@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/cleanup-and-housekeeping-phase-0`
-**Commit:** `329430e7cef4798d6511e681c15d8733d2642e42`
-**Generated:** 2026-05-06T15:49:48Z
+**Branch:** `dependabot/npm_and_yarn/types/jest-30.0.0`
+**Commit:** `e27d69d59c93ff0c33343c1dc44322af45e9061b`
+**Generated:** 2026-05-06T15:51:49Z
 
 ## All Files
 
