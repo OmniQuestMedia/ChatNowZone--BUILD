@@ -3,8 +3,9 @@
 **Authority:** Kevin B. Hartley (CEO) — pending sign-off in PROGRAM_CONTROL/CLEARANCES/
 **Branch:** claude/payload10-backend-closure-JpiXh
 **Priority:** High (FIZ/GOV scoped where applicable)
-**Status:** IN_PROGRESS
+**Status:** DONE
 **Filed:** 2026-05-03
+**Closed:** 2026-05-06 (PR #403 — see PROGRAM_CONTROL/REPORT_BACK/PAYLOAD-10-BACKEND-CLOSURE.md)
 
 ## Goal
 

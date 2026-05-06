@@ -78,8 +78,12 @@ export class PayoutService {
           level: lock.heatTier.toLowerCase() as HeatLevel,
           ratePerToken: lock.ratePerTokenUsd,
           appliedFloor: lock.floorApplied,
-          appliedDiamondFloor: lock.diamondFloorActive,
-          appliedPixelLegacyFloor: lock.pixelLegacyFloorActive,
+          // PAY-006 audit invariant — the lock's `*Applied` fields carry
+          // "this floor actually raised the live rate" semantics, distinct
+          // from "eligible". PayoutService writes the applied flags to the
+          // ledger metadata so settlement reconciliation matches reality.
+          appliedDiamondFloor: lock.diamondFloorApplied,
+          appliedPixelLegacyFloor: lock.pixelLegacyFloorApplied,
         }
       : this.rateCards.resolveCreatorPayoutRate({
           heatScore: input.heatScore,

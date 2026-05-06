@@ -335,8 +335,14 @@ export class RiskEngineService {
         ? NATS_TOPICS.RISK_ENGINE_DECISION_BLOCK
         : NATS_TOPICS.RISK_ENGINE_DECISION_ESCALATE;
 
+    // Primary reason_code aligns the NATS payload with the persisted DB row
+    // and satisfies the file-header invariant: every emission carries
+    // correlation_id + reason_code. The reason_codes array stays for detail.
+    const primaryReason = this.primaryReasonCode(result.reasonCodes, result.tier);
+
     this.nats.publish(topic, {
       correlation_id: result.correlationId,
+      reason_code: primaryReason,
       subject_user_id: input.subjectUserId,
       intent: input.intent,
       composite_score: result.compositeScore,
@@ -350,6 +356,7 @@ export class RiskEngineService {
     // Immutable audit envelope — non-PII summary only.
     this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_RISK_ENGINE, {
       correlation_id: result.correlationId,
+      reason_code: primaryReason,
       subject_user_id: input.subjectUserId,
       intent: input.intent,
       composite_score: result.compositeScore,

@@ -377,7 +377,8 @@ describe('PAYLOAD 10 — backend closure', () => {
       expect(result.heatTier).toBe('COLD');
       expect(result.ratePerTokenUsd).toBeCloseTo(0.08, 4);
       expect(result.floorApplied).toBe(true);
-      expect(result.diamondFloorActive).toBe(true);
+      expect(result.diamondFloorApplied).toBe(true);
+      expect(result.diamondFloorEligible).toBe(true);
     });
   });
 

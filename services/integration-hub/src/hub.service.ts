@@ -274,9 +274,13 @@ export class IntegrationHubService {
       : true;
     const approved = gateguardOk && riskOk;
 
+    // Hub-owned handoff topic — distinct from AUDIT_IMMUTABLE_RISK_ENGINE
+    // which is solely owned by RiskEngineService.evaluate() so subscribers
+    // see one stable schema per topic.
     if (req.risk_engine) {
-      this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_RISK_ENGINE, {
+      this.nats.publish(NATS_TOPICS.HUB_RISK_ENGINE_HANDOFF, {
         correlation_id: req.correlation_id,
+        reason_code: req.reason_code,
         wallet_id: req.wallet_id,
         actor_user_id: req.actor_user_id,
         intent: req.intent,
@@ -286,14 +290,21 @@ export class IntegrationHubService {
         composite_score: req.risk_engine.composite_score,
         tier: req.risk_engine.tier,
         reason_codes: req.risk_engine.reason_codes,
-        rule_applied_id: req.risk_engine.rule_applied_id,
+        risk_engine_correlation_id: req.risk_engine.correlation_id,
+        risk_engine_rule_applied_id: req.risk_engine.rule_applied_id,
+        rule_applied_id: HUB_RULE_ID,
         captured_at_utc: capturedAt,
       });
     }
 
+    // Hub-owned handoff topic — distinct from AUDIT_IMMUTABLE_PAYOUT_LOCK
+    // which PayoutRateLockService owns. Hub only signals "the guarded
+    // request carried a lock id"; the lock-service envelope carries the
+    // canonical lock state.
     if (req.payout_rate_lock_correlation_id) {
-      this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_PAYOUT_LOCK, {
+      this.nats.publish(NATS_TOPICS.HUB_PAYOUT_RATE_LOCK_ATTACHED, {
         correlation_id: req.correlation_id,
+        reason_code: req.reason_code,
         wallet_id: req.wallet_id,
         intent: req.intent,
         payout_rate_lock_correlation_id: req.payout_rate_lock_correlation_id,

@@ -39,6 +39,13 @@ export interface AudioProbeInput {
   creatorId: string;
   /** Normalised 0..1 vocal-to-noise ratio (mirrors FFS audio_vocal_ratio). */
   vocalRatio: number;
+  /**
+   * Optional correlation id propagated to downstream NATS subscribers + audit
+   * dedupe. When omitted the service derives a deterministic id from
+   * `${streamId}:${capturedAtMs}` so the doctrine invariant
+   * (correlation_id + reason_code on every NATS emission) is upheld.
+   */
+  correlationId?: string;
   /** Optional override for clock injection in tests. */
   capturedAtMs?: number;
 }
@@ -85,7 +92,12 @@ export class AudioSignalService {
     const topic = present
       ? NATS_TOPICS.OBS_AUDIO_SIGNAL_PRESENT
       : NATS_TOPICS.OBS_AUDIO_SIGNAL_ABSENT;
+    const reasonCode = present ? 'AUDIO_SIGNAL_PRESENT' : 'AUDIO_SIGNAL_ABSENT';
+    const correlationId =
+      input.correlationId ?? `obs-audio:${input.streamId}:${now}`;
     this.nats.publish(topic, {
+      correlation_id: correlationId,
+      reason_code: reasonCode,
       stream_id: input.streamId,
       creator_id: input.creatorId,
       vocal_ratio: input.vocalRatio,

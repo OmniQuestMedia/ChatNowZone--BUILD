@@ -342,12 +342,29 @@ export const NATS_TOPICS = {
   RISK_ENGINE_DECISION_REVIEW:   'risk.engine.decision.review',
   RISK_ENGINE_DECISION_BLOCK:    'risk.engine.decision.block',
   RISK_ENGINE_DECISION_ESCALATE: 'risk.engine.decision.escalate',
+  /**
+   * Single canonical immutable-audit topic for risk-engine decisions. Owned
+   * by RiskEngineService.evaluate() — only RiskEngineService publishes here
+   * so subscribers see one stable schema.
+   */
   AUDIT_IMMUTABLE_RISK_ENGINE:   'audit.immutable.risk_engine',
+  /** Hub-only handoff topic — emitted when the Hub forwards a guarded ledger
+   *  request that carries a Risk Engine envelope. Distinct schema from the
+   *  RiskEngineService-owned audit topic. */
+  HUB_RISK_ENGINE_HANDOFF:       'hub.risk_engine.handoff',
 
   // ── PAYLOAD 10 — FairPay rate lock (PAY-006) ───────────────────────────
   PAYOUT_RATE_LOCKED:            'fairpay.payout.rate_locked',
   PAYOUT_RATE_LOCK_FLOOR_APPLIED: 'fairpay.payout.rate_lock.floor_applied',
+  /**
+   * Single canonical immutable-audit topic for payout rate locks. Owned by
+   * PayoutRateLockService.capture() — only the lock service publishes here.
+   */
   AUDIT_IMMUTABLE_PAYOUT_LOCK:   'audit.immutable.payout_lock',
+  /** Hub-only handoff topic — emitted when a guarded ledger request attaches
+   *  a payout_rate_lock_correlation_id. Distinct schema from
+   *  AUDIT_IMMUTABLE_PAYOUT_LOCK. */
+  HUB_PAYOUT_RATE_LOCK_ATTACHED: 'hub.payout_rate_lock.attached',
 
   // ── PAYLOAD 10 — OBS audio-signal gate (PAY-008 / D004) ────────────────
   OBS_AUDIO_SIGNAL_PRESENT:      'obs.audio.signal.present',
