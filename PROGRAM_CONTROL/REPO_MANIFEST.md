@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/bootstrap-docs-policies`
-**Commit:** `07e0024d8ca5a43a1d4fcc0230910bd9c8c3667b`
-**Generated:** 2026-05-06T15:38:11Z
+**Branch:** `copilot/cleanup-and-housekeeping-phase-0`
+**Commit:** `329430e7cef4798d6511e681c15d8733d2642e42`
+**Generated:** 2026-05-06T15:49:48Z
 
 ## All Files
 
@@ -14,6 +14,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/CODEOWNERS`
 - `.github/ISSUE_TEMPLATE/directive.yml`
 - `.github/copilot-instructions.md`
+- `.github/dependabot.yml`
 - `.github/linters/.markdown-lint.yml`
 - `.github/linters/.yaml-lint.yml`
 - `.github/refs-branch-policy.md`
@@ -85,10 +86,12 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.1.md`
 - `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`
 - `PROGRAM_CONTROL/LAUNCH_READY.md`
 - `PROGRAM_CONTROL/REPORT_BACK/ADD-CLEARANCE-CONFIRMATION.md`
