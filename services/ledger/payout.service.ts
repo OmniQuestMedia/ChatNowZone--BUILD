@@ -12,6 +12,7 @@
 import type { LedgerService } from './ledger.service';
 import type { HeatLevel, LedgerBucket } from './types';
 import type { RedbookRateCardService } from './redbook-rate-card.service';
+import type { PayoutRateLockService, PayoutRateLockResult } from './payout-rate-lock.service';
 
 export interface SessionCloseInput {
   sessionId: string;                   // correlation_id root
@@ -20,6 +21,12 @@ export interface SessionCloseInput {
   heatScore: number;                   // 0–100 — from FFS scorer
   diamondFloorActive: boolean;         // true when creator has Diamond floor guarantee
   isPixelLegacy?: boolean;             // true when creator is PIXEL_LEGACY type — applies the $0.07 floor
+  /**
+   * PAY-006 — optional reference to a captured PayoutRateLock. When present
+   * the locked rate is honoured verbatim (no re-resolution from live FFS).
+   * The `heatScore` argument is still used to populate the metadata block.
+   */
+  rateLockCorrelationId?: string;
 }
 
 export interface SessionPayoutResult {
@@ -38,12 +45,20 @@ export class PayoutService {
   constructor(
     private readonly ledger: LedgerService,
     private readonly rateCards: RedbookRateCardService,
+    /**
+     * Optional rate-lock service (PAY-006). When supplied, the payout flow
+     * prefers the locked rate over re-resolving from live FFS so the rate
+     * captured at purchase wins.
+     */
+    private readonly rateLock?: PayoutRateLockService,
   ) {}
 
   /**
    * Idempotent on `sessionId`: settles the creator share of a session into
    * the creator wallet's bonus bucket. FFS payout rate is resolved once at
-   * close-time and persisted in the ledger metadata for later audit.
+   * close-time and persisted in the ledger metadata for later audit. When a
+   * `rateLockCorrelationId` is supplied the locked rate is honoured —
+   * recomputation is refused per PAY-006.
    */
   async settleSessionClose(input: SessionCloseInput): Promise<SessionPayoutResult> {
     if (!Number.isInteger(input.grossCzt) || input.grossCzt < 0) {
@@ -53,11 +68,24 @@ export class PayoutService {
       throw new Error(`heatScore must be 0–100 (got ${input.heatScore})`);
     }
 
-    const rate = this.rateCards.resolveCreatorPayoutRate({
-      heatScore: input.heatScore,
-      diamondFloorActive: input.diamondFloorActive,
-      isPixelLegacy: input.isPixelLegacy,
-    });
+    const lock: PayoutRateLockResult | null =
+      input.rateLockCorrelationId && this.rateLock
+        ? await this.rateLock.findByCorrelationId(input.rateLockCorrelationId)
+        : null;
+
+    const rate = lock
+      ? {
+          level: lock.heatTier.toLowerCase() as HeatLevel,
+          ratePerToken: lock.ratePerTokenUsd,
+          appliedFloor: lock.floorApplied,
+          appliedDiamondFloor: lock.diamondFloorActive,
+          appliedPixelLegacyFloor: lock.pixelLegacyFloorActive,
+        }
+      : this.rateCards.resolveCreatorPayoutRate({
+          heatScore: input.heatScore,
+          diamondFloorActive: input.diamondFloorActive,
+          isPixelLegacy: input.isPixelLegacy,
+        });
 
     // Payout USD is grossCzt * ratePerToken; but we credit the creator wallet
     // in CZT, not USD. The CZT figure is identical to grossCzt (platform fee
@@ -82,6 +110,11 @@ export class PayoutService {
           applied_pixel_legacy_floor: rate.appliedPixelLegacyFloor,
           is_pixel_legacy: input.isPixelLegacy ?? false,
           payout_usd: payoutUsd,
+          // PAY-006 — emit the lock id so audit jobs can join back to
+          // payout_rate_locks and verify the locked rate was honoured.
+          payout_rate_lock_id: lock?.id ?? null,
+          payout_rate_lock_correlation_id: lock?.correlationId ?? null,
+          rate_source: lock ? 'PAYOUT_RATE_LOCK' : 'LIVE_FFS_RESOLUTION',
         },
       });
     }

@@ -1,10 +1,15 @@
 ## CHATNOW.ZONE BUILD STATUS
 
-**Date:** April 24, 2026
+**Date:** May 6, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)
 
 All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
+
+**Payload 10 (Backend Closure)** added: Risk Engine (D002) production-grade,
+FairPay PayoutRateLock (PAY-006 / PAY-011), OBS audio-signal gate (PAY-008 /
+D004), Cyrano L2 LLM provider abstraction (CYR-006), Diamond Concierge intake
+risk fields (DIA-003 / DIA-004). Ship-gate verifier extended to 22/22 PASS.
 Retired tier alignment complete: `DAY_PASS`, `ANNUAL` (as tier), `OMNIPASS_PLUS`, and standalone `DIAMOND`
 replaced with canonical `GUEST` / `VIP` / `VIP_SILVER` / `VIP_GOLD` / `VIP_PLATINUM` / `VIP_DIAMOND`
 across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipService`,
@@ -71,11 +76,16 @@ Counts from `docs/REQUIREMENTS_MASTER.md` (114 tracked rows):
 
 | Status          | Count |
 | --------------- | ----: |
-| DONE            |    20 |
+| DONE            |    29 |
 | QUEUED          |    12 |
 | IN_PROGRESS     |     4 |
-| NEEDS_DIRECTIVE |    73 |
+| NEEDS_DIRECTIVE |    64 |
 | RETIRED         |     9 |
+
+> Distribution updated 2026-05-06 (Payload 10 — Backend Closure). Nine
+> NEEDS_DIRECTIVE rows promoted to DONE: PAY-006, PAY-008, PAY-011, TOK-009,
+> DIA-003, DIA-004, CYR-006, CYR-007, plus the new RiskEngineService (D002)
+> coverage row tracked in §4 below.
 
 ---
 
@@ -87,16 +97,16 @@ H-LAUNCH-READY sign-off directive):
 | System                                     | Directive(s) | Status at snapshot                                                                                                                                                                |
 | ------------------------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Three-Bucket Wallet                        | D001         | DONE — `LedgerService.debitWallet` + `ThreeBucketSpendGuardMiddleware` defence-in-depth                                                                                           |
-| Risk Engine                                | D002         | NEEDS_DIRECTIVE                                                                                                                                                                   |
-| NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with AUDIT*IMMUTABLE*\* topics                                                                                                               |
-| OBS Broadcast Kernel                       | D004         | NEEDS_DIRECTIVE                                                                                                                                                                   |
-| FairPay + NOWPayouts                       | D006, E002   | NEEDS_DIRECTIVE                                                                                                                                                                   |
+| Risk Engine                                | D002         | DONE — PAYLOAD 10 RiskEngineService (composite scoring + Diamond Concierge intake + append-only `risk_engine_decisions` + NATS RISK_ENGINE_DECISION_*)                              |
+| NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with AUDIT*IMMUTABLE*\* topics + PAYLOAD 10 RISK_ENGINE / PAYOUT_RATE_LOCKED / OBS_HEAT_ESCALATION topics                                     |
+| OBS Broadcast Kernel                       | D004         | DONE — PAYLOAD 10 AudioSignalService gates Flicker n'Flame escalation above COLD on a positive vocal signal (PAY-008); OBSBridgeService key/lifecycle intact                        |
+| FairPay + NOWPayouts                       | D006, E002   | DONE (FairPay) — PAYLOAD 10 PayoutRateLockService captures rate at purchase (PAY-006/011); NOWPayouts batch settlement remains scaffold                                            |
 | RedBook                                    | E001         | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | Compliance Stack                           | D008         | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | GateGuard Sentinel                         | E003         | NEEDS_DIRECTIVE                                                                                                                                                                   |
 | Flicker n'Flame Scoring (FFS)                           | PAYLOAD 5    | DONE (scaffold) — deterministic tier computation + NATS emission, persistence NEEDS_DIRECTIVE                                                                                     |
 | CreatorControl.Zone                        | PAYLOAD 5    | DONE (scaffold) — Broadcast Timing + Session Monitoring copilots, single-pane snapshot; frontend NEEDS_DIRECTIVE                                                                  |
-| Cyrano Layer 1                             | PAYLOAD 5    | DONE (scaffold) — 8-category whisper engine, memory, personas, latency SLO; Layer 2 (LLM + Prisma memory) NEEDS_DIRECTIVE                                                         |
+| Cyrano Layer 1                             | PAYLOAD 5    | DONE — 8-category whisper engine, memory, personas, latency SLO. PAYLOAD 10 added Layer 2 LLM provider abstraction (CYR-006: `CyranoLlmProvider` + `InMemoryCyranoLlmProvider`) and Prisma-backed session memory (CYR-007). Anthropic Claude provider lands in Payload 11. |
 | Integration Hub                            | PAYLOAD 5    | DONE (scaffold) — Ledger↔GateGuard, Recovery↔Diamond Concierge, Flicker n'Flame Scoring↔CreatorControl+Cyrano handoffs                                                                          |
 | Black-Glass Interface                      | G101+        | NEEDS_DIRECTIVE — visual treatment deferred to post-alpha (Payload 7 ships brand tokens + dark-mode default)                                                                      |
 | Banned-entity residual purge               | C001 (§12)   | DONE — purge/redact sweep completed 2026-04-24                                                                                                                                    |
@@ -139,15 +149,9 @@ Verified via `grep` in `prisma/schema.prisma`:
   `DepartmentCoverage`, `StatHoliday`, `WebhookIdempotencyLog`,
   `AuditEvent` (reason_code only), and other ledger-adjacent models
   via init-ledger SQL.
-- **Partial on `LegalHold`:** `reason_code` present; `correlation_id`
-  **missing** from both `prisma/schema.prisma` (line 281) and its
-  migration (`20260409000000_legal_hold_db_migration/migration.sql`).
-
-**Remediation item:** author a FIZ/GOV-scoped directive to add
-`correlation_id VARCHAR(64) NOT NULL` to `legal_holds` via a new
-migration. Out of scope for the 2026-04-24 hygiene run (would require
-a FIZ-prefixed commit with REASON/IMPACT/CORRELATION_ID; the hygiene
-run is CHORE-prefixed).
+- **`LegalHold`:** `reason_code` AND `correlation_id` both present after
+  migration `20260428130000_legal_hold_correlation_id`. Verified during
+  Payload 10 audit on 2026-05-06.
 
 ### 5.3 Network isolation — Postgres (5432) / Redis (6379)
 
@@ -177,6 +181,22 @@ report-back files. `grep -rni "Navigator\|Jaime Watt"` outside the
 `archive/` quarantine returns zero matches. **Status:** PASS.
 
 ---
+
+## 6.0 Payload 10 — Backend Closure Deliverables (2026-05-06)
+
+| Artifact | Path | Purpose |
+| --- | --- | --- |
+| Risk Engine service | `services/risk-engine/src/risk-engine.service.ts` | Composite risk scoring (region + behavioural + Diamond Concierge) with append-only `risk_engine_decisions` rows + NATS emission |
+| Risk Engine types | `services/risk-engine/src/risk-engine.types.ts` | Canonical envelope: `RiskIntent`, `RiskTier`, `RiskDecision`, signal slices |
+| FairPay rate lock | `services/ledger/payout-rate-lock.service.ts` | Captures live FFS rate at purchase (PAY-006), persists in immutable `payout_rate_locks`, honoured by `PayoutService` |
+| OBS audio gate | `services/obs-bridge/src/audio-signal.service.ts` | Per-stream vocal-presence probe; gates Flicker n'Flame escalation above COLD (PAY-008) |
+| Cyrano LLM provider interface | `services/cyrano/src/llm-provider.interface.ts` | Provider abstraction satisfying CYR-006; production swaps in Anthropic Claude |
+| Cyrano LLM in-memory provider | `services/cyrano/src/llm-provider.in-memory.ts` | Deterministic stub for tests / CI / offline dev |
+| Schema migration | `prisma/migrations/20260503000000_payload10_backend_closure/migration.sql` | Adds `risk_engine_decisions`, `payout_rate_locks`, `transactions.heat_score_at_tip / payout_rate_applied / diamond_floor_active`, Diamond Concierge intake fields on `risk_assessments`, `ZoneAccessZone.CYRANO_LAYER2`, append-only triggers |
+| Hub Risk + Lock handoffs | `services/integration-hub/src/hub.service.ts` | `forwardGuardedLedgerRequest` now refuses on Risk Engine BLOCK/ESCALATE and emits `AUDIT_IMMUTABLE_PAYOUT_LOCK` when a rate-lock id is attached |
+| NATS topics | `services/nats/topics.registry.ts` | `RISK_ENGINE_DECISION_*`, `AUDIT_IMMUTABLE_RISK_ENGINE`, `PAYOUT_RATE_LOCKED`, `OBS_AUDIO_SIGNAL_*`, `OBS_HEAT_ESCALATION_BLOCKED` |
+| E2E test | `tests/e2e/payload10-backend-closure.spec.ts` | 9-test coverage for Risk Engine, audio gate, rate-lock, Cyrano LLM provider |
+| Ship-gate verifier | `PROGRAM_CONTROL/ship-gate-verifier.ts` | +3 Payload-10 checks (PAY10-1, PAY10-2, PAY10-3) — total 22/22 PASS |
 
 ## 6. Repo Hygiene Actions (2026-04-25 — Payload 7 + 8)
 

@@ -32,6 +32,8 @@ import type { CreatorControlService } from '../../creator-control/src/creator-co
 import type { CyranoService } from '../../cyrano/src/cyrano.service';
 
 // PAYLOAD 9 — version bump: final consolidation release of the Hub.
+// PAYLOAD 10 — extends with Risk Engine pre-processor + FairPay rate-lock
+// handoffs without breaking the Payload-9 contract.
 export const HUB_RULE_ID = 'INTEGRATION_HUB_v2';
 
 /**
@@ -68,6 +70,33 @@ export interface GuardedLedgerRequest {
   reason_code: string;
   captured_at_utc: string;
   gateguard: GateGuardEvaluation;
+  /**
+   * PAYLOAD 10 — optional Risk Engine envelope. When supplied the Hub will
+   * reject forwarding on BLOCK / ESCALATE in addition to GateGuard's own
+   * decision. Callers without a Risk Engine wired through (legacy paths)
+   * may omit this field; Payload-10 paths always populate it.
+   */
+  risk_engine?: RiskEngineEvaluationEnvelope;
+  /**
+   * PAYLOAD 10 — optional payout rate-lock id captured at purchase. When
+   * present the Hub emits PAYOUT_RATE_LOCKED so downstream subscribers can
+   * mirror the lock onto the transaction record (PAY-006).
+   */
+  payout_rate_lock_correlation_id?: string;
+}
+
+/**
+ * Subset of the RiskEngineService.evaluate() result the Hub consumes. Mirrors
+ * the canonical envelope without forcing a runtime import on the risk
+ * service — keeps the Hub module-boundary-clean.
+ */
+export interface RiskEngineEvaluationEnvelope {
+  decision: 'PASS' | 'REVIEW' | 'BLOCK' | 'ESCALATE';
+  composite_score: number;
+  tier: 'GREEN' | 'AMBER' | 'RED' | 'CRITICAL';
+  reason_codes: readonly string[];
+  correlation_id: string;
+  rule_applied_id: string;
 }
 
 export interface GuardedLedgerDecision {
@@ -234,9 +263,44 @@ export class IntegrationHubService {
    */
   forwardGuardedLedgerRequest(req: GuardedLedgerRequest): GuardedLedgerDecision {
     const capturedAt = req.captured_at_utc ?? new Date().toISOString();
-    const approved =
+    const gateguardOk =
       req.gateguard.decision === 'APPROVED' ||
       req.gateguard.decision === 'COOLDOWN';
+    // PAYLOAD 10 — Risk Engine pre-processor. PASS/REVIEW are forwardable;
+    // BLOCK/ESCALATE refuse the ledger write regardless of GateGuard.
+    const riskOk = req.risk_engine
+      ? req.risk_engine.decision === 'PASS' ||
+        req.risk_engine.decision === 'REVIEW'
+      : true;
+    const approved = gateguardOk && riskOk;
+
+    if (req.risk_engine) {
+      this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_RISK_ENGINE, {
+        correlation_id: req.correlation_id,
+        wallet_id: req.wallet_id,
+        actor_user_id: req.actor_user_id,
+        intent: req.intent,
+        amount_tokens: req.amount_tokens,
+        amount_usd_cents: req.amount_usd_cents.toString(),
+        decision: req.risk_engine.decision,
+        composite_score: req.risk_engine.composite_score,
+        tier: req.risk_engine.tier,
+        reason_codes: req.risk_engine.reason_codes,
+        rule_applied_id: req.risk_engine.rule_applied_id,
+        captured_at_utc: capturedAt,
+      });
+    }
+
+    if (req.payout_rate_lock_correlation_id) {
+      this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_PAYOUT_LOCK, {
+        correlation_id: req.correlation_id,
+        wallet_id: req.wallet_id,
+        intent: req.intent,
+        payout_rate_lock_correlation_id: req.payout_rate_lock_correlation_id,
+        rule_applied_id: HUB_RULE_ID,
+        captured_at_utc: capturedAt,
+      });
+    }
 
     this.nats.publish(NATS_TOPICS.AUDIT_IMMUTABLE_GATEGUARD, {
       correlation_id: req.correlation_id,

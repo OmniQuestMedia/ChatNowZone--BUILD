@@ -200,6 +200,8 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       const boost =
         SENSYNC_FFS_BOOST_MIN + t * (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN);
       rawScore += boost;
+    }
+
     // Phase 3 — SenSync™ FFS boost. Applied only when the BPM_TO_FFS scope is
     // active upstream (the SenSync service refuses to publish to
     // SENSYNC_BPM_UPDATE without it, so by the time `sensync_boost_points` is
@@ -851,8 +853,9 @@ export class FfsService implements OnModuleInit, OnModuleDestroy {
       if (!sessionId) return;
       const last = this.lastInput.get(sessionId);
       if (last && last.sensync_bpm !== undefined) {
-        const { sensync_bpm: _dropped, ...rest } = last;
-        this.lastInput.set(sessionId, rest);
+        const next = { ...last };
+        delete (next as Partial<typeof last>).sensync_bpm;
+        this.lastInput.set(sessionId, next);
       }
     });
 
