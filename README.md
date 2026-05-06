@@ -2,7 +2,7 @@
 
 > **✅ BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)**
 > Payloads 1–10 executed and verified. All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
-> **Date:** April 24, 2026 · **Next steps:** Pixel Legacy onboarding, payment processor testing, CEO launch clearance sign-off.
+> **Date:** May 6, 2026 · **Next steps:** Phase 1 IaC Bootstrap (ca-central-1), eCommsZone Node.js client integration, ship-gate-verifier INFRA_v1.0 full matrix — see [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) + [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) (INFRA_v1.0).
 
 > **ChatNow.Zone — Canonical Corpus v10 governed monorepo (TypeScript + Prisma + Postgres).**
 > **Status: BUILD COMPLETE (Payload 9, 2026-04-24) — Alpha Launch Ready (September 2026 target).**
@@ -133,7 +133,7 @@ the full topology, cross-Payload contracts, and AWS deploy plan.
 
 ## Ship-gate status (vs Canonical Corpus L0)
 
-Snapshot at 2026-04-25 (Payload 7 + 8):
+Snapshot at 2026-05-06 (Payload 10 + WORK-ORDER-v0.2 / INFRA_v1.0):
 
 - **PAYLOAD 1 (Canonical Ledger)** — DONE. Three-bucket wallet + hash chain.
 - **PAYLOAD 2 (Recovery Engine)** — DONE. REDBOOK §5 pillars wired.
@@ -143,6 +143,10 @@ Snapshot at 2026-04-25 (Payload 7 + 8):
 - **PAYLOAD 6 (Immutable audit + RBAC + compliance)** — DONE.
 - **PAYLOAD 7 (Frontend polish + Diamond Concierge UI)** — DONE.
 - **PAYLOAD 8 (E2E validation + ship-gate verifier)** — DONE.
+- **PAYLOAD 9 (INFRA_v1.0 policy + Phase 0 housekeeping)** — DONE.
+- **PAYLOAD 10 (WORK-ORDER-v0.2 + ship-gate INFRA_v1.0 checks)** — DONE. All L0 INFRA checks GREEN. Active directive: [`WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md).
+
+**Phase 1 OPEN (WORK-ORDER-v0.2):** IaC Bootstrap (ca-central-1), eCommsZone integration, INFRA_v1.0 full matrix in ship-gate-verifier, zero-trust + EDR alignment. See [`WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) for full task list.
 
 Remaining `NEEDS_DIRECTIVE` items (deferred to post-alpha): Cyrano
 Layer 2, FairPay + NOWPayouts wiring, and OBS Broadcast Kernel
