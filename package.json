@@ -27,7 +27,7 @@
     "@nestjs/platform-express": "^11.1.18",
     "@nestjs/typeorm": "^11.0.0",
     "@prisma/client": "^6.2.1",
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "bull": "^4.16.5",
     "decimal.js": "10.6.0",
     "nats": "^2.29.0",
@@ -36,7 +36,7 @@
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
+    "@types/bcryptjs": "^3.0.0",
     "@types/bull": "^4.10.4",
     "@types/jest": "^29.5.14",
     "@types/node": "^25.6.0",
