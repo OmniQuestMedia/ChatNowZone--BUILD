@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `dependabot/npm_and_yarn/nestjs/platform-express-11.1.19`
 **Commit:** `67ee80ad5bf6e3b4f9d509563cfcd9811ad5a298`
 **Generated:** 2026-05-06T15:52:42Z
+**Branch:** `dependabot/npm_and_yarn/nestjs/typeorm-11.0.1`
+**Commit:** `c4aac66a74058bd92e08aa481cc8d7bcd546e5bf`
+**Generated:** 2026-05-06T16:04:27Z
 
 ## All Files
 
