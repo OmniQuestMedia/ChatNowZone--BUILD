@@ -29,6 +29,26 @@ listed below in §2(E) are SUPERSEDED — use the canonical enum in
 
 ---
 
+# OmniQuest Agent Instructions — Continuous Flow Mode
+
+## Operating Mode
+- Strict Droid Mode (no creative deviation)
+- FIZ commits must keep the full FIZ format; infrastructure/security changes must cite `rule_applied_id` per `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` §11
+- Every payload must end with full ship-gate evidence and a `## HANDOFF` block when work is left for another agent
+
+## Fast-Path Rules for Agent Branches
+- Branches matching: `copilot/*`, `grok/*`, `agent/*`
+- Additive fast-path CI is permitted for early feedback, but required governance/security gates are not reduced; existing required checks, including CodeQL and ship-gate, remain in force
+- Auto-merge should be enabled immediately on valid agent PRs and will land once protected checks are green
+- Parallel job execution is strongly encouraged where independent checks can safely run concurrently
+
+## Post-Payload Requirements
+- Always run full `yarn ship-gate` (or repo equivalent)
+- Update `OQMI_SYSTEM_STATE.md` with a concise summary
+- Flag any cross-repo impacts
+
+---
+
 ## 0) Non-Negotiable Rules
 
 ### 1) NO SYNTHESIS

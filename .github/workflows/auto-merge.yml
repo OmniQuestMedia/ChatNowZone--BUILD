@@ -6,7 +6,7 @@ name: Auto Merge
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
 
 # Needs write access to pull-requests (to enable auto-merge) and
@@ -19,8 +19,17 @@ jobs:
   enable-auto-merge:
     name: Enable Auto Merge
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
 
     steps:
+      - name: Determine PR lane
+        run: |
+          if [[ "${{ github.head_ref }}" == copilot/* || "${{ github.head_ref }}" == grok/* || "${{ github.head_ref }}" == agent/* ]]; then
+            echo "Agent fast-path PR detected: ${{ github.head_ref }}"
+          else
+            echo "Standard PR detected: ${{ github.head_ref }}"
+          fi
+
       - name: Enable auto-merge for PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
