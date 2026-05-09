@@ -106,6 +106,8 @@ export class CreatorControlService implements OnModuleInit {
     { pattern: /\b(telegram|whatsapp|signal)\b/i, reason_code: 'REDBOOK_OFF_PLATFORM_CONTACT' },
   ];
   private readonly AGGREGATED_CHAT_MAX_ROWS = 100;
+  private readonly AGGREGATED_CHAT_MAX_CREATORS = 500;
+  private readonly CYRANO_CONTEXT_MAX_SESSIONS = 1_000;
 
   constructor(
     private readonly nats: NatsService,
@@ -143,7 +145,9 @@ export class CreatorControlService implements OnModuleInit {
       ) {
         return;
       }
+      this.latestCyranoBySession.delete(session_id);
       this.latestCyranoBySession.set(session_id, { copy, emitted_at_utc });
+      this.trimMapToMax(this.latestCyranoBySession, this.CYRANO_CONTEXT_MAX_SESSIONS);
     });
   }
 
@@ -252,6 +256,10 @@ export class CreatorControlService implements OnModuleInit {
     const cyranoSuggestion = input.session_id
       ? this.latestCyranoBySession.get(input.session_id)
       : undefined;
+    if (input.session_id && cyranoSuggestion) {
+      this.latestCyranoBySession.delete(input.session_id);
+      this.latestCyranoBySession.set(input.session_id, cyranoSuggestion);
+    }
 
     const entry: AggregatedChatFeedEntry = {
       message_id: input.id,
@@ -276,7 +284,9 @@ export class CreatorControlService implements OnModuleInit {
 
     const existing = this.aggregatedChatByCreator.get(input.creator_id) ?? [];
     const next = [entry, ...existing].slice(0, this.AGGREGATED_CHAT_MAX_ROWS);
+    this.aggregatedChatByCreator.delete(input.creator_id);
     this.aggregatedChatByCreator.set(input.creator_id, next);
+    this.trimMapToMax(this.aggregatedChatByCreator, this.AGGREGATED_CHAT_MAX_CREATORS);
 
     this.nats.publish(NATS_TOPICS.CREATOR_CONTROL_CHAT_FEED_UPDATED, {
       creator_id: input.creator_id,
@@ -298,7 +308,13 @@ export class CreatorControlService implements OnModuleInit {
     const highlightsOnly = args.highlights_only ?? false;
     const limit = args.limit ?? 50;
 
-    return (this.aggregatedChatByCreator.get(args.creator_id) ?? [])
+    const creatorRows = this.aggregatedChatByCreator.get(args.creator_id) ?? [];
+    if (creatorRows.length > 0) {
+      this.aggregatedChatByCreator.delete(args.creator_id);
+      this.aggregatedChatByCreator.set(args.creator_id, creatorRows);
+    }
+
+    return creatorRows
       .filter((row) => (platformFilter === 'ALL' ? true : row.platform_badge === platformFilter))
       .filter((row) => (moderationFilter === 'ALL' ? true : row.moderation_state === moderationFilter))
       .filter((row) => (highlightsOnly ? row.highlight_state !== 'NONE' : true))
@@ -335,6 +351,14 @@ export class CreatorControlService implements OnModuleInit {
       }
     }
     return { safe: true, reason_code: 'REDBOOK_SAFE' };
+  }
+
+  private trimMapToMax<K, V>(map: Map<K, V>, max: number): void {
+    while (map.size > max) {
+      const oldestKey = map.keys().next().value;
+      if (oldestKey === undefined) break;
+      map.delete(oldestKey);
+    }
   }
 }
 

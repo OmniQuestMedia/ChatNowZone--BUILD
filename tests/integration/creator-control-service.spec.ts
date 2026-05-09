@@ -13,6 +13,7 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 
 type Published = { topic: string; payload: Record<string, unknown> };
+type Subscriber = (payload: Record<string, unknown>) => void;
 
 function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
   const published: Published[] = [];
@@ -22,6 +23,34 @@ function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
     }),
   };
   return { stub, published };
+}
+
+function natsStubWithSubscribe(): {
+  stub: { publish: jest.Mock; subscribe: jest.Mock };
+  published: Published[];
+  emit: (topic: string, payload: Record<string, unknown>) => void;
+} {
+  const published: Published[] = [];
+  const subscribers = new Map<string, Subscriber[]>();
+  const stub = {
+    publish: jest.fn((topic: string, payload: Record<string, unknown>) => {
+      published.push({ topic, payload });
+    }),
+    subscribe: jest.fn((topic: string, handler: Subscriber) => {
+      const handlers = subscribers.get(topic) ?? [];
+      handlers.push(handler);
+      subscribers.set(topic, handlers);
+      return null;
+    }),
+  };
+  return {
+    stub,
+    published,
+    emit: (topic: string, payload: Record<string, unknown>) => {
+      const handlers = subscribers.get(topic) ?? [];
+      handlers.forEach((h) => h(payload));
+    },
+  };
 }
 
 function sample(overrides: Partial<FfsSample> = {}): FfsSample {
@@ -278,5 +307,73 @@ describe('CreatorControlService — workstation orchestration', () => {
 
     const topics = published.map((p) => p.topic);
     expect(topics).toContain(NATS_TOPICS.CREATOR_CONTROL_CHAT_FEED_UPDATED);
+  });
+
+  it('evicts least-recently-used creator chat feeds when creator cache cap is exceeded', () => {
+    const { stub } = natsStub();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+
+    for (let i = 0; i <= 500; i += 1) {
+      svc.ingestAggregatedChatMessage({
+        id: `msg-${i}`,
+        creator_id: `creator-${i}`,
+        user_id: `guest-${i}`,
+        content: 'hello',
+        source: 'CNZ',
+      });
+    }
+
+    expect(svc.buildAggregatedChatFeed({ creator_id: 'creator-0' })).toEqual([]);
+    expect(svc.buildAggregatedChatFeed({ creator_id: 'creator-500' }).length).toBe(1);
+  });
+
+  it('evicts least-recently-used Cyrano session context when session cache cap is exceeded', () => {
+    const { stub, emit } = natsStubWithSubscribe();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+    svc.onModuleInit();
+
+    for (let i = 0; i <= 1000; i += 1) {
+      emit(NATS_TOPICS.CYRANO_SUGGESTION_EMITTED, {
+        session_id: `sess-${i}`,
+        copy: `ctx-${i}`,
+        emitted_at_utc: '2026-05-01T10:00:00Z',
+      });
+    }
+
+    const evicted = svc.ingestAggregatedChatMessage({
+      id: 'msg-evicted',
+      creator_id: 'creator-z',
+      session_id: 'sess-0',
+      user_id: 'guest-z',
+      content: 'safe content',
+      source: 'CNZ',
+    });
+    expect(evicted.cyrano_context).toBeNull();
+
+    const retained = svc.ingestAggregatedChatMessage({
+      id: 'msg-retained',
+      creator_id: 'creator-z',
+      session_id: 'sess-1000',
+      user_id: 'guest-z',
+      content: 'safe content',
+      source: 'CNZ',
+    });
+    expect(retained.cyrano_context).toBe('ctx-1000');
   });
 });
