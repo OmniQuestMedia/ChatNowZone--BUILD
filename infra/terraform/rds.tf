@@ -91,11 +91,50 @@ resource "aws_db_parameter_group" "postgres" {
 
 # Cross-region snapshot copy to ca-west-1 (DR — INFRA_v1.0 §11)
 # "Automated daily snapshots; cross-region copy to ca-west-1; 35-day retention"
+data "aws_caller_identity" "dr_current" {
+  provider = aws.dr
+}
+
+resource "aws_kms_key" "dr_rds_backups" {
+  provider                = aws.dr
+  description             = "OQMI CNZ DR KMS CMK for RDS automated backup replication"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.dr_current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name      = "oqmi-cnz-dr-rds-backups-${var.environment}"
+    Service   = "rds"
+    Purpose   = "automated-backups-replication"
+    PolicyRef = "INFRA_v1.0"
+  }
+}
+
+resource "aws_kms_alias" "dr_rds_backups" {
+  provider      = aws.dr
+  name          = "alias/oqmi-cnz-dr-rds-backups-${var.environment}"
+  target_key_id = aws_kms_key.dr_rds_backups.key_id
+}
+
 resource "aws_db_instance_automated_backups_replication" "postgres_dr" {
   source_db_instance_arn = aws_db_instance.postgres.arn
   provider               = aws.dr
   retention_period       = 35
-  kms_key_id             = aws_kms_key.dr_s3_worm.arn
+  kms_key_id             = aws_kms_key.dr_rds_backups.arn
 }
 
 # RDS Enhanced Monitoring IAM role
