@@ -145,8 +145,7 @@ export class CreatorControlService implements OnModuleInit {
       ) {
         return;
       }
-      this.latestCyranoBySession.delete(session_id);
-      this.latestCyranoBySession.set(session_id, { copy, emitted_at_utc });
+      this.touchMapEntry(this.latestCyranoBySession, session_id, { copy, emitted_at_utc });
       this.trimMapToMax(this.latestCyranoBySession, this.CYRANO_CONTEXT_MAX_SESSIONS);
     });
   }
@@ -257,8 +256,7 @@ export class CreatorControlService implements OnModuleInit {
       ? this.latestCyranoBySession.get(input.session_id)
       : undefined;
     if (input.session_id && cyranoSuggestion) {
-      this.latestCyranoBySession.delete(input.session_id);
-      this.latestCyranoBySession.set(input.session_id, cyranoSuggestion);
+      this.touchMapEntry(this.latestCyranoBySession, input.session_id, cyranoSuggestion);
     }
 
     const entry: AggregatedChatFeedEntry = {
@@ -284,8 +282,7 @@ export class CreatorControlService implements OnModuleInit {
 
     const existing = this.aggregatedChatByCreator.get(input.creator_id) ?? [];
     const next = [entry, ...existing].slice(0, this.AGGREGATED_CHAT_MAX_ROWS);
-    this.aggregatedChatByCreator.delete(input.creator_id);
-    this.aggregatedChatByCreator.set(input.creator_id, next);
+    this.touchMapEntry(this.aggregatedChatByCreator, input.creator_id, next);
     this.trimMapToMax(this.aggregatedChatByCreator, this.AGGREGATED_CHAT_MAX_CREATORS);
 
     this.nats.publish(NATS_TOPICS.CREATOR_CONTROL_CHAT_FEED_UPDATED, {
@@ -310,8 +307,7 @@ export class CreatorControlService implements OnModuleInit {
 
     const creatorRows = this.aggregatedChatByCreator.get(args.creator_id) ?? [];
     if (creatorRows.length > 0) {
-      this.aggregatedChatByCreator.delete(args.creator_id);
-      this.aggregatedChatByCreator.set(args.creator_id, creatorRows);
+      this.touchMapEntry(this.aggregatedChatByCreator, args.creator_id, creatorRows);
     }
 
     return creatorRows
@@ -359,6 +355,11 @@ export class CreatorControlService implements OnModuleInit {
       if (oldestKey === undefined) break;
       map.delete(oldestKey);
     }
+  }
+
+  private touchMapEntry<K, V>(map: Map<K, V>, key: K, value: V): void {
+    map.delete(key);
+    map.set(key, value);
   }
 }
 
