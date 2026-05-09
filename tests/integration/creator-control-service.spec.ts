@@ -13,6 +13,7 @@ import { CreatorControlService } from '../../services/creator-control/src/creato
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
 
 type Published = { topic: string; payload: Record<string, unknown> };
+type Subscriber = (payload: Record<string, unknown>) => void;
 
 function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
   const published: Published[] = [];
@@ -22,6 +23,34 @@ function natsStub(): { stub: { publish: jest.Mock }; published: Published[] } {
     }),
   };
   return { stub, published };
+}
+
+function natsStubWithSubscribe(): {
+  stub: { publish: jest.Mock; subscribe: jest.Mock };
+  published: Published[];
+  emit: (topic: string, payload: Record<string, unknown>) => void;
+} {
+  const published: Published[] = [];
+  const subscribers = new Map<string, Subscriber[]>();
+  const stub = {
+    publish: jest.fn((topic: string, payload: Record<string, unknown>) => {
+      published.push({ topic, payload });
+    }),
+    subscribe: jest.fn((topic: string, handler: Subscriber) => {
+      const handlers = subscribers.get(topic) ?? [];
+      handlers.push(handler);
+      subscribers.set(topic, handlers);
+      return null;
+    }),
+  };
+  return {
+    stub,
+    published,
+    emit: (topic: string, payload: Record<string, unknown>) => {
+      const handlers = subscribers.get(topic) ?? [];
+      handlers.forEach((h) => h(payload));
+    },
+  };
 }
 
 function sample(overrides: Partial<FfsSample> = {}): FfsSample {
@@ -229,6 +258,122 @@ describe('CreatorControlService — workstation orchestration', () => {
     expect(snap.latest_heat).not.toBeNull();
     expect(snap.obs_ready).toBe(true);
     expect(snap.chat_aggregator_ready).toBe(false);
+    expect(snap.aggregated_chat_feed).toEqual([]);
     expect(snap.rule_applied_id).toBe('CREATOR_CONTROL_ZONE_v1');
+  });
+
+  it('builds unified aggregated chat feed rows with RedBook moderation + Cyrano context', () => {
+    const { stub, published } = natsStub();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+
+    // High heat marks subsequent chat row as highlighted.
+    svc.ingestSample(sample({ tippers_online: 55, tips_per_minute: 20, avg_tip_tokens: 20, diamond_guests_present: 4 }));
+
+    const row = svc.ingestAggregatedChatMessage({
+      id: 'msg-1',
+      creator_id: 'creator-1',
+      session_id: 'sess-1',
+      user_id: 'guest-1',
+      content: 'DM my cashapp for a refund',
+      source: 'OBS',
+      cyrano_context: 'Offer concierge handoff now.',
+      timestamp: '2026-05-01T10:00:00Z',
+    });
+
+    expect(row.platform_badge).toBe('OBS');
+    expect(row.redbook_safe).toBe(false);
+    expect(row.moderation_state).toBe('FLAGGED');
+    expect(row.moderation_reason_code).toBe('REDBOOK_OFF_PLATFORM_PAYMENT');
+    expect(row.highlight_state).toBe('INFERNO');
+    expect(row.cyrano_context).toBe('Offer concierge handoff now.');
+    expect(row.rule_applied_id).toBe('CREATOR-UI_v1.0');
+
+    const feed = svc.buildAggregatedChatFeed({
+      creator_id: 'creator-1',
+      platform_filter: 'OBS',
+      moderation_filter: 'FLAGGED',
+      highlights_only: true,
+    });
+    expect(feed).toHaveLength(1);
+    expect(feed[0]?.message_id).toBe('msg-1');
+
+    const topics = published.map((p) => p.topic);
+    expect(topics).toContain(NATS_TOPICS.CREATOR_CONTROL_CHAT_FEED_UPDATED);
+  });
+
+  it('evicts least-recently-used creator chat feeds when creator cache cap is exceeded', () => {
+    const { stub } = natsStub();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+
+    for (let i = 0; i <= 500; i += 1) {
+      svc.ingestAggregatedChatMessage({
+        id: `msg-${i}`,
+        creator_id: `creator-${i}`,
+        user_id: `guest-${i}`,
+        content: 'hello',
+        source: 'CNZ',
+      });
+    }
+
+    expect(svc.buildAggregatedChatFeed({ creator_id: 'creator-0' })).toEqual([]);
+    expect(svc.buildAggregatedChatFeed({ creator_id: 'creator-500' }).length).toBe(1);
+  });
+
+  it('evicts least-recently-used Cyrano session context when session cache cap is exceeded', () => {
+    const { stub, emit } = natsStubWithSubscribe();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+    svc.onModuleInit();
+
+    for (let i = 0; i <= 1000; i += 1) {
+      emit(NATS_TOPICS.CYRANO_SUGGESTION_EMITTED, {
+        session_id: `sess-${i}`,
+        copy: `ctx-${i}`,
+        emitted_at_utc: '2026-05-01T10:00:00Z',
+      });
+    }
+
+    const evicted = svc.ingestAggregatedChatMessage({
+      id: 'msg-evicted',
+      creator_id: 'creator-z',
+      session_id: 'sess-0',
+      user_id: 'guest-z',
+      content: 'safe content',
+      source: 'CNZ',
+    });
+    expect(evicted.cyrano_context).toBeNull();
+
+    const retained = svc.ingestAggregatedChatMessage({
+      id: 'msg-retained',
+      creator_id: 'creator-z',
+      session_id: 'sess-1000',
+      user_id: 'guest-z',
+      content: 'safe content',
+      source: 'CNZ',
+    });
+    expect(retained.cyrano_context).toBe('ctx-1000');
   });
 });
