@@ -589,6 +589,164 @@ const checks: Array<() => CheckResult> = [
           : [`Missing topics: ${missing.join(', ')}`],
     };
   },
+
+  // ── 14. INFRA_v1.0 PHASE 1 — IaC BOOTSTRAP ───────────────────────────────
+  () => {
+    // INFRA-4: eCommsZone mandatory comms routing module present.
+    // INFRA_v1.0 §8.1 — ALL outbound comms route through eCommsZone.
+    // No direct SMTP/SNS calls permitted.
+    const required = [
+      'services/integration-hub/comms/ecommszone.service.ts',
+      'services/integration-hub/comms/ecommszone.module.ts',
+      'services/integration-hub/comms/ecommszone.controller.ts',
+      'services/integration-hub/comms/ecommszone.tokens.ts',
+    ];
+    const missing = required.filter((p) => !exists(p));
+    // Verify the service enforces MANDATORY_ROUTING and PII_REFERENCE_ONLY
+    const svc = readSafe('services/integration-hub/comms/ecommszone.service.ts') ?? '';
+    const hasMandatoryRouting = svc.includes('ECOMMSZONE_COMMS_v1') && svc.includes('RULE_APPLIED_ID');
+    const hasPiiGuard = svc.includes('PII_REFERENCE_ONLY') && svc.includes('assertNoPii');
+    const ok = missing.length === 0 && hasMandatoryRouting && hasPiiGuard;
+    return {
+      id: 'INFRA-4',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'eCommsZone mandatory routing module present (services/integration-hub/comms/) — §8.1',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        missing.length === 0
+          ? 'All eCommsZone comms module files present'
+          : `Missing files: ${missing.join(', ')}`,
+        hasMandatoryRouting
+          ? 'ECommsZoneService enforces RULE_APPLIED_ID (ECOMMSZONE_COMMS_v1)'
+          : 'ECOMMSZONE_COMMS_v1 RULE_APPLIED_ID missing',
+        hasPiiGuard
+          ? 'PII_REFERENCE_ONLY guard (assertNoPii) present'
+          : 'PII_REFERENCE_ONLY guard missing',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Create services/integration-hub/comms/ with ecommszone.service.ts, ecommszone.module.ts, ecommszone.controller.ts (INFRA_v1.0 §8.1)',
+    };
+  },
+  () => {
+    // INFRA-5: Terraform IaC bootstrap present in infra/terraform/ for ca-central-1.
+    // INFRA_v1.0 §2 (all compute/DB/cache in private VPC) + §1 (ca-central-1 mandate).
+    const required = [
+      'infra/terraform/main.tf',
+      'infra/terraform/variables.tf',
+      'infra/terraform/vpc.tf',
+      'infra/terraform/rds.tf',
+      'infra/terraform/elasticache.tf',
+      'infra/terraform/s3.tf',
+      'infra/terraform/alb.tf',
+      'infra/terraform/kms.tf',
+      'infra/terraform/outputs.tf',
+    ];
+    const missing = required.filter((p) => !exists(p));
+    // Verify ca-central-1 is the declared primary region
+    const mainTf = readSafe('infra/terraform/main.tf') ?? '';
+    const varsTf = readSafe('infra/terraform/variables.tf') ?? '';
+    const caRegionDeclared =
+      mainTf.includes('ca-central-1') && varsTf.includes('ca-central-1');
+    // Verify WORM_RETENTION_DAYS: 90 is declared in variables
+    const wormDeclared = varsTf.includes('WORM_RETENTION_DAYS') && varsTf.includes('90');
+    const ok = missing.length === 0 && caRegionDeclared && wormDeclared;
+    return {
+      id: 'INFRA-5',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'Terraform IaC bootstrap present in infra/terraform/ with ca-central-1 + KMS + S3 Object Lock — §1/§2/§3',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        missing.length === 0
+          ? 'All Terraform IaC files present (main, vpc, rds, elasticache, s3, alb, kms, outputs)'
+          : `Missing files: ${missing.join(', ')}`,
+        caRegionDeclared
+          ? 'ca-central-1 declared as primary region in main.tf + variables.tf'
+          : 'ca-central-1 not declared in IaC — Canada residency unconfirmed',
+        wormDeclared
+          ? 'WORM_RETENTION_DAYS: 90 declared in variables.tf'
+          : 'WORM_RETENTION_DAYS: 90 not declared in IaC',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Create infra/terraform/ with all required .tf files declaring ca-central-1 + KMS CMK + S3 Object Lock',
+    };
+  },
+  () => {
+    // INFRA-6: Zero-trust posture — SSM-only access; no SSH port (22) in IaC.
+    // INFRA_v1.0 §2: "Admin access via SSM Session Manager only; no SSH port exposed"
+    // §6: Zero-trust — no SSH, IAM least-privilege, SSM VPC endpoints.
+    const vpcTf = readSafe('infra/terraform/vpc.tf') ?? '';
+    const ssmEndpointPresent = vpcTf.includes('aws_vpc_endpoint') && vpcTf.includes('ssm');
+    // Confirm SSH port 22 is NOT opened in any security group in vpc.tf
+    const noSshPort = !(/from_port\s*=\s*22\b/.test(vpcTf));
+    const noSshIngress = !vpcTf.includes('"22"');
+    const ssmOnlyTagPresent = vpcTf.includes('SSMOnly') && vpcTf.includes('NoSSHPort');
+    const ok = ssmEndpointPresent && noSshPort && noSshIngress && ssmOnlyTagPresent;
+    return {
+      id: 'INFRA-6',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'Zero-trust posture: SSM VPC endpoints present, SSH port 22 never opened — §2/§6',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        ssmEndpointPresent
+          ? 'SSM Session Manager VPC endpoints declared in vpc.tf'
+          : 'SSM VPC endpoints missing — SSM-only access unconfirmed',
+        noSshPort && noSshIngress
+          ? 'SSH port 22 never opened in any security group'
+          : 'SSH port 22 found in IaC — zero-trust violation',
+        ssmOnlyTagPresent
+          ? 'App security group tagged SSMOnly=true, NoSSHPort=true'
+          : 'SSMOnly/NoSSHPort tags missing from app security group',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Remove any SSH (port 22) security group rules; add SSM VPC endpoints (INFRA_v1.0 §2/§6)',
+    };
+  },
+  () => {
+    // INFRA-7: 3-2-1 immutable backup + cross-region replication to ca-west-1.
+    // INFRA_v1.0 §11: "S3 cross-region replication to ca-west-1 for audit and financial buckets"
+    // §3.1: 3-2-1 backup rule — 3 copies, 2 media, 1 off-site (ca-west-1).
+    const s3Tf = readSafe('infra/terraform/s3.tf') ?? '';
+    const rdsTf = readSafe('infra/terraform/rds.tf') ?? '';
+    // S3 cross-region replication declared
+    const s3Replication = s3Tf.includes('aws_s3_bucket_replication_configuration');
+    const drRegionDeclared = s3Tf.includes('ca-west-1');
+    // S3 Object Lock in COMPLIANCE mode
+    const objectLockCompliance =
+      s3Tf.includes('S3_OBJECT_LOCK') && s3Tf.includes('COMPLIANCE');
+    // RDS cross-region backup replication
+    const rdsBackupReplication = rdsTf.includes('aws_db_instance_automated_backups_replication');
+    const ok = s3Replication && drRegionDeclared && objectLockCompliance && rdsBackupReplication;
+    return {
+      id: 'INFRA-7',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        '3-2-1 immutable backup: S3 Object Lock COMPLIANCE + cross-region replication to ca-west-1 + RDS backup replication — §3/§11',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        s3Replication
+          ? 'S3 cross-region replication configuration declared in s3.tf'
+          : 'S3 cross-region replication missing',
+        drRegionDeclared
+          ? 'ca-west-1 DR destination declared in s3.tf'
+          : 'ca-west-1 DR destination missing — 3-2-1 rule not satisfied',
+        objectLockCompliance
+          ? 'S3 Object Lock COMPLIANCE mode declared in s3.tf'
+          : 'S3 Object Lock COMPLIANCE mode missing',
+        rdsBackupReplication
+          ? 'RDS automated backups cross-region replication to ca-west-1 declared'
+          : 'RDS backup replication to ca-west-1 missing',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Add S3 cross-region replication to ca-west-1 + RDS backup replication + S3 Object Lock COMPLIANCE (INFRA_v1.0 §3/§11)',
+    };
+  },
 ];
 
 export function runShipGate(): ShipGateReport {

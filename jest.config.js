@@ -14,6 +14,7 @@ const config = {
     '<rootDir>/tests/integration/**/*.spec.ts',
     '<rootDir>/tests/e2e/**/*.spec.ts',
     '<rootDir>/services/**/src/**/*.spec.ts',
+    '<rootDir>/services/**/comms/**/*.spec.ts',
     '<rootDir>/ui/**/*.spec.ts',
   ],
   moduleFileExtensions: ['ts', 'js', 'json'],
