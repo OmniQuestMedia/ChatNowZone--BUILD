@@ -4,6 +4,9 @@
 // bootstrapped — these contracts keep the frontend integration gap narrow.
 
 export type FfsTier = 'COLD' | 'WARM' | 'HOT' | 'INFERNO';
+export type ChatPlatformBadge = 'CNZ' | 'OBS' | 'TWITCH' | 'YOUTUBE' | 'TIKTOK' | 'UNKNOWN';
+export type ChatModerationState = 'SAFE' | 'FLAGGED';
+export type ChatHighlightState = 'NONE' | 'HOT' | 'INFERNO';
 
 export type CyranoCategory =
   | 'CAT_SESSION_OPEN'
@@ -74,4 +77,26 @@ export interface CyranoPanelFeed {
   active_persona_id: string | null;
   suggestions: CyranoPanelSuggestion[];
   latency_sla_ms: number;             // reference SLO (2000 ideal, 4000 cutoff)
+}
+
+/** Unified aggregated chat row for /creator/control. */
+export interface AggregatedChatRow {
+  message_id: string;
+  creator_id: string;
+  session_id: string | null;
+  user_id: string;
+  content: string;
+  timestamp: string;
+  platform_badge: ChatPlatformBadge;
+  moderation_state: ChatModerationState;
+  moderation_reason_code: string;
+  redbook_safe: boolean;
+  highlight_state: ChatHighlightState;
+  cyrano_context: string | null;
+  moderation_tools: {
+    can_hide: boolean;
+    can_warn: boolean;
+    can_escalate: boolean;
+  };
+  rule_applied_id: string;
 }

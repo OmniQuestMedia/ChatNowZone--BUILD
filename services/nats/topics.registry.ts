@@ -288,6 +288,7 @@ export const NATS_TOPICS = {
   CREATOR_CONTROL_BROADCAST_SUGGESTION: 'creator_control.broadcast.suggestion',
   CREATOR_CONTROL_SESSION_SUGGESTION: 'creator_control.session.suggestion',
   CREATOR_CONTROL_PRICE_NUDGE: 'creator_control.price.nudge',
+  CREATOR_CONTROL_CHAT_FEED_UPDATED: 'creator_control.chat.feed.updated',
 
   // ── Cyrano Layer 1 (Business Plan B.3.5 — whisper copilot) ───────────────
   CYRANO_SUGGESTION_EMITTED: 'cyrano.suggestion.emitted',

@@ -10,8 +10,10 @@ import type {
   PriceNudgeCard,
   BroadcastWindowRow,
   CyranoPanelSuggestion,
+  AggregatedChatRow,
 } from '../types/creator-control-contracts';
 import type {
+  AggregatedChatFeedPanel,
   BroadcastTimingDashboard,
   CreatorCommandCenterView,
   CyranoSessionSummary,
@@ -108,6 +110,7 @@ export interface CreatorCommandCenterInputs {
   broadcast_windows: BroadcastWindowInput[];
   cyrano_suggestions: CyranoSuggestionInput[];
   cyrano_personas: PersonaInput[];
+  aggregated_chat_feed?: AggregatedChatRow[];
   cyrano_latency_sla_ms: number;
   creator_base_payout_rate_per_token_usd: number;
   now_utc?: Date;
@@ -125,6 +128,11 @@ export class CreatorControlPresenter {
       inputs.active_session_id,
       inputs.latest_heat,
       inputs.latest_nudge,
+      now,
+    );
+    const aggregated_chat_feed = this.buildAggregatedChatFeed(
+      inputs.creator_id,
+      inputs.aggregated_chat_feed ?? [],
       now,
     );
     const broadcast_timing = this.buildBroadcastTiming(
@@ -154,6 +162,7 @@ export class CreatorControlPresenter {
       chat_aggregator_ready: inputs.chat_aggregator_ready,
       heat_meter,
       session_monitoring,
+      aggregated_chat_feed,
       broadcast_timing,
       cyrano_panel,
       payout_rate,
@@ -229,6 +238,24 @@ export class CreatorControlPresenter {
       windows: rows,
       generated_at_utc: now.toISOString(),
       reason_code: 'BROADCAST_TIMING_COPILOT',
+    };
+  }
+
+  buildAggregatedChatFeed(
+    creator_id: string,
+    rows: AggregatedChatRow[],
+    now: Date,
+  ): AggregatedChatFeedPanel {
+    const sorted = [...rows]
+      .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+      .slice(0, 50);
+    return {
+      creator_id,
+      platform_filters: ['ALL', 'CNZ', 'OBS', 'TWITCH', 'YOUTUBE', 'TIKTOK', 'UNKNOWN'],
+      moderation_filters: ['ALL', 'SAFE', 'FLAGGED'],
+      rows: sorted,
+      highlights_active: sorted.some((row) => row.highlight_state !== 'NONE'),
+      generated_at_utc: now.toISOString(),
     };
   }
 

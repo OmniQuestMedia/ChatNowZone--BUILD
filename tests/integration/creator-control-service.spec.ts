@@ -229,6 +229,54 @@ describe('CreatorControlService — workstation orchestration', () => {
     expect(snap.latest_heat).not.toBeNull();
     expect(snap.obs_ready).toBe(true);
     expect(snap.chat_aggregator_ready).toBe(false);
+    expect(snap.aggregated_chat_feed).toEqual([]);
     expect(snap.rule_applied_id).toBe('CREATOR_CONTROL_ZONE_v1');
+  });
+
+  it('builds unified aggregated chat feed rows with RedBook moderation + Cyrano context', () => {
+    const { stub, published } = natsStub();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = new CreatorControlService(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new FlickerNFlameScoringEngine(stub as any),
+      new BroadcastTimingCopilot(),
+      new SessionMonitoringCopilot(),
+    );
+
+    // High heat marks subsequent chat row as highlighted.
+    svc.ingestSample(sample({ tippers_online: 55, tips_per_minute: 20, avg_tip_tokens: 20, diamond_guests_present: 4 }));
+
+    const row = svc.ingestAggregatedChatMessage({
+      id: 'msg-1',
+      creator_id: 'creator-1',
+      session_id: 'sess-1',
+      user_id: 'guest-1',
+      content: 'DM my cashapp for a refund',
+      source: 'OBS',
+      cyrano_context: 'Offer concierge handoff now.',
+      timestamp: '2026-05-01T10:00:00Z',
+    });
+
+    expect(row.platform_badge).toBe('OBS');
+    expect(row.redbook_safe).toBe(false);
+    expect(row.moderation_state).toBe('FLAGGED');
+    expect(row.moderation_reason_code).toBe('REDBOOK_OFF_PLATFORM_PAYMENT');
+    expect(row.highlight_state).toBe('INFERNO');
+    expect(row.cyrano_context).toBe('Offer concierge handoff now.');
+    expect(row.rule_applied_id).toBe('CREATOR-UI_v1.0');
+
+    const feed = svc.buildAggregatedChatFeed({
+      creator_id: 'creator-1',
+      platform_filter: 'OBS',
+      moderation_filter: 'FLAGGED',
+      highlights_only: true,
+    });
+    expect(feed).toHaveLength(1);
+    expect(feed[0]?.message_id).toBe('msg-1');
+
+    const topics = published.map((p) => p.topic);
+    expect(topics).toContain(NATS_TOPICS.CREATOR_CONTROL_CHAT_FEED_UPDATED);
   });
 });

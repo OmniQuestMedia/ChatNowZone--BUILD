@@ -483,6 +483,55 @@ describe('Surface 01 — Public Wallet View — new features', () => {
 // ─── Core Surface 02 — Creator Cyrano Control Panel ──────────────────────────
 
 describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
+  it('renders unified aggregated chat feed with badges, moderation tools, highlights, and Cyrano context', () => {
+    const render = renderCreatorControlPage({
+      creator_id: 'creator-chat-1',
+      display_name: 'Creator Chat',
+      obs_ready: true,
+      chat_aggregator_ready: true,
+      active_session_id: 'sess-chat',
+      latest_heat: {
+        session_id: 'sess-chat',
+        creator_id: 'creator-chat-1',
+        tier: 'INFERNO',
+        score: 94,
+        components: { tipper_pressure: 40, velocity: 39, vip_presence: 15 },
+        captured_at_utc: '2026-05-01T10:00:00Z',
+      },
+      latest_nudge: null,
+      broadcast_windows: [],
+      aggregated_chat_feed: [
+        {
+          message_id: 'msg-1',
+          creator_id: 'creator-chat-1',
+          session_id: 'sess-chat',
+          user_id: 'guest-1',
+          content: 'I can move to private now',
+          timestamp: '2026-05-01T10:00:01Z',
+          platform_badge: 'OBS',
+          moderation_state: 'SAFE',
+          moderation_reason_code: 'REDBOOK_SAFE',
+          redbook_safe: true,
+          highlight_state: 'INFERNO',
+          cyrano_context: 'Push private-show conversion copy.',
+          moderation_tools: { can_hide: true, can_warn: false, can_escalate: false },
+          rule_applied_id: 'CREATOR-UI_v1.0',
+        },
+      ],
+      cyrano_suggestions: [],
+      cyrano_personas: [],
+      cyrano_latency_sla_ms: 2000,
+      creator_base_payout_rate_per_token_usd: 0.075,
+    });
+
+    expect(findByTestId(render.tree, 'creator-control-aggregated-chat-feed')).toBeDefined();
+    expect(findByTestId(render.tree, 'creator-control-chat-filters')).toBeDefined();
+    expect(findByTestId(render.tree, 'creator-control-chat-row-msg-1')).toBeDefined();
+    expect(findByTestId(render.tree, 'creator-control-chat-badge-msg-1')?.children).toEqual(['OBS']);
+    expect(findByTestId(render.tree, 'creator-control-chat-cyrano-context-msg-1')).toBeDefined();
+    expect(findByTestId(render.tree, 'creator-control-chat-moderation-tools-msg-1')?.children).toEqual(['HIDE']);
+  });
+
   it('renders CyranoSessionSummary widget on the command pane', () => {
     const render = renderCreatorControlPage({
       creator_id: 'creator-2',

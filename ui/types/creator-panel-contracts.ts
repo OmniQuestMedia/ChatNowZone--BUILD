@@ -9,6 +9,7 @@ import type {
   PriceNudgeCard,
   BroadcastWindowRow,
   CyranoPanelSuggestion,
+  AggregatedChatRow,
 } from './creator-control-contracts';
 
 /** Payout rate indicator — live creator revenue per token. */
@@ -73,6 +74,16 @@ export interface SessionMonitoringPanel {
   generated_at_utc: string;
 }
 
+/** Unified chat feed panel for /creator/control. */
+export interface AggregatedChatFeedPanel {
+  creator_id: string;
+  platform_filters: Array<'ALL' | 'CNZ' | 'OBS' | 'TWITCH' | 'YOUTUBE' | 'TIKTOK' | 'UNKNOWN'>;
+  moderation_filters: Array<'ALL' | 'SAFE' | 'FLAGGED'>;
+  rows: AggregatedChatRow[];
+  highlights_active: boolean;
+  generated_at_utc: string;
+}
+
 // ─── Core Surface 02 — Creator Cyrano Control Panel extensions ───────────────
 
 /**
@@ -116,6 +127,7 @@ export interface CreatorCommandCenterView {
   chat_aggregator_ready: boolean;
   heat_meter: FfsMeter | null;
   session_monitoring: SessionMonitoringPanel;
+  aggregated_chat_feed: AggregatedChatFeedPanel;
   broadcast_timing: BroadcastTimingDashboard;
   cyrano_panel: CyranoWhisperPanel;
   payout_rate: PayoutRateIndicator;

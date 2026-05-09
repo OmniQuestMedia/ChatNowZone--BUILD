@@ -87,6 +87,7 @@ export function renderCreatorControlPage(
         : null,
       renderHeatMeter(view),
       renderSessionMonitoring(view),
+      renderAggregatedChatFeed(view),
       renderBroadcastTiming(view),
       renderCyranoPanel(view),
       renderPersonaSwitcher(view),
@@ -213,6 +214,84 @@ function renderSessionMonitoring(view: CreatorCommandCenterView): RenderElement 
             ],
           )
         : el('p', { classes: ['cnz-panel--empty'] }, ['No nudge — latest signal too cold.']),
+    ],
+  );
+}
+
+function renderAggregatedChatFeed(view: CreatorCommandCenterView): RenderElement {
+  const feed = view.aggregated_chat_feed;
+  return el(
+    'section',
+    {
+      test_id: 'creator-control-aggregated-chat-feed',
+      classes: ['cnz-panel', 'cnz-panel--aggregated-chat-feed'],
+      aria: { 'aria-label': 'Unified aggregated chat feed' },
+      props: {
+        platform_filters: feed.platform_filters,
+        moderation_filters: feed.moderation_filters,
+        highlights_active: feed.highlights_active,
+      },
+    },
+    [
+      el('header', {}, [
+        el('h2', {}, ['Unified Chat Feed']),
+        el(
+          'div',
+          { test_id: 'creator-control-chat-filters', classes: ['cnz-chip-row'] },
+          [
+            el('span', {}, [`Platforms: ${feed.platform_filters.join(', ')}`]),
+            el('span', {}, [`Moderation: ${feed.moderation_filters.join(', ')}`]),
+          ],
+        ),
+      ]),
+      ...feed.rows.map((row) =>
+        el(
+          'article',
+          {
+            test_id: `creator-control-chat-row-${row.message_id}`,
+            classes: [
+              'cnz-chat-row',
+              row.highlight_state === 'NONE' ? '' : 'cnz-chat-row--highlight',
+            ],
+            props: {
+              platform_badge: row.platform_badge,
+              moderation_state: row.moderation_state,
+              redbook_safe: row.redbook_safe,
+              moderation_reason_code: row.moderation_reason_code,
+            },
+          },
+          [
+            el('header', {}, [
+              el('strong', { test_id: `creator-control-chat-badge-${row.message_id}` }, [row.platform_badge]),
+              el('span', {}, [row.timestamp]),
+              el('span', {}, [row.highlight_state]),
+            ]),
+            el('p', {}, [row.content]),
+            row.cyrano_context
+              ? el('p', { test_id: `creator-control-chat-cyrano-context-${row.message_id}` }, [
+                  `Cyrano: ${row.cyrano_context}`,
+                ])
+              : el('p', {}, ['Cyrano: —']),
+            el('footer', {}, [
+              el('span', {}, [`Moderation: ${row.moderation_state}`]),
+              el('span', {}, [row.moderation_reason_code]),
+              el(
+                'span',
+                { test_id: `creator-control-chat-moderation-tools-${row.message_id}` },
+                [
+                  [
+                    row.moderation_tools.can_hide ? 'HIDE' : null,
+                    row.moderation_tools.can_warn ? 'WARN' : null,
+                    row.moderation_tools.can_escalate ? 'ESCALATE' : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · '),
+                ],
+              ),
+            ]),
+          ],
+        ),
+      ),
     ],
   );
 }
