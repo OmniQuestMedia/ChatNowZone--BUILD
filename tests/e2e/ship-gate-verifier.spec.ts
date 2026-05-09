@@ -1,6 +1,7 @@
 // PAYLOAD 8 — Unit tests for the Ship-Gate Verifier itself.
 // Hermetic — invokes the verifier against the live tree and pins the
 // shape + summary of the resulting report.
+// INFRA Phase 1 — INFRA-4 / INFRA-5 / INFRA-6 / INFRA-7 checks added.
 
 import { runShipGate } from '../../PROGRAM_CONTROL/ship-gate-verifier';
 
@@ -56,6 +57,28 @@ describe('Ship-Gate Verifier', () => {
   it('DOC-1 confirms architecture + checklist + readme are present', () => {
     const doc = report.results.find((r) => r.id === 'DOC-1');
     expect(doc?.status).toBe('PASS');
+  });
+
+  // ── INFRA Phase 1 checks (INFRA_v1.0 matrix) ─────────────────────────────
+
+  it('INFRA-4 confirms eCommsZone mandatory routing module present (§8.1)', () => {
+    const infra4 = report.results.find((r) => r.id === 'INFRA-4');
+    expect(infra4?.status).toBe('PASS');
+  });
+
+  it('INFRA-5 confirms Terraform IaC bootstrap present with ca-central-1', () => {
+    const infra5 = report.results.find((r) => r.id === 'INFRA-5');
+    expect(infra5?.status).toBe('PASS');
+  });
+
+  it('INFRA-6 confirms zero-trust posture: SSM-only, no SSH port 22', () => {
+    const infra6 = report.results.find((r) => r.id === 'INFRA-6');
+    expect(infra6?.status).toBe('PASS');
+  });
+
+  it('INFRA-7 confirms 3-2-1 backup: S3 Object Lock + cross-region replication to ca-west-1', () => {
+    const infra7 = report.results.find((r) => r.id === 'INFRA-7');
+    expect(infra7?.status).toBe('PASS');
   });
 
   it('summary is GREEN or YELLOW (never RED on a clean tree)', () => {

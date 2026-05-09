@@ -5,6 +5,9 @@ Auto-generated on every push. Do not edit manually.
 **Branch:** `copilot/creator-ui-v10-implement-aggregated-chat-feed`
 **Commit:** `9281f809d98b7d31bd4a59b037ee4b5c6092f6f8`
 **Generated:** 2026-05-09T08:49:35Z
+**Branch:** `copilot/work-order-v0-2-execute-phase-1`
+**Commit:** `d284c037989be043730d4057e064f8e3494b0055`
+**Generated:** 2026-05-09T07:10:33Z
 
 ## All Files
 
@@ -217,6 +220,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/WO-INIT-001-sql-fix.md`
 - `PROGRAM_CONTROL/REPORT_BACK/WO-INIT-001.md`
 - `PROGRAM_CONTROL/REPORT_BACK/WO-PAYROLL-SPLIT-001.md`
+- `PROGRAM_CONTROL/REPORT_BACK/WORK-ORDER-v0.2-PHASE1-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/WORK-ORDER-v0.2-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/_ARCHIVE_2026-Q1/CHORE-INFRA-BCRYPT-001.md`
 - `PROGRAM_CONTROL/REPORT_BACK/_ARCHIVE_2026-Q1/CHORE-PIPELINE-001.md`
@@ -376,6 +380,15 @@ Auto-generated on every push. Do not edit manually.
 - `governance/Sovereign_Kernel.md.pdf`
 - `governance/pre-ship-audit.service.ts`
 - `infra/postgres/init-ledger.sql`
+- `infra/terraform/alb.tf`
+- `infra/terraform/elasticache.tf`
+- `infra/terraform/kms.tf`
+- `infra/terraform/main.tf`
+- `infra/terraform/outputs.tf`
+- `infra/terraform/rds.tf`
+- `infra/terraform/s3.tf`
+- `infra/terraform/variables.tf`
+- `infra/terraform/vpc.tf`
 - `jest.config.js`
 - `package.json`
 - `prisma/migrations/20260409000000_legal_hold_db_migration/migration.sql`
@@ -637,6 +650,11 @@ Auto-generated on every push. Do not edit manually.
 - `services/guest-heat/src/guest-heat.types.ts`
 - `services/guest-heat/src/performance-timer.service.ts`
 - `services/integration-hub/WEBHOOK_CONTRACTS.md`
+- `services/integration-hub/comms/ecommszone.controller.ts`
+- `services/integration-hub/comms/ecommszone.module.ts`
+- `services/integration-hub/comms/ecommszone.service.spec.ts`
+- `services/integration-hub/comms/ecommszone.service.ts`
+- `services/integration-hub/comms/ecommszone.tokens.ts`
 - `services/integration-hub/src/ecommszone/INTEGRATION_AUDIT.md`
 - `services/integration-hub/src/ecommszone/ecommszone-client.interface.ts`
 - `services/integration-hub/src/hub.module.ts`
