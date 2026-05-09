@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/creator-ui-v10-implement-aggregated-chat-feed`
-**Commit:** `06e6ab3dd255e2d71ebcc94d27ad86176fda62d7`
-**Generated:** 2026-05-09T08:51:05Z
+**Branch:** `copilot/optimize-repo-for-agent-payloads`
+**Commit:** `568dd112a76d032c1754535cba9a315b33053782`
+**Generated:** 2026-05-09T09:17:52Z
 
 ## All Files
 
@@ -22,6 +22,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/workflows/auto-merge.yml`
 - `.github/workflows/ci.yml`
 - `.github/workflows/codeql.yml`
+- `.github/workflows/copilot-internal.yml`
 - `.github/workflows/copilot-setup-steps.yml`
 - `.github/workflows/deploy.yml`
 - `.github/workflows/directive-dispatch.yml`
