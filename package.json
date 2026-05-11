@@ -33,7 +33,7 @@
     "nats": "^2.29.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.29"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
