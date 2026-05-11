@@ -1,6 +1,9 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 11, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.5 Ecosystem Lint Parity: lint:ci script added, lint-staged + Husky pre-commit hook standardized, LINT-1 ship-gate invariant added. Ship-gate 32/32 GREEN.
+
+**Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
 
 **Date:** May 11, 2026
@@ -15,6 +18,14 @@
 
 All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
+
+**Phase 0.5 — Ecosystem Lint Parity (2026-05-11):**
+- P0.5.2: devDependencies audited — no dupes found in ChatNowZone--BUILD
+- P0.5.3: lint-staged@15.5.2 + husky@9.1.7 installed; `prepare: husky` script added; `.husky/pre-commit` invokes `yarn lint-staged`; `lint-staged` config in package.json targets `services/**/*.ts` with ESLint
+- P0.5.4: `lint:ci` script added to package.json (`eslint 'services/**/*.ts' --max-warnings 0`); `yarn lint:ci` → **PASS** (0 warnings, 0 errors); formatter check deferred — 432 pre-existing prettier violations in ui/ are tracked as tech-debt (out of Phase 0.5 scope)
+- Cross-Repo Flag: LINT-1 invariant added to `PROGRAM_CONTROL/ship-gate-verifier.ts` — checks `.eslintrc.js`, `lint:ci` script, `lint-staged` config, `super-linter.yml`, `linter` configs, Husky pre-commit hook
+- Ship-gate result: **32/32 GREEN** (LINT-1 PASS)
+- P0.5.1: Cross-repo distribution of canonical lint configs (`.github/linters/*`, `super-linter.yml`, `.eslintrc.js`) to CyranoZone / Marketplace-Build / eCommsZone is **DEFERRED** — requires separate PRs in those repos (agent has write access to ChatNowZone--BUILD only)
 
 **Agent flow optimization:** Added a branch-scoped internal fast-gate workflow for
 `copilot/*`, `grok/*`, and `agent/*` PRs, tightened auto-merge re-arming for

@@ -835,6 +835,73 @@ const checks: Array<() => CheckResult> = [
         : 'Create services/integration-hub/comms/outbound-webhook.service.ts + outbound-webhook.types.ts with all four event types (INFRA_v1.0 §8)',
     };
   },
+
+  // ── 15. LINT-CLEAN INVARIANT (Phase 0.5) ─────────────────────────────────
+  () => {
+    // Verify the repo carries a complete canonical lint surface:
+    //   1. .eslintrc.js at repo root
+    //   2. package.json exposes a lint:ci script
+    //   3. .github/workflows/super-linter.yml exists
+    //   4. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
+    //   5. .husky/pre-commit invokes lint-staged
+    const eslintPresent = exists('.eslintrc.js');
+    const pkg = readSafe('package.json') ?? '';
+    let lintCiPresent = false;
+    let lintStagedPresent = false;
+    try {
+      const json = JSON.parse(pkg);
+      lintCiPresent = typeof json?.scripts?.['lint:ci'] === 'string';
+      lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
+    } catch {
+      // parse failure → treated as missing
+    }
+    const superLinterPresent = exists('.github/workflows/super-linter.yml');
+    const markdownLintPresent = exists('.github/linters/.markdown-lint.yml');
+    const yamlLintPresent = exists('.github/linters/.yaml-lint.yml');
+    const huskyHookPresent = (() => {
+      const hook = readSafe('.husky/pre-commit') ?? '';
+      return hook.includes('lint-staged');
+    })();
+    const ok =
+      eslintPresent &&
+      lintCiPresent &&
+      lintStagedPresent &&
+      superLinterPresent &&
+      markdownLintPresent &&
+      yamlLintPresent &&
+      huskyHookPresent;
+    return {
+      id: 'LINT-1',
+      category: 'Lint-clean invariant (Phase 0.5)',
+      description:
+        'Canonical lint surface present: .eslintrc.js, lint:ci script, super-linter.yml, linter configs, Husky + lint-staged pre-commit hook',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        eslintPresent ? '.eslintrc.js present at repo root' : '.eslintrc.js MISSING',
+        lintCiPresent
+          ? 'package.json exposes lint:ci script'
+          : 'package.json missing lint:ci script',
+        lintStagedPresent
+          ? 'package.json contains lint-staged config'
+          : 'package.json missing lint-staged config',
+        superLinterPresent
+          ? '.github/workflows/super-linter.yml present'
+          : '.github/workflows/super-linter.yml MISSING',
+        markdownLintPresent
+          ? '.github/linters/.markdown-lint.yml present'
+          : '.github/linters/.markdown-lint.yml MISSING',
+        yamlLintPresent
+          ? '.github/linters/.yaml-lint.yml present'
+          : '.github/linters/.yaml-lint.yml MISSING',
+        huskyHookPresent
+          ? '.husky/pre-commit invokes lint-staged'
+          : '.husky/pre-commit does not invoke lint-staged',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Run: yarn add --dev husky lint-staged && yarn husky init; add lint:ci script and lint-staged config to package.json (Phase 0.5)',
+    };
+  },
 ];
 
 export function runShipGate(): ShipGateReport {
