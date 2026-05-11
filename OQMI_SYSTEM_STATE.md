@@ -1,6 +1,9 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 11, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
+
+**Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
 
 **Date:** May 9, 2026

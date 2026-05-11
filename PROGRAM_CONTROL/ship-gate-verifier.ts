@@ -747,6 +747,94 @@ const checks: Array<() => CheckResult> = [
         : 'Add S3 cross-region replication to ca-west-1 + RDS backup replication + S3 Object Lock COMPLIANCE (INFRA_v1.0 §3/§11)',
     };
   },
+  () => {
+    // INFRA-8: EDR + Ransomware Defense alignment — §6.2 + §7.
+    // INFRA_v1.0 §6.2: "Production container images are scanned for CVEs at
+    // build time via docker scout or AWS Inspector before deployment. Critical
+    // and high CVEs block the deployment pipeline."
+    // INFRA_v1.0 §7: EDR on all servers, immutable backups, zero-trust, MFA,
+    // continuous vulnerability scanning + automated patching within 48h.
+    const edrTf = readSafe('infra/terraform/edr.tf') ?? '';
+    const inspectorEnabled = edrTf.includes('aws_inspector2_enabler') && edrTf.includes('scan_on_push');
+    const imdsv2Enforced = edrTf.includes('DenyIMDSv1') || edrTf.includes('MetadataHttpTokens');
+    const patchBaseline = edrTf.includes('aws_ssm_patch_baseline') && edrTf.includes('48');
+    const ecrScan = edrTf.includes('aws_ecr_repository') && edrTf.includes('IMMUTABLE');
+    // Verify rule_applied_id: INFRA_v1.0_CANADA_RESIDENCY tag present in main.tf
+    const mainTf = readSafe('infra/terraform/main.tf') ?? '';
+    const residencyTagged = mainTf.includes('INFRA_v1.0_CANADA_RESIDENCY');
+    const ok = inspectorEnabled && imdsv2Enforced && patchBaseline && ecrScan && residencyTagged;
+    return {
+      id: 'INFRA-8',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'EDR + ransomware defense stack aligned: Inspector CVE scan, IMDSv2, patch baseline, ECR immutable, CANADA_RESIDENCY tag — §6.2/§7',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        inspectorEnabled
+          ? 'AWS Inspector v2 enabled + ECR scan-on-push declared in edr.tf'
+          : 'AWS Inspector v2 / scan-on-push missing from edr.tf',
+        imdsv2Enforced
+          ? 'IMDSv2 enforcement policy (DenyIMDSv1) declared in edr.tf'
+          : 'IMDSv2 enforcement missing — SSRF attack vector open',
+        patchBaseline
+          ? 'SSM Patch baseline declared with 48h critical-CVE patch SLA'
+          : 'SSM Patch baseline missing — automated patching unconfirmed',
+        ecrScan
+          ? 'ECR repository declared as IMMUTABLE with scan-on-push'
+          : 'ECR repository IMMUTABLE + scan config missing',
+        residencyTagged
+          ? 'rule_applied_id: INFRA_v1.0_CANADA_RESIDENCY tag declared in main.tf default_tags'
+          : 'rule_applied_id: INFRA_v1.0_CANADA_RESIDENCY tag missing from Terraform default_tags',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Create infra/terraform/edr.tf with Inspector/IMDSv2/SSM-patch/ECR-immutable; add INFRA_v1.0_CANADA_RESIDENCY tag to main.tf default_tags (INFRA_v1.0 §6.2/§7)',
+    };
+  },
+  () => {
+    // INFRA-9: Outbound signed webhook dispatcher present — §8 Partner Ecosystem.
+    // ChatNow.Zone must emit HMAC-signed webhook notifications to partners
+    // (RedRoomRewards, Marketplace-Build) for ledger/consent/risk/payout events.
+    const svc = readSafe('services/integration-hub/comms/outbound-webhook.service.ts') ?? '';
+    const types = readSafe('services/integration-hub/comms/outbound-webhook.types.ts') ?? '';
+    const contracts = readSafe('services/integration-hub/WEBHOOK_CONTRACTS.md') ?? '';
+    const svcOk =
+      svc.includes('OutboundWebhookService') &&
+      svc.includes('OUTBOUND_WEBHOOK_v1') &&
+      svc.includes('assertNoPii') &&
+      svc.includes('computeSignature');
+    const typesOk =
+      types.includes('LEDGER_ENTRY_APPENDED') &&
+      types.includes('CONSENT_UPDATED') &&
+      types.includes('RISK_DECISION_EMITTED') &&
+      types.includes('PAYOUT_COMPLETED');
+    const contractsOk =
+      contracts.includes('Marketplace-Build') &&
+      contracts.includes('OUTBOUND_WEBHOOK_v1') ||
+      contracts.includes('OutboundWebhookService');
+    const ok = svcOk && typesOk;
+    return {
+      id: 'INFRA-9',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'Outbound signed webhook dispatcher present for ledger/consent/risk/payout events — §8 Partner Ecosystem',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        svcOk
+          ? 'OutboundWebhookService: RULE_APPLIED_ID, PII guard, HMAC signer all present'
+          : 'OutboundWebhookService missing required: OUTBOUND_WEBHOOK_v1 / assertNoPii / computeSignature',
+        typesOk
+          ? 'Outbound event types: LEDGER_ENTRY_APPENDED, CONSENT_UPDATED, RISK_DECISION_EMITTED, PAYOUT_COMPLETED declared'
+          : 'One or more outbound event types missing from outbound-webhook.types.ts',
+        contractsOk
+          ? 'WEBHOOK_CONTRACTS.md includes Marketplace-Build outbound contract'
+          : 'Marketplace-Build outbound contract not yet documented in WEBHOOK_CONTRACTS.md',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Create services/integration-hub/comms/outbound-webhook.service.ts + outbound-webhook.types.ts with all four event types (INFRA_v1.0 §8)',
+    };
+  },
 ];
 
 export function runShipGate(): ShipGateReport {
