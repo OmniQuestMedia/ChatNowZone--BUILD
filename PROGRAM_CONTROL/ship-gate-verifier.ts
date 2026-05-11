@@ -857,8 +857,7 @@ const checks: Array<() => CheckResult> = [
         lintCiScript.includes('eslint') &&
         (lintCiScript.includes('services/**/*.ts') ||
           lintCiScript.includes('services/**/*.{ts,js}') ||
-          (lintCiScript.includes('services/**/*.ts') &&
-            lintCiScript.includes('services/**/*.js')));
+          lintCiScript.includes('services/**/*.js'));
       lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
     } catch {
       // parse failure → treated as missing
