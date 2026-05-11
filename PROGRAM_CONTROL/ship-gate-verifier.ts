@@ -46,6 +46,12 @@ function exists(path: string): boolean {
   return existsSync(join(REPO_ROOT, path));
 }
 
+function hasTruthyYamlKey(yaml: string, key: string): boolean {
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|\\n)\\s*${escapedKey}\\s*:\\s*(true|yes|on)\\s*(\\n|$)`, 'i');
+  return re.test(yaml);
+}
+
 function walkTs(dir: string, out: string[] = []): string[] {
   const abs = join(REPO_ROOT, dir);
   if (!existsSync(abs)) return out;
@@ -852,12 +858,13 @@ const checks: Array<() => CheckResult> = [
     try {
       const json = JSON.parse(pkg);
       const lintCiScript = String(json?.scripts?.['lint:ci'] ?? '');
+      const lintCiScriptNormalized = lintCiScript.replace(/\s+/g, ' ');
       lintCiPresent = lintCiScript.length > 0;
       lintCiServicesPresent =
-        lintCiScript.includes('eslint') &&
-        (lintCiScript.includes('services/**/*.ts') ||
-          lintCiScript.includes('services/**/*.{ts,js}') ||
-          lintCiScript.includes('services/**/*.js'));
+        /\beslint\b/.test(lintCiScriptNormalized) &&
+        /(services\/\*\*\/\*\.ts|services\/\*\*\/\*\.\{ts,js\}|services\/\*\*\/\*\.js)/.test(
+          lintCiScriptNormalized,
+        );
       lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
     } catch {
       // parse failure → treated as missing
@@ -865,9 +872,9 @@ const checks: Array<() => CheckResult> = [
     const superLinterContent = readSafe('.github/workflows/super-linter.yml') ?? '';
     const superLinterPresent = superLinterContent.length > 0;
     const superLinterMixedLangPresent =
-      superLinterContent.includes('VALIDATE_PYTHON: true') &&
-      superLinterContent.includes('VALIDATE_JAVASCRIPT_ES: true') &&
-      superLinterContent.includes('VALIDATE_TYPESCRIPT_ES: true');
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_PYTHON') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_JAVASCRIPT_ES') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_TYPESCRIPT_ES');
     const markdownLintPresent = exists('.github/linters/.markdown-lint.yml');
     const yamlLintPresent = exists('.github/linters/.yaml-lint.yml');
     const huskyHookPresent = (() => {
