@@ -2,12 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `dependabot/npm_and_yarn/typeorm-0.3.29`
-**Commit:** `8b233d94902facf59a9c5f8cded61ea7ae4d982c`
-**Generated:** 2026-05-11T18:38:08Z
-**Branch:** `copilot/remove-claude-and-set-grok-primary`
-**Commit:** `21cb538a2c280a4ec18b60f9addb6068d56bebed`
-**Generated:** 2026-05-11T18:37:35Z
+**Branch:** `copilot/add-iac-full-bootstrap`
+**Commit:** `193a6970d0c98a287e8f4ead5da9a80cebcd977f`
+**Generated:** 2026-05-11T19:31:48Z
 
 ## All Files
 
@@ -224,6 +221,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/WO-PAYROLL-SPLIT-001.md`
 - `PROGRAM_CONTROL/REPORT_BACK/WORK-ORDER-v0.2-PHASE1-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/WORK-ORDER-v0.2-REPORT-BACK.md`
+- `PROGRAM_CONTROL/REPORT_BACK/WORK-ORDER-v0.3-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/_ARCHIVE_2026-Q1/CHORE-INFRA-BCRYPT-001.md`
 - `PROGRAM_CONTROL/REPORT_BACK/_ARCHIVE_2026-Q1/CHORE-PIPELINE-001.md`
 - `PROGRAM_CONTROL/REPORT_BACK/_ARCHIVE_2026-Q1/CHORE-PIPELINE-002.md`
@@ -385,6 +383,7 @@ Auto-generated on every push. Do not edit manually.
 - `governance/pre-ship-audit.service.ts`
 - `infra/postgres/init-ledger.sql`
 - `infra/terraform/alb.tf`
+- `infra/terraform/edr.tf`
 - `infra/terraform/elasticache.tf`
 - `infra/terraform/kms.tf`
 - `infra/terraform/main.tf`
@@ -659,6 +658,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/integration-hub/comms/ecommszone.service.spec.ts`
 - `services/integration-hub/comms/ecommszone.service.ts`
 - `services/integration-hub/comms/ecommszone.tokens.ts`
+- `services/integration-hub/comms/outbound-webhook.service.ts`
+- `services/integration-hub/comms/outbound-webhook.types.ts`
 - `services/integration-hub/src/ecommszone/INTEGRATION_AUDIT.md`
 - `services/integration-hub/src/ecommszone/ecommszone-client.interface.ts`
 - `services/integration-hub/src/hub.module.ts`
