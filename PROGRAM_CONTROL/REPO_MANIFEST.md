@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/fix-ship-gate-verifier-package-json`
-**Commit:** `f3235f0287ad831d38aecf8871f68c5f3f90f5b8`
-**Generated:** 2026-05-11T20:48:54Z
+**Commit:** `e78d3f36aac7cb3ea0f81b4852650ae982179124`
+**Generated:** 2026-05-11T20:50:00Z
 
 ## All Files
 
