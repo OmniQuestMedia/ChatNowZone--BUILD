@@ -46,6 +46,12 @@ function exists(path: string): boolean {
   return existsSync(join(REPO_ROOT, path));
 }
 
+function hasTruthyYamlKey(yaml: string, key: string): boolean {
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|\\n)\\s*${escapedKey}\\s*:\\s*(true|yes|on)\\s*(\\n|$)`, 'i');
+  return re.test(yaml);
+}
+
 function walkTs(dir: string, out: string[] = []): string[] {
   const abs = join(REPO_ROOT, dir);
   if (!existsSync(abs)) return out;
@@ -830,33 +836,99 @@ const checks: Array<() => CheckResult> = [
         : 'Create services/integration-hub/comms/outbound-webhook.service.ts + outbound-webhook.types.ts with all four event types (INFRA_v1.0 §8)',
     };
   },
-  // ── 15. LINT STANDARDS (OQMI_LINT_STANDARD_v1.0) ─────────────────────────
+
+  // ── 15. LINT-CLEAN INVARIANT (OQMI_LINT_STANDARD_v1.0) ───────────────────
   () => {
-    const superlinter = readSafe('.github/workflows/super-linter.yml') ?? '';
-    const validateAllOff = superlinter.includes('VALIDATE_ALL_CODEBASE: false');
-    const linterRulesPath = superlinter.includes('LINTER_RULES_PATH: .github/linters');
+    // Verify the repo carries a complete canonical lint surface:
+    //   1. .eslintrc.js at repo root
+    //   2. package.json exposes lint:ci script (full repo ESLint coverage)
+    //   3. package.json has lint-staged config
+    //   4. .github/workflows/super-linter.yml present with VALIDATE_ALL_CODEBASE=false,
+    //      LINTER_RULES_PATH, and mixed-language validators (Python + JS/TS + ESLint)
+    //   5. .github/linters/.eslintrc.json fallback present
+    //   6. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
+    //   7. .husky/pre-commit invokes lint-staged
+    const eslintPresent = exists('.eslintrc.js');
+    const pkg = readSafe('package.json') ?? '';
+    let lintCiPresent = false;
+    let lintStagedPresent = false;
+    try {
+      const json = JSON.parse(pkg);
+      const lintCiScript = String(json?.scripts?.['lint:ci'] ?? '');
+      lintCiPresent = /\beslint\b/.test(lintCiScript);
+      lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
+    } catch {
+      // parse failure → treated as missing
+    }
+    const superLinterContent = readSafe('.github/workflows/super-linter.yml') ?? '';
+    const superLinterPresent = superLinterContent.length > 0;
+    const validateAllOff = superLinterContent.includes('VALIDATE_ALL_CODEBASE: false');
+    const linterRulesPath = superLinterContent.includes('LINTER_RULES_PATH: .github/linters');
+    const superLinterMixedLangPresent =
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_PYTHON') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_JAVASCRIPT_ES') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_TYPESCRIPT_ES');
     const eslintFallback = exists('.github/linters/.eslintrc.json');
-    const ok = validateAllOff && linterRulesPath && eslintFallback;
+    const markdownLintPresent = exists('.github/linters/.markdown-lint.yml');
+    const yamlLintPresent = exists('.github/linters/.yaml-lint.yml');
+    const huskyHookPresent = (() => {
+      const hook = readSafe('.husky/pre-commit') ?? '';
+      return hook.includes('lint-staged');
+    })();
+    const ok =
+      eslintPresent &&
+      lintCiPresent &&
+      lintStagedPresent &&
+      superLinterPresent &&
+      validateAllOff &&
+      linterRulesPath &&
+      superLinterMixedLangPresent &&
+      eslintFallback &&
+      markdownLintPresent &&
+      yamlLintPresent &&
+      huskyHookPresent;
     return {
       id: 'LINT-1',
-      category: 'Lint standards (OQMI_LINT_STANDARD_v1.0)',
+      category: 'Lint-clean invariant (OQMI_LINT_STANDARD_v1.0)',
       description:
-        'Super-Linter configured: VALIDATE_ALL_CODEBASE=false, LINTER_RULES_PATH=.github/linters, ESLint fallback config present',
+        'Canonical lint surface: .eslintrc.js, lint:ci, lint-staged, super-linter.yml (VALIDATE_ALL_CODEBASE=false, mixed-language + ESLint validators, LINTER_RULES_PATH), .eslintrc.json fallback, linter configs, Husky pre-commit hook',
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
+        eslintPresent ? '.eslintrc.js present at repo root' : '.eslintrc.js MISSING',
+        lintCiPresent
+          ? 'package.json exposes lint:ci script with ESLint coverage'
+          : 'package.json missing lint:ci script',
+        lintStagedPresent
+          ? 'package.json contains lint-staged config'
+          : 'package.json missing lint-staged config',
+        superLinterPresent
+          ? '.github/workflows/super-linter.yml present'
+          : '.github/workflows/super-linter.yml MISSING',
         validateAllOff
           ? 'VALIDATE_ALL_CODEBASE: false declared in super-linter.yml'
           : 'VALIDATE_ALL_CODEBASE: false missing — super-linter may scan full codebase',
         linterRulesPath
           ? 'LINTER_RULES_PATH: .github/linters declared in super-linter.yml'
           : 'LINTER_RULES_PATH not set — linter configs may not be discovered',
+        superLinterMixedLangPresent
+          ? 'super-linter.yml enables VALIDATE_PYTHON + VALIDATE_JAVASCRIPT_ES + VALIDATE_TYPESCRIPT_ES'
+          : 'super-linter.yml missing one or more mixed-language validators',
         eslintFallback
           ? '.github/linters/.eslintrc.json fallback config present'
           : '.github/linters/.eslintrc.json missing — Super-Linter ESLint fallback absent',
+        markdownLintPresent
+          ? '.github/linters/.markdown-lint.yml present'
+          : '.github/linters/.markdown-lint.yml MISSING',
+        yamlLintPresent
+          ? '.github/linters/.yaml-lint.yml present'
+          : '.github/linters/.yaml-lint.yml MISSING',
+        huskyHookPresent
+          ? '.husky/pre-commit invokes lint-staged'
+          : '.husky/pre-commit does not invoke lint-staged',
       ],
       remediation: ok
         ? undefined
-        : 'Verify .github/workflows/super-linter.yml and create .github/linters/.eslintrc.json (OQMI_LINT_STANDARD_v1.0)',
+        : 'Run: yarn add --dev husky lint-staged && husky init; add lint:ci script; enable Python + JS/TS + ESLint validators in super-linter.yml; create .github/linters/.eslintrc.json (OQMI_LINT_STANDARD_v1.0)',
     };
   },
 ];

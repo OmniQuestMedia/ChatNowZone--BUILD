@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-canonical-configs-for-typescript`
-**Commit:** `654b2864c429e52cc85a832714fb29232dd0b561`
-**Generated:** 2026-05-11T21:05:24Z
+**Branch:** `copilot/fix-ship-gate-verifier-package-json`
+**Commit:** `e41461e928b90a3966a8f92641ef96d381234032`
+**Generated:** 2026-05-11T20:52:19Z
 
 ## All Files
 

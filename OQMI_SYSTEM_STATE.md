@@ -1,23 +1,31 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 11, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.6 Linting Standardization (OQMI_LINT_STANDARD_v1.0) applied: canonical package.json scripts (lint/lint:ci/lint:fix/format/prepare), husky pre-commit hook, lint-staged full coverage (_.ts,_.js,_.json,_.md,\*.yml), super-linter.yml updated (VALIDATE_ESLINT:true, FILTER_REGEX_INCLUDE includes PROGRAM_CONTROL/ and ts/js), .github/linters/.eslintrc.json fallback created, ship-gate LINT-1 check added (32 checks).
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.6 Linting Standardization (OQMI*LINT_STANDARD_v1.0) applied: canonical package.json scripts (lint/lint:ci/lint:fix/format/prepare), husky pre-commit hook, lint-staged full coverage (*.ts,_.js,_.json,\_.md,\*.yml), super-linter.yml updated (VALIDATE_ESLINT:true, FILTER_REGEX_INCLUDE includes PROGRAM_CONTROL/ and ts/js), .github/linters/.eslintrc.json fallback created, ship-gate LINT-1 check added (32 checks).
 
 **Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.5 Ecosystem Lint Parity: lint:ci script added, lint-staged + Husky pre-commit hook standardized, LINT-1 ship-gate invariant added. Ship-gate 32/32 GREEN.
 
-**Date:** May 11, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
+**Recent status log:**
 
-**Date:** May 9, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — agent fast-path signal lane added without relaxing required governance/security gates
-**Date:** May 6, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)
-**Date:** May 3, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied
+- May 11, 2026 — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
+- May 11, 2026 — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
+- May 9, 2026 — agent fast-path signal lane added without relaxing required governance/security gates.
+- May 6, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready).
+- May 3, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied.
 
 All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
+
+**Phase 0.5 — Ecosystem Lint Parity (2026-05-11):**
+
+- P0.5.2: devDependencies audited — no dupes found in ChatNowZone--BUILD
+- P0.5.3: lint-staged@15.5.2 + husky@9.1.7 installed; `prepare: husky` script added; `.husky/pre-commit` invokes `yarn lint-staged`; `lint-staged` config in package.json targets `services/**/*.ts` with ESLint
+- P0.5.4: `lint:ci` script added to package.json (`eslint 'services/**/*.ts' --max-warnings 0`); `yarn lint:ci` → **PASS** (0 warnings, 0 errors); formatter check deferred — 432 pre-existing prettier violations in ui/ are tracked as tech-debt (out of Phase 0.5 scope)
+- Cross-Repo Flag: LINT-1 invariant added to `PROGRAM_CONTROL/ship-gate-verifier.ts` — checks `.eslintrc.js`, `lint:ci` script, `lint-staged` config, `super-linter.yml`, `linter` configs, Husky pre-commit hook
+- Ship-gate result: **32/32 GREEN** (LINT-1 PASS)
+- P0.5.1: Cross-repo distribution of canonical lint configs (`.github/linters/*`, `super-linter.yml`, `.eslintrc.js`) to CyranoZone / Marketplace-Build / eCommsZone is **DEFERRED** — requires separate PRs in those repos (agent has write access to ChatNowZone--BUILD only)
 
 **Agent flow optimization:** Added a branch-scoped internal fast-gate workflow for
 `copilot/*`, `grok/*`, and `agent/*` PRs, tightened auto-merge re-arming for
@@ -48,7 +56,7 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 > The live, authoritative source of truth is:
 >
 > - Governance doctrine → `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
-> - Coding doctrine v2.0 → `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
+> - Historical program-state snapshot (context only; non-authoritative) → `OQMI_SYSTEM_STATE.md`
 > - Live requirements → `docs/REQUIREMENTS_MASTER.md`
 > - Domain glossary → `docs/DOMAIN_GLOSSARY.md`
 > - Agent instructions → `.github/copilot-instructions.md`
