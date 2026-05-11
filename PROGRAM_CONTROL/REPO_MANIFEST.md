@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/p0-5-1-extract-linters-and-templates`
-**Commit:** `b119b8ef69c438f4f4fcd23dd69bbca632e08c22`
-**Generated:** 2026-05-11T20:14:40Z
+**Branch:** `copilot/fix-ship-gate-verifier-package-json`
+**Commit:** `47e3cc249cd89c44d11cd03b872e9717af0895ec`
+**Generated:** 2026-05-11T20:45:25Z
 
 ## All Files
 
