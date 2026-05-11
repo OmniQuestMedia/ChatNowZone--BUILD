@@ -1,6 +1,9 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 11, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.6 Cross-Repo Linting + Ship-Gate Propagation: `lint:ci-js` canonical alias added to package.json, LINT-2 (`cross-repo-lint-parity`) invariant added to ship-gate-verifier.ts. Cross-repo template extraction complete (`.eslintrc.js`, `.github/linters/*`, `super-linter.yml`, `ci.yml` available as canonical source). Propagation to RedRoomRewards / Cyrano / Marketplace-Build / eCommsZone is a separate multi-repo PR wave (agent write-access scoped to ChatNowZone--BUILD). Ship-gate 33/33 GREEN.
+
+**Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.5 Ecosystem Lint Parity: lint:ci script added, lint-staged + Husky pre-commit hook standardized, LINT-1 ship-gate invariant added. Ship-gate 32/32 GREEN.
 
 **Date:** May 11, 2026

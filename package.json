@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "eslint 'services/**/*.ts' --max-warnings 0",
     "lint:ci": "eslint 'services/**/*.ts' --max-warnings 0",
+    "lint:ci-js": "eslint 'services/**/*.ts' --max-warnings 0",
     "lint:fix": "eslint 'services/**/*.ts' --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
