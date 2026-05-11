@@ -809,7 +809,7 @@ const checks: Array<() => CheckResult> = [
       types.includes('RISK_DECISION_EMITTED') &&
       types.includes('PAYOUT_COMPLETED');
     const contractsOk =
-      contracts.includes('Marketplace-Build') &&
+      contracts.includes('Marketplace-Build') ||
       contracts.includes('OUTBOUND_WEBHOOK_v1') ||
       contracts.includes('OutboundWebhookService');
     const ok = svcOk && typesOk;

@@ -172,7 +172,7 @@ export class OutboundWebhookService {
       throw new Error(
         `HARD_STOP: OutboundWebhookService — ${envKey} is not set. ` +
           `Partner endpoint URL must be injected from AWS Secrets Manager ` +
-          `(INFRA_v1.0 §7). Set ${envKey} in ECS task definition.`,
+          `(INFRA_v1.0 §8 Partner Ecosystem Contracts). Set ${envKey} in ECS task definition.`,
       );
     }
     return url;
