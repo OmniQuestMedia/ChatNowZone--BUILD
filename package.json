@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint 'services/**/*.ts' --max-warnings 0",
+    "lint:ci": "eslint 'services/**/*.ts' --max-warnings 0",
     "lint:fix": "eslint 'services/**/*.ts' --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -11,6 +12,7 @@
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "typecheck:api": "tsc --noEmit --project services/core-api/tsconfig.json",
     "postinstall": "prisma generate",
+    "prepare": "husky",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push --skip-generate",
     "seed:scheduling": "ts-node scripts/seed-scheduling.ts",
@@ -43,11 +45,16 @@
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "eslint": "8.57.1",
+    "husky": "9.1.7",
     "jest": "^30.4.2",
+    "lint-staged": "15.5.2",
     "prettier": "^3.3.3",
     "prisma": "^6.19.3",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "5.9.3"
+  },
+  "lint-staged": {
+    "services/**/*.ts": "eslint --max-warnings 0"
   }
 }
