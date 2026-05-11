@@ -55,6 +55,6 @@
     "typescript": "5.9.3"
   },
   "lint-staged": {
-    "services/**/*.ts": "eslint --max-warnings 0"
+    "services/**/*.{ts,js}": "eslint --max-warnings 0"
   }
 }

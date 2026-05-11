@@ -3,18 +3,12 @@
 **Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.5 Ecosystem Lint Parity: lint:ci script added, lint-staged + Husky pre-commit hook standardized, LINT-1 ship-gate invariant added. Ship-gate 32/32 GREEN.
 
-**Date:** May 11, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
-
-**Date:** May 11, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
-
-**Date:** May 9, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — agent fast-path signal lane added without relaxing required governance/security gates
-**Date:** May 6, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)
-**Date:** May 3, 2026
-**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied
+**Recent status log:**
+- May 11, 2026 — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
+- May 11, 2026 — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
+- May 9, 2026 — agent fast-path signal lane added without relaxing required governance/security gates.
+- May 6, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready).
+- May 3, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied.
 
 All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
@@ -56,7 +50,7 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 > The live, authoritative source of truth is:
 >
 > - Governance doctrine → `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
-> - Coding doctrine v2.0 → `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
+> - Historical program-state snapshot (context only; non-authoritative) → `OQMI_SYSTEM_STATE.md`
 > - Live requirements → `docs/REQUIREMENTS_MASTER.md`
 > - Domain glossary → `docs/DOMAIN_GLOSSARY.md`
 > - Agent instructions → `.github/copilot-instructions.md`
