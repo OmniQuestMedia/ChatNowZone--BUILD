@@ -41,6 +41,8 @@ provider "aws" {
       DataResidency   = "Canada"
       PolicyRef       = "INFRA_v1.0"
       ComplianceOwner = "OmniQuestMediaInc"
+      # Mandatory residency tag — INFRA_v1.0 §1 (Canada-only invariant INFRA_v1.0-INV-01)
+      rule_applied_id = "INFRA_v1.0_CANADA_RESIDENCY"
     }
   }
 }
@@ -52,12 +54,14 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project       = "ChatNowZone"
-      Environment   = "${var.environment}-dr"
-      ManagedBy     = "Terraform"
-      DataResidency = "Canada"
-      PolicyRef     = "INFRA_v1.0"
-      Role          = "DisasterRecovery"
+      Project         = "ChatNowZone"
+      Environment     = "${var.environment}-dr"
+      ManagedBy       = "Terraform"
+      DataResidency   = "Canada"
+      PolicyRef       = "INFRA_v1.0"
+      Role            = "DisasterRecovery"
+      # Mandatory residency tag — INFRA_v1.0 §1
+      rule_applied_id = "INFRA_v1.0_CANADA_RESIDENCY"
     }
   }
 }
