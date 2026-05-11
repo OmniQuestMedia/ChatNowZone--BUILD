@@ -2,7 +2,9 @@
 **Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.  
 **Version:** v0.2 (2026-05-06) — Post-INFRA_v1.0 + Payload 10  
 **Status:** ACTIVE — Phase 0 COMPLETE / Phase 1 START  
-**Rule Applied:** INFRA_v1.0 + OQMI_GOVERNANCE (all tasks)
+**Rule Applied:** INFRA_v1.0 + OQMI_GOVERNANCE (all tasks)  
+**Primary Build Agent:** Grok (effective 2026-05-11 — Claude retired; see
+`PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-GROK-STANDING-PROMPT.md`)
 
 ## Phase 0: Governance & Housekeeping (COMPLETE)
 - [x] OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md landed in docs/POLICIES/

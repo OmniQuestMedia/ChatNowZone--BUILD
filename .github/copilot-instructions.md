@@ -209,7 +209,7 @@ All existing FIZ rules apply (REASON, IMPACT, CORRELATION_ID in commit):
 
 ## 9) Agent Handoff Protocol
 
-When work is handed between agents (Claude, Copilot, KIMI, etc.):
+When work is handed between agents (Grok, Copilot, etc.):
 
 1. The handing agent leaves a `## HANDOFF` block at the bottom of the relevant file or in a `HANDOFF.md` in the affected service folder.
 2. The block must state: what was built, what was intentionally left incomplete, and what the next agent's first task is.
@@ -299,7 +299,7 @@ Stop immediately and open a blocking issue if:
   - Modify another agent's completed work without explicit human instruction
   - Clear a GOV gate (clearance artifacts are CEO-signed only)
   - Merge its own PR (auto-merge handles this via CI)
-  - Create directives (directive authoring is Claude Chat's role)
+  - Create directives (directive authoring is CEO / Grok Chat's role)
   - Make CEO-level decisions when a CLARIFY tag is present in a directive
 
 ---

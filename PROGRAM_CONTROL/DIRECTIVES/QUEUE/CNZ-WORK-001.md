@@ -64,8 +64,15 @@ Scope is bounded to:
 
 Each task carries an `Agent:` hint:
 
-- `copilot` — preferred for repo chores, file moves, config edits, multi-file mechanical work
-- `claude-code` — preferred for service authoring, schema design, complex refactors, anything FIZ-scoped
+> **Agent change (2026-05-11):** Claude Code and Claude in chat are retired. Grok is
+> the primary build agent. Legacy `claude-code` and `claude-in-chat` hints are
+> re-routed to `grok`. Standing prompt: `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-GROK-STANDING-PROMPT.md`.
+
+- `grok` — **primary** for all task types: service authoring, schema design, complex
+  refactors, FIZ-scoped work, repo chores, file moves, config edits, CEO decision surfacing
+- `copilot` — secondary (when Grok unavailable); repo chores, file moves, config edits
+- `claude-code` — **RETIRED 2026-05-11** — re-route all such tasks to `grok`
+- `claude-in-chat` — **RETIRED 2026-05-11** — re-route all such tasks to `grok`
 - `either` — task is small and routing-agnostic; first-come-first-served
 
 The hint is a **routing suggestion, not an exclusivity lock.** An agent that cannot satisfy a task’s `Agent:` hint may still execute it if no other agent has claimed it within 24h, but must note the override in the report-back.
@@ -356,12 +363,12 @@ CNZ-WORK-001-B001: Consolidate R-CLARIFY surface to CEO
 Wave: B
 Priority: P0
 Scope: S
-Agent: claude-in-chat
+Agent: grok
 Depends-on: none
 CEO_GATE: YES (CEO answers; agent only structures)
 FIZ: NO
 Source: Deficit doc Part 4
-Status: QUEUED
+Status: IN-REVIEW — 2026-05-11 — grok — PROGRAM_CONTROL/REPORT_BACK/R-CLARIFY-CONSOLIDATED.md filed; awaiting CEO answers
 Directive: Surface all twelve R-CLARIFY rows (R-CLARIFY-001 through R-CLARIFY-012) to CEO as a single consolidated question set, not one at a time. Format: question, options, downstream affected tasks. CEO answers in one pass. Answers feed Wave F task GAP_TYPE conversions.
 ```
 
