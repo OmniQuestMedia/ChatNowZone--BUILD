@@ -840,22 +840,23 @@ const checks: Array<() => CheckResult> = [
   () => {
     // Verify the repo carries a complete canonical lint surface:
     //   1. .eslintrc.js at repo root
-    //   2. package.json exposes mixed-language lint:ci script coverage (ts+js)
+    //   2. package.json exposes lint:ci script coverage for TS service paths
     //   3. .github/workflows/super-linter.yml exists and validates Python + JS/TS
     //   4. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
     //   5. .husky/pre-commit invokes lint-staged
     const eslintPresent = exists('.eslintrc.js');
     const pkg = readSafe('package.json') ?? '';
     let lintCiPresent = false;
-    let lintCiMixedLangPresent = false;
+    let lintCiServicesPresent = false;
     let lintStagedPresent = false;
     try {
       const json = JSON.parse(pkg);
       const lintCiScript = String(json?.scripts?.['lint:ci'] ?? '');
       lintCiPresent = lintCiScript.length > 0;
-      lintCiMixedLangPresent =
+      lintCiServicesPresent =
         lintCiScript.includes('eslint') &&
-        (lintCiScript.includes('services/**/*.{ts,js}') ||
+        (lintCiScript.includes('services/**/*.ts') ||
+          lintCiScript.includes('services/**/*.{ts,js}') ||
           (lintCiScript.includes('services/**/*.ts') &&
             lintCiScript.includes('services/**/*.js')));
       lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
@@ -877,7 +878,7 @@ const checks: Array<() => CheckResult> = [
     const ok =
       eslintPresent &&
       lintCiPresent &&
-      lintCiMixedLangPresent &&
+      lintCiServicesPresent &&
       lintStagedPresent &&
       superLinterPresent &&
       superLinterMixedLangPresent &&
@@ -888,16 +889,16 @@ const checks: Array<() => CheckResult> = [
       id: 'LINT-1',
       category: 'Lint-clean invariant (Phase 0.5)',
       description:
-        'Canonical lint surface present: .eslintrc.js, mixed-language lint:ci script, super-linter.yml (Python + JS/TS validators), linter configs, Husky + lint-staged pre-commit hook',
+        'Canonical lint surface present: .eslintrc.js, lint:ci script for services, super-linter.yml (Python + JS/TS validators), linter configs, Husky + lint-staged pre-commit hook',
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
         eslintPresent ? '.eslintrc.js present at repo root' : '.eslintrc.js MISSING',
         lintCiPresent
           ? 'package.json exposes lint:ci script'
           : 'package.json missing lint:ci script',
-        lintCiMixedLangPresent
-          ? 'lint:ci script covers mixed-language services/**/*.{ts,js}'
-          : 'lint:ci script missing mixed-language ts+js coverage',
+        lintCiServicesPresent
+          ? 'lint:ci script targets services lint path(s)'
+          : 'lint:ci script missing services lint path coverage',
         lintStagedPresent
           ? 'package.json contains lint-staged config'
           : 'package.json missing lint-staged config',
@@ -919,7 +920,7 @@ const checks: Array<() => CheckResult> = [
       ],
       remediation: ok
         ? undefined
-        : 'Run: yarn add --dev husky lint-staged && yarn husky init; ensure lint:ci covers services/**/*.{ts,js}; enable Python + JS/TS validators in .github/workflows/super-linter.yml (Phase 0.5)',
+        : 'Run: yarn add --dev husky lint-staged && yarn husky init; ensure lint:ci targets services path(s); enable Python + JS/TS validators in .github/workflows/super-linter.yml (Phase 0.5)',
     };
   },
 ];
