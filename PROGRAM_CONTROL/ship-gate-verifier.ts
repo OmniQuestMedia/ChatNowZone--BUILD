@@ -840,22 +840,34 @@ const checks: Array<() => CheckResult> = [
   () => {
     // Verify the repo carries a complete canonical lint surface:
     //   1. .eslintrc.js at repo root
-    //   2. package.json exposes a lint:ci script
-    //   3. .github/workflows/super-linter.yml exists
+    //   2. package.json exposes mixed-language lint:ci script coverage (ts+js)
+    //   3. .github/workflows/super-linter.yml exists and validates Python + JS/TS
     //   4. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
     //   5. .husky/pre-commit invokes lint-staged
     const eslintPresent = exists('.eslintrc.js');
     const pkg = readSafe('package.json') ?? '';
     let lintCiPresent = false;
+    let lintCiMixedLangPresent = false;
     let lintStagedPresent = false;
     try {
       const json = JSON.parse(pkg);
-      lintCiPresent = typeof json?.scripts?.['lint:ci'] === 'string';
+      const lintCiScript = String(json?.scripts?.['lint:ci'] ?? '');
+      lintCiPresent = lintCiScript.length > 0;
+      lintCiMixedLangPresent =
+        lintCiScript.includes('eslint') &&
+        (lintCiScript.includes('services/**/*.{ts,js}') ||
+          (lintCiScript.includes('services/**/*.ts') &&
+            lintCiScript.includes('services/**/*.js')));
       lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
     } catch {
       // parse failure → treated as missing
     }
-    const superLinterPresent = exists('.github/workflows/super-linter.yml');
+    const superLinterContent = readSafe('.github/workflows/super-linter.yml') ?? '';
+    const superLinterPresent = superLinterContent.length > 0;
+    const superLinterMixedLangPresent =
+      superLinterContent.includes('VALIDATE_PYTHON: true') &&
+      superLinterContent.includes('VALIDATE_JAVASCRIPT_ES: true') &&
+      superLinterContent.includes('VALIDATE_TYPESCRIPT_ES: true');
     const markdownLintPresent = exists('.github/linters/.markdown-lint.yml');
     const yamlLintPresent = exists('.github/linters/.yaml-lint.yml');
     const huskyHookPresent = (() => {
@@ -865,8 +877,10 @@ const checks: Array<() => CheckResult> = [
     const ok =
       eslintPresent &&
       lintCiPresent &&
+      lintCiMixedLangPresent &&
       lintStagedPresent &&
       superLinterPresent &&
+      superLinterMixedLangPresent &&
       markdownLintPresent &&
       yamlLintPresent &&
       huskyHookPresent;
@@ -874,19 +888,25 @@ const checks: Array<() => CheckResult> = [
       id: 'LINT-1',
       category: 'Lint-clean invariant (Phase 0.5)',
       description:
-        'Canonical lint surface present: .eslintrc.js, lint:ci script, super-linter.yml, linter configs, Husky + lint-staged pre-commit hook',
+        'Canonical lint surface present: .eslintrc.js, mixed-language lint:ci script, super-linter.yml (Python + JS/TS validators), linter configs, Husky + lint-staged pre-commit hook',
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
         eslintPresent ? '.eslintrc.js present at repo root' : '.eslintrc.js MISSING',
         lintCiPresent
           ? 'package.json exposes lint:ci script'
           : 'package.json missing lint:ci script',
+        lintCiMixedLangPresent
+          ? 'lint:ci script covers mixed-language services/**/*.{ts,js}'
+          : 'lint:ci script missing mixed-language ts+js coverage',
         lintStagedPresent
           ? 'package.json contains lint-staged config'
           : 'package.json missing lint-staged config',
         superLinterPresent
           ? '.github/workflows/super-linter.yml present'
           : '.github/workflows/super-linter.yml MISSING',
+        superLinterMixedLangPresent
+          ? 'super-linter.yml enables VALIDATE_PYTHON + VALIDATE_JAVASCRIPT_ES + VALIDATE_TYPESCRIPT_ES'
+          : 'super-linter.yml missing one or more mixed-language validators',
         markdownLintPresent
           ? '.github/linters/.markdown-lint.yml present'
           : '.github/linters/.markdown-lint.yml MISSING',
@@ -899,7 +919,7 @@ const checks: Array<() => CheckResult> = [
       ],
       remediation: ok
         ? undefined
-        : 'Run: yarn add --dev husky lint-staged && yarn husky init; add lint:ci script and lint-staged config to package.json (Phase 0.5)',
+        : 'Run: yarn add --dev husky lint-staged && yarn husky init; ensure lint:ci covers services/**/*.{ts,js}; enable Python + JS/TS validators in .github/workflows/super-linter.yml (Phase 0.5)',
     };
   },
 ];
