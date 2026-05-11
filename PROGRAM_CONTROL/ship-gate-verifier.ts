@@ -841,7 +841,7 @@ const checks: Array<() => CheckResult> = [
       id: 'LINT-1',
       category: 'Lint standards (OQMI_LINT_STANDARD_v1.0)',
       description:
-        'Super-Linter configured: VALIDATE_ALL_CODEBASE=false, LINTER_RULES_PATH=.github/linters, ESLint fallback config present (advisory)',
+        'Super-Linter configured: VALIDATE_ALL_CODEBASE=false, LINTER_RULES_PATH=.github/linters, ESLint fallback config present',
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
         validateAllOff
