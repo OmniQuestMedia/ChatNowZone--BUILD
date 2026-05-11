@@ -31,7 +31,7 @@ This document is itself governed: see §11 for amendment procedure.
 
 ## 1. CEO ASSIGNMENT-EQUALS-APPROVAL
 
-When the CEO assigns a task to a coding agent (Claude Code, Copilot, Claude in chat, or any other authorized agent), that assignment IS the approval to proceed. The agent does NOT pause to request CEO confirmation before executing.
+When the CEO assigns a task to a coding agent (Grok, Copilot, or any other authorized agent), that assignment IS the approval to proceed. The agent does NOT pause to request CEO confirmation before executing.
 
 The agent proceeds autonomously until one of the following occurs:
 
@@ -93,7 +93,7 @@ Anything not in this list auto-merges. The list is intentionally narrow. Expansi
 
 If a PR is mergeable (no conflicts, gates passed) but the branch carries unresolved errors of any kind — failing tests, lint failures, type errors, build warnings escalated to errors, broken CI steps that were skipped, dependency warnings, deprecation notices, or any other diagnostic flagged by tooling — the merge does NOT auto-land.
 
-The agent that opened the PR (Copilot, Claude Code, or other) MUST first attempt to resolve the errors autonomously. CEO intervention is the last resort, not the first.
+The agent that opened the PR (Grok, Copilot, or other) MUST first attempt to resolve the errors autonomously. CEO intervention is the last resort, not the first.
 
 The agent escalates to CEO only when ALL of the following are true:
 
@@ -157,10 +157,15 @@ If a single question would generate more than three follow-up questions, restruc
 
 Any AI agent operating against an OmniQuest Media Inc. repository, including but not limited to:
 
-- Claude Code (CLI, IDE, GitHub Action)
-- GitHub Copilot (chat, agent mode, PR mode)
-- Claude in chat (anthropic.claude.com or API)
+- Grok (primary build agent — effective 2026-05-11; replaces Claude)
+- GitHub Copilot (chat, agent mode, PR mode — secondary)
 - Any future agent introduced into the workflow
+
+> **Agent change notice (2026-05-11):** Claude Code and Claude in chat are retired.
+> Grok is the primary build agent. Archived Claude prompts:
+> `archive/agents/CNZ-CLAUDE-CODE-KICKOFF-RETIRED-2026-05-11.md`,
+> `archive/agents/CNZ-CLAUDE-CODE-STANDING-PROMPT-RETIRED-2026-05-11.md`.
+> Standing prompt for Grok: `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-GROK-STANDING-PROMPT.md`.
 
 ### 4.2 Mode of operation
 

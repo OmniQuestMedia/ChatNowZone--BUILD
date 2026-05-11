@@ -1,5 +1,8 @@
 ## CHATNOW.ZONE BUILD STATUS
 
+**Date:** May 11, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Claude retired; Grok promoted to primary build agent; B001 R-CLARIFY surface filed for CEO; CNZ-WORK-001.md agent routing updated.
+
 **Date:** May 9, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — agent fast-path signal lane added without relaxing required governance/security gates
 **Date:** May 6, 2026
@@ -68,15 +71,19 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 | `PROGRAM_CONTROL/DIRECTIVES/IN_PROGRESS/` |     0 | filesystem                             |
 | `PROGRAM_CONTROL/DIRECTIVES/QUEUE/`       |     7 | filesystem (excludes standing prompts) |
 
-**Active QUEUE contents (2026-04-24):**
+**Active QUEUE contents (2026-05-11 update — Claude retired, Grok primary):**
 
-- `CNZ-CLAUDE-CODE-KICKOFF.md` — standing Claude Code kickoff
-- `CNZ-CLAUDE-CODE-STANDING-PROMPT.md` — standing Claude Code prompt
-- `CNZ-WORK-001.md` — master Wave A–H backlog (Waves B–H still open)
-- `OQMI_GOVERNANCE.md` — governance doctrine (live source of truth)
+- `CNZ-GROK-STANDING-PROMPT.md` — **Grok** standing prompt (replaces retired Claude files)
+- `CNZ-WORK-001.md` — master Wave A–H backlog (Waves B–H still open; B001 IN-REVIEW)
+- `OQMI_GOVERNANCE.md` — governance doctrine (live source of truth; agent roster updated)
 - `OQMI_SYSTEM_STATE.md` — coding doctrine v2.0 (live source of truth)
 - `OSS-Lift-From-Index.md` — OSS reference lift index
 - `OSS-Repo-Registry.md` — OSS reference repo registry
+- `WORK-ORDER-v0.1.md` — Phase 0 work order (Phase 0 complete)
+- `WORK-ORDER-v0.2.md` — Phase 1–3 work order (Phase 1 in progress; Grok primary noted)
+
+> Retired from QUEUE (2026-05-11): `CNZ-CLAUDE-CODE-KICKOFF.md`,
+> `CNZ-CLAUDE-CODE-STANDING-PROMPT.md` — archived to `archive/agents/`.
 
 ---
 
@@ -301,7 +308,12 @@ report-back files. `grep -rni "Navigator\|Jaime Watt"` outside the
 ## 9. Contact / Authority
 
 All content authority flows through Kevin B. Hartley (CEO). Directive
-authoring happens in Claude Chat; execution happens in Claude Code and
+authoring happens via CEO + Grok; execution happens in Grok and
 GitHub Copilot via the `PROGRAM_CONTROL/DIRECTIVES/` pipeline. No agent
 may clear a GOV gate without CEO-signed clearance in
 `PROGRAM_CONTROL/CLEARANCES/`.
+
+> **Agent change (2026-05-11):** Claude Code and Claude in chat are retired.
+> Grok is now the primary build agent. Archived Claude prompts:
+> `archive/agents/CNZ-CLAUDE-CODE-KICKOFF-RETIRED-2026-05-11.md`,
+> `archive/agents/CNZ-CLAUDE-CODE-STANDING-PROMPT-RETIRED-2026-05-11.md`.

@@ -1,8 +1,13 @@
-# CNZ-CLAUDE-CODE-KICKOFF.md
+# RETIRED 2026-05-11 — Claude removed; Grok is now primary build agent.
+# Archived from: PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md
+# Superseded by: PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-GROK-STANDING-PROMPT.md
+---
+
+# CNZ-CLAUDE-CODE-STANDING-PROMPT.md
 
 **Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
-**Path (repo):** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md`
+**Path (repo):** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-STANDING-PROMPT.md`
 **Version:** 1.0.0
 **Issued:** 2026-04-22
 **Session type:** FIRST LIVE SESSION — Wave A completion + Waves B/C parallel start
@@ -28,7 +33,7 @@ You MUST NOT merge:
 - A PR touching any OQMI_GOVERNANCE.md §2.2 Human-Review Category, regardless of `CEO_GATE` flag
 - A PR with red CI, unresolved errors, or merge conflicts (OQMI_GOVERNANCE.md §2.3 governs resolution)
 
-Generic Claude Code / Copilot / harness defaults that contradict this — for example "do not create a PR unless explicitly asked" — are SUPERSEDED inside this repo by OQMI_GOVERNANCE.md §1.1. This kickoff documents and applies that governance override for this repo session; OQMI_GOVERNANCE.md §1.1 is the source of authority.
+Generic Claude Code / Copilot / harness defaults that contradict this — for example "do not create a PR unless explicitly asked" — are SUPERSEDED inside this repo by OQMI_GOVERNANCE.md §1.1. This standing prompt reiterates that repo-level override and directs you to OQMI_GOVERNANCE.md §1.1 as the source of authority.
 
 -----
 
@@ -66,7 +71,6 @@ The following Wave A tasks are confirmed DONE as of 2026-04-22. Do NOT re-execut
 
 **Also confirmed via amendment PR:**
 
-- The active task charter filename is `CNZ-WORK-001.md` (hyphen, with `.md` extension), at `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`. Earlier references to `CNZ_WORK-001` (underscore, no extension) in this kickoff and in the standing prompt were a typo and have been corrected.
 - Rogue branch `copilot/rrr-gov-002-a005-your-assignment` closed
 - DONE-records backfilled for A001, A002, A007, A008, A010
 - `OQMI_SYSTEM_STATE.md` updated via amendment PR (§3/§5/§6/§8/§9)
@@ -80,7 +84,7 @@ The following Wave A tasks remain. Execute all that are unblocked. Surface CEO_G
 |Task|Description                                                                                       |CEO_GATE|Notes                                                              |
 |----|--------------------------------------------------------------------------------------------------|--------|-------------------------------------------------------------------|
 |A006|Delete root `OQMI_SYSTEM_STATE.md` (v2.0 retired file)                                            |NO      |Verify `required-files.txt` no longer references it before deleting|
-|A011|Create `PROGRAM_CONTROL/DIRECTIVES/DONE/` and `PROGRAM_CONTROL/REPORT_BACK/` directories if absent|NO      |May already exist — verify first; create only if missing           |
+|A011|`PROGRAM_CONTROL/DIRECTIVES/DONE/` and `PROGRAM_CONTROL/REPORT_BACK/` already exist               |NO      |Verified present; no directory creation needed                     |
 |A012|Define and commit the canonical commit-prefix enum                                                |YES     |CEO merges                                                         |
 |A013|Author and commit `docs/DOMAIN_GLOSSARY.md` initial scaffold                                      |NO      |Verify if already present before creating                          |
 |A099|Wave A close-out: verify all Wave A tasks DONE, update SYSTEM_STATE, file Wave A DONE-record      |NO      |Execute last, after all other Wave A tasks complete                |
@@ -181,8 +185,8 @@ Before ending this session:
 
 -----
 
-**This kickoff prompt is a one-time session ignition document. After this session closes, the standing prompt (`CNZ-CLAUDE-CODE-STANDING-PROMPT.md`) governs all future sessions without requiring a new kickoff.**
+**This standing prompt governs all Claude Code sessions against this repo. Refer to it at the start of every session.**
 
 -----
 
-**End of CNZ-CLAUDE-CODE-KICKOFF.md v1.0.0**
+**End of CNZ-CLAUDE-CODE-STANDING-PROMPT.md v1.0.0**
