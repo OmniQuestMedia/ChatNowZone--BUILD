@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/add-iac-full-bootstrap`
-**Commit:** `5378c44d8d050641985e27ef9a04fab2d504ceb2`
-**Generated:** 2026-05-11T19:33:26Z
+**Branch:** `copilot/add-canonical-configs-for-typescript`
+**Commit:** `6c95d3a237a062eb55864de0e46934fe1d23b8e9`
+**Generated:** 2026-05-11T20:24:22Z
 
 ## All Files
 
@@ -15,6 +15,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/ISSUE_TEMPLATE/directive.yml`
 - `.github/copilot-instructions.md`
 - `.github/dependabot.yml`
+- `.github/linters/.eslintrc.json`
 - `.github/linters/.markdown-lint.yml`
 - `.github/linters/.yaml-lint.yml`
 - `.github/refs-branch-policy.md`
@@ -35,6 +36,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/workflows/ship-gate.yml`
 - `.github/workflows/super-linter.yml`
 - `.gitignore`
+- `.husky/pre-commit`
 - `.markdownlintignore`
 - `.prettierignore`
 - `.prettierrc`
