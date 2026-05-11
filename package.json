@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "lint": "eslint . --max-warnings=0",
-    "lint:ci": "eslint . --max-warnings=0 && prettier --check . && tsc --noEmit",
-    "lint:fix": "eslint . --fix && prettier --write .",
+    "lint": "eslint . --ext .ts,.js --max-warnings=0",
+    "lint:ci": "eslint . --ext .ts,.js --max-warnings=0 && prettier --check . && tsc --noEmit",
+    "lint:fix": "eslint . --ext .ts,.js --fix && prettier --write .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
