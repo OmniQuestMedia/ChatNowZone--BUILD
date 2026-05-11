@@ -15,6 +15,7 @@ Auto-generated on every push. Do not edit manually.
 - `.github/ISSUE_TEMPLATE/directive.yml`
 - `.github/copilot-instructions.md`
 - `.github/dependabot.yml`
+- `.github/linters/.eslintrc.json`
 - `.github/linters/.markdown-lint.yml`
 - `.github/linters/.yaml-lint.yml`
 - `.github/refs-branch-policy.md`
