@@ -447,8 +447,7 @@ const checks: Array<() => CheckResult> = [
   // ── 12. INFRA_v1.0 — INFRASTRUCTURE & SECURITY POLICY ────────────────────
   () => {
     // Canada residency: policy doc must exist and declare ca-central-1.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const docPresent = policy.length > 0;
     const caRegionPresent = policy.includes('ca-central-1');
     const ok = docPresent && caRegionPresent;
@@ -473,14 +472,12 @@ const checks: Array<() => CheckResult> = [
   },
   () => {
     // WORM backups: policy must mandate S3_OBJECT_LOCK + 90-day retention.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const wormOk = policy.includes('S3_OBJECT_LOCK') && policy.includes('WORM_RETENTION_DAYS: 90');
     return {
       id: 'INFRA-2',
       category: 'Infrastructure policy (INFRA_v1.0)',
-      description:
-        'INFRA policy mandates S3 Object Lock (WORM) with 90-day minimum retention',
+      description: 'INFRA policy mandates S3 Object Lock (WORM) with 90-day minimum retention',
       status: wormOk ? 'PASS' : 'FAIL',
       evidence: [
         policy.includes('S3_OBJECT_LOCK')
@@ -497,8 +494,7 @@ const checks: Array<() => CheckResult> = [
   },
   () => {
     // PII reference-only: policy must declare PII_REFERENCE_ONLY principle.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const piiOk = policy.includes('PII_REFERENCE_ONLY');
     return {
       id: 'INFRA-3',
@@ -542,9 +538,8 @@ const checks: Array<() => CheckResult> = [
     };
   },
   () => {
-    const sql = readSafe(
-      'prisma/migrations/20260503000000_payload10_backend_closure/migration.sql',
-    ) ?? '';
+    const sql =
+      readSafe('prisma/migrations/20260503000000_payload10_backend_closure/migration.sql') ?? '';
     const checks = [
       'risk_engine_decisions',
       'payout_rate_locks',
@@ -604,7 +599,8 @@ const checks: Array<() => CheckResult> = [
     const missing = required.filter((p) => !exists(p));
     // Verify the service enforces MANDATORY_ROUTING and PII_REFERENCE_ONLY
     const svc = readSafe('services/integration-hub/comms/ecommszone.service.ts') ?? '';
-    const hasMandatoryRouting = svc.includes('ECOMMSZONE_COMMS_v1') && svc.includes('RULE_APPLIED_ID');
+    const hasMandatoryRouting =
+      svc.includes('ECOMMSZONE_COMMS_v1') && svc.includes('RULE_APPLIED_ID');
     const hasPiiGuard = svc.includes('PII_REFERENCE_ONLY') && svc.includes('assertNoPii');
     const ok = missing.length === 0 && hasMandatoryRouting && hasPiiGuard;
     return {
@@ -647,8 +643,7 @@ const checks: Array<() => CheckResult> = [
     // Verify ca-central-1 is the declared primary region
     const mainTf = readSafe('infra/terraform/main.tf') ?? '';
     const varsTf = readSafe('infra/terraform/variables.tf') ?? '';
-    const caRegionDeclared =
-      mainTf.includes('ca-central-1') && varsTf.includes('ca-central-1');
+    const caRegionDeclared = mainTf.includes('ca-central-1') && varsTf.includes('ca-central-1');
     // Verify WORM_RETENTION_DAYS: 90 is declared in variables
     const wormDeclared = varsTf.includes('WORM_RETENTION_DAYS') && varsTf.includes('90');
     const ok = missing.length === 0 && caRegionDeclared && wormDeclared;
@@ -681,7 +676,7 @@ const checks: Array<() => CheckResult> = [
     const vpcTf = readSafe('infra/terraform/vpc.tf') ?? '';
     const ssmEndpointPresent = vpcTf.includes('aws_vpc_endpoint') && vpcTf.includes('ssm');
     // Confirm SSH port 22 is NOT opened in any security group in vpc.tf
-    const noSshPort = !(/from_port\s*=\s*22\b/.test(vpcTf));
+    const noSshPort = !/from_port\s*=\s*22\b/.test(vpcTf);
     const noSshIngress = !vpcTf.includes('"22"');
     const ssmOnlyTagPresent = vpcTf.includes('SSMOnly') && vpcTf.includes('NoSSHPort');
     const ok = ssmEndpointPresent && noSshPort && noSshIngress && ssmOnlyTagPresent;
@@ -717,8 +712,7 @@ const checks: Array<() => CheckResult> = [
     const s3Replication = s3Tf.includes('aws_s3_bucket_replication_configuration');
     const drRegionDeclared = s3Tf.includes('ca-west-1');
     // S3 Object Lock in COMPLIANCE mode
-    const objectLockCompliance =
-      s3Tf.includes('S3_OBJECT_LOCK') && s3Tf.includes('COMPLIANCE');
+    const objectLockCompliance = s3Tf.includes('S3_OBJECT_LOCK') && s3Tf.includes('COMPLIANCE');
     // RDS cross-region backup replication
     const rdsBackupReplication = rdsTf.includes('aws_db_instance_automated_backups_replication');
     const ok = s3Replication && drRegionDeclared && objectLockCompliance && rdsBackupReplication;
@@ -755,7 +749,8 @@ const checks: Array<() => CheckResult> = [
     // INFRA_v1.0 §7: EDR on all servers, immutable backups, zero-trust, MFA,
     // continuous vulnerability scanning + automated patching within 48h.
     const edrTf = readSafe('infra/terraform/edr.tf') ?? '';
-    const inspectorEnabled = edrTf.includes('aws_inspector2_enabler') && edrTf.includes('scan_on_push');
+    const inspectorEnabled =
+      edrTf.includes('aws_inspector2_enabler') && edrTf.includes('scan_on_push');
     const imdsv2Enforced = edrTf.includes('DenyIMDSv1') || edrTf.includes('MetadataHttpTokens');
     const patchBaseline = edrTf.includes('aws_ssm_patch_baseline') && edrTf.includes('48');
     const ecrScan = edrTf.includes('aws_ecr_repository') && edrTf.includes('IMMUTABLE');
@@ -833,6 +828,35 @@ const checks: Array<() => CheckResult> = [
       remediation: ok
         ? undefined
         : 'Create services/integration-hub/comms/outbound-webhook.service.ts + outbound-webhook.types.ts with all four event types (INFRA_v1.0 §8)',
+    };
+  },
+  // ── 15. LINT STANDARDS (OQMI_LINT_STANDARD_v1.0) ─────────────────────────
+  () => {
+    const superlinter = readSafe('.github/workflows/super-linter.yml') ?? '';
+    const validateAllOff = superlinter.includes('VALIDATE_ALL_CODEBASE: false');
+    const linterRulesPath = superlinter.includes('LINTER_RULES_PATH: .github/linters');
+    const eslintFallback = exists('.github/linters/.eslintrc.json');
+    const ok = validateAllOff && linterRulesPath && eslintFallback;
+    return {
+      id: 'LINT-1',
+      category: 'Lint standards (OQMI_LINT_STANDARD_v1.0)',
+      description:
+        'Super-Linter configured: VALIDATE_ALL_CODEBASE=false, LINTER_RULES_PATH=.github/linters, ESLint fallback config present (advisory)',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        validateAllOff
+          ? 'VALIDATE_ALL_CODEBASE: false declared in super-linter.yml'
+          : 'VALIDATE_ALL_CODEBASE: false missing — super-linter may scan full codebase',
+        linterRulesPath
+          ? 'LINTER_RULES_PATH: .github/linters declared in super-linter.yml'
+          : 'LINTER_RULES_PATH not set — linter configs may not be discovered',
+        eslintFallback
+          ? '.github/linters/.eslintrc.json fallback config present'
+          : '.github/linters/.eslintrc.json missing — Super-Linter ESLint fallback absent',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Verify .github/workflows/super-linter.yml and create .github/linters/.eslintrc.json (OQMI_LINT_STANDARD_v1.0)',
     };
   },
 ];

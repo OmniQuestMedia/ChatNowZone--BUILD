@@ -1,6 +1,9 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 11, 2026
+**Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Phase 0.6 Linting Standardization (OQMI_LINT_STANDARD_v1.0) applied: canonical package.json scripts (lint/lint:ci/lint:fix/format/prepare), husky pre-commit hook, lint-staged full coverage (_.ts,_.js,_.json,_.md,\*.yml), super-linter.yml updated (VALIDATE_ESLINT:true, FILTER_REGEX_INCLUDE includes PROGRAM_CONTROL/ and ts/js), .github/linters/.eslintrc.json fallback created, ship-gate LINT-1 check added (32 checks).
+
+**Date:** May 11, 2026
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — WORK-ORDER-v0.3 Phase 1 completed: EDR alignment (INFRA-8), outbound webhook dispatcher (INFRA-9), INFRA_v1.0_CANADA_RESIDENCY tagging, docker-compose eCommsZone + outbound webhook env vars. Ship-gate 31/31 GREEN.
 
 **Date:** May 11, 2026
@@ -129,7 +132,7 @@ H-LAUNCH-READY sign-off directive):
 | ------------------------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Three-Bucket Wallet                        | D001         | DONE — `LedgerService.debitWallet` + `ThreeBucketSpendGuardMiddleware` defence-in-depth                                                                                                                                                                                    |
 | Risk Engine                                | D002         | DONE — PAYLOAD 10 RiskEngineService (composite scoring + Diamond Concierge intake + append-only `risk_engine_decisions` + NATS `RISK_ENGINE_DECISION_*`)                                                                                                                   |
-| NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with `AUDIT_IMMUTABLE_*` topics + PAYLOAD 10 RISK_ENGINE / PAYOUT_RATE_LOCKED / OBS_HEAT_ESCALATION topics                                                                                                                           |
+| NATS Fabric                                | D003         | DONE (scaffold) — PAYLOAD 6 extended with `AUDIT_IMMUTABLE_*` topics + PAYLOAD 10 RISK_ENGINE / PAYOUT_RATE_LOCKED / OBS_HEAT_ESCALATION topics                                                                                                                            |
 | OBS Broadcast Kernel                       | D004         | DONE — PAYLOAD 10 AudioSignalService gates Flicker n'Flame escalation above COLD on a positive vocal signal (PAY-008); OBSBridgeService key/lifecycle intact                                                                                                               |
 | FairPay + NOWPayouts                       | D006, E002   | DONE (FairPay) — PAYLOAD 10 PayoutRateLockService captures rate at purchase (PAY-006/011); NOWPayouts batch settlement remains scaffold                                                                                                                                    |
 | Risk Engine                                | D002         | DONE (scaffold v1) — `RegionSignalService` deterministic, NATS-driven (`risk.region_signal.emitted`), GateGuard-pre-processed; full Mini Credit Bureau still NEEDS_DIRECTIVE                                                                                               |
