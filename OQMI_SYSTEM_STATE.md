@@ -50,7 +50,7 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 > The live, authoritative source of truth is:
 >
 > - Governance doctrine → `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
-> - Coding doctrine v2.0 / Program state tracker → `OQMI_SYSTEM_STATE.md`
+> - Program state tracker snapshot (non-authoritative) → `OQMI_SYSTEM_STATE.md`
 > - Live requirements → `docs/REQUIREMENTS_MASTER.md`
 > - Domain glossary → `docs/DOMAIN_GLOSSARY.md`
 > - Agent instructions → `.github/copilot-instructions.md`
