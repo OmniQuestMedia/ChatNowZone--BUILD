@@ -17,16 +17,17 @@ tree.
 
 ## Authoritative docs
 
-- **Governance doctrine:** [`PROGRAM_CONTROL/OQMI_GOVERNANCE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) — invariants, agent roles, PR-lifecycle authority.
+- **Governance doctrine:** [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) — invariants, agent roles, PR-lifecycle authority.
 - **Infrastructure & Security policy:** [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) — INFRA_v1.0 — Canada residency, WORM backups, PII handling, network isolation, zero-trust, secret management, partner contracts.
 - **Policy index:** [`docs/POLICIES/`](docs/POLICIES/) — all active OQMInc platform policies.
-- **Coding doctrine:** [`PROGRAM_CONTROL/OQMI_SYSTEM_STATE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md) — OQMI Coding Doctrine v2.0.
+- **Coding doctrine:** [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md) — OQMI Coding Doctrine v2.0.
 - **Program control pipeline:** [`PROGRAM_CONTROL/`](PROGRAM_CONTROL/) — directive queue, in-progress, done, report-backs, repo manifest, ship-gate verifier.
 - **Architecture overview (Payloads 1–8):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md).
 - **Pre-launch L0 checklist:** [`docs/PRE_LAUNCH_CHECKLIST.md`](docs/PRE_LAUNCH_CHECKLIST.md).
 - **Engineering docs root:** [`docs/`](docs/) — `DOMAIN_GLOSSARY.md`, `REQUIREMENTS_MASTER.md`, `MEMBERSHIP_LIFECYCLE_POLICY.md`, `ROADMAP_MANIFEST.md`, compliance, doctrine.
 - **⚠️ Infrastructure & Security Policy:** [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) — Canada-only data residency (PIPEDA), immutable 3-2-1 backups (WORM), zero-trust architecture, AI advisory-only invariant, ransomware defense. **All infrastructure/security changes MUST cite `rule_applied_id` from §11.**
-- **Agent instructions (GitHub Copilot + Claude Code):** [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
+- **Agent instructions (Grok + GitHub Copilot):** [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
+- **Root architecture inventory:** [`architecture.md`](architecture.md) — governance equalization status matrix.
 - **Backlog snapshot:** [`OQMI_SYSTEM_STATE.md`](OQMI_SYSTEM_STATE.md) (repo root — periodic snapshot of ship-gate and invariant-audit status).
 - **Architecture overview (Payload 9):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md) — full system map + cross-Payload invariants.
 - **Pre-launch checklist:** [`docs/PRE_LAUNCH_CHECKLIST.md`](docs/PRE_LAUNCH_CHECKLIST.md) — go/no-go for the 2026-10-01 hard launch.
@@ -81,7 +82,7 @@ environment without rebuilding the container.
 
 | Command                                 | Purpose                                                            |
 | --------------------------------------- | ------------------------------------------------------------------ |
-| `yarn lint` / `yarn lint:fix`           | ESLint `services/**/*.ts` (zero warnings)                          |
+| `yarn lint` / `yarn lint:fix`           | ESLint across the repository (zero warnings)                       |
 | `yarn format` / `yarn format:check`     | Prettier across the tree                                           |
 | `yarn typecheck` / `yarn typecheck:api` | `tsc --noEmit` (root / core-api)                                   |
 | `yarn test`                             | Jest integration + E2E suite (`tests/integration/` + `tests/e2e/`) |
@@ -116,17 +117,17 @@ Detailed map: [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md).
 
 Eight payloads compose the canonical runtime:
 
-| # | Payload | Highlights |
-| - | --- | --- |
-| 1 | Canonical Financial Ledger | Three-bucket wallet, REDBOOK rate cards, append-only triggers |
-| 2 | REDBOOK Recovery + Diamond Concierge | Extension / recovery / Token Bridge / 3/5ths Exit |
-| 3 | GateGuard Sentinel + Welfare Guardian Score | Pre-processor on every ledger touch |
-| 4 | OBS Streaming Bridge + Flicker n'Flame Scoring (FFS) | Deterministic tier transitions, theatre + Bijou |
-| 5 | CreatorControl.Zone + Cyrano L1 + Integration Hub | Whisper copilot ≤ 350 ms, cross-Payload wiring |
-| 6 | Immutable Audit Architecture | Hash-chain + WORM export + Canonical Compliance Checklist |
-| 7 | RBAC Step-Up + Compliance Lockdown | Step-up challenge + Legal Hold model |
-| 8 | (Cross-cutting) | Covered by Payloads 1–7 |
-| 9 | Deployment Readiness + Launch Prep | This release — see `docs/ARCHITECTURE_OVERVIEW.md` |
+| #   | Payload                                              | Highlights                                                    |
+| --- | ---------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | Canonical Financial Ledger                           | Three-bucket wallet, REDBOOK rate cards, append-only triggers |
+| 2   | REDBOOK Recovery + Diamond Concierge                 | Extension / recovery / Token Bridge / 3/5ths Exit             |
+| 3   | GateGuard Sentinel + Welfare Guardian Score          | Pre-processor on every ledger touch                           |
+| 4   | OBS Streaming Bridge + Flicker n'Flame Scoring (FFS) | Deterministic tier transitions, theatre + Bijou               |
+| 5   | CreatorControl.Zone + Cyrano L1 + Integration Hub    | Whisper copilot ≤ 350 ms, cross-Payload wiring                |
+| 6   | Immutable Audit Architecture                         | Hash-chain + WORM export + Canonical Compliance Checklist     |
+| 7   | RBAC Step-Up + Compliance Lockdown                   | Step-up challenge + Legal Hold model                          |
+| 8   | (Cross-cutting)                                      | Covered by Payloads 1–7                                       |
+| 9   | Deployment Readiness + Launch Prep                   | This release — see `docs/ARCHITECTURE_OVERVIEW.md`            |
 
 See [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md) for
 the full topology, cross-Payload contracts, and AWS deploy plan.
@@ -177,8 +178,8 @@ Full invariant set and enforcement rules:
 
 Work flows through the **PROGRAM_CONTROL directive pipeline**:
 
-1. Claude Chat authors a directive into `PROGRAM_CONTROL/DIRECTIVES/QUEUE/`.
-2. An agent (Claude Code, GitHub Copilot, or human contributor) moves
+1. A governance-authorized operator/agent authors a directive into `PROGRAM_CONTROL/DIRECTIVES/QUEUE/`.
+2. An agent (Grok, GitHub Copilot, or human contributor) moves
    the directive to `IN_PROGRESS/`, opens a branch, executes exactly
    as written, and files a report-back in `PROGRAM_CONTROL/REPORT_BACK/`.
 3. PR is reviewed per `.github/CODEOWNERS` + `ci.yml` + `super-linter.yml`;
