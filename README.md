@@ -20,6 +20,7 @@ tree.
 - **Governance doctrine:** [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) — invariants, agent roles, PR-lifecycle authority.
 - **Infrastructure & Security policy:** [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) — INFRA_v1.0 — Canada residency, WORM backups, PII handling, network isolation, zero-trust, secret management, partner contracts.
 - **Policy index:** [`docs/POLICIES/`](docs/POLICIES/) — all active OQMInc platform policies.
+- **RedBook bootstrap playbook:** [`docs/REDBOOK_HCZ_PLAYBOOK.md`](docs/REDBOOK_HCZ_PLAYBOOK.md) — repo-local HCZ escalation matrix for existing welfare, recovery, and Diamond Concierge flows.
 - **Coding doctrine:** [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md) — OQMI Coding Doctrine v2.0.
 - **Program control pipeline:** [`PROGRAM_CONTROL/`](PROGRAM_CONTROL/) — directive queue, in-progress, done, report-backs, repo manifest, ship-gate verifier.
 - **Architecture overview (Payloads 1–8):** [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md).
@@ -131,6 +132,9 @@ Eight payloads compose the canonical runtime:
 
 See [`docs/ARCHITECTURE_OVERVIEW.md`](docs/ARCHITECTURE_OVERVIEW.md) for
 the full topology, cross-Payload contracts, and AWS deploy plan.
+
+The HCZ escalation bootstrap for current RedBook-linked flows lives in
+[`docs/REDBOOK_HCZ_PLAYBOOK.md`](docs/REDBOOK_HCZ_PLAYBOOK.md).
 
 ## Ship-gate status (vs Canonical Corpus L0)
 

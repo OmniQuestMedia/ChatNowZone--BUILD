@@ -1,6 +1,9 @@
 ## CHATNOW.ZONE BUILD STATUS
 
 **Date:** May 12, 2026
+**Status:** HUMANCONTACT bootstrap slice in progress: added `docs/REDBOOK_HCZ_PLAYBOOK.md`, linked RedBook bootstrap coverage from `README.md` and `architecture.md`, pending targeted validation + PR open. Rule applied: `HUMANCONTACT-ACTIVATE-v1`.
+
+**Date:** May 12, 2026
 **Status:** Governance Equalization refresh (cycle 1) in progress: added root `architecture.md` inventory matrix, added root `CONTRIBUTING.md` governance contribution flow, synced README governance links + Grok/Copilot authority wording, removed generated/dead service JS artifacts under `services/bijou/src` and `services/zone-gpt/src`, and ran local branch hygiene (`git remote prune origin`, `git gc`).
 
 **Date:** May 11, 2026
