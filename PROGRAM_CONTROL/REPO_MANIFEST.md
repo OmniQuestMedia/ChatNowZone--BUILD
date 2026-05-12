@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/governance-equalization-refresh`
-**Commit:** `18a70ee8c127dfa306fc507b8a6977a2efd70648`
-**Generated:** 2026-05-12T06:56:42Z
+**Branch:** `copilot/update-architecture-and-workflows`
+**Commit:** `44928988c861e4ae2c26962c6964e6bddf6093e2`
+**Generated:** 2026-05-12T10:33:08Z
 
 ## All Files
 
@@ -323,6 +323,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
 - `docs/POLICIES/README.md`
 - `docs/PRE_LAUNCH_CHECKLIST.md`
+- `docs/REDBOOK_HCZ_PLAYBOOK.md`
 - `docs/REQUIREMENTS_MASTER.md`
 - `docs/ROADMAP_MANIFEST.md`
 - `docs/RRR_CEO_DECISIONS_FINAL_2026-04-17.md`
