@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/p0-6-cross-repo-linting`
-**Commit:** `8b759ee1d1a1411be867974da812afb5a113f788`
-**Generated:** 2026-05-12T05:44:26Z
+**Branch:** `copilot/governance-equalization-refresh`
+**Commit:** `18a70ee8c127dfa306fc507b8a6977a2efd70648`
+**Generated:** 2026-05-12T06:56:42Z
 
 ## All Files
 
@@ -40,6 +40,7 @@ Auto-generated on every push. Do not edit manually.
 - `.markdownlintignore`
 - `.prettierignore`
 - `.prettierrc`
+- `CONTRIBUTING.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
@@ -301,6 +302,7 @@ Auto-generated on every push. Do not edit manually.
 - `apps/cyrano-standalone/next.config.js`
 - `apps/cyrano-standalone/package.json`
 - `apps/cyrano-standalone/tsconfig.json`
+- `architecture.md`
 - `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md`
 - `archive/INFRA-PRE-2026-05-06/ARCHIVE_MANIFEST.md`
 - `archive/LEGACY_CONFIGS_2026-04/.eslintrc.js`
@@ -432,21 +434,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/bijou-admission.service.ts`
 - `services/bijou/src/bijou-dwell.service.ts`
 - `services/bijou/src/bijou-scheduler.service.ts`
-- `services/bijou/src/bijou-session.service.d.ts`
-- `services/bijou/src/bijou-session.service.js`
-- `services/bijou/src/bijou-session.service.js.map`
 - `services/bijou/src/bijou-session.service.ts`
-- `services/bijou/src/bijou.module.d.ts`
-- `services/bijou/src/bijou.module.js`
-- `services/bijou/src/bijou.module.js.map`
 - `services/bijou/src/bijou.module.ts`
-- `services/bijou/src/min-seat-gate.service.d.ts`
-- `services/bijou/src/min-seat-gate.service.js`
-- `services/bijou/src/min-seat-gate.service.js.map`
 - `services/bijou/src/min-seat-gate.service.ts`
-- `services/bijou/src/pass-pricing.service.d.ts`
-- `services/bijou/src/pass-pricing.service.js`
-- `services/bijou/src/pass-pricing.service.js.map`
 - `services/bijou/src/pass-pricing.service.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
 - `services/core-api/src/analytics/ffs-score.service.ts`
@@ -746,13 +736,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
-- `services/zone-gpt/src/proposal.service.d.ts`
-- `services/zone-gpt/src/proposal.service.js`
-- `services/zone-gpt/src/proposal.service.js.map`
 - `services/zone-gpt/src/proposal.service.ts`
-- `services/zone-gpt/src/zone-gpt.module.d.ts`
-- `services/zone-gpt/src/zone-gpt.module.js`
-- `services/zone-gpt/src/zone-gpt.module.js.map`
 - `services/zone-gpt/src/zone-gpt.module.ts`
 - `services/zonebot-scheduler/.env.example`
 - `services/zonebot-scheduler/ASSUMPTIONS.md`
