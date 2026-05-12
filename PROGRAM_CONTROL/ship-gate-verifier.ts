@@ -837,6 +837,7 @@ const checks: Array<() => CheckResult> = [
     };
   },
 
+  // ── 15. LINT-CLEAN INVARIANT (Phase 0.5) + CROSS-REPO LINT PARITY (Phase 0.6) ──
   // ── 15. LINT-CLEAN INVARIANT (OQMI_LINT_STANDARD_v1.0) ───────────────────
   () => {
     // Verify the repo carries a complete canonical lint surface:
@@ -929,6 +930,45 @@ const checks: Array<() => CheckResult> = [
       remediation: ok
         ? undefined
         : 'Run: yarn add --dev husky lint-staged && husky init; add lint:ci script; enable Python + JS/TS + ESLint validators in super-linter.yml; create .github/linters/.eslintrc.json (OQMI_LINT_STANDARD_v1.0)',
+    };
+  },
+
+  // ── 16. CROSS-REPO LINT PARITY (Phase 0.6) ───────────────────────────────
+  () => {
+    // LINT-2: Verify this repo exposes the canonical cross-repo lint script
+    // alias (lint:ci-js) and that OQMI_SYSTEM_STATE.md records the Phase 0.6
+    // propagation entry. ChatNowZone--BUILD is the canonical template source;
+    // lint:ci-js is the JS-specific alias from the MaxZoneGPT mixed-pattern so
+    // all repos share a uniform lint:ci-js / lint:ci-python surface.
+    const pkg = readSafe('package.json') ?? '';
+    let lintCiJsPresent = false;
+    try {
+      const json = JSON.parse(pkg);
+      lintCiJsPresent = typeof json?.scripts?.['lint:ci-js'] === 'string';
+    } catch {
+      // parse failure → treated as missing
+    }
+    const systemState = readSafe('OQMI_SYSTEM_STATE.md') ?? '';
+    const propagationRecorded =
+      systemState.includes('Phase 0.6') && systemState.includes('cross-repo-lint-parity');
+    const ok = lintCiJsPresent && propagationRecorded;
+    return {
+      id: 'LINT-2',
+      category: 'Cross-repo lint parity (Phase 0.6)',
+      description:
+        'Canonical lint:ci-js script alias present and Phase 0.6 propagation recorded in OQMI_SYSTEM_STATE.md',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        lintCiJsPresent
+          ? 'package.json exposes lint:ci-js script (canonical cross-repo alias)'
+          : 'package.json missing lint:ci-js script — add as alias for lint:ci',
+        propagationRecorded
+          ? 'OQMI_SYSTEM_STATE.md contains Phase 0.6 cross-repo-lint-parity propagation entry'
+          : 'OQMI_SYSTEM_STATE.md missing Phase 0.6 / cross-repo-lint-parity entry',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Add lint:ci-js script to package.json and record Phase 0.6 propagation in OQMI_SYSTEM_STATE.md (Phase 0.6)',
     };
   },
 ];
