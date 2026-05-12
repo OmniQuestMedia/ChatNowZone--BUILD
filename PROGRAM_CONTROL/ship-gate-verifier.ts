@@ -46,6 +46,12 @@ function exists(path: string): boolean {
   return existsSync(join(REPO_ROOT, path));
 }
 
+function hasTruthyYamlKey(yaml: string, key: string): boolean {
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|\\n)\\s*${escapedKey}\\s*:\\s*(true|yes|on)\\s*(\\n|$)`, 'i');
+  return re.test(yaml);
+}
+
 function walkTs(dir: string, out: string[] = []): string[] {
   const abs = join(REPO_ROOT, dir);
   if (!existsSync(abs)) return out;
@@ -447,8 +453,7 @@ const checks: Array<() => CheckResult> = [
   // ── 12. INFRA_v1.0 — INFRASTRUCTURE & SECURITY POLICY ────────────────────
   () => {
     // Canada residency: policy doc must exist and declare ca-central-1.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const docPresent = policy.length > 0;
     const caRegionPresent = policy.includes('ca-central-1');
     const ok = docPresent && caRegionPresent;
@@ -473,14 +478,12 @@ const checks: Array<() => CheckResult> = [
   },
   () => {
     // WORM backups: policy must mandate S3_OBJECT_LOCK + 90-day retention.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const wormOk = policy.includes('S3_OBJECT_LOCK') && policy.includes('WORM_RETENTION_DAYS: 90');
     return {
       id: 'INFRA-2',
       category: 'Infrastructure policy (INFRA_v1.0)',
-      description:
-        'INFRA policy mandates S3 Object Lock (WORM) with 90-day minimum retention',
+      description: 'INFRA policy mandates S3 Object Lock (WORM) with 90-day minimum retention',
       status: wormOk ? 'PASS' : 'FAIL',
       evidence: [
         policy.includes('S3_OBJECT_LOCK')
@@ -497,8 +500,7 @@ const checks: Array<() => CheckResult> = [
   },
   () => {
     // PII reference-only: policy must declare PII_REFERENCE_ONLY principle.
-    const policy =
-      readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
+    const policy = readSafe('docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md') ?? '';
     const piiOk = policy.includes('PII_REFERENCE_ONLY');
     return {
       id: 'INFRA-3',
@@ -542,9 +544,8 @@ const checks: Array<() => CheckResult> = [
     };
   },
   () => {
-    const sql = readSafe(
-      'prisma/migrations/20260503000000_payload10_backend_closure/migration.sql',
-    ) ?? '';
+    const sql =
+      readSafe('prisma/migrations/20260503000000_payload10_backend_closure/migration.sql') ?? '';
     const checks = [
       'risk_engine_decisions',
       'payout_rate_locks',
@@ -604,7 +605,8 @@ const checks: Array<() => CheckResult> = [
     const missing = required.filter((p) => !exists(p));
     // Verify the service enforces MANDATORY_ROUTING and PII_REFERENCE_ONLY
     const svc = readSafe('services/integration-hub/comms/ecommszone.service.ts') ?? '';
-    const hasMandatoryRouting = svc.includes('ECOMMSZONE_COMMS_v1') && svc.includes('RULE_APPLIED_ID');
+    const hasMandatoryRouting =
+      svc.includes('ECOMMSZONE_COMMS_v1') && svc.includes('RULE_APPLIED_ID');
     const hasPiiGuard = svc.includes('PII_REFERENCE_ONLY') && svc.includes('assertNoPii');
     const ok = missing.length === 0 && hasMandatoryRouting && hasPiiGuard;
     return {
@@ -647,8 +649,7 @@ const checks: Array<() => CheckResult> = [
     // Verify ca-central-1 is the declared primary region
     const mainTf = readSafe('infra/terraform/main.tf') ?? '';
     const varsTf = readSafe('infra/terraform/variables.tf') ?? '';
-    const caRegionDeclared =
-      mainTf.includes('ca-central-1') && varsTf.includes('ca-central-1');
+    const caRegionDeclared = mainTf.includes('ca-central-1') && varsTf.includes('ca-central-1');
     // Verify WORM_RETENTION_DAYS: 90 is declared in variables
     const wormDeclared = varsTf.includes('WORM_RETENTION_DAYS') && varsTf.includes('90');
     const ok = missing.length === 0 && caRegionDeclared && wormDeclared;
@@ -681,7 +682,7 @@ const checks: Array<() => CheckResult> = [
     const vpcTf = readSafe('infra/terraform/vpc.tf') ?? '';
     const ssmEndpointPresent = vpcTf.includes('aws_vpc_endpoint') && vpcTf.includes('ssm');
     // Confirm SSH port 22 is NOT opened in any security group in vpc.tf
-    const noSshPort = !(/from_port\s*=\s*22\b/.test(vpcTf));
+    const noSshPort = !/from_port\s*=\s*22\b/.test(vpcTf);
     const noSshIngress = !vpcTf.includes('"22"');
     const ssmOnlyTagPresent = vpcTf.includes('SSMOnly') && vpcTf.includes('NoSSHPort');
     const ok = ssmEndpointPresent && noSshPort && noSshIngress && ssmOnlyTagPresent;
@@ -717,8 +718,7 @@ const checks: Array<() => CheckResult> = [
     const s3Replication = s3Tf.includes('aws_s3_bucket_replication_configuration');
     const drRegionDeclared = s3Tf.includes('ca-west-1');
     // S3 Object Lock in COMPLIANCE mode
-    const objectLockCompliance =
-      s3Tf.includes('S3_OBJECT_LOCK') && s3Tf.includes('COMPLIANCE');
+    const objectLockCompliance = s3Tf.includes('S3_OBJECT_LOCK') && s3Tf.includes('COMPLIANCE');
     // RDS cross-region backup replication
     const rdsBackupReplication = rdsTf.includes('aws_db_instance_automated_backups_replication');
     const ok = s3Replication && drRegionDeclared && objectLockCompliance && rdsBackupReplication;
@@ -755,7 +755,8 @@ const checks: Array<() => CheckResult> = [
     // INFRA_v1.0 §7: EDR on all servers, immutable backups, zero-trust, MFA,
     // continuous vulnerability scanning + automated patching within 48h.
     const edrTf = readSafe('infra/terraform/edr.tf') ?? '';
-    const inspectorEnabled = edrTf.includes('aws_inspector2_enabler') && edrTf.includes('scan_on_push');
+    const inspectorEnabled =
+      edrTf.includes('aws_inspector2_enabler') && edrTf.includes('scan_on_push');
     const imdsv2Enforced = edrTf.includes('DenyIMDSv1') || edrTf.includes('MetadataHttpTokens');
     const patchBaseline = edrTf.includes('aws_ssm_patch_baseline') && edrTf.includes('48');
     const ecrScan = edrTf.includes('aws_ecr_repository') && edrTf.includes('IMMUTABLE');
@@ -837,25 +838,38 @@ const checks: Array<() => CheckResult> = [
   },
 
   // ── 15. LINT-CLEAN INVARIANT (Phase 0.5) + CROSS-REPO LINT PARITY (Phase 0.6) ──
+  // ── 15. LINT-CLEAN INVARIANT (OQMI_LINT_STANDARD_v1.0) ───────────────────
   () => {
     // Verify the repo carries a complete canonical lint surface:
     //   1. .eslintrc.js at repo root
-    //   2. package.json exposes a lint:ci script
-    //   3. .github/workflows/super-linter.yml exists
-    //   4. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
-    //   5. .husky/pre-commit invokes lint-staged
+    //   2. package.json exposes lint:ci script (full repo ESLint coverage)
+    //   3. package.json has lint-staged config
+    //   4. .github/workflows/super-linter.yml present with VALIDATE_ALL_CODEBASE=false,
+    //      LINTER_RULES_PATH, and mixed-language validators (Python + JS/TS + ESLint)
+    //   5. .github/linters/.eslintrc.json fallback present
+    //   6. .github/linters/.markdown-lint.yml + .yaml-lint.yml present
+    //   7. .husky/pre-commit invokes lint-staged
     const eslintPresent = exists('.eslintrc.js');
     const pkg = readSafe('package.json') ?? '';
     let lintCiPresent = false;
     let lintStagedPresent = false;
     try {
       const json = JSON.parse(pkg);
-      lintCiPresent = typeof json?.scripts?.['lint:ci'] === 'string';
+      const lintCiScript = String(json?.scripts?.['lint:ci'] ?? '');
+      lintCiPresent = /\beslint\b/.test(lintCiScript);
       lintStagedPresent = typeof json?.['lint-staged'] !== 'undefined';
     } catch {
       // parse failure → treated as missing
     }
-    const superLinterPresent = exists('.github/workflows/super-linter.yml');
+    const superLinterContent = readSafe('.github/workflows/super-linter.yml') ?? '';
+    const superLinterPresent = superLinterContent.length > 0;
+    const validateAllOff = superLinterContent.includes('VALIDATE_ALL_CODEBASE: false');
+    const linterRulesPath = superLinterContent.includes('LINTER_RULES_PATH: .github/linters');
+    const superLinterMixedLangPresent =
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_PYTHON') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_JAVASCRIPT_ES') &&
+      hasTruthyYamlKey(superLinterContent, 'VALIDATE_TYPESCRIPT_ES');
+    const eslintFallback = exists('.github/linters/.eslintrc.json');
     const markdownLintPresent = exists('.github/linters/.markdown-lint.yml');
     const yamlLintPresent = exists('.github/linters/.yaml-lint.yml');
     const huskyHookPresent = (() => {
@@ -867,19 +881,23 @@ const checks: Array<() => CheckResult> = [
       lintCiPresent &&
       lintStagedPresent &&
       superLinterPresent &&
+      validateAllOff &&
+      linterRulesPath &&
+      superLinterMixedLangPresent &&
+      eslintFallback &&
       markdownLintPresent &&
       yamlLintPresent &&
       huskyHookPresent;
     return {
       id: 'LINT-1',
-      category: 'Lint-clean invariant (Phase 0.5)',
+      category: 'Lint-clean invariant (OQMI_LINT_STANDARD_v1.0)',
       description:
-        'Canonical lint surface present: .eslintrc.js, lint:ci script, super-linter.yml, linter configs, Husky + lint-staged pre-commit hook',
+        'Canonical lint surface: .eslintrc.js, lint:ci, lint-staged, super-linter.yml (VALIDATE_ALL_CODEBASE=false, mixed-language + ESLint validators, LINTER_RULES_PATH), .eslintrc.json fallback, linter configs, Husky pre-commit hook',
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
         eslintPresent ? '.eslintrc.js present at repo root' : '.eslintrc.js MISSING',
         lintCiPresent
-          ? 'package.json exposes lint:ci script'
+          ? 'package.json exposes lint:ci script with ESLint coverage'
           : 'package.json missing lint:ci script',
         lintStagedPresent
           ? 'package.json contains lint-staged config'
@@ -887,6 +905,18 @@ const checks: Array<() => CheckResult> = [
         superLinterPresent
           ? '.github/workflows/super-linter.yml present'
           : '.github/workflows/super-linter.yml MISSING',
+        validateAllOff
+          ? 'VALIDATE_ALL_CODEBASE: false declared in super-linter.yml'
+          : 'VALIDATE_ALL_CODEBASE: false missing — super-linter may scan full codebase',
+        linterRulesPath
+          ? 'LINTER_RULES_PATH: .github/linters declared in super-linter.yml'
+          : 'LINTER_RULES_PATH not set — linter configs may not be discovered',
+        superLinterMixedLangPresent
+          ? 'super-linter.yml enables VALIDATE_PYTHON + VALIDATE_JAVASCRIPT_ES + VALIDATE_TYPESCRIPT_ES'
+          : 'super-linter.yml missing one or more mixed-language validators',
+        eslintFallback
+          ? '.github/linters/.eslintrc.json fallback config present'
+          : '.github/linters/.eslintrc.json missing — Super-Linter ESLint fallback absent',
         markdownLintPresent
           ? '.github/linters/.markdown-lint.yml present'
           : '.github/linters/.markdown-lint.yml MISSING',
@@ -899,7 +929,7 @@ const checks: Array<() => CheckResult> = [
       ],
       remediation: ok
         ? undefined
-        : 'Run: yarn add --dev husky lint-staged && yarn husky init; add lint:ci script and lint-staged config to package.json (Phase 0.5)',
+        : 'Run: yarn add --dev husky lint-staged && husky init; add lint:ci script; enable Python + JS/TS + ESLint validators in super-linter.yml; create .github/linters/.eslintrc.json (OQMI_LINT_STANDARD_v1.0)',
     };
   },
 
