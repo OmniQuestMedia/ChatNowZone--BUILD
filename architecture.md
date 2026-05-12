@@ -22,6 +22,7 @@
 | Encrypted references / PII-reference-only | **Finished**    | INFRA policy + integration-hub controls enforce reference-only pattern                                               |
 | Canada region patterns (`ca-central-1`)   | **Finished**    | INFRA policy + Terraform defaults enforce Canada residency                                                           |
 | Zero-trust network isolation              | **Finished**    | Internal-only Postgres/Redis, SSM endpoint posture, no SSH 22 policy                                                 |
+| RedBook bootstrap playbook                | **Finished**    | `docs/REDBOOK_HCZ_PLAYBOOK.md` captures HCZ scenario routing for welfare, recovery, Diamond, and shift handoff       |
 | Branch hygiene                            | **In Progress** | Branch inventory completed; local prune completed; no stale branches present in current clone                        |
 | Dependency refresh cadence                | **Queued**      | Dependabot config present; next refresh cycle pending in separate dependency PR wave                                 |
 | Cross-repo architecture shedding          | **Queued**      | Candidate removals identified; this cycle removes local generated artifacts only                                     |
@@ -31,3 +32,4 @@
 
 - **Missing:** dedicated root legal-address source document for boilerplate reuse across repos.
 - **Queued:** next pass to externalize additional shared contracts into standalone shared libraries.
+- **Queued:** expand the RedBook bootstrap matrix into a directive-backed HCZ operating manual with case lifecycle ownership and escalation SLAs.
