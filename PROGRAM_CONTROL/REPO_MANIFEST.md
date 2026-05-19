@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/update-architecture-and-workflows`
-**Commit:** `44928988c861e4ae2c26962c6964e6bddf6093e2`
-**Generated:** 2026-05-12T10:33:08Z
+**Branch:** `main`
+**Commit:** `cfdd8a637ee64b8f1be85e1da7445b4e720c6041`
+**Generated:** 2026-05-19T16:36:13Z
 
 ## All Files
 
@@ -384,6 +384,7 @@ Auto-generated on every push. Do not edit manually.
 - `gateguard/gateguard/welfare_engine.py`
 - `gateguard/gateguard_audit.db`
 - `gateguard/requirements.txt`
+- `github_pat`
 - `governance/Sovereign_Kernel.md.pdf`
 - `governance/pre-ship-audit.service.ts`
 - `infra/postgres/init-ledger.sql`
