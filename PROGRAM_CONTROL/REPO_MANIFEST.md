@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `cfdd8a637ee64b8f1be85e1da7445b4e720c6041`
-**Generated:** 2026-05-19T16:36:13Z
+**Commit:** `e45bb87d9fbabe5cab77c8c19b0c8d8cb2c0f2ed`
+**Generated:** 2026-05-19T16:39:53Z
 
 ## All Files
 
@@ -384,7 +384,6 @@ Auto-generated on every push. Do not edit manually.
 - `gateguard/gateguard/welfare_engine.py`
 - `gateguard/gateguard_audit.db`
 - `gateguard/requirements.txt`
-- `github_pat`
 - `governance/Sovereign_Kernel.md.pdf`
 - `governance/pre-ship-audit.service.ts`
 - `infra/postgres/init-ledger.sql`
