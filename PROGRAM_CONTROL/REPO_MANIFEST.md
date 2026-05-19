@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `agent/cowork-orch-2026-05-19-directives`
-**Commit:** `67cfb0b8f149066f94b9d9645fb4d42fa27f1d52`
-**Generated:** 2026-05-19T18:01:24Z
+**Branch:** `main`
+**Commit:** `c5e38d53c3ded76b5f421112aa1b2077b883293c`
+**Generated:** 2026-05-19T18:21:41Z
 
 ## All Files
 
