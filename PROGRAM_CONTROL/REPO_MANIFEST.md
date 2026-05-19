@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `e45bb87d9fbabe5cab77c8c19b0c8d8cb2c0f2ed`
-**Generated:** 2026-05-19T16:39:53Z
+**Branch:** `agent/cowork-orch-2026-05-19-directives`
+**Commit:** `67cfb0b8f149066f94b9d9645fb4d42fa27f1d52`
+**Generated:** 2026-05-19T18:01:24Z
 
 ## All Files
 
@@ -91,6 +91,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001-AMEND-C007.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/GOV-CNZ-CHARTER-CONSOLIDATE-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md`
