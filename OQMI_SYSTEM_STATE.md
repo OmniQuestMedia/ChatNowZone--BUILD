@@ -35,7 +35,7 @@ Payloads 1–10 executed and verified.
 - P0.5.4: `lint:ci` script added to package.json (`eslint 'services/**/*.ts' --max-warnings 0`); `yarn lint:ci` → **PASS** (0 warnings, 0 errors); formatter check deferred — 432 pre-existing prettier violations in ui/ are tracked as tech-debt (out of Phase 0.5 scope)
 - Cross-Repo Flag: LINT-1 invariant added to `PROGRAM_CONTROL/ship-gate-verifier.ts` — checks `.eslintrc.js`, `lint:ci` script, `lint-staged` config, `super-linter.yml`, `linter` configs, Husky pre-commit hook
 - Ship-gate result: **32/32 GREEN** (LINT-1 PASS)
-- P0.5.1: Cross-repo distribution of canonical lint configs (`.github/linters/*`, `super-linter.yml`, `.eslintrc.js`) to CyranoZone / Marketplace-Build / eCommsZone is **DEFERRED** — requires separate PRs in those repos (agent has write access to ChatNowZone--BUILD only)
+- P0.5.1: Cross-repo distribution of canonical lint configs (`.github/linters/*`, `super-linter.yml`, `.eslintrc.js`) to SythiMatesAi.com / Marketplace-Build / eCommsZone is **DEFERRED** — requires separate PRs in those repos (agent has write access to ChatNowZone--BUILD only)
 
 **Agent flow optimization:** Added a branch-scoped internal fast-gate workflow for
 `copilot/*`, `grok/*`, and `agent/*` PRs, tightened auto-merge re-arming for
