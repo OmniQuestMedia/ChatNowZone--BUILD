@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `470681cbf9cb391541ee461887265fd91326f7db`
-**Generated:** 2026-05-21T21:09:03Z
+**Commit:** `21d7a1269ebc86115d719a75e8196f1419554c0c`
+**Generated:** 2026-05-21T22:49:50Z
 
 ## All Files
 
@@ -313,6 +313,7 @@ Auto-generated on every push. Do not edit manually.
 - `archive/LEGACY_CONFIGS_2026-04/HANDOFF.md`
 - `archive/LEGACY_CONFIGS_2026-04/package.json`
 - `archive/LEGACY_CONFIGS_2026-04/tsconfig.json`
+- `archive/README.md`
 - `archive/agents/CNZ-CLAUDE-CODE-KICKOFF-RETIRED-2026-05-11.md`
 - `archive/agents/CNZ-CLAUDE-CODE-STANDING-PROMPT-RETIRED-2026-05-11.md`
 - `docker-compose.yml`
