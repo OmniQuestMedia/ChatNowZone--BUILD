@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `21d7a1269ebc86115d719a75e8196f1419554c0c`
-**Generated:** 2026-05-21T22:49:50Z
+**Commit:** `f67e75fa4cce00dcf9a438991c28c741d47b8f2e`
+**Generated:** 2026-05-23T09:07:04Z
 
 ## All Files
 
@@ -97,6 +97,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_SYSTEM_STATE.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Lift-From-Index.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OSS-Repo-Registry.md`
+- `PROGRAM_CONTROL/DIRECTIVES/QUEUE/TASK-HYG-001-ChatNowZone-BUILD-Hygiene-Verification.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.1.md`
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`
 - `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`
