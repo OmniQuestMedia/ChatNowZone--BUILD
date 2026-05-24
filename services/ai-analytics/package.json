@@ -1,0 +1,9 @@
+{
+  "name": "ai-analytics",
+  "version": "1.0.0",
+  "description": "PHASE3-ITEM3: Creator analytics for AI features",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {}
+}
