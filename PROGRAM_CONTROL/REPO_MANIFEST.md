@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `95459ca6b30e3ad367d319606ab782ad78f69c40`
-**Generated:** 2026-05-24T23:01:13Z
+**Commit:** `be861c1a745daf6deb5c1464665b70ba4a51cafe`
+**Generated:** 2026-05-24T23:07:45Z
 
 ## All Files
 
@@ -41,6 +41,7 @@ Auto-generated on every push. Do not edit manually.
 - `.markdownlintignore`
 - `.prettierignore`
 - `.prettierrc`
+- `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
