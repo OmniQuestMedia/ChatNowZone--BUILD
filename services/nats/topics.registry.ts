@@ -232,6 +232,16 @@ export const NATS_TOPICS = {
   CHAT_MESSAGE_INGESTED: 'chat.message.ingested',
   PERSONA_RESPONSE_QUEUED: 'persona.response.queued',
 
+  // ── PHASE3: Voice Chat & Group Chat with Synthetic Twins ──────────────────
+  VOICE_MESSAGE_SENT: 'chat.voice.message.sent',
+  VOICE_TTS_REQUESTED: 'chat.voice.tts.requested',
+  VOICE_TTS_COMPLETED: 'chat.voice.tts.completed',
+  VOICE_TTS_FAILED: 'chat.voice.tts.failed',
+  GROUP_CHAT_CREATED: 'chat.group.created',
+  GROUP_CHAT_PARTICIPANT_ADDED: 'chat.group.participant.added',
+  GROUP_CHAT_PARTICIPANT_REMOVED: 'chat.group.participant.removed',
+  SYNTHETIC_TWIN_MESSAGE_SENT: 'chat.synthetic_twin.message.sent',
+
   // ── GateGuard Sentinel Pre-Processor (Business Plan B.5) ─────────────────
   GATEGUARD_EVALUATION_COMPLETED: 'gateguard.evaluation.completed',
   GATEGUARD_DECISION_APPROVED: 'gateguard.decision.approved',
