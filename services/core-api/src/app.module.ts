@@ -35,6 +35,7 @@ import { AffiliationNumberModule } from '../../affiliation-number/src/affiliatio
 import { StudioAffiliationModule } from '../../studio-affiliation/src/studio-affiliation.module';
 import { CreatorOnboardingModule } from '../../creator-onboarding/src/creator-onboarding.module';
 import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
+import { SyntheticTwinModule } from './synthetic-twin/synthetic-twin.module';
 
 @Module({
   imports: [
@@ -73,6 +74,8 @@ import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
     StudioAffiliationModule,
     CreatorOnboardingModule,
     CyranoAuthModule,
+    // PHASE2-440 — Safe Synthetic Twin AI image generation
+    SyntheticTwinModule,
   ],
 })
 export class AppModule implements NestModule {

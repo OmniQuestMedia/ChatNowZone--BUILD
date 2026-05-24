@@ -8,7 +8,7 @@ import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
-interface GenerateImageRequest {
+export interface GenerateImageRequest {
   userId: string;
   creatorId: string;
   prompt?: string;
@@ -16,7 +16,7 @@ interface GenerateImageRequest {
   tenantId: string;
 }
 
-interface GenerateImageResponse {
+export interface GenerateImageResponse {
   id: string;
   correlationId: string;
   status: 'PENDING' | 'COMPLETED' | 'FAILED';
@@ -89,16 +89,18 @@ export class SyntheticTwinService {
 
       const totalBalance = wallet.purchased_tokens + wallet.membership_tokens + wallet.bonus_tokens;
 
-      if (totalBalance < this.TOKENS_PER_GENERATION) {
+      if (totalBalance < SyntheticTwinService.TOKENS_PER_GENERATION) {
         throw new Error(
-          `Insufficient balance. Required: ${this.TOKENS_PER_GENERATION}, Available: ${totalBalance}`,
+          `Insufficient balance. Required: ${SyntheticTwinService.TOKENS_PER_GENERATION}, Available: ${totalBalance}`,
         );
       }
 
       // Step 3: Calculate earnings split
-      const totalValueCents = BigInt(this.TOKENS_PER_GENERATION * this.CENTS_PER_TOKEN);
+      const totalValueCents = BigInt(
+        SyntheticTwinService.TOKENS_PER_GENERATION * SyntheticTwinService.CENTS_PER_TOKEN,
+      );
       const creatorEarningsCents = BigInt(
-        Math.floor(Number(totalValueCents) * this.CREATOR_SHARE_PERCENT),
+        Math.floor(Number(totalValueCents) * SyntheticTwinService.CREATOR_SHARE_PERCENT),
       );
       const platformShareCents = totalValueCents - creatorEarningsCents;
 
@@ -108,7 +110,7 @@ export class SyntheticTwinService {
           correlation_id: correlationId,
           user_id: request.userId,
           creator_id: request.creatorId,
-          tokens_charged: this.TOKENS_PER_GENERATION,
+          tokens_charged: SyntheticTwinService.TOKENS_PER_GENERATION,
           creator_earnings_cents: creatorEarningsCents,
           platform_share_cents: platformShareCents,
           status: 'PENDING',
@@ -121,7 +123,11 @@ export class SyntheticTwinService {
       });
 
       // Step 5: Deduct tokens from fan's wallet using three-bucket priority
-      await this.deductTokensFromWallet(request.userId, this.TOKENS_PER_GENERATION, correlationId);
+      await this.deductTokensFromWallet(
+        request.userId,
+        SyntheticTwinService.TOKENS_PER_GENERATION,
+        correlationId,
+      );
 
       // Step 6: Create ledger entry for creator earnings
       await this.recordCreatorEarnings(
@@ -242,10 +248,9 @@ export class SyntheticTwinService {
         correlation_id: correlationId,
         reason_code: 'AI_IMAGE_GENERATION_SPEND',
         amount: -amount, // Negative for debit
-        bucket_type: 'MIXED', // Multiple buckets used
+        bucket: deductions[0]?.bucket || 'purchased', // Primary bucket used
         metadata: { deductions },
-        organization_id: wallet.organization_id,
-        tenant_id: wallet.tenant_id,
+        hash_current: correlationId, // Simplified hash for MVP
       },
     });
   }
