@@ -2415,3 +2415,81 @@ model SyntheticTwinGeneration {
   @@index([status])
   @@map("synthetic_twin_generations")
 }
+
+// ── PHASE3: Chat Messages — Voice & Group Chat Support ──────────────────────
+// Append-only chat message storage for voice and text messages in conversations.
+// Supports both 1:1 and group chats with synthetic twins.
+
+model ChatMessage {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id  String   @unique @db.VarChar(128)
+  conversation_id String   @db.Uuid        // Links to Conversation
+  sender_id       String   @db.Uuid        // User or synthetic twin ID
+  sender_type     String   @db.VarChar(20) // USER | CREATOR | SYNTHETIC_TWIN
+  message_type    String   @db.VarChar(20) // TEXT | VOICE | IMAGE
+  content         String?  @db.Text        // Text content or voice transcript
+  voice_uri       String?  @db.VarChar(500) // S3 path to voice file
+  voice_duration_ms Int?                   // Voice message duration
+  tts_voice_id    String?  @db.VarChar(50) // ElevenLabs/Banana.dev voice ID
+  tokens_charged  Int      @default(0)     // CZT cost for voice TTS
+  status          String   @default("SENT") @db.VarChar(20) // SENT | DELIVERED | FAILED
+  // Canonical audit columns
+  reason_code     String   @default("CHAT_MESSAGE") @db.VarChar(64)
+  rule_applied_id String   @default("CHAT_v1") @db.VarChar(100)
+  organization_id String   @db.VarChar(100)
+  tenant_id       String   @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+  updated_at      DateTime @updatedAt @db.Timestamptz
+
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  @@index([conversation_id, created_at])
+  @@index([sender_id, created_at])
+  @@map("chat_messages")
+}
+
+// ── PHASE3: Conversation — Group Chat with Synthetic Twins ──────────────────
+// Represents a chat conversation (1:1 or group) that can include synthetic twins
+
+model Conversation {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id  String   @unique @db.VarChar(128)
+  conversation_type String @db.VarChar(20) // ONE_TO_ONE | GROUP
+  title           String?  @db.VarChar(200) // Optional group chat title
+  creator_id      String?  @db.Uuid        // Primary creator if applicable
+  status          String   @default("ACTIVE") @db.VarChar(20) // ACTIVE | ARCHIVED | DELETED
+  // Canonical audit columns
+  reason_code     String   @default("CONVERSATION_CREATED") @db.VarChar(64)
+  rule_applied_id String   @default("CHAT_v1") @db.VarChar(100)
+  organization_id String   @db.VarChar(100)
+  tenant_id       String   @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamptz
+  updated_at      DateTime @updatedAt @db.Timestamptz
+
+  messages        ChatMessage[]
+  participants    ConversationParticipant[]
+
+  @@index([creator_id, created_at])
+  @@index([status])
+  @@map("conversations")
+}
+
+// ── PHASE3: Conversation Participants — Multi-User & Synthetic Twin Support ──
+
+model ConversationParticipant {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversation_id String   @db.Uuid
+  participant_id  String   @db.Uuid        // User ID or synthetic twin ID
+  participant_type String  @db.VarChar(20) // USER | SYNTHETIC_TWIN
+  joined_at       DateTime @default(now()) @db.Timestamptz
+  left_at         DateTime? @db.Timestamptz
+  // Canonical audit columns
+  organization_id String   @db.VarChar(100)
+  tenant_id       String   @db.VarChar(100)
+
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  @@unique([conversation_id, participant_id])
+  @@index([participant_id])
+  @@map("conversation_participants")
+}
