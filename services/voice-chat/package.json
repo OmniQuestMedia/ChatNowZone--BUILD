@@ -1,0 +1,9 @@
+{
+  "name": "voice-chat",
+  "version": "1.0.0",
+  "description": "PHASE3: Voice chat with TTS support for Safe Synthetic Twin conversations",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {}
+}

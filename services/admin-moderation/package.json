@@ -1,0 +1,9 @@
+{
+  "name": "admin-moderation",
+  "version": "1.0.0",
+  "description": "PHASE3-ITEM4: Admin moderation tools for synthetic AI content",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {}
+}

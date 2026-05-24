@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `3e4eedfb25baf4a4c9c8ea01c5b915c3e9241b74`
-**Generated:** 2026-05-24T22:51:58Z
+**Commit:** `be861c1a745daf6deb5c1464665b70ba4a51cafe`
+**Generated:** 2026-05-24T23:07:45Z
 
 ## All Files
 
@@ -41,9 +41,11 @@ Auto-generated on every push. Do not edit manually.
 - `.markdownlintignore`
 - `.prettierignore`
 - `.prettierrc`
+- `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
+- `PHASE3-IMPLEMENTATION-SUMMARY.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
@@ -324,6 +326,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
 - `docs/CANONICAL_COMPLIANCE_CHECKLIST.md`
+- `docs/CREATOR_SYNTHETIC_TWIN_GUIDE.md`
 - `docs/DIRECTIVE_TEMPLATE.md`
 - `docs/DOMAIN_GLOSSARY.md`
 - `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
@@ -434,9 +437,13 @@ Auto-generated on every push. Do not edit manually.
 - `scripts/seed-scheduling.ts`
 - `scripts/verify-gov-gate.sh`
 - `scripts/verify-vault-delivery.ts`
+- `services/admin-moderation/package.json`
+- `services/admin-moderation/src/admin-moderation.service.ts`
 - `services/affiliation-number/src/affiliation-number.module.ts`
 - `services/affiliation-number/src/affiliation-number.service.spec.ts`
 - `services/affiliation-number/src/affiliation-number.service.ts`
+- `services/ai-analytics/package.json`
+- `services/ai-analytics/src/ai-analytics.service.ts`
 - `services/assets/DigitalVaultService.ts`
 - `services/assets/WatermarkUtility.ts`
 - `services/bijou/src/bijou-admission.service.ts`
@@ -446,6 +453,10 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/bijou.module.ts`
 - `services/bijou/src/min-seat-gate.service.ts`
 - `services/bijou/src/pass-pricing.service.ts`
+- `services/core-api/src/admin-moderation/admin-moderation.controller.ts`
+- `services/core-api/src/admin-moderation/admin-moderation.module.ts`
+- `services/core-api/src/ai-analytics/ai-analytics.controller.ts`
+- `services/core-api/src/ai-analytics/ai-analytics.module.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
 - `services/core-api/src/analytics/ffs-score.service.ts`
 - `services/core-api/src/app.module.ts`
@@ -512,6 +523,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/gifts/rrr-client.service.spec.ts`
 - `services/core-api/src/gifts/rrr-client.service.ts`
 - `services/core-api/src/governance/governance.config.ts`
+- `services/core-api/src/group-chat/group-chat.controller.ts`
+- `services/core-api/src/group-chat/group-chat.module.ts`
 - `services/core-api/src/growth/growth.module.ts`
 - `services/core-api/src/growth/guarded-notification.service.ts`
 - `services/core-api/src/growth/gwp.service.ts`
@@ -560,6 +573,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/synthetic-twin/synthetic-twin.controller.ts`
 - `services/core-api/src/synthetic-twin/synthetic-twin.module.ts`
 - `services/core-api/src/test/helpers/setTestEnv.ts`
+- `services/core-api/src/voice-chat/voice-chat.controller.ts`
+- `services/core-api/src/voice-chat/voice-chat.module.ts`
 - `services/core-api/src/zone-access/zone-access.guard.ts`
 - `services/core-api/src/zone-access/zone-access.module.ts`
 - `services/core-api/src/zone-access/zone-access.service.ts`
@@ -639,6 +654,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/gamification/src/services/redroom-rewards-burn.service.ts`
 - `services/gamification/src/services/security.service.ts`
 - `services/gamification/src/types/gamification.types.ts`
+- `services/group-chat/package.json`
+- `services/group-chat/src/group-chat.service.ts`
 - `services/guest-heat/.env.example`
 - `services/guest-heat/ASSUMPTIONS.md`
 - `services/guest-heat/FLAGS.md`
@@ -749,6 +766,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
+- `services/voice-chat/package.json`
+- `services/voice-chat/src/voice-chat.service.ts`
 - `services/zone-gpt/src/proposal.service.ts`
 - `services/zone-gpt/src/zone-gpt.module.ts`
 - `services/zonebot-scheduler/.env.example`
