@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `d07dfbab4e60b36730c303acc6a0e5176a21d87c`
-**Generated:** 2026-05-24T20:45:29Z
+**Branch:** `claude/add-copilot-instructions-file`
+**Commit:** `1a18e081ca186215536a50da64c791262a9f8ca1`
+**Generated:** 2026-05-24T21:24:17Z
 
 ## All Files
 
@@ -12,6 +12,7 @@ Auto-generated on every push. Do not edit manually.
 - `.editorconfig`
 - `.eslintrc.js`
 - `.github/CODEOWNERS`
+- `.github/COPILOT_INSTRUCTIONS.md`
 - `.github/ISSUE_TEMPLATE/directive.yml`
 - `.github/copilot-instructions.md`
 - `.github/dependabot.yml`
