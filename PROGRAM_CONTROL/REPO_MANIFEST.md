@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `58f051cf201227629864901ae304fd78794022c2`
-**Generated:** 2026-05-24T23:00:39Z
+**Branch:** `claude/polish-live-show-page`
+**Commit:** `88e2a281d2ff8c4e013044d34ea9d2419eca146f`
+**Generated:** 2026-05-24T23:00:54Z
 
 ## All Files
 
