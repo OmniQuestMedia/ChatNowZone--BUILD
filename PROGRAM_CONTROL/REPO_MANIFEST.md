@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `a639e27b485a0d36cb87921b6ab82af8537832d6`
-**Generated:** 2026-05-24T21:42:11Z
+**Branch:** `claude/fix-issue-440`
+**Commit:** `122ec362753683226bd1dd555d4539beaca78b12`
+**Generated:** 2026-05-24T22:14:17Z
 
 ## All Files
 
@@ -43,6 +43,7 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierrc`
 - `CONTRIBUTING.md`
 - `OQMI_SYSTEM_STATE.md`
+- `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
@@ -555,6 +556,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/scheduling/zonebot.service.ts`
 - `services/core-api/src/studio/studio-report.controller.ts`
 - `services/core-api/src/studio/studio-report.service.ts`
+- `services/core-api/src/synthetic-twin/synthetic-twin.controller.ts`
+- `services/core-api/src/synthetic-twin/synthetic-twin.module.ts`
 - `services/core-api/src/test/helpers/setTestEnv.ts`
 - `services/core-api/src/zone-access/zone-access.guard.ts`
 - `services/core-api/src/zone-access/zone-access.module.ts`
@@ -734,6 +737,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/studio-affiliation/src/studio-rbac.guard.ts`
 - `services/studio-affiliation/src/studio.controller.ts`
 - `services/studio-affiliation/src/studio.service.ts`
+- `services/synthetic-twin/README.md`
+- `services/synthetic-twin/package.json`
+- `services/synthetic-twin/src/synthetic-twin.service.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`
 - `services/velocityzone/src/velocityzone.controller.ts`

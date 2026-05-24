@@ -1,0 +1,9 @@
+{
+  "name": "synthetic-twin",
+  "version": "1.0.0",
+  "description": "Safe Synthetic Twin AI image generation service",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {}
+}

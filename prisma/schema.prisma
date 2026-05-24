@@ -1402,6 +1402,8 @@ model Creator {
   creator_type                CreatorType @default(STANDARD)
   pixel_legacy_granted_at     DateTime?   @db.Timestamptz
   lifetime_cyrano_membership  Boolean     @default(false)
+  // PHASE2-440: Safe Synthetic Twin toggle — gates AI image generation for fans.
+  synthetic_twin_enabled      Boolean     @default(false)
   organization_id String   @db.VarChar(100)
   tenant_id       String   @db.VarChar(100)
   created_at      DateTime @default(now()) @db.Timestamptz
@@ -1410,6 +1412,7 @@ model Creator {
   studio_affiliations StudioAffiliation[]
   studio_onboarding   CreatorOnboarding?
   pixel_legacy_seat   PixelLegacySeatAllocation?
+  synthetic_twin_generations SyntheticTwinGeneration[]
 
   @@index([affiliation_number])
   @@index([creator_type])
@@ -2371,4 +2374,44 @@ model RedRoomRewardsBurn {
 
   @@index([user_id, burned_at_utc])
   @@map("redroom_rewards_burns")
+}
+
+// ── PHASE2-440: Safe Synthetic Twin — AI Image Generation ──────────────────
+// Append-only ledger of all synthetic twin image generations. Each generation
+// deducts CZT tokens from the fan's wallet and credits the creator's earnings.
+// All financial amounts stored as BigInt (cents) per OQMI governance.
+
+model SyntheticTwinGeneration {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id      String   @unique @db.VarChar(128)
+  user_id             String   @db.Uuid        // Fan who requested generation
+  creator_id          String   @db.Uuid        // Creator whose twin was used
+  // Cost paid by fan (in CZT tokens, stored as integer count)
+  tokens_charged      Int
+  // Creator's share (in cents USD)
+  creator_earnings_cents BigInt
+  // Platform's share (in cents USD)
+  platform_share_cents   BigInt
+  // Generated image storage URI (e.g. S3 bucket path)
+  image_uri           String?  @db.VarChar(500)
+  // Generation status: PENDING | COMPLETED | FAILED
+  status              String   @default("PENDING") @db.VarChar(20)
+  // Optional prompt used for generation
+  prompt              String?  @db.Text
+  // Optional error message if generation failed
+  error_message       String?  @db.Text
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("AI_IMAGE_GENERATION") @db.VarChar(64)
+  rule_applied_id     String   @default("SYNTHETIC_TWIN_v1") @db.VarChar(100)
+  organization_id     String   @db.VarChar(100)
+  tenant_id           String   @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamptz
+  updated_at          DateTime @updatedAt @db.Timestamptz
+
+  creator             Creator  @relation(fields: [creator_id], references: [id])
+
+  @@index([user_id, created_at])
+  @@index([creator_id, created_at])
+  @@index([status])
+  @@map("synthetic_twin_generations")
 }
