@@ -2415,3 +2415,165 @@ model SyntheticTwinGeneration {
   @@index([status])
   @@map("synthetic_twin_generations")
 }
+
+// ─── PHASE3 — Voice Chat Integration ────────────────────────────────────────
+// Voice messages using Safe Synthetic Twin TTS pipeline. Each voice message
+// deducts CZT tokens from the fan's wallet and credits the creator's earnings.
+// Stores both the audio file URI and text transcript for accessibility.
+
+model VoiceChatMessage {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id      String   @unique @db.VarChar(128)
+  user_id             String   @db.Uuid        // Fan who sent voice message
+  creator_id          String   @db.Uuid        // Creator whose synthetic twin responded
+  // Input voice audio URI (fan's recording)
+  input_audio_uri     String?  @db.VarChar(500)
+  // Output voice audio URI (synthetic twin TTS response)
+  output_audio_uri    String?  @db.VarChar(500)
+  // Text transcript of fan's voice message
+  input_transcript    String?  @db.Text
+  // Text transcript of synthetic twin's response
+  output_transcript   String?  @db.Text
+  // Cost paid by fan (in CZT tokens)
+  tokens_charged      Int
+  // Creator's share (in cents USD)
+  creator_earnings_cents BigInt
+  // Platform's share (in cents USD)
+  platform_share_cents   BigInt
+  // Processing status: PENDING | COMPLETED | FAILED
+  status              String   @default("PENDING") @db.VarChar(20)
+  // Optional error message if processing failed
+  error_message       String?  @db.Text
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("AI_VOICE_CHAT") @db.VarChar(64)
+  rule_applied_id     String   @default("VOICE_CHAT_v1") @db.VarChar(100)
+  organization_id     String   @db.VarChar(100)
+  tenant_id           String   @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamptz
+  updated_at          DateTime @updatedAt @db.Timestamptz
+
+  @@index([user_id, created_at])
+  @@index([creator_id, created_at])
+  @@index([status])
+  @@map("voice_chat_messages")
+}
+
+// ─── PHASE3 — Group Chat with Synthetic Twins ───────────────────────────────
+// Group chat sessions that can include multiple participants (fans and creators)
+// plus synthetic twin AI characters.
+
+model GroupChatSession {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id      String   @unique @db.VarChar(128)
+  // Session name/title
+  name                String   @db.VarChar(200)
+  // Host user (fan who created the group)
+  host_user_id        String   @db.Uuid
+  // Session status: ACTIVE | CLOSED | ARCHIVED
+  status              String   @default("ACTIVE") @db.VarChar(20)
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("GROUP_CHAT_SESSION") @db.VarChar(64)
+  rule_applied_id     String   @default("GROUP_CHAT_v1") @db.VarChar(100)
+  organization_id     String   @db.VarChar(100)
+  tenant_id           String   @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamptz
+  updated_at          DateTime @updatedAt @db.Timestamptz
+
+  participants        GroupChatParticipant[]
+  messages            GroupChatMessage[]
+
+  @@index([host_user_id, created_at])
+  @@index([status])
+  @@map("group_chat_sessions")
+}
+
+model GroupChatParticipant {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id          String   @db.Uuid
+  // Participant type: USER | CREATOR | SYNTHETIC_TWIN
+  participant_type    String   @db.VarChar(20)
+  // User ID (for USER/CREATOR types)
+  user_id             String?  @db.Uuid
+  // Creator ID (for SYNTHETIC_TWIN type - which creator's twin)
+  creator_id          String?  @db.Uuid
+  // Display name in chat
+  display_name        String   @db.VarChar(100)
+  // Join status: ACTIVE | LEFT | REMOVED
+  status              String   @default("ACTIVE") @db.VarChar(20)
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("GROUP_CHAT_PARTICIPANT") @db.VarChar(64)
+  rule_applied_id     String   @default("GROUP_CHAT_v1") @db.VarChar(100)
+  joined_at           DateTime @default(now()) @db.Timestamptz
+  left_at             DateTime? @db.Timestamptz
+
+  session             GroupChatSession @relation(fields: [session_id], references: [id])
+
+  @@index([session_id, status])
+  @@index([user_id])
+  @@index([creator_id])
+  @@map("group_chat_participants")
+}
+
+model GroupChatMessage {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id      String   @unique @db.VarChar(128)
+  session_id          String   @db.Uuid
+  participant_id      String   @db.Uuid
+  // Message content (text or voice transcript)
+  content             String   @db.Text
+  // Message type: TEXT | VOICE | IMAGE
+  message_type        String   @default("TEXT") @db.VarChar(20)
+  // Optional media URI (for voice/image messages)
+  media_uri           String?  @db.VarChar(500)
+  // Tokens charged (for AI-generated responses)
+  tokens_charged      Int      @default(0)
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("GROUP_CHAT_MESSAGE") @db.VarChar(64)
+  rule_applied_id     String   @default("GROUP_CHAT_v1") @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamptz
+
+  session             GroupChatSession @relation(fields: [session_id], references: [id])
+
+  @@index([session_id, created_at])
+  @@map("group_chat_messages")
+}
+
+// ─── PHASE3 — Admin Moderation for Synthetic Content ────────────────────────
+// Flagged synthetic twin content requiring admin review/moderation.
+
+model SyntheticContentModeration {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  correlation_id      String   @unique @db.VarChar(128)
+  // Content type: IMAGE | VOICE | TEXT
+  content_type        String   @db.VarChar(20)
+  // Reference to source generation (SyntheticTwinGeneration.id or VoiceChatMessage.id)
+  generation_id       String   @db.Uuid
+  // Creator whose synthetic twin generated the content
+  creator_id          String   @db.Uuid
+  // Fan who requested the generation
+  user_id             String   @db.Uuid
+  // Content URI for review
+  content_uri         String   @db.VarChar(500)
+  // Flagging reason
+  flag_reason         String   @db.Text
+  // Auto-flag or manual report
+  flag_source         String   @db.VarChar(20)      // AUTO | USER_REPORT
+  // Moderation status: PENDING | APPROVED | REMOVED | ESCALATED
+  moderation_status   String   @default("PENDING") @db.VarChar(20)
+  // Admin who reviewed
+  reviewed_by         String?  @db.Uuid
+  // Review decision notes
+  review_notes        String?  @db.Text
+  // Canonical audit columns per OQMI governance
+  reason_code         String   @default("SYNTHETIC_CONTENT_REVIEW") @db.VarChar(64)
+  rule_applied_id     String   @default("MODERATION_v1") @db.VarChar(100)
+  organization_id     String   @db.VarChar(100)
+  tenant_id           String   @db.VarChar(100)
+  flagged_at          DateTime @default(now()) @db.Timestamptz
+  reviewed_at         DateTime? @db.Timestamptz
+
+  @@index([moderation_status, flagged_at])
+  @@index([creator_id])
+  @@index([user_id])
+  @@map("synthetic_content_moderations")
+}
