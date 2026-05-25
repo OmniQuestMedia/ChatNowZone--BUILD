@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `820fe236e85cc58efc0bb662837b425d82a17bbf`
-**Generated:** 2026-05-25T12:44:19Z
+**Branch:** `copilot/featurefinal-webcam-iac-hardening`
+**Commit:** `ac1a04eff3bf724a7d05890fe7a245ffc83079a2`
+**Generated:** 2026-05-25T13:21:16Z
 
 ## All Files
 
@@ -419,6 +419,7 @@ Auto-generated on every push. Do not edit manually.
 - `infra/terraform/s3.tf`
 - `infra/terraform/variables.tf`
 - `infra/terraform/vpc.tf`
+- `infra/terraform/webcam-services.tf`
 - `jest.config.js`
 - `package.json`
 - `prisma/migrations/20260409000000_legal_hold_db_migration/migration.sql`
