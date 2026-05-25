@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `0a6e0c2480b4c3de557d3933da738f998f4838fa`
-**Generated:** 2026-05-25T05:53:03Z
+**Branch:** `claude/homestretch-delete-stale-branches`
+**Commit:** `1b4904382c9020d3ab0c499c58ff2f5c277ce1f6`
+**Generated:** 2026-05-25T10:51:41Z
 
 ## All Files
 
@@ -43,6 +43,7 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierrc`
 - `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
+- `HYGIENE_SWEEP_REPORT.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-STATUS.md`
@@ -334,6 +335,8 @@ Auto-generated on every push. Do not edit manually.
 - `docs/DIRECTIVE_TEMPLATE.md`
 - `docs/DOMAIN_GLOSSARY.md`
 - `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
+- `docs/PHASE_11_CHANGELOG.md`
+- `docs/PHASE_11_GOLIVE_READINESS.md`
 - `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`
 - `docs/POLICIES/README.md`
 - `docs/PRE_LAUNCH_CHECKLIST.md`
@@ -476,6 +479,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/auth/step-up.service.ts`
 - `services/core-api/src/compliance/audit-chain.service.ts`
 - `services/core-api/src/compliance/compliance.module.ts`
+- `services/core-api/src/compliance/dual-integrity-enforcement.service.ts`
 - `services/core-api/src/compliance/geo-fencing.service.ts`
 - `services/core-api/src/compliance/legal-hold.service.ts`
 - `services/core-api/src/compliance/reconciliation.service.ts`
@@ -587,7 +591,9 @@ Auto-generated on every push. Do not edit manually.
 - `services/creator-control/src/creator-control.module.ts`
 - `services/creator-control/src/creator-control.service.ts`
 - `services/creator-control/src/ffs.engine.ts`
+- `services/creator-control/src/omnisync-telemetry.service.ts`
 - `services/creator-control/src/session-monitoring.copilot.ts`
+- `services/creator-control/src/synthetic-feature-toggle.service.ts`
 - `services/creator-onboarding/src/creator-onboarding.controller.ts`
 - `services/creator-onboarding/src/creator-onboarding.module.ts`
 - `services/creator-onboarding/src/creator-onboarding.service.ts`
