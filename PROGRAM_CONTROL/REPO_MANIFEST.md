@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `820fe236e85cc58efc0bb662837b425d82a17bbf`
-**Generated:** 2026-05-25T12:44:19Z
+**Branch:** `copilot/featureprivate-group-show-backend`
+**Commit:** `7bedce04279c2e8a98d33f0019b6b8be0e12ae45`
+**Generated:** 2026-05-25T13:17:06Z
 
 ## All Files
 
