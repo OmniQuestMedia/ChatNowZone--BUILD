@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `af770867d3820d27c038e2f480d701872be84e5c`
-**Generated:** 2026-05-25T10:54:08Z
+**Branch:** `claude/pr-001-cyrano-layer-1-whisper`
+**Commit:** `2c33e38cbb2f22350aca43e3f2dab32b71f5e0bb`
+**Generated:** 2026-05-25T11:15:46Z
 
 ## All Files
 
@@ -43,6 +43,7 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierrc`
 - `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
+- `CYRANO_LAYER_1_PR_SUMMARY.md`
 - `HYGIENE_SWEEP_REPORT.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
