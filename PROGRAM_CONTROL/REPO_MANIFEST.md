@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `3436d1b9724c8ee3f3b80fa7a70f65ce0e0f4361`
-**Generated:** 2026-05-25T03:21:16Z
+**Branch:** `claude/sync-shared-account-core`
+**Commit:** `1c4ec6611aa063c9776bd5d60b068c2d17c71816`
+**Generated:** 2026-05-25T03:49:28Z
 
 ## All Files
 
@@ -47,6 +47,7 @@ Auto-generated on every push. Do not edit manually.
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-SUMMARY.md`
+- `PHASE5_FILES_INVENTORY.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
@@ -756,12 +757,18 @@ Auto-generated on every push. Do not edit manually.
 - `services/studio-affiliation/src/studio-rbac.guard.ts`
 - `services/studio-affiliation/src/studio.controller.ts`
 - `services/studio-affiliation/src/studio.service.ts`
+- `services/synthetic-twin/CREATOR_DASHBOARD_GUIDE.md`
+- `services/synthetic-twin/E2E_TESTING_GUIDE.md`
+- `services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md`
 - `services/synthetic-twin/README.md`
+- `services/synthetic-twin/REVENUE_MODEL.md`
 - `services/synthetic-twin/package.json`
 - `services/synthetic-twin/src/analytics.service.ts`
 - `services/synthetic-twin/src/group-chat.service.ts`
 - `services/synthetic-twin/src/moderation.service.ts`
 - `services/synthetic-twin/src/synthetic-twin.service.ts`
+- `services/synthetic-twin/src/synthimates-api-client.ts`
+- `services/synthetic-twin/src/synthimates-webhook.service.ts`
 - `services/synthetic-twin/src/voice-chat.service.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`
