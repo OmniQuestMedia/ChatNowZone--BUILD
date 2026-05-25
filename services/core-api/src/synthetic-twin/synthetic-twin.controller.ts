@@ -1,5 +1,6 @@
 // services/core-api/src/synthetic-twin/synthetic-twin.controller.ts
 // PHASE2-440 + PHASE3: REST API controller for Safe Synthetic Twin features
+// PHASE5-ITEM1: Added SynthiMatesAi webhook endpoint
 
 import { Controller, Post, Get, Put, Body, Param, Query } from '@nestjs/common';
 import { syntheticTwinService } from '../../../synthetic-twin/src/synthetic-twin.service';
@@ -7,6 +8,7 @@ import { voiceChatService } from '../../../synthetic-twin/src/voice-chat.service
 import { groupChatService } from '../../../synthetic-twin/src/group-chat.service';
 import { analyticsService } from '../../../synthetic-twin/src/analytics.service';
 import { moderationService } from '../../../synthetic-twin/src/moderation.service';
+import { synthiMatesWebhookService } from '../../../synthetic-twin/src/synthimates-webhook.service';
 
 /**
  * Safe Synthetic Twin API Controller
@@ -267,5 +269,41 @@ export class SyntheticTwinController {
     @Query('limit') limit?: number,
   ) {
     return await moderationService.getUsageLogs(creatorId, userId, limit);
+  }
+
+  // ─── PHASE5-ITEM1: SynthiMatesAi Webhook Endpoint ─────────────────────────
+
+  /**
+   * PHASE5-ITEM1: Receive webhook callbacks from SynthiMatesAi
+   *
+   * This endpoint is called by SynthiMatesAi when image/video generation completes.
+   * The webhook includes the result URL or error message.
+   *
+   * Security: HMAC signature verification is performed to ensure authenticity.
+   */
+  @Post('webhooks/synthimates/generation-complete')
+  async synthiMatesWebhook(
+    @Body()
+    payload: {
+      jobId: string;
+      correlationId: string;
+      status: 'completed' | 'failed';
+      resultUrl?: string;
+      contentType: 'image' | 'video';
+      errorMessage?: string;
+      metadata?: Record<string, unknown>;
+      completedAt: string;
+      hmacSignature: string;
+    },
+  ) {
+    return await synthiMatesWebhookService.processWebhook(payload);
+  }
+
+  /**
+   * PHASE5-ITEM1: Get generation status (for debugging/polling)
+   */
+  @Get('generation/status/:correlationId')
+  async getGenerationStatus(@Param('correlationId') correlationId: string) {
+    return await synthiMatesWebhookService.getGenerationStatus(correlationId);
   }
 }

@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `main`
-**Commit:** `3436d1b9724c8ee3f3b80fa7a70f65ce0e0f4361`
-**Generated:** 2026-05-25T03:21:16Z
+**Commit:** `df497754fa4ababeb50d3b270cb55e46557973ee`
+**Generated:** 2026-05-25T03:51:13Z
 
 ## All Files
 
@@ -47,6 +47,7 @@ Auto-generated on every push. Do not edit manually.
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-SUMMARY.md`
+- `PHASE5_FILES_INVENTORY.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
@@ -618,6 +619,24 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/llm-provider.interface.ts`
 - `services/cyrano/src/persona.manager.ts`
 - `services/cyrano/src/session-memory.store.ts`
+- `services/cyranoengines/README.md`
+- `services/cyranoengines/api/src/cyranoengines-api.module.ts`
+- `services/cyranoengines/api/src/cyranoengines.controller.ts`
+- `services/cyranoengines/api/src/dto/cyranoengines.dto.ts`
+- `services/cyranoengines/api/src/health.controller.ts`
+- `services/cyranoengines/api/src/services/memory.service.ts`
+- `services/cyranoengines/api/src/services/synthetic-twin.service.ts`
+- `services/cyranoengines/api/src/services/video-generation.service.ts`
+- `services/cyranoengines/api/src/services/voice-generation.service.ts`
+- `services/cyranoengines/api/src/services/webhook-callback.service.ts`
+- `services/cyranoengines/audio/README.md`
+- `services/cyranoengines/common/src/cyranoengines-common.module.ts`
+- `services/cyranoengines/common/src/gateguard-integration.service.ts`
+- `services/cyranoengines/common/src/learning-loop-capture.service.ts`
+- `services/cyranoengines/common/src/studiotokens-charging.service.ts`
+- `services/cyranoengines/image/README.md`
+- `services/cyranoengines/memory/README.md`
+- `services/cyranoengines/video/README.md`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
 - `services/ffs/.env.example`
@@ -756,12 +775,18 @@ Auto-generated on every push. Do not edit manually.
 - `services/studio-affiliation/src/studio-rbac.guard.ts`
 - `services/studio-affiliation/src/studio.controller.ts`
 - `services/studio-affiliation/src/studio.service.ts`
+- `services/synthetic-twin/CREATOR_DASHBOARD_GUIDE.md`
+- `services/synthetic-twin/E2E_TESTING_GUIDE.md`
+- `services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md`
 - `services/synthetic-twin/README.md`
+- `services/synthetic-twin/REVENUE_MODEL.md`
 - `services/synthetic-twin/package.json`
 - `services/synthetic-twin/src/analytics.service.ts`
 - `services/synthetic-twin/src/group-chat.service.ts`
 - `services/synthetic-twin/src/moderation.service.ts`
 - `services/synthetic-twin/src/synthetic-twin.service.ts`
+- `services/synthetic-twin/src/synthimates-api-client.ts`
+- `services/synthetic-twin/src/synthimates-webhook.service.ts`
 - `services/synthetic-twin/src/voice-chat.service.ts`
 - `services/velocityzone/README.md`
 - `services/velocityzone/src/creator-rate-tier.service.ts`

@@ -42,6 +42,17 @@ export class SyntheticTwinService {
   // TODO: Integrate with actual token pricing from Diamond Concierge
   private static readonly CENTS_PER_TOKEN = 9;
 
+  // PHASE5-ITEM1: SynthiMatesAi API fee (deducted from platform share)
+  // This represents the cost CNZ pays to SynthiMatesAi per generation
+  private static readonly SYNTHIMATES_API_FEE_CENTS = 15; // $0.15 per generation
+
+  // PHASE5-ITEM1: Optional SynthiMatesAi API client for external integration
+  private synthiMatesClient?: SynthiMatesAiClient;
+
+  constructor(synthiMatesClient?: SynthiMatesAiClient) {
+    this.synthiMatesClient = synthiMatesClient;
+  }
+
   /**
    * PHASE2-440-ITEM1: Generate AI image for a fan using creator's synthetic twin
    *
