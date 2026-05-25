@@ -43,6 +43,7 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierrc`
 - `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
+- `CYRANO_LAYER_1_PR_SUMMARY.md`
 - `HYGIENE_SWEEP_REPORT.md`
 - `MASTER_PROJECT_FOLDER.md`
 - `OQMI_SYSTEM_STATE.md`
