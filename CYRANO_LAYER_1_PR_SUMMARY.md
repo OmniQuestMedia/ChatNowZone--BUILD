@@ -2,9 +2,7 @@
 
 **PR Title:** `CYR: Cyrano Layer 1 Whisper Copilot — Full Implementation (TechSpec v1.0 + v3.1 Compliance)`
 
-**Branch:** `claude/pr-001-cyrano-layer-1-whisper`
-**Base:** `main`
-**Status:** Implementation complete, ready for PR creation
+**Status:** Ready for review
 
 ---
 
