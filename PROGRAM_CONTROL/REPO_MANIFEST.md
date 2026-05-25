@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `273d576dc083cff00166abc9aa69377ea95a4c20`
-**Generated:** 2026-05-25T03:17:32Z
+**Branch:** `claude/sync-shared-account-core`
+**Commit:** `a40332e487eac1d15401911e660bfaa34c326891`
+**Generated:** 2026-05-25T03:19:43Z
 
 ## All Files
 
