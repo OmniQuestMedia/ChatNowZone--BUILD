@@ -7,6 +7,9 @@
 > **ChatNow.Zone — Canonical Corpus v10 governed monorepo (TypeScript + Prisma + Postgres).**
 > **Status: BUILD COMPLETE (Payload 9, 2026-04-24) — Alpha Launch Ready (September 2026 target).**
 
+> **✅ Safe Synthetic Twin and Shared Account-Core features are now fully integrated and optional for creators via CyranoEngines**
+> **Phase 7 Complete (2026-05-25)**: All AI-powered synthetic twin features (image generation, voice chat, group chat) are production-ready with webhook integration to CyranoEngines. Creators can enable/disable AI features independently. StudioTokens (CZT) charging and 70/30 revenue sharing fully implemented. See [`docs/CREATOR_AI_GUIDE.md`](docs/CREATOR_AI_GUIDE.md) for creator documentation.
+
 The ChatNow.Zone build is the primary production platform for
 OmniQuest Media Inc. (OQMInc™). Every commit is bound by the OQMI
 governance invariants: append-only finance, deterministic execution,

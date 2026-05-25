@@ -1,11 +1,12 @@
 // services/synthetic-twin/src/synthetic-twin.service.ts
 // PHASE2-440: Safe Synthetic Twin AI image generation service
-// PHASE5-ITEM1: Integrated with SynthiMatesAi API for actual ML pipeline
-// Implements token deduction, creator earnings, and external API integration.
+// PHASE7-ITEM2: Updated to use CyranoEngines via webhook for actual AI processing
+// Implements minimal viable stub for image generation with proper token deduction
+// and creator earnings. Actual ML pipeline handled by CyranoEngines.
 
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
-import type { SynthiMatesAiClient } from './synthimates-api-client';
+import { cyranoWebhookService } from './cyrano-webhook.service';
 
 const prisma = new PrismaClient();
 
@@ -151,43 +152,9 @@ export class SyntheticTwinService {
         request.tenantId,
       );
 
-      // Step 7: Trigger ML pipeline via SynthiMatesAi API or fallback to simulation
-      // PHASE5-ITEM1: Integration with actual SynthiMatesAi platform
-      if (this.synthiMatesClient) {
-        // Real API integration - trigger external generation
-        const callbackUrl = `${process.env.CNZ_API_BASE_URL || 'https://api.chatnow.zone'}/webhooks/synthimates/generation-complete`;
-
-        this.synthiMatesClient
-          .generateImage({
-            correlationId,
-            creatorId: request.creatorId,
-            userId: request.userId,
-            prompt: request.prompt,
-            callbackUrl,
-            metadata: {
-              generation_id: generation.id,
-              organization_id: request.organizationId,
-              tenant_id: request.tenantId,
-            },
-          })
-          .catch((error) => {
-            // If API call fails, mark generation as failed
-            prisma.syntheticTwinGeneration
-              .update({
-                where: { id: generation.id },
-                data: {
-                  status: 'FAILED',
-                  error_message: `SynthiMatesAi API error: ${error.message}`,
-                  updated_at: new Date(),
-                },
-              })
-              .catch(console.error);
-          });
-      } else {
-        // Fallback to simulation for local development/testing
-        // eslint-disable-next-line no-console
-        this.simulateImageGeneration(generation.id, correlationId).catch(console.error);
-      }
+      // Step 7: PHASE7-ITEM2: Call CyranoEngines via webhook for actual AI generation
+      // CyranoEngines will handle the ML pipeline and callback when complete
+      await this.requestCyranoGeneration(generation.id, correlationId, request);
 
       return {
         id: generation.id,
@@ -335,23 +302,73 @@ export class SyntheticTwinService {
   }
 
   /**
-   * [STUB] Simulate image generation
-   * TODO: Replace with actual SafeSyntheticWizard ML pipeline integration
+   * PHASE7-ITEM2: Request AI generation from CyranoEngines via webhook
    */
-  private async simulateImageGeneration(
+  private async requestCyranoGeneration(
     generationId: string,
     correlationId: string,
+    request: GenerateImageRequest,
   ): Promise<void> {
-    // Simulate async generation delay (2-5 seconds)
-    await new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 3000));
+    try {
+      const webhookResponse = await cyranoWebhookService.requestGeneration({
+        correlationId,
+        userId: request.userId,
+        creatorId: request.creatorId,
+        requestType: 'IMAGE_GENERATION',
+        prompt: request.prompt,
+        organizationId: request.organizationId,
+        tenantId: request.tenantId,
+      });
 
-    // Update to COMPLETED with placeholder image URI
-    // TODO: Replace with actual S3/storage URI from ML pipeline
+      if (webhookResponse.status !== 'ACCEPTED') {
+        // If CyranoEngines rejects or errors, mark generation as failed
+        await prisma.syntheticTwinGeneration.update({
+          where: { id: generationId },
+          data: {
+            status: 'FAILED',
+            error_message: webhookResponse.errorMessage || 'CyranoEngines rejected request',
+            updated_at: new Date(),
+          },
+        });
+      }
+      // If ACCEPTED, generation status remains PENDING until CyranoEngines callbacks
+    } catch (error) {
+      // On error, mark generation as failed
+      await prisma.syntheticTwinGeneration.update({
+        where: { id: generationId },
+        data: {
+          status: 'FAILED',
+          error_message:
+            error instanceof Error ? error.message : 'Failed to call CyranoEngines webhook',
+          updated_at: new Date(),
+        },
+      });
+    }
+  }
+
+  /**
+   * PHASE7-ITEM2: Handle callback from CyranoEngines when generation completes
+   */
+  async handleCyranoCallback(
+    correlationId: string,
+    status: 'COMPLETED' | 'FAILED',
+    imageUri?: string,
+    errorMessage?: string,
+  ): Promise<void> {
+    const generation = await prisma.syntheticTwinGeneration.findUnique({
+      where: { correlation_id: correlationId },
+    });
+
+    if (!generation) {
+      throw new Error(`Generation not found for correlation_id: ${correlationId}`);
+    }
+
     await prisma.syntheticTwinGeneration.update({
-      where: { id: generationId },
+      where: { id: generation.id },
       data: {
-        status: 'COMPLETED',
-        image_uri: `s3://synthetic-twins/${correlationId}/generated.png`,
+        status,
+        image_uri: imageUri || null,
+        error_message: errorMessage || null,
         updated_at: new Date(),
       },
     });
