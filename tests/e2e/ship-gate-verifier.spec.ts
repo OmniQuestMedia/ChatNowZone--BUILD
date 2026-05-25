@@ -44,6 +44,11 @@ describe('Ship-Gate Verifier', () => {
     expect(e2e?.status).toBe('PASS');
   });
 
+  it('WEBCAM-1 confirms webcam flow files and topics are ship-gate verified', () => {
+    const webcam = report.results.find((r) => r.id === 'WEBCAM-1');
+    expect(webcam?.status).toBe('PASS');
+  });
+
   it('NET-1 confirms Postgres + Redis are not exposed on host', () => {
     const net = report.results.find((r) => r.id === 'NET-1');
     expect(net?.status).toBe('PASS');
@@ -56,6 +61,11 @@ describe('Ship-Gate Verifier', () => {
 
   it('DOC-1 confirms architecture + checklist + readme are present', () => {
     const doc = report.results.find((r) => r.id === 'DOC-1');
+    expect(doc?.status).toBe('PASS');
+  });
+
+  it('DOC-2 confirms master homestretch queue marks final hardening COMPLETE', () => {
+    const doc = report.results.find((r) => r.id === 'DOC-2');
     expect(doc?.status).toBe('PASS');
   });
 
@@ -79,6 +89,11 @@ describe('Ship-Gate Verifier', () => {
   it('INFRA-7 confirms 3-2-1 backup: S3 Object Lock + cross-region replication to ca-west-1', () => {
     const infra7 = report.results.find((r) => r.id === 'INFRA-7');
     expect(infra7?.status).toBe('PASS');
+  });
+
+  it('INFRA-10 confirms webcam IaC hardening (scaling + observability + residency)', () => {
+    const infra10 = report.results.find((r) => r.id === 'INFRA-10');
+    expect(infra10?.status).toBe('PASS');
   });
 
   it('summary is GREEN or YELLOW (never RED on a clean tree)', () => {

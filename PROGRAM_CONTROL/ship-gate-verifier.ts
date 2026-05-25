@@ -365,6 +365,42 @@ const checks: Array<() => CheckResult> = [
         missing.length === 0 ? ['All six E2E flows shipped'] : [`Missing: ${missing.join(', ')}`],
     };
   },
+  () => {
+    // Webcam flow verification — backend webcam surfaces + event fabric must
+    // remain present for final hardening.
+    const required = [
+      'services/obs-bridge/src/obs-bridge.service.ts',
+      'services/obs-bridge/src/audio-signal.service.ts',
+      'tests/e2e/payload10-backend-closure.spec.ts',
+    ];
+    const missing = required.filter((p) => !exists(p));
+    const topics = readSafe('services/nats/topics.registry.ts') ?? '';
+    const requiredTopics = [
+      'OBS_STREAM_STARTED',
+      'OBS_STREAM_ENDED',
+      'OBS_AUDIO_SIGNAL_PRESENT',
+      'OBS_HEAT_ESCALATION_BLOCKED',
+    ];
+    const missingTopics = requiredTopics.filter((topic) => !topics.includes(topic));
+    const ok = missing.length === 0 && missingTopics.length === 0;
+    return {
+      id: 'WEBCAM-1',
+      category: 'Webcam flow verification',
+      description: 'Webcam backend flow surfaces + NATS topics remain Ship-Gate verified',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        missing.length === 0
+          ? 'OBS bridge + audio signal services and webcam E2E fixture present'
+          : `Missing webcam flow files: ${missing.join(', ')}`,
+        missingTopics.length === 0
+          ? 'Webcam NATS topics present (OBS stream + audio gate)'
+          : `Missing webcam NATS topics: ${missingTopics.join(', ')}`,
+      ],
+      remediation: ok
+        ? undefined
+        : 'Restore OBS bridge/audio-signal service files and required webcam NATS topics',
+    };
+  },
 
   // ── 9. SECRETS HYGIENE ────────────────────────────────────────────────────
   () => {
@@ -447,6 +483,27 @@ const checks: Array<() => CheckResult> = [
         missing.length === 0
           ? ['All four required docs present']
           : [`Missing: ${missing.join(', ')}`],
+    };
+  },
+  () => {
+    const queue =
+      readSafe('PROGRAM_CONTROL/DIRECTIVES/QUEUE/MASTER-HOMESTRETCH-BUILD-QUEUE.md') ?? '';
+    const phaseMarkedComplete =
+      queue.includes('Phase 4: Final Backend Polish & IaC Hardening — COMPLETE') &&
+      queue.includes('Status: COMPLETE');
+    return {
+      id: 'DOC-2',
+      category: 'Documentation',
+      description: 'MASTER-HOMESTRETCH-BUILD-QUEUE marks final webcam IaC hardening as COMPLETE',
+      status: phaseMarkedComplete ? 'PASS' : 'FAIL',
+      evidence: [
+        phaseMarkedComplete
+          ? 'Phase 4 hardening section marked COMPLETE in MASTER-HOMESTRETCH-BUILD-QUEUE.md'
+          : 'MASTER-HOMESTRETCH-BUILD-QUEUE.md is missing COMPLETE status for final webcam hardening',
+      ],
+      remediation: phaseMarkedComplete
+        ? undefined
+        : 'Update MASTER-HOMESTRETCH-BUILD-QUEUE.md to mark Final Backend Polish & IaC Hardening as COMPLETE',
     };
   },
 
@@ -643,6 +700,7 @@ const checks: Array<() => CheckResult> = [
       'infra/terraform/s3.tf',
       'infra/terraform/alb.tf',
       'infra/terraform/kms.tf',
+      'infra/terraform/webcam-services.tf',
       'infra/terraform/outputs.tf',
     ];
     const missing = required.filter((p) => !exists(p));
@@ -661,7 +719,7 @@ const checks: Array<() => CheckResult> = [
       status: ok ? 'PASS' : 'FAIL',
       evidence: [
         missing.length === 0
-          ? 'All Terraform IaC files present (main, vpc, rds, elasticache, s3, alb, kms, outputs)'
+          ? 'All Terraform IaC files present (main, vpc, rds, elasticache, s3, alb, kms, webcam-services, outputs)'
           : `Missing files: ${missing.join(', ')}`,
         caRegionDeclared
           ? 'ca-central-1 declared as primary region in main.tf + variables.tf'
@@ -673,6 +731,50 @@ const checks: Array<() => CheckResult> = [
       remediation: ok
         ? undefined
         : 'Create infra/terraform/ with all required .tf files declaring ca-central-1 + KMS CMK + S3 Object Lock',
+    };
+  },
+  () => {
+    // INFRA-10: Webcam services production hardening.
+    // Ensures scaling profile + Prometheus/Grafana hooks + Canada residency tags
+    // are declared in Terraform for streaming/live-room services.
+    const webcamTf = readSafe('infra/terraform/webcam-services.tf') ?? '';
+    const varsTf = readSafe('infra/terraform/variables.tf') ?? '';
+    const scalingDeclared =
+      webcamTf.includes('webcam_service_profiles') &&
+      webcamTf.includes('streaming') &&
+      webcamTf.includes('live_room') &&
+      webcamTf.includes('aws_cloudwatch_metric_alarm');
+    const observabilityHooks =
+      webcamTf.includes('prometheus') &&
+      webcamTf.includes('grafana') &&
+      webcamTf.includes('aws_ssm_parameter');
+    const residencyEnforced =
+      varsTf.includes('webcam_ecs_cluster_name') &&
+      varsTf.includes('webcam_streaming_service_name') &&
+      varsTf.includes('webcam_live_room_service_name') &&
+      webcamTf.includes('INFRA_v1.0_CANADA_RESIDENCY') &&
+      webcamTf.includes('ca-central-1');
+    const ok = scalingDeclared && observabilityHooks && residencyEnforced;
+    return {
+      id: 'INFRA-10',
+      category: 'Infrastructure policy (INFRA_v1.0)',
+      description:
+        'Webcam IaC hardening declares scaling + Prometheus/Grafana hooks + Canada residency for streaming/live-room services',
+      status: ok ? 'PASS' : 'FAIL',
+      evidence: [
+        scalingDeclared
+          ? 'webcam-services.tf declares streaming/live-room scaling profiles with CloudWatch alarms'
+          : 'webcam scaling profile or CloudWatch alarm declarations missing',
+        observabilityHooks
+          ? 'Prometheus/Grafana hooks declared via SSM parameters in webcam-services.tf'
+          : 'Prometheus/Grafana observability hooks missing from webcam-services.tf',
+        residencyEnforced
+          ? 'Canada residency markers present for webcam services (ca-central-1 + INFRA_v1.0_CANADA_RESIDENCY)'
+          : 'Canada residency markers missing for webcam service IaC',
+      ],
+      remediation: ok
+        ? undefined
+        : 'Add webcam-services.tf with scaling, Prometheus/Grafana hooks, and INFRA_v1.0_CANADA_RESIDENCY markers for streaming/live-room',
     };
   },
   () => {

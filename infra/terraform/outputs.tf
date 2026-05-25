@@ -79,3 +79,18 @@ output "dr_region" {
   description = "Confirmed DR region (INFRA_v1.0 §11)"
   value       = var.dr_region # Always ca-west-1 (validated by variable constraint)
 }
+
+output "webcam_service_scaling_profiles" {
+  description = "Production scaling profiles for webcam streaming + live-room services"
+  value       = local.webcam_service_profiles
+}
+
+output "webcam_observability_hooks" {
+  description = "Prometheus/Grafana hook pointers for webcam services"
+  value = {
+    prometheus_parameter = aws_ssm_parameter.webcam_prometheus_hook.name
+    grafana_parameter    = aws_ssm_parameter.webcam_grafana_hook.name
+    prometheus_job_name  = local.webcam_observability_hooks.prometheus_job_name
+    grafana_dashboard    = local.webcam_observability_hooks.grafana_dashboard_uid
+  }
+}
