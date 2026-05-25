@@ -1,5 +1,8 @@
 ## CHATNOW.ZONE BUILD STATUS
 
+**Date:** May 25, 2026
+**Status:** ✅ v3.1 FINAL INVARIANT VALIDATION COMPLETE — PASS — All homestretch work merged (Hygiene Sweep, Phase 11 Cyrano Layer 1 Whisper Copilot, Whisper Rollout). Final validation executed: Ship-gate 33/33 GREEN. All v3.1 canonical invariants validated: three-bucket ledger, advisory-only AI boundary, brand firewall, Dual Integrity Architecture, Canada-only infrastructure. ChatNow.Zone--BUILD ready for full go-live readiness gate. Report: `PROGRAM_CONTROL/REPORT_BACK/FINAL_V3_1_INVARIANT_VALIDATION_2026-05-25.md`.
+
 **Date:** May 12, 2026
 **Status:** HUMANCONTACT bootstrap slice in progress: added `docs/REDBOOK_HCZ_PLAYBOOK.md`, linked RedBook bootstrap coverage from `README.md` and `architecture.md`, pending targeted validation + PR open. Rule applied: `HUMANCONTACT-ACTIVATE-v1`.
 
