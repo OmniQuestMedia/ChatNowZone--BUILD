@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `c83b32bc3bdd38290c1e2219db242626a555e8d4`
-**Generated:** 2026-05-25T03:54:13Z
+**Branch:** `claude/phase-9-live-monetization-synthetic`
+**Commit:** `5b37fb51f67633f3531058d43375767705301bb3`
+**Generated:** 2026-05-25T05:52:44Z
 
 ## All Files
 
