@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/sub-pr-471`
-**Commit:** `769b519a1a774ab4d1f1a55ba9fa8eef01df7a56`
-**Generated:** 2026-05-25T11:25:55Z
+**Commit:** `62f2cf9147aefab98d6bda3e51f7f701dd0840de`
+**Generated:** 2026-05-25T11:28:22Z
 
 ## All Files
 
@@ -44,6 +44,7 @@ Auto-generated on every push. Do not edit manually.
 - `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
 - `HYGIENE_SWEEP_REPORT.md`
+- `MASTER_PROJECT_FOLDER.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-STATUS.md`
