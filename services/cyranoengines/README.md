@@ -51,6 +51,7 @@ All endpoints accept `correlation_id` in headers (`x-correlation-id`) or body.
 Generates a Safe Synthetic Twin image from input parameters.
 
 **Request Body:**
+
 ```json
 {
   "input_image": "base64_or_url",
@@ -63,6 +64,7 @@ Generates a Safe Synthetic Twin image from input parameters.
 ```
 
 **Response (202 Accepted):**
+
 ```json
 {
   "job_id": "uuid-v4",
@@ -74,6 +76,7 @@ Generates a Safe Synthetic Twin image from input parameters.
 ```
 
 **Webhook Callback (on completion):**
+
 ```json
 {
   "job_id": "uuid-v4",
@@ -92,6 +95,7 @@ Generates a Safe Synthetic Twin image from input parameters.
 Generates video content via HeyGen or internal pipeline.
 
 **Request Body:**
+
 ```json
 {
   "prompt": "Video generation prompt",
@@ -111,6 +115,7 @@ Generates video content via HeyGen or internal pipeline.
 Generates voice/audio content via TTS engine.
 
 **Request Body:**
+
 ```json
 {
   "text": "Text to synthesize",
@@ -130,6 +135,7 @@ Generates voice/audio content via TTS engine.
 Queries context memory, RAG system, or summarization engine.
 
 **Request Body:**
+
 ```json
 {
   "query": "Search query",
@@ -148,6 +154,7 @@ Queries context memory, RAG system, or summarization engine.
 Health check endpoint.
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -171,6 +178,7 @@ CyranoEngines does **NOT** maintain its own ledger. Instead, it calls back to th
 6. On failure, charge is refunded via webhook
 
 All charges include:
+
 - `correlation_id` for tracking
 - `reason_code` for audit trail
 - Platform-specific ledger integration
@@ -315,8 +323,8 @@ app.post('/webhook/cyranoengines', (req, res) => {
 - [ ] Integrate HeyGen API for video generation
 - [ ] Add ElevenLabs or similar TTS integration
 - [ ] Implement vector database for memory/RAG
-- [ ] Add retry logic with exponential backoff for webhook callbacks
-- [ ] Implement HMAC signature verification for webhooks
+- [✅] **COMPLETED (Phase 11):** Add retry logic with exponential backoff for webhook callbacks
+- [✅] **COMPLETED (Phase 11):** Implement HMAC signature verification for webhooks
 - [ ] Add rate limiting per platform/account
 - [ ] Implement job queue with Bull/Redis
 - [ ] Add comprehensive monitoring and alerting
@@ -328,6 +336,53 @@ app.post('/webhook/cyranoengines', (req, res) => {
 - [ ] Advanced RAG with semantic search
 - [ ] Custom model training API
 - [ ] Real-time generation status streaming
+
+## Phase 11 Enhancements (Production-Ready)
+
+### Webhook Callback Service Hardening
+
+**Location:** `services/cyranoengines/api/src/services/webhook-callback.service.ts`
+
+**Implemented Features:**
+
+- ✅ HMAC-SHA256 signature generation for webhook verification
+- ✅ Exponential backoff retry logic (5 retries, 1s-60s backoff with jitter)
+- ✅ Failed callback persistence for manual intervention
+- ✅ Request timeout enforcement (10 seconds)
+- ✅ Manual retry and cleanup endpoints
+
+**Webhook Signature Verification:**
+Platforms receiving CyranoEngines webhooks can verify authenticity using:
+
+```typescript
+const signature = req.headers['x-cyranoengines-signature'];
+const expectedSignature = crypto
+  .createHmac('sha256', process.env.CYRANOENGINES_WEBHOOK_SECRET)
+  .update(`${job_id}|${correlation_id}|${timestamp}`)
+  .digest('hex');
+
+if (signature !== expectedSignature) {
+  throw new Error('Invalid webhook signature');
+}
+```
+
+**Retry Behavior:**
+
+- Attempt 1: Immediate
+- Attempt 2: ~1 second later
+- Attempt 3: ~2 seconds later
+- Attempt 4: ~4 seconds later
+- Attempt 5: ~8 seconds later
+- Attempt 6: ~16 seconds later
+- After max retries: Stored for manual intervention at `/admin/webhooks/failed`
+
+**Environment Variables:**
+
+```bash
+CYRANOENGINES_WEBHOOK_SECRET=<256-bit-secret>
+```
+
+Generate secret: `openssl rand -hex 32`
 
 ## License
 
