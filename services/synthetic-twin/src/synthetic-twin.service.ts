@@ -1,10 +1,11 @@
 // services/synthetic-twin/src/synthetic-twin.service.ts
 // PHASE2-440: Safe Synthetic Twin AI image generation service
-// Implements minimal viable stub for image generation with proper token deduction
-// and creator earnings. Actual ML pipeline to be integrated from SynthiMatesAi.
+// PHASE5-ITEM1: Integrated with SynthiMatesAi API for actual ML pipeline
+// Implements token deduction, creator earnings, and external API integration.
 
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
+import type { SynthiMatesAiClient } from './synthimates-api-client';
 
 const prisma = new PrismaClient();
 
@@ -39,6 +40,17 @@ export class SyntheticTwinService {
   // Token value in cents USD (average market rate)
   // TODO: Integrate with actual token pricing from Diamond Concierge
   private static readonly CENTS_PER_TOKEN = 9;
+
+  // PHASE5-ITEM1: SynthiMatesAi API fee (deducted from platform share)
+  // This represents the cost CNZ pays to SynthiMatesAi per generation
+  private static readonly SYNTHIMATES_API_FEE_CENTS = 15; // $0.15 per generation
+
+  // PHASE5-ITEM1: Optional SynthiMatesAi API client for external integration
+  private synthiMatesClient?: SynthiMatesAiClient;
+
+  constructor(synthiMatesClient?: SynthiMatesAiClient) {
+    this.synthiMatesClient = synthiMatesClient;
+  }
 
   /**
    * PHASE2-440-ITEM1: Generate AI image for a fan using creator's synthetic twin
@@ -139,11 +151,43 @@ export class SyntheticTwinService {
         request.tenantId,
       );
 
-      // Step 7: [STUB] Trigger ML pipeline
-      // TODO: Integrate actual SafeSyntheticWizard pipeline from SynthiMatesAi
-      // For now, simulate async generation with a placeholder
-      // eslint-disable-next-line no-console
-      this.simulateImageGeneration(generation.id, correlationId).catch(console.error);
+      // Step 7: Trigger ML pipeline via SynthiMatesAi API or fallback to simulation
+      // PHASE5-ITEM1: Integration with actual SynthiMatesAi platform
+      if (this.synthiMatesClient) {
+        // Real API integration - trigger external generation
+        const callbackUrl = `${process.env.CNZ_API_BASE_URL || 'https://api.chatnow.zone'}/webhooks/synthimates/generation-complete`;
+
+        this.synthiMatesClient
+          .generateImage({
+            correlationId,
+            creatorId: request.creatorId,
+            userId: request.userId,
+            prompt: request.prompt,
+            callbackUrl,
+            metadata: {
+              generation_id: generation.id,
+              organization_id: request.organizationId,
+              tenant_id: request.tenantId,
+            },
+          })
+          .catch((error) => {
+            // If API call fails, mark generation as failed
+            prisma.syntheticTwinGeneration
+              .update({
+                where: { id: generation.id },
+                data: {
+                  status: 'FAILED',
+                  error_message: `SynthiMatesAi API error: ${error.message}`,
+                  updated_at: new Date(),
+                },
+              })
+              .catch(console.error);
+          });
+      } else {
+        // Fallback to simulation for local development/testing
+        // eslint-disable-next-line no-console
+        this.simulateImageGeneration(generation.id, correlationId).catch(console.error);
+      }
 
       return {
         id: generation.id,
