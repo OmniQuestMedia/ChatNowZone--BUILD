@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `copilot/epic-homestretch-webcam-backend-completion`
-**Commit:** `098d45ecd12cb9f4753f47917468d3c64831568b`
-**Generated:** 2026-05-25T13:21:45Z
+**Branch:** `copilot/featurefinal-webcam-iac-hardening`
+**Commit:** `befb8640928f269b88ca84f89b816a5e8b7adf83`
+**Generated:** 2026-05-25T13:23:43Z
 
 ## All Files
 
@@ -419,6 +419,7 @@ Auto-generated on every push. Do not edit manually.
 - `infra/terraform/s3.tf`
 - `infra/terraform/variables.tf`
 - `infra/terraform/vpc.tf`
+- `infra/terraform/webcam-services.tf`
 - `jest.config.js`
 - `package.json`
 - `prisma/migrations/20260409000000_legal_hold_db_migration/migration.sql`

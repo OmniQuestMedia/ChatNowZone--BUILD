@@ -1,5 +1,8 @@
 ## CHATNOW.ZONE BUILD STATUS
 
+**Date:** May 25, 2026  
+**Status:** ✅ Phase 5 Final Backend Polish & IaC Hardening closed for webcam services: Terraform webcam scaling + Prometheus/Grafana hooks + Canada residency markers added, Ship-Gate extended with WEBCAM-1 / DOC-2 / INFRA-10 checks, and MASTER-HOMESTRETCH-BUILD-QUEUE.md Phase 4 marked COMPLETE. Targeted verifier status: 36/36 GREEN.
+
 **Date:** May 25, 2026
 **Status:** ✅ v3.1 FINAL INVARIANT VALIDATION COMPLETE — PASS — All homestretch work merged (Hygiene Sweep, Phase 11 Cyrano Layer 1 Whisper Copilot, Whisper Rollout). Final validation executed: Ship-gate 33/33 GREEN. All v3.1 canonical invariants validated: three-bucket ledger, advisory-only AI boundary, brand firewall, Dual Integrity Architecture, Canada-only infrastructure. ChatNow.Zone--BUILD ready for full go-live readiness gate. Report: `PROGRAM_CONTROL/REPORT_BACK/FINAL_V3_1_INVARIANT_VALIDATION_2026-05-25.md`.
 

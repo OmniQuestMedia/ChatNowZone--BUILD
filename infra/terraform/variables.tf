@@ -99,3 +99,36 @@ variable "certificate_arn" {
   type        = string
   default     = ""
 }
+
+variable "webcam_ecs_cluster_name" {
+  description = "ECS cluster hosting webcam workloads (streaming + live-room) in ca-central-1"
+  type        = string
+  default     = "chatnowzone-webcam-prod"
+
+  validation {
+    condition     = length(trimspace(var.webcam_ecs_cluster_name)) > 0
+    error_message = "webcam_ecs_cluster_name must be non-empty."
+  }
+}
+
+variable "webcam_streaming_service_name" {
+  description = "ECS service name for the streaming workload"
+  type        = string
+  default     = "chatnowzone-streaming"
+
+  validation {
+    condition     = length(trimspace(var.webcam_streaming_service_name)) > 0
+    error_message = "webcam_streaming_service_name must be non-empty."
+  }
+}
+
+variable "webcam_live_room_service_name" {
+  description = "ECS service name for the live-room orchestration workload"
+  type        = string
+  default     = "chatnowzone-live-room"
+
+  validation {
+    condition     = length(trimspace(var.webcam_live_room_service_name)) > 0
+    error_message = "webcam_live_room_service_name must be non-empty."
+  }
+}
