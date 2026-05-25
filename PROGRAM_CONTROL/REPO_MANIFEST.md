@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `claude/pr-001-cyrano-layer-1-whisper`
-**Commit:** `2c33e38cbb2f22350aca43e3f2dab32b71f5e0bb`
-**Generated:** 2026-05-25T11:15:46Z
+**Branch:** `claude/run-final-invariant-validation`
+**Commit:** `99bfdbf805dedc3ff15fff18dc3bef5beb2307c1`
+**Generated:** 2026-05-25T11:31:14Z
 
 ## All Files
 
@@ -45,6 +45,7 @@ Auto-generated on every push. Do not edit manually.
 - `CONTRIBUTING.md`
 - `CYRANO_LAYER_1_PR_SUMMARY.md`
 - `HYGIENE_SWEEP_REPORT.md`
+- `MASTER_PROJECT_FOLDER.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-STATUS.md`
@@ -134,6 +135,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/REPORT_BACK/DRIVE-FOLDER-UPDATE-REPORT-BACK.md`
 - `PROGRAM_CONTROL/REPORT_BACK/ENFORCE-FINANCIAL-SCHEMA-INTEGRITY.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FASTTRACK-STATEMENT-SURFACES.md`
+- `PROGRAM_CONTROL/REPORT_BACK/FINAL_V3_1_INVARIANT_VALIDATION_2026-05-25.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-001-GOVERNANCE-CONSTANTS.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-002-DISPUTE-RESOLUTION-REPLACE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/FIZ-002-REVISION-2026-04-11.md`
