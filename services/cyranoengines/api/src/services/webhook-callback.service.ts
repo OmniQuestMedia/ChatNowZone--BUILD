@@ -41,7 +41,7 @@ export class WebhookCallbackService {
     }
   }
 
-  private async generateSignature(payload: WebhookCallbackPayload): Promise<string> {
+  private async generateSignature(_payload: WebhookCallbackPayload): Promise<string> {
     // TODO: Implement HMAC signature generation for webhook verification
     // This ensures calling platforms can verify the webhook came from CyranoEngines
     return 'placeholder-signature';

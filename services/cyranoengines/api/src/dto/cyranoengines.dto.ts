@@ -6,7 +6,7 @@ export interface GenerateSyntheticTwinDto {
   /** Input image data or URL */
   input_image: string;
   /** Generation parameters */
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   /** Callback webhook URL for result delivery */
   callback_url: string;
   /** Optional caller-provided correlation ID */
@@ -23,7 +23,7 @@ export interface GenerateVideoDto {
   /** Avatar/character selection */
   avatar?: string;
   /** Generation parameters */
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   /** Callback webhook URL for result delivery */
   callback_url: string;
   /** Optional caller-provided correlation ID */
@@ -40,7 +40,7 @@ export interface GenerateVoiceDto {
   /** Voice profile selection */
   voice_id?: string;
   /** Generation parameters */
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   /** Callback webhook URL for result delivery */
   callback_url: string;
   /** Optional caller-provided correlation ID */
@@ -87,12 +87,12 @@ export interface WebhookCallbackPayload {
   /** Job status */
   status: 'completed' | 'failed';
   /** Result data (if successful) */
-  result?: any;
+  result?: unknown;
   /** Error information (if failed) */
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   /** Timestamp */
   timestamp: string;

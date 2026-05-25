@@ -16,7 +16,7 @@ export class GateGuardIntegrationService {
    */
   async verifySafety(params: {
     content_type: 'image' | 'video' | 'audio' | 'text';
-    input_data: any;
+    input_data: unknown;
     correlation_id: string;
     platform: 'synthi' | 'cnz';
   }): Promise<{ approved: boolean; reason_code?: string; zk_proof_hash?: string }> {

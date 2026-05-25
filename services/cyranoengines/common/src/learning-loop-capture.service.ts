@@ -18,7 +18,7 @@ export class LearningLoopCaptureService {
     job_id: string;
     correlation_id: string;
     service: string;
-    input_data: any;
+    input_data: unknown;
     platform: string;
     account_id: string;
     timestamp: string;
@@ -54,7 +54,7 @@ export class LearningLoopCaptureService {
     job_id: string;
     correlation_id: string;
     service: string;
-    output_data: any;
+    output_data: unknown;
     success: boolean;
     error?: string;
     timestamp: string;
@@ -90,7 +90,7 @@ export class LearningLoopCaptureService {
     start_date?: string;
     end_date?: string;
     success_only?: boolean;
-  }): Promise<any[]> {
+  }): Promise<unknown[]> {
     // TODO: Implement actual retrieval from storage
     console.log('[LearningLoop] Retrieving captured data with filters:', filters);
     return [];
