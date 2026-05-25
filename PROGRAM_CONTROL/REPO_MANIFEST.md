@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `df497754fa4ababeb50d3b270cb55e46557973ee`
-**Generated:** 2026-05-25T03:51:13Z
+**Branch:** `claude/phase-7-final-creator-dashboard-polish`
+**Commit:** `70863b1d6e1ca21b2b82ac7c82184226480be206`
+**Generated:** 2026-05-25T03:51:57Z
 
 ## All Files
 
@@ -48,6 +48,7 @@ Auto-generated on every push. Do not edit manually.
 - `PHASE3-IMPLEMENTATION-STATUS.md`
 - `PHASE3-IMPLEMENTATION-SUMMARY.md`
 - `PHASE5_FILES_INVENTORY.md`
+- `PHASE7-IMPLEMENTATION-STATUS.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AGENT-CHANGE-2026-05-11.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-001.md`
 - `PROGRAM_CONTROL/DIRECTIVES/DONE/AUDIT-002.md`
@@ -328,6 +329,7 @@ Auto-generated on every push. Do not edit manually.
 - `docs/ARCHITECTURE_OVERVIEW.md`
 - `docs/AUDIT_CERTIFICATION_V1.md`
 - `docs/CANONICAL_COMPLIANCE_CHECKLIST.md`
+- `docs/CREATOR_AI_GUIDE.md`
 - `docs/CREATOR_SYNTHETIC_TWIN_GUIDE.md`
 - `docs/DIRECTIVE_TEMPLATE.md`
 - `docs/DOMAIN_GLOSSARY.md`
@@ -782,6 +784,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/synthetic-twin/REVENUE_MODEL.md`
 - `services/synthetic-twin/package.json`
 - `services/synthetic-twin/src/analytics.service.ts`
+- `services/synthetic-twin/src/cyrano-webhook.service.ts`
 - `services/synthetic-twin/src/group-chat.service.ts`
 - `services/synthetic-twin/src/moderation.service.ts`
 - `services/synthetic-twin/src/synthetic-twin.service.ts`
@@ -814,6 +817,7 @@ Auto-generated on every push. Do not edit manually.
 - `tests/e2e/full-token-purchase-flow.spec.ts`
 - `tests/e2e/high-heat-cyrano-payout-flow.spec.ts`
 - `tests/e2e/payload10-backend-closure.spec.ts`
+- `tests/e2e/phase7-integration.test.ts`
 - `tests/e2e/rbac-step-up-enforcement.spec.ts`
 - `tests/e2e/ship-gate-verifier.spec.ts`
 - `tests/e2e/ui-presenters.spec.ts`
