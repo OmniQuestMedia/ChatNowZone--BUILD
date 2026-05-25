@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `af770867d3820d27c038e2f480d701872be84e5c`
-**Generated:** 2026-05-25T10:54:08Z
+**Branch:** `claude/update-master-project-folder-md`
+**Commit:** `3e0203ff166cb343b7d87fbf89e5772f12b541c4`
+**Generated:** 2026-05-25T11:29:16Z
 
 ## All Files
 
@@ -110,6 +110,7 @@ Auto-generated on every push. Do not edit manually.
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`
 - `PROGRAM_CONTROL/LAUNCH_MANIFEST.md`
 - `PROGRAM_CONTROL/LAUNCH_READY.md`
+- `PROGRAM_CONTROL/MASTER_PROJECT_FOLDER.md`
 - `PROGRAM_CONTROL/REPORT_BACK/ADD-CLEARANCE-CONFIRMATION.md`
 - `PROGRAM_CONTROL/REPORT_BACK/AUDIT-001-AUDIT-CHAIN-SERVICE.md`
 - `PROGRAM_CONTROL/REPORT_BACK/AUDIT-002-LEGAL-HOLD-SERVICE.md`
