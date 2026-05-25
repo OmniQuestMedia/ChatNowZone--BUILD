@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `9490b14b2cad8887a195d870ff3d8c4200f14cde`
-**Generated:** 2026-05-25T03:50:06Z
+**Branch:** `claude/create-repository-structure`
+**Commit:** `8d14fbcf615b6993496078f1ec6ef5fb005d6116`
+**Generated:** 2026-05-25T03:50:47Z
 
 ## All Files
 
@@ -619,6 +619,24 @@ Auto-generated on every push. Do not edit manually.
 - `services/cyrano/src/llm-provider.interface.ts`
 - `services/cyrano/src/persona.manager.ts`
 - `services/cyrano/src/session-memory.store.ts`
+- `services/cyranoengines/README.md`
+- `services/cyranoengines/api/src/cyranoengines-api.module.ts`
+- `services/cyranoengines/api/src/cyranoengines.controller.ts`
+- `services/cyranoengines/api/src/dto/cyranoengines.dto.ts`
+- `services/cyranoengines/api/src/health.controller.ts`
+- `services/cyranoengines/api/src/services/memory.service.ts`
+- `services/cyranoengines/api/src/services/synthetic-twin.service.ts`
+- `services/cyranoengines/api/src/services/video-generation.service.ts`
+- `services/cyranoengines/api/src/services/voice-generation.service.ts`
+- `services/cyranoengines/api/src/services/webhook-callback.service.ts`
+- `services/cyranoengines/audio/README.md`
+- `services/cyranoengines/common/src/cyranoengines-common.module.ts`
+- `services/cyranoengines/common/src/gateguard-integration.service.ts`
+- `services/cyranoengines/common/src/learning-loop-capture.service.ts`
+- `services/cyranoengines/common/src/studiotokens-charging.service.ts`
+- `services/cyranoengines/image/README.md`
+- `services/cyranoengines/memory/README.md`
+- `services/cyranoengines/video/README.md`
 - `services/diamond-concierge/src/diamond-concierge.module.ts`
 - `services/diamond-concierge/src/diamond.service.ts`
 - `services/ffs/.env.example`
