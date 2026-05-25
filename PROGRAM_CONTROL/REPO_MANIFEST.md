@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `0f714bb0dda85e608ec07d5b284c4610db32e29c`
-**Generated:** 2026-05-24T23:16:08Z
+**Branch:** `claude/sync-studio-tokens-system`
+**Commit:** `5f0c399c2e87015d11b94903b6e228efe8ff8d33`
+**Generated:** 2026-05-25T03:16:48Z
 
 ## All Files
 

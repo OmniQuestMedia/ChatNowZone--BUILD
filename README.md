@@ -112,17 +112,17 @@ environment without rebuilding the container.
 
 **PHASE 2 & 3 — Safe Synthetic Twin (Optional Creator Feature):**
 
-| Surface                                                    | Path                                                                |
-| ---------------------------------------------------------- | ------------------------------------------------------------------- |
-| Synthetic Twin AI Image Generation                         | `services/synthetic-twin/`                                          |
-| Voice Chat with TTS Support                                | `services/voice-chat/`                                              |
-| Group Chat with Synthetic Twins                            | `services/group-chat/`                                              |
-| Creator AI Analytics Dashboard                             | `services/ai-analytics/`                                            |
-| Admin Moderation Tools                                     | `services/admin-moderation/`                                        |
+| Surface                            | Path                         |
+| ---------------------------------- | ---------------------------- |
+| Synthetic Twin AI Image Generation | `services/synthetic-twin/`   |
+| Voice Chat with TTS Support        | `services/voice-chat/`       |
+| Group Chat with Synthetic Twins    | `services/group-chat/`       |
+| Creator AI Analytics Dashboard     | `services/ai-analytics/`     |
+| Admin Moderation Tools             | `services/admin-moderation/` |
 
 > **Optional Feature**: Creators can enable Safe Synthetic Twin in their settings.
 > Fans can then generate AI images, voice chat with TTS responses, and participate in group chats
-> that include creator synthetic twins. All interactions charge DreamCoins/tokens with 70% going
+> that include creator synthetic twins. All interactions charge CZT (ChatZoneTokens) with 70% going
 > to creators. Feature is completely opt-in and does not affect existing streaming, tipping,
 > or private show functionality.
 
