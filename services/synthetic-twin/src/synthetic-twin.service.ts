@@ -7,6 +7,9 @@
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { cyranoWebhookService } from './cyrano-webhook.service';
+import { AntiLookalikeGuard } from '../../../src/domain/anti-lookalike.guard';
+import { motionLibraryRepository } from '../../../src/domain/motion/motion-library.repository';
+import type { SynthiMatesAiClient } from './synthimates-api-client';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +17,8 @@ export interface GenerateImageRequest {
   userId: string;
   creatorId: string;
   prompt?: string;
+  motionProfileId?: string;
+  characterReference?: string;
   organizationId: string;
   tenantId: string;
 }
@@ -29,6 +34,8 @@ export interface GenerateImageResponse {
 }
 
 export class SyntheticTwinService {
+  private readonly antiLookalikeGuard = new AntiLookalikeGuard();
+
   // PHASE2-440-ITEM2: Revenue sharing configuration
   // Creator gets 70% of token value, platform gets 30%
   private static readonly CREATOR_SHARE_PERCENT = 0.7;
@@ -70,6 +77,7 @@ export class SyntheticTwinService {
    */
   async generateImage(request: GenerateImageRequest): Promise<GenerateImageResponse> {
     const correlationId = `SYNTWIN-${randomUUID()}`;
+    const promptPolicy = this.antiLookalikeGuard.enforcePromptPolicy(request.prompt);
 
     try {
       // Step 1: Verify creator has synthetic twin enabled
@@ -117,6 +125,10 @@ export class SyntheticTwinService {
       );
       const platformShareCents = totalValueCents - creatorEarningsCents;
 
+      if (request.motionProfileId && !motionLibraryRepository.getById(request.motionProfileId)) {
+        throw new Error(`Unknown motion profile: ${request.motionProfileId}`);
+      }
+
       // Step 4: Create generation record (PENDING status)
       const generation = await prisma.syntheticTwinGeneration.create({
         data: {
@@ -127,7 +139,7 @@ export class SyntheticTwinService {
           creator_earnings_cents: creatorEarningsCents,
           platform_share_cents: platformShareCents,
           status: 'PENDING',
-          prompt: request.prompt || null,
+          prompt: promptPolicy.sanitizedPrompt || null,
           reason_code: 'AI_IMAGE_GENERATION',
           rule_applied_id: 'SYNTHETIC_TWIN_v1',
           organization_id: request.organizationId,
@@ -154,7 +166,7 @@ export class SyntheticTwinService {
 
       // Step 7: PHASE7-ITEM2: Call CyranoEngines via webhook for actual AI generation
       // CyranoEngines will handle the ML pipeline and callback when complete
-      await this.requestCyranoGeneration(generation.id, correlationId, request);
+      await this.requestCyranoGeneration(generation.id, correlationId, request, promptPolicy);
 
       return {
         id: generation.id,
@@ -174,7 +186,7 @@ export class SyntheticTwinService {
           creator_earnings_cents: BigInt(0),
           platform_share_cents: BigInt(0),
           status: 'FAILED',
-          prompt: request.prompt || null,
+          prompt: promptPolicy.sanitizedPrompt || null,
           error_message: error instanceof Error ? error.message : 'Unknown error',
           reason_code: 'AI_IMAGE_GENERATION_FAILED',
           rule_applied_id: 'SYNTHETIC_TWIN_v1',
@@ -308,6 +320,10 @@ export class SyntheticTwinService {
     generationId: string,
     correlationId: string,
     request: GenerateImageRequest,
+    promptPolicy: {
+      sanitizedPrompt: string;
+      negativePrompt: string;
+    },
   ): Promise<void> {
     try {
       const webhookResponse = await cyranoWebhookService.requestGeneration({
@@ -315,7 +331,10 @@ export class SyntheticTwinService {
         userId: request.userId,
         creatorId: request.creatorId,
         requestType: 'IMAGE_GENERATION',
-        prompt: request.prompt,
+        prompt: promptPolicy.sanitizedPrompt,
+        negativePrompt: promptPolicy.negativePrompt,
+        motionProfileId: request.motionProfileId,
+        characterReference: request.characterReference,
         organizationId: request.organizationId,
         tenantId: request.tenantId,
       });

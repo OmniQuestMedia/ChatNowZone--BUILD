@@ -44,6 +44,8 @@ export class SyntheticTwinController {
    *   userId: string,
    *   creatorId: string,
    *   prompt?: string,
+   *   motionProfileId?: string,
+   *   characterReference?: string,
    *   organizationId: string,
    *   tenantId: string
    * }
@@ -55,6 +57,8 @@ export class SyntheticTwinController {
       userId: string;
       creatorId: string;
       prompt?: string;
+      motionProfileId?: string;
+      characterReference?: string;
       organizationId: string;
       tenantId: string;
     },

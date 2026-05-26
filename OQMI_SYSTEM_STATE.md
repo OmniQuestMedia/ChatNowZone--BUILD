@@ -1,5 +1,8 @@
 ## CHATNOW.ZONE BUILD STATUS
 
+**Date:** May 26, 2026  
+**Status:** ✅ Phase 2.7 ethical AI decision update logged for MaxZoneGPT alignment: MediaPipe-based anonymized motion extraction, generic motion profile storage, ArcFace-style anti-lookalike validation, celebrity prompt sanitization, and explicit no-real-person-likeness UI policy warning.
+
 **Date:** May 25, 2026  
 **Status:** ✅ Phase 5 Final Backend Polish & IaC Hardening closed for webcam services: Terraform webcam scaling + Prometheus/Grafana hooks + Canada residency markers added, Ship-Gate extended with WEBCAM-1 / DOC-2 / INFRA-10 checks, and MASTER-HOMESTRETCH-BUILD-QUEUE.md Phase 4 marked COMPLETE. Targeted verifier status: 36/36 GREEN.
 

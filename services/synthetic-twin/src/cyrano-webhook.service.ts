@@ -11,7 +11,10 @@ export interface CyranoWebhookRequest {
   creatorId: string;
   requestType: 'IMAGE_GENERATION' | 'VOICE_TTS' | 'GROUP_CHAT_AI';
   prompt?: string;
+  negativePrompt?: string;
   inputTranscript?: string;
+  motionProfileId?: string;
+  characterReference?: string;
   organizationId: string;
   tenantId: string;
 }
@@ -60,7 +63,10 @@ export class CyranoWebhookService {
       creator_id: request.creatorId,
       request_type: request.requestType,
       prompt: request.prompt,
+      negative_prompt: request.negativePrompt,
       input_transcript: request.inputTranscript,
+      motion_profile_id: request.motionProfileId,
+      character_reference: request.characterReference,
       organization_id: request.organizationId,
       tenant_id: request.tenantId,
       // Metadata for CyranoEngines to callback CNZ
@@ -70,7 +76,8 @@ export class CyranoWebhookService {
 
     try {
       // Get signing secret from env (should be in AWS Secrets Manager)
-      const signingSecret = process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
+      const signingSecret =
+        process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
 
       // Compute HMAC signature for request
       const signature = this.webhookService.computeSignature(
@@ -137,7 +144,7 @@ export class CyranoWebhookService {
    * - result_uri (S3 path to generated content)
    * - status (COMPLETED | FAILED)
    */
-  verifyCallback(signature: string, payload: unknown, signingSecret: string): boolean {
+  verifyCallback(_signature: string, _payload: unknown, _signingSecret: string): boolean {
     // TODO: Implement signature verification
     // For now, accept all callbacks in dev
     return true;
