@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `a39a14710bba9898b4c8e17f57483a0fea7f1cd1`
-**Generated:** 2026-05-25T13:24:05Z
+**Branch:** `copilot/add-motion-library-infrastructure`
+**Commit:** `9310e6b4cbc0dc27e623cbcf48e252f70772c3ae`
+**Generated:** 2026-05-26T18:44:47Z
 
 ## All Files
 
@@ -799,6 +799,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/synthetic-twin/src/cyrano-webhook.service.ts`
 - `services/synthetic-twin/src/group-chat.service.ts`
 - `services/synthetic-twin/src/moderation.service.ts`
+- `services/synthetic-twin/src/phase27-guardrails.spec.ts`
 - `services/synthetic-twin/src/synthetic-twin.service.ts`
 - `services/synthetic-twin/src/synthimates-api-client.ts`
 - `services/synthetic-twin/src/synthimates-webhook.service.ts`
@@ -824,6 +825,13 @@ Auto-generated on every push. Do not edit manually.
 - `services/zonebot-scheduler/src/zonebot-scheduler.controller.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.module.ts`
 - `services/zonebot-scheduler/src/zonebot-scheduler.service.ts`
+- `src/domain/anti-lookalike.guard.ts`
+- `src/domain/face-embedding.service.ts`
+- `src/domain/motion/motion-library.repository.ts`
+- `src/domain/motion/motion-library.seed.ts`
+- `src/domain/motion/motion-profile.types.ts`
+- `src/infra/motion/expression-retargeter.ts`
+- `src/infra/motion/motion-extractor.service.ts`
 - `tests/e2e/audit-chain-replay.spec.ts`
 - `tests/e2e/diamond-recovery-flows.spec.ts`
 - `tests/e2e/full-token-purchase-flow.spec.ts`
