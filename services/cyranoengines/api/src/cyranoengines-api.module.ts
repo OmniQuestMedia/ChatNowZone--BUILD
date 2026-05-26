@@ -25,11 +25,6 @@ import { HealthController } from './health.controller';
     MemoryService,
     WebhookCallbackService,
   ],
-  exports: [
-    SyntheticTwinService,
-    VideoGenerationService,
-    VoiceGenerationService,
-    MemoryService,
-  ],
+  exports: [SyntheticTwinService, VideoGenerationService, VoiceGenerationService, MemoryService],
 })
 export class CyranoEnginesApiModule {}

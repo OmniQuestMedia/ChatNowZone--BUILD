@@ -2,9 +2,9 @@
 // WO-002: HCZ ZoneBot Zoey — type definitions for the scheduling engine.
 
 export interface Schedule {
-  weekStart: string;                 // ISO date: YYYY-MM-DD
+  weekStart: string; // ISO date: YYYY-MM-DD
   department: string;
-  generatedAt: string;               // ISO timestamp
+  generatedAt: string; // ISO timestamp
   shifts: Shift[];
   violations: Violation[];
   budgetForecast?: BudgetSummary;
@@ -14,13 +14,13 @@ export interface Schedule {
 export interface Shift {
   id?: string;
   staffMemberId: string;
-  shiftDate: string;                 // ISO date
-  startUtc: string;                  // ISO timestamp
-  endUtc: string;                    // ISO timestamp
+  shiftDate: string; // ISO date
+  startUtc: string; // ISO timestamp
+  endUtc: string; // ISO timestamp
   breakStartUtc?: string;
   breakMinutes: number;
   isBreakLocked: boolean;
-  payrollCode: string;               // REG, OT, STAT
+  payrollCode: string; // REG, OT, STAT
   staggerOffsetMinutes: number;
   roleSegment?: Record<string, unknown>;
   overtimeMinutes: number;
@@ -29,7 +29,7 @@ export interface Shift {
 }
 
 export interface Violation {
-  type: string;                      // e.g. REST_12H, MAX_CONSECUTIVE_6D, MIN_HOURS_FT
+  type: string; // e.g. REST_12H, MAX_CONSECUTIVE_6D, MIN_HOURS_FT
   severity: 'ERROR' | 'WARNING';
   staffMemberId: string;
   date?: string;

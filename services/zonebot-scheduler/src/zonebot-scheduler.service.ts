@@ -23,17 +23,17 @@ import type {
 
 // ── Governance constants (HCZ scheduling) ────────────────────────────────────
 const HCZ = {
-  RULE_ID:                'HCZ_ZOEY_v1',
-  MIN_REST_HOURS:         12,           // Minimum rest between shifts (Ontario ESA)
-  MAX_CONSECUTIVE_DAYS:   6,            // No 7-day streaks (Ontario ESA)
-  FT_TARGET_TENTHS_HOURS: 385,          // 38.5h target (stored as tenths: 385 = 38.5h)
-  FT_FLOOR_TENTHS_HOURS:  360,          // 36.0h minimum for FT
-  SICK_DAYS_ANNUAL:       5,            // 5 paid sick days per year (Ontario ESA 2026)
-  INCENTIVE_SPIN_CAD:     50_00,        // $50.00 in cents — cash incentive per spin win
-  MOD_COOLDOWN_HOURS:     4,            // Moderation: 4h cooldown within 24h window
-  BREAK_LOCK_WINDOW_MINS: 30,           // Locked break duration (supervisor-controlled)
-  STAGGER_OFFSET_MINS:    15,           // Staggered arrival offset between staff
-  JURISDICTION:           'ON',         // Default jurisdiction
+  RULE_ID: 'HCZ_ZOEY_v1',
+  MIN_REST_HOURS: 12, // Minimum rest between shifts (Ontario ESA)
+  MAX_CONSECUTIVE_DAYS: 6, // No 7-day streaks (Ontario ESA)
+  FT_TARGET_TENTHS_HOURS: 385, // 38.5h target (stored as tenths: 385 = 38.5h)
+  FT_FLOOR_TENTHS_HOURS: 360, // 36.0h minimum for FT
+  SICK_DAYS_ANNUAL: 5, // 5 paid sick days per year (Ontario ESA 2026)
+  INCENTIVE_SPIN_CAD: 50_00, // $50.00 in cents — cash incentive per spin win
+  MOD_COOLDOWN_HOURS: 4, // Moderation: 4h cooldown within 24h window
+  BREAK_LOCK_WINDOW_MINS: 30, // Locked break duration (supervisor-controlled)
+  STAGGER_OFFSET_MINS: 15, // Staggered arrival offset between staff
+  JURISDICTION: 'ON', // Default jurisdiction
 } as const;
 
 @Injectable()
@@ -48,7 +48,10 @@ export class ZonebotSchedulingService {
    * moderation cooldown, staggered arrivals, FT floor/target, locked breaks,
    * fatigue scoring, and budget projection.
    */
-  async generateSchedule(weekStart: string, _forecast?: Record<string, unknown>): Promise<Schedule> {
+  async generateSchedule(
+    weekStart: string,
+    _forecast?: Record<string, unknown>,
+  ): Promise<Schedule> {
     this.logger.log('ZonebotSchedulingService: generating schedule', { weekStart });
 
     const staff = await this.prisma.staffMember.findMany({
@@ -328,8 +331,7 @@ export class ZonebotSchedulingService {
 
     const windows = dayShifts.slice(0, 4).map((shift, idx) => {
       const breakStart = new Date(
-        new Date(shift.start_utc).getTime() +
-          (HCZ.MOD_COOLDOWN_HOURS + idx * 0.5) * 3_600_000,
+        new Date(shift.start_utc).getTime() + (HCZ.MOD_COOLDOWN_HOURS + idx * 0.5) * 3_600_000,
       );
       const breakEnd = new Date(breakStart.getTime() + HCZ.BREAK_LOCK_WINDOW_MINS * 60_000);
       return {
@@ -439,8 +441,7 @@ export class ZonebotSchedulingService {
         : 0.5;
 
     const requiredHours = Math.ceil(dto.targetCoverageHours * avgVolumeIndex);
-    const currentCapacity =
-      dto.currentHeadcountFt * 38.5 + dto.currentHeadcountPt * 20;
+    const currentCapacity = dto.currentHeadcountFt * 38.5 + dto.currentHeadcountPt * 20;
     const gap = Math.max(0, requiredHours - currentCapacity);
 
     const recommendedFt = Math.floor(gap / 38.5);
@@ -468,10 +469,7 @@ export class ZonebotSchedulingService {
     return map;
   }
 
-  private async buildBudgetForecast(
-    weekStart: string,
-    shifts: Shift[],
-  ): Promise<BudgetSummary> {
+  private async buildBudgetForecast(weekStart: string, shifts: Shift[]): Promise<BudgetSummary> {
     const staff = await this.prisma.staffMember.findMany({ where: { is_active: true } });
     const ftIds = new Set(staff.filter((s) => s.employment_type === 'FT').map((s) => s.id));
     const ptIds = new Set(staff.filter((s) => s.employment_type === 'PT').map((s) => s.id));
@@ -520,10 +518,7 @@ export class ZonebotSchedulingService {
 
       const consecutiveDays = staffShifts.length;
       const hoursPast7Days = Math.round((totalMinutes / 60) * 100) / 100;
-      const recentOvertimeHours = staffShifts.reduce(
-        (sum, s) => sum + s.overtimeMinutes / 60,
-        0,
-      );
+      const recentOvertimeHours = staffShifts.reduce((sum, s) => sum + s.overtimeMinutes / 60, 0);
 
       // Simple fatigue scoring heuristic
       let score = 0;

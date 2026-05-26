@@ -2,7 +2,7 @@
 // PHASE3-ITEM4: REST API controller for admin moderation of synthetic AI content
 // Protected routes - should be behind RBAC/admin-only middleware
 
-import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Delete, Body, Param, Query } from '@nestjs/common';
 import { AdminModerationService } from '../../../admin-moderation/src/admin-moderation.service';
 
 const adminModerationService = new AdminModerationService();

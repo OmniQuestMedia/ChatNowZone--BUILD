@@ -13,8 +13,8 @@ export const COMMISSION_RULE_ID = 'STUDIO_AFFILIATION_v1';
 export interface CommissionView {
   studio_id: string;
   affiliation_number: string;
-  commission_rate: string;        // decimal string ("0.2500")
-  commission_rate_pct: string;    // human ("25.00%")
+  commission_rate: string; // decimal string ("0.2500")
+  commission_rate_pct: string; // human ("25.00%")
   last_updated_at: string;
   rule_applied_id: string;
 }

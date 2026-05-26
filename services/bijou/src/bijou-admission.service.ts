@@ -3,12 +3,7 @@
 // - 10s accept window (ADMIT_ACCEPT_WINDOW_SECONDS) enforced server-side
 // - 30s camera grace (CAMERA_GRACE_SECONDS) enforced server-side
 // - FIFO standby promotion on ABANDONED or EJECTED
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
@@ -66,13 +61,16 @@ export class BijouAdmissionService {
       },
     });
     if (active) {
-      this.logger.warn('BijouAdmissionService.requestAdmission: user already has active admission', {
-        session_id: sessionId,
-        user_id: userId,
-        existing_admission_id: active.id,
-        existing_status: active.status,
-        rule_applied_id: ruleAppliedId,
-      });
+      this.logger.warn(
+        'BijouAdmissionService.requestAdmission: user already has active admission',
+        {
+          session_id: sessionId,
+          user_id: userId,
+          existing_admission_id: active.id,
+          existing_status: active.status,
+          rule_applied_id: ruleAppliedId,
+        },
+      );
       throw new ConflictException({
         message: 'User already has an active admission for this session.',
         admission_id: active.id,
@@ -86,9 +84,7 @@ export class BijouAdmissionService {
     });
 
     const atCapacity = admittedCount >= GovernanceConfig.BIJOU.MAX_CAPACITY;
-    const status = atCapacity
-      ? BijouAdmissionStatus.STANDBY
-      : BijouAdmissionStatus.PENDING;
+    const status = atCapacity ? BijouAdmissionStatus.STANDBY : BijouAdmissionStatus.PENDING;
 
     const admission = await this.prisma.bijouAdmission.create({
       data: {
@@ -244,12 +240,15 @@ export class BijouAdmissionService {
 
     this.clearCameraTimer(admissionId);
 
-    this.logger.log('BijouAdmissionService.confirmCamera: camera confirmed — ejection risk cleared', {
-      admission_id: admissionId,
-      session_id: admission.session_id,
-      user_id: admission.user_id,
-      rule_applied_id: ruleAppliedId,
-    });
+    this.logger.log(
+      'BijouAdmissionService.confirmCamera: camera confirmed — ejection risk cleared',
+      {
+        admission_id: admissionId,
+        session_id: admission.session_id,
+        user_id: admission.user_id,
+        rule_applied_id: ruleAppliedId,
+      },
+    );
   }
 
   /**

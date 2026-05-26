@@ -89,10 +89,10 @@ The endpoint inventory in `docs/ux/02-endpoint-inventory.md` lists `pixel_legacy
 
 ## Open follow-ups (tracked)
 
-| ID | Scope |
-|----|-------|
-| PIXEL-LEGACY-002 | Wire `PIXEL_LEGACY.PAYOUT_FLOOR_USD` into `FairPayService` payout calculation |
-| PIXEL-LEGACY-003 | Month-4 `PIXEL_LEGACY_SIGNING_BONUS` trigger job |
-| PIXEL-LEGACY-004 | `PIXEL_LEGACY_GRANT` event type in `ImmutableAuditEventType` + AuditBridgeService mapping |
+| ID               | Scope                                                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| PIXEL-LEGACY-002 | Wire `PIXEL_LEGACY.PAYOUT_FLOOR_USD` into `FairPayService` payout calculation                                         |
+| PIXEL-LEGACY-003 | Month-4 `PIXEL_LEGACY_SIGNING_BONUS` trigger job                                                                      |
+| PIXEL-LEGACY-004 | `PIXEL_LEGACY_GRANT` event type in `ImmutableAuditEventType` + AuditBridgeService mapping                             |
 | PIXEL-LEGACY-005 | Integration test: concurrent seat allocation (10 races, 1 winner — verifies advisory-lock invariant on real Postgres) |
-| PIXEL-LEGACY-006 | Step-up auth modal flow on `/admin/pixel-legacy` review action |
+| PIXEL-LEGACY-006 | Step-up auth modal flow on `/admin/pixel-legacy` review action                                                        |

@@ -21,6 +21,7 @@ allotments have been removed.
 ## NATS Topics (Tombstoned)
 
 The following NATS topics are tombstoned in `services/nats/topics.registry.ts`:
+
 - `showzone.dwell.tick`
 - `showzone.seat.opened`
 - `showzone.phase2.trigger`

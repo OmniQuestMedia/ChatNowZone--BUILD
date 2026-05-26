@@ -23,10 +23,10 @@ export const MEMBERSHIP_PRESENTER_RULE_ID = 'MEMBERSHIP_LIFECYCLE_UI_v1';
 // presenter to be tested without pulling in the service bootstrap graph.
 export const DEFAULT_MEMBERSHIP_GOVERNANCE: MembershipGovernanceSnapshot = {
   expiry_warning_hours: 48,
-  token_bridge_bonus_pct_int: 20,       // 20% — RECOVERY_ENGINE.TOKEN_BRIDGE_BONUS_PCT
+  token_bridge_bonus_pct_int: 20, // 20% — RECOVERY_ENGINE.TOKEN_BRIDGE_BONUS_PCT
   token_bridge_restriction_hours: 24,
   token_bridge_waiver_limit_per_year: 1,
-  three_fifths_refund_pct_int: 60,      // 60% — RECOVERY_ENGINE.THREE_FIFTHS_REFUND_PCT
+  three_fifths_refund_pct_int: 60, // 60% — RECOVERY_ENGINE.THREE_FIFTHS_REFUND_PCT
   three_fifths_lock_hours: 24,
   stipend_czt: {
     VIP: 0,

@@ -75,16 +75,11 @@ export class RiskEngineService {
     // Diamond Concierge intake — flag set drives the most aggressive bumps.
     const diamondResult = this.scoreDiamondConcierge(input);
 
-    const compositeRaw =
-      regionScore.score + behaviouralResult.score + diamondResult.score;
+    const compositeRaw = regionScore.score + behaviouralResult.score + diamondResult.score;
     const compositeScore = Math.max(0, Math.min(100, Math.round(compositeRaw)));
     const tier = this.tierForScore(compositeScore);
     const decision = this.decisionForTier(tier, input);
-    const reasonCodes = this.collectReasonCodes(
-      regionScore,
-      behaviouralResult,
-      diamondResult,
-    );
+    const reasonCodes = this.collectReasonCodes(regionScore, behaviouralResult, diamondResult);
 
     const breakdown: SignalBreakdown = {
       region: regionScore.score,
@@ -142,9 +137,7 @@ export class RiskEngineService {
   }
 
   /** Public read helper for downstream services / audit dashboards. */
-  async findByCorrelationId(
-    correlationId: string,
-  ): Promise<RiskEvaluationResult | null> {
+  async findByCorrelationId(correlationId: string): Promise<RiskEvaluationResult | null> {
     const row = await this.prisma.riskEngineDecision.findUnique({
       where: { correlation_id: correlationId },
     });
@@ -297,10 +290,7 @@ export class RiskEngineService {
     return 'GREEN';
   }
 
-  private decisionForTier(
-    tier: RiskTier,
-    input: RiskEvaluationInput,
-  ): RiskDecision {
+  private decisionForTier(tier: RiskTier, input: RiskEvaluationInput): RiskDecision {
     if (tier === 'CRITICAL') return 'ESCALATE';
     if (tier === 'RED') return 'BLOCK';
     if (tier === 'AMBER') return 'REVIEW';
@@ -337,10 +327,10 @@ export class RiskEngineService {
       result.decision === 'PASS'
         ? NATS_TOPICS.RISK_ENGINE_DECISION_PASS
         : result.decision === 'REVIEW'
-        ? NATS_TOPICS.RISK_ENGINE_DECISION_REVIEW
-        : result.decision === 'BLOCK'
-        ? NATS_TOPICS.RISK_ENGINE_DECISION_BLOCK
-        : NATS_TOPICS.RISK_ENGINE_DECISION_ESCALATE;
+          ? NATS_TOPICS.RISK_ENGINE_DECISION_REVIEW
+          : result.decision === 'BLOCK'
+            ? NATS_TOPICS.RISK_ENGINE_DECISION_BLOCK
+            : NATS_TOPICS.RISK_ENGINE_DECISION_ESCALATE;
 
     // Primary reason_code aligns the NATS payload with the persisted DB row
     // and satisfies the file-header invariant: every emission carries
@@ -387,9 +377,7 @@ export class RiskEngineService {
     rule_applied_id: string;
     evaluated_at: Date;
   }): RiskEvaluationResult {
-    const reasonCodes = Array.isArray(row.reason_codes)
-      ? (row.reason_codes as string[])
-      : [];
+    const reasonCodes = Array.isArray(row.reason_codes) ? (row.reason_codes as string[]) : [];
     const breakdown = (row.signal_breakdown as SignalBreakdown) ?? {
       region: 0,
       behavioural: 0,

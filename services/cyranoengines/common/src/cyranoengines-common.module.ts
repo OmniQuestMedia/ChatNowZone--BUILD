@@ -13,15 +13,7 @@ import { GateGuardIntegrationService } from './gateguard-integration.service';
  * - Shared logging utilities
  */
 @Module({
-  providers: [
-    LearningLoopCaptureService,
-    StudioTokensChargingService,
-    GateGuardIntegrationService,
-  ],
-  exports: [
-    LearningLoopCaptureService,
-    StudioTokensChargingService,
-    GateGuardIntegrationService,
-  ],
+  providers: [LearningLoopCaptureService, StudioTokensChargingService, GateGuardIntegrationService],
+  exports: [LearningLoopCaptureService, StudioTokensChargingService, GateGuardIntegrationService],
 })
 export class CyranoEnginesCommonModule {}

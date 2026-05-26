@@ -77,13 +77,13 @@ See `OQMI_SYSTEM_STATE.md` (root) §Done items for the full list. Key milestones
 
 ## STEP 3 — AGENT ROUTING TABLE
 
-| Scope | Agent |
-|-------|-------|
-| Repo chores, file moves, config edits, multi-file mechanical work | **Grok** (primary) |
-| Service authoring, schema design, complex refactors, FIZ-scoped work | **Grok** (primary) |
-| CEO decision surfacing / Wave B/C docs | **Grok** (primary) |
-| Human-Review Category (OQMI_GOVERNANCE.md §2.2) | CEO / human reviewer |
-| GitHub Copilot | secondary (when Grok unavailable) |
+| Scope                                                                | Agent                             |
+| -------------------------------------------------------------------- | --------------------------------- |
+| Repo chores, file moves, config edits, multi-file mechanical work    | **Grok** (primary)                |
+| Service authoring, schema design, complex refactors, FIZ-scoped work | **Grok** (primary)                |
+| CEO decision surfacing / Wave B/C docs                               | **Grok** (primary)                |
+| Human-Review Category (OQMI_GOVERNANCE.md §2.2)                      | CEO / human reviewer              |
+| GitHub Copilot                                                       | secondary (when Grok unavailable) |
 
 ---
 
@@ -97,6 +97,7 @@ priority order. Respect `CEO_GATE`, `FIZ`, and `Depends-on` fields.
 - Wave D–H: service verification, net-new build, hardening
 
 For each completed task:
+
 1. File completion record in `PROGRAM_CONTROL/DIRECTIVES/DONE/`
 2. Update `CNZ-WORK-001.md` status from `QUEUED` → `DONE` (with SHA + DONE file ref)
 3. Update `OQMI_SYSTEM_STATE.md` (root) §3 DONE / §5 OUTSTANDING

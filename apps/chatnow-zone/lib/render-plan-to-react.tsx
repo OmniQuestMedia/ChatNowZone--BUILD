@@ -57,11 +57,7 @@ export function renderPlanToReact(node: RenderNode, key?: string | number): Reac
   if (node == null) return null;
   if (typeof node === 'string' || typeof node === 'number') return node;
   if (Array.isArray(node)) {
-    return createElement(
-      Fragment,
-      { key },
-      ...node.map((child, i) => renderPlanToReact(child, i)),
-    );
+    return createElement(Fragment, { key }, ...node.map((child, i) => renderPlanToReact(child, i)));
   }
 
   const { tag, test_id, aria, classes, style, props, children } = node;

@@ -3,14 +3,30 @@ import { createHash } from 'crypto';
 import { CommissionSplitEntry } from './schema';
 import { NotificationGateway } from './notification-gateway.service';
 
+interface StudioBatch {
+  batchId: string;
+  totalPayoutCents: bigint;
+  batchChecksum: string;
+  processedAt: string;
+}
+
 export class BatchPayoutService {
-  public static async generateStudioBatch(studioId: string, entries: CommissionSplitEntry[]): Promise<any> {
-    const validEntries = entries.filter(e => e.studioId === studioId && (e.modelNetCents + e.studioAgencyHoldbackCents === e.grossCents));
+  public static async generateStudioBatch(
+    studioId: string,
+    entries: CommissionSplitEntry[],
+  ): Promise<StudioBatch> {
+    const validEntries = entries.filter(
+      (e) =>
+        e.studioId === studioId && e.modelNetCents + e.studioAgencyHoldbackCents === e.grossCents,
+    );
     let totalCents = 0n;
     const ids: string[] = [];
 
-    validEntries.forEach(entry => {
-      totalCents += (entry.studioAgencyHoldbackCents + entry.studioServiceFeesCents) - entry.platformSystemFeeCents;
+    validEntries.forEach((entry) => {
+      totalCents +=
+        entry.studioAgencyHoldbackCents +
+        entry.studioServiceFeesCents -
+        entry.platformSystemFeeCents;
       ids.push(entry.transactionId);
     });
 
@@ -19,7 +35,7 @@ export class BatchPayoutService {
       batchId: `OQMI-BATCH-${studioId}-${Date.now()}`,
       totalPayoutCents: totalCents,
       batchChecksum: createHash('sha512').update(payload).digest('hex'),
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
     };
 
     await NotificationGateway.dispatchPayoutAlert({

@@ -60,7 +60,9 @@ export abstract class BaseHardwareAdapter implements SenSyncHardwareAdapter {
 
   protected emitSample(sample: SenSyncSample, latency_ms: number, plausible: boolean): void {
     this.latencyEwma =
-      this.latencyEwma === 0 ? latency_ms : EWMA_ALPHA * latency_ms + (1 - EWMA_ALPHA) * this.latencyEwma;
+      this.latencyEwma === 0
+        ? latency_ms
+        : EWMA_ALPHA * latency_ms + (1 - EWMA_ALPHA) * this.latencyEwma;
     this.totalSamples1m += 1;
     if (plausible) this.goodSamples1m += 1;
     this.scheduleWindowReset();

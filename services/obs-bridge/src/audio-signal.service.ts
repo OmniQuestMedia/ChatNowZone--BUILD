@@ -84,7 +84,7 @@ export class AudioSignalService {
     const prior = this.state.get(input.streamId);
     const next: AudioState = {
       creatorId: input.creatorId,
-      lastPositiveAtMs: present ? now : prior?.lastPositiveAtMs ?? null,
+      lastPositiveAtMs: present ? now : (prior?.lastPositiveAtMs ?? null),
       lastVocalRatio: input.vocalRatio,
     };
     this.state.set(input.streamId, next);
@@ -93,8 +93,7 @@ export class AudioSignalService {
       ? NATS_TOPICS.OBS_AUDIO_SIGNAL_PRESENT
       : NATS_TOPICS.OBS_AUDIO_SIGNAL_ABSENT;
     const reasonCode = present ? 'AUDIO_SIGNAL_PRESENT' : 'AUDIO_SIGNAL_ABSENT';
-    const correlationId =
-      input.correlationId ?? `obs-audio:${input.streamId}:${now}`;
+    const correlationId = input.correlationId ?? `obs-audio:${input.streamId}:${now}`;
     this.nats.publish(topic, {
       correlation_id: correlationId,
       reason_code: reasonCode,
@@ -125,8 +124,7 @@ export class AudioSignalService {
     const now = input.capturedAtMs ?? Date.now();
     const state = this.state.get(input.streamId);
     const lastPositive = state?.lastPositiveAtMs ?? null;
-    const fresh =
-      lastPositive !== null && now - lastPositive <= AUDIO_PRESENCE_WINDOW_MS;
+    const fresh = lastPositive !== null && now - lastPositive <= AUDIO_PRESENCE_WINDOW_MS;
 
     if (fresh) {
       return {

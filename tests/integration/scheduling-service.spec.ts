@@ -11,7 +11,7 @@
 import { randomUUID } from 'crypto';
 
 describe('SchedulingService', () => {
-  const correlation_id = `TEST-${randomUUID()}`;
+  const _correlation_id = `TEST-${randomUUID()}`;
 
   describe('createPeriod', () => {
     it('should calculate B-Lock cutoff at 21 days before period start', () => {
@@ -59,10 +59,10 @@ describe('SchedulingService', () => {
 
   describe('stat holiday pay', () => {
     it('should apply 1.5x multiplier for stat holidays', () => {
-      const STAT_HOLIDAY_PAY_MULTIPLIER = 1.50;
-      const baseRate = 22.00;
+      const STAT_HOLIDAY_PAY_MULTIPLIER = 1.5;
+      const baseRate = 22.0;
       const statRate = baseRate * STAT_HOLIDAY_PAY_MULTIPLIER;
-      expect(statRate).toBe(33.00);
+      expect(statRate).toBe(33.0);
     });
   });
 });

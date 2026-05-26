@@ -24,10 +24,7 @@
 
 import { Controller, Get, Param } from '@nestjs/common';
 import { PixelLegacyService } from './pixel-legacy.service';
-import {
-  PixelLegacyCreatorStatusPublic,
-  PixelLegacySeatMeterPublic,
-} from './dto/pixel-legacy.dto';
+import { PixelLegacyCreatorStatusPublic, PixelLegacySeatMeterPublic } from './dto/pixel-legacy.dto';
 
 @Controller('pixel-legacy')
 export class PixelLegacyController {

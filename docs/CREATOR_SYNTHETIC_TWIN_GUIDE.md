@@ -7,18 +7,21 @@ The Safe Synthetic Twin feature allows creators to offer AI-powered interactions
 ## Features
 
 ### 1. AI Image Generation
+
 - Fans can generate AI-powered images using your synthetic twin
 - Cost: **10 CZT tokens** per generation (~$0.90 USD)
 - **You earn 70%** of the token value (~$0.63 per generation)
 - Platform keeps 30% for infrastructure and ML processing
 
 ### 2. Voice Chat with TTS
+
 - Fans can send voice messages and receive TTS (text-to-speech) responses
 - Cost: **5 CZT tokens** for fan voice messages, **8 CZT tokens** for TTS responses
 - **You earn 70%** of all voice interaction costs
 - Supports ElevenLabs and Banana.dev voice synthesis
 
 ### 3. Group Chats with Synthetic Twins
+
 - Fans can create group chats that include your synthetic twin character
 - Multiple fans and synthetic twins can participate in one conversation
 - Text messages are free; voice messages are charged per the rates above
@@ -31,6 +34,7 @@ The Safe Synthetic Twin feature allows creators to offer AI-powered interactions
 4. **Save your settings**
 
 Once enabled:
+
 - Fans will see an "AI Image" button when chatting with you
 - Your synthetic twin will appear in the group chat participant list
 - You'll start earning from AI interactions immediately
@@ -60,34 +64,41 @@ GET /ai-analytics/creator/:creatorId/activity
 ## Financial Details
 
 ### Revenue Sharing
+
 - **Creator Share**: 70% of all token costs
 - **Platform Share**: 30% (covers ML processing, storage, infrastructure)
 
 ### Token Pricing
+
 - AI Image Generation: 10 CZT
 - Fan Voice Message: 5 CZT
 - TTS Response: 8 CZT
 
 ### Earnings Examples
+
 - 100 AI images = 1,000 CZT spent = $63 to you
 - 50 voice conversations (100 messages) = 650 CZT spent = $40.95 to you
 
 ### Payout
+
 AI earnings are added to your regular creator earnings and paid out according to the standard payout schedule.
 
 ## Best Practices
 
 ### 1. Enable Strategically
+
 - Turn on AI features during peak fan engagement times
 - Promote the feature to your audience on social media
 - Explain to fans how they can use the AI features
 
 ### 2. Monitor Analytics
+
 - Check your AI analytics daily
 - Identify which features fans use most
 - Adjust your promotion strategy based on data
 
 ### 3. Quality Control
+
 - AI-generated content is automatically monitored
 - Flagged content is reviewed by admins
 - You won't lose earnings from removed content (if flagged incorrectly)
@@ -108,6 +119,7 @@ You can disable Safe Synthetic Twin at any time:
 3. Save
 
 When disabled:
+
 - Fans cannot generate new AI content using your synthetic twin
 - Existing AI conversations are archived
 - Your analytics history is preserved
@@ -116,6 +128,7 @@ When disabled:
 ## Support
 
 For questions or issues:
+
 - Email: creator-support@chatnow.zone
 - In-app support: Creator Dashboard → Help
 - Documentation: `/docs/creator-guides/synthetic-twin.md`
@@ -123,6 +136,7 @@ For questions or issues:
 ## Technical Details (Optional)
 
 ### Database Models
+
 - `Creator.synthetic_twin_enabled` — Toggle field
 - `SyntheticTwinGeneration` — Image generation records
 - `ChatMessage` (message_type: 'VOICE') — Voice chat records
@@ -131,6 +145,7 @@ For questions or issues:
 ### API Endpoints
 
 **Image Generation:**
+
 ```
 POST /synthetic-twin/generate
   Body: { userId, creatorId, prompt?, organizationId, tenantId }
@@ -140,6 +155,7 @@ GET /synthetic-twin/earnings/:creatorId
 ```
 
 **Voice Chat:**
+
 ```
 POST /voice-chat/send
   Body: { conversationId, senderId, voiceUri?, transcript? }
@@ -149,6 +165,7 @@ POST /voice-chat/tts/generate
 ```
 
 **Group Chat:**
+
 ```
 POST /group-chat/create
   Body: { creatorId?, title?, initialParticipants }

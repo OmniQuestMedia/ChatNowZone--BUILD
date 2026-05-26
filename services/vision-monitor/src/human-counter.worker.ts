@@ -17,7 +17,7 @@ export class HumanCounterWorker {
     // Integration point for Python/FastAPI Vision microservice.
     return {
       humanCount: 1,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 }

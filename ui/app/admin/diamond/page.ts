@@ -564,26 +564,22 @@ function renderHighHeatVipQueue(rows: HighHeatVipRow[]): RenderElement {
                 el('td', {}, [row.remaining_usd_cents]),
                 el('td', {}, [row.velocity_band]),
                 el('td', {}, [row.detected_at_utc]),
-                el(
-                  'td',
-                  {},
-                  [
-                    el(
-                      'button',
-                      {
-                        test_id: `admin-diamond-high-heat-handoff-${row.session_id}`,
-                        classes: ['cnz-button', 'cnz-button--primary', 'cnz-button--sm'],
-                        on: { click: 'initiateHandoff' },
-                        props: {
-                          session_id: row.session_id,
-                          user_id: row.user_id,
-                          wallet_id: row.wallet_id,
-                        },
+                el('td', {}, [
+                  el(
+                    'button',
+                    {
+                      test_id: `admin-diamond-high-heat-handoff-${row.session_id}`,
+                      classes: ['cnz-button', 'cnz-button--primary', 'cnz-button--sm'],
+                      on: { click: 'initiateHandoff' },
+                      props: {
+                        session_id: row.session_id,
+                        user_id: row.user_id,
+                        wallet_id: row.wallet_id,
                       },
-                      ['Handoff'],
-                    ),
-                  ],
-                ),
+                    },
+                    ['Handoff'],
+                  ),
+                ]),
               ],
             ),
           ),
@@ -633,7 +629,12 @@ function renderOperatorQuoteGenerator(
             el('dt', {}, ['Platform rate']),
             el('dd', {}, [`$${quote.platform_rate_usd.toFixed(4)}/CZT`]),
             el('dt', {}, ['Floor applied']),
-            el('dd', {}, [formatFloorAppliedDisplay(quote.platform_floor_applied, quote.platform_floor_per_token_usd)]),
+            el('dd', {}, [
+              formatFloorAppliedDisplay(
+                quote.platform_floor_applied,
+                quote.platform_floor_per_token_usd,
+              ),
+            ]),
             el('dt', {}, ['USD total (cents)']),
             el('dd', {}, [quote.usd_total_cents]),
             el('dt', {}, ['Expires']),
@@ -641,35 +642,31 @@ function renderOperatorQuoteGenerator(
             el('dt', {}, ['Correlation ID']),
             el('dd', { classes: ['cnz-table__hash'] }, [quote.correlation_id]),
           ]),
-          el(
-            'div',
-            { classes: ['cnz-cta-row'] },
-            [
-              el(
-                'button',
-                {
-                  test_id: 'admin-diamond-operator-quote-confirm',
-                  classes: ['cnz-button', 'cnz-button--primary'],
-                  on: { click: 'confirmOperatorQuote' },
-                  props: {
-                    correlation_id: quote.correlation_id,
-                    step_up_auth_required: true,
-                  },
-                  aria: { 'aria-label': 'Confirm quote — requires step-up authentication' },
+          el('div', { classes: ['cnz-cta-row'] }, [
+            el(
+              'button',
+              {
+                test_id: 'admin-diamond-operator-quote-confirm',
+                classes: ['cnz-button', 'cnz-button--primary'],
+                on: { click: 'confirmOperatorQuote' },
+                props: {
+                  correlation_id: quote.correlation_id,
+                  step_up_auth_required: true,
                 },
-                ['Confirm Quote (step-up auth required)'],
-              ),
-              el(
-                'button',
-                {
-                  test_id: 'admin-diamond-operator-quote-discard',
-                  classes: ['cnz-button', 'cnz-button--ghost'],
-                  on: { click: 'discardOperatorQuote' },
-                },
-                ['Discard'],
-              ),
-            ],
-          ),
+                aria: { 'aria-label': 'Confirm quote — requires step-up authentication' },
+              },
+              ['Confirm Quote (step-up auth required)'],
+            ),
+            el(
+              'button',
+              {
+                test_id: 'admin-diamond-operator-quote-discard',
+                classes: ['cnz-button', 'cnz-button--ghost'],
+                on: { click: 'discardOperatorQuote' },
+              },
+              ['Discard'],
+            ),
+          ]),
         ],
       )
     : el('p', { classes: ['cnz-panel__empty-msg'] }, [

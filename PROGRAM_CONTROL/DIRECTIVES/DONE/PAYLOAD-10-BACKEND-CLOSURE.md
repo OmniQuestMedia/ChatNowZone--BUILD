@@ -16,6 +16,7 @@ features remain deferred.
 ## Scope of Closure (Payload 10)
 
 ### Schema & Invariant
+
 - PAY-006/PAY-011: heat_score_at_tip, payout_rate_applied, diamond_floor_active
   on Transaction; new immutable PayoutRateLock table for purchase-moment lock.
 - DIA-003/DIA-004: Diamond Concierge risk-assessment fields on RiskAssessment
@@ -27,6 +28,7 @@ features remain deferred.
   every new table.
 
 ### Core Engines
+
 - Risk Engine (D002) — full RiskEngineService with composite scoring
   (region + behavioural + Diamond Concierge intake risk), NATS emission,
   immutable audit hook, GateGuard pre-processor handoff.
@@ -37,19 +39,22 @@ features remain deferred.
   records on Transaction record, persists in PayoutRateLock, guarantees
   the locked rate at payout time.
 - RedBook integration confirmed across rate-card resolver + recovery rules
-  + Diamond floor (TOK-009 wiring).
+  - Diamond floor (TOK-009 wiring).
 
 ### Cyrano & Integration
+
 - Cyrano L2 foundations — LLMProvider interface (CYR-006), in-memory provider
   scaffold + Anthropic Claude reference, prompt template engine, persistent
   session memory persistence.
 - Integration Hub — pre-ledger Risk decision handoff alongside GateGuard.
 
 ### Compliance & Safety
+
 - WORM export integrity check still passes; legal_holds.correlation_id
   remains backed by migration 20260428130000.
 
 ### Testing & Verification
+
 - New E2E test: full backend purchase → FFS scoring → payout rate lock → ledger
   entry → audit chain.
 - ship-gate-verifier extended with Payload-10 backend-closure checks.

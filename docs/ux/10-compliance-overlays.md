@@ -20,12 +20,14 @@ displayed to a guest, AI-assisted creator copy in profiles or messages.
 (authoritative source — wireframes do not override the string).
 
 **Where it appears:**
+
 - Chat lane (when output is AI-generated)
 - Cyrano whisper console suggestions (server output before it's spoken / typed by creator — different rule than user-facing AI output; consult engineering on edge cases)
 - AI-assisted creator profile copy
 - Any persona-driven response
 
 **Where it does NOT appear:**
+
 - Human-typed creator messages
 - System notifications (toasts, banners)
 - Operator administrative copy
@@ -42,6 +44,7 @@ displayed to a guest, AI-assisted creator copy in profiles or messages.
 cannot dismiss. Component: `<SovereignCaCGate />`.
 
 **Surfaces affected:**
+
 - `/` (marketing landing — only adult-content sections)
 - `/sign-up` (when adult sub-flow selected)
 - All authenticated VIP surfaces
@@ -51,6 +54,7 @@ cannot dismiss. Component: `<SovereignCaCGate />`.
 **Reason codes:** `SOVEREIGN_CAC_BLOCK`, `AGE_VERIFICATION_REQUIRED`, `AGE_REVERIFY_DUE`.
 
 **Re-verify cadence:** Per `MEMBERSHIP_LIFECYCLE_POLICY.md`:
+
 - VIP (free): every 30 days
 - Paid tiers: on each new purchase
 
@@ -69,6 +73,7 @@ mutation that crosses a financial threshold.
 **Reason codes:** `KYC_REQUIRED`, `KYC_PENDING`, `KYC_FAILED`.
 
 **Wireframes must include:**
+
 - Initial gate state ("Verify your identity to continue")
 - Wizard steps (provider-driven; copy varies)
 - Pending state (with expected wait time)
@@ -87,6 +92,7 @@ Component: `<StepUpModal />`.
 **State machine:** see [`03-state-machines.md`](03-state-machines.md) §9.
 
 **Wireframes must include:**
+
 - Challenge state (factor entry)
 - Attempts-remaining indicator
 - Granted state (modal closes; action resumes in original context)
@@ -101,12 +107,12 @@ Component: `<StepUpModal />`.
 
 **Trigger:** WGS computation crossing a threshold band. Bands:
 
-| Band | Reason code | Treatment |
-|------|-------------|-----------|
-| 0–39 (GREEN) | (none) | No overlay |
-| 40–69 (NUDGE) | `SOFT_NUDGE` | **Banner.** Dismissible. Non-blocking. Copy slot: "Take a moment — does this still feel right?" |
-| 70–89 (PAUSE) | `COOL_DOWN` | **Modal.** Non-dismissible. 5-minute countdown timer. Copy slot: "Let's pause for 5 minutes." |
-| 90+ (HARD) | `HARD_DECLINE_HCZ` | **Full-screen overlay.** Non-dismissible. Component: `<HCZContactCTA />`. Copy slot: "We've paused this session. → [talk to a real person from HCZ]" |
+| Band          | Reason code        | Treatment                                                                                                                                            |
+| ------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0–39 (GREEN)  | (none)             | No overlay                                                                                                                                           |
+| 40–69 (NUDGE) | `SOFT_NUDGE`       | **Banner.** Dismissible. Non-blocking. Copy slot: "Take a moment — does this still feel right?"                                                      |
+| 70–89 (PAUSE) | `COOL_DOWN`        | **Modal.** Non-dismissible. 5-minute countdown timer. Copy slot: "Let's pause for 5 minutes."                                                        |
+| 90+ (HARD)    | `HARD_DECLINE_HCZ` | **Full-screen overlay.** Non-dismissible. Component: `<HCZContactCTA />`. Copy slot: "We've paused this session. → [talk to a real person from HCZ]" |
 
 **Wireframes must show:** every band as its own visual treatment. Never
 silent. Never punitive. Never imply user fault.
@@ -125,6 +131,7 @@ Component: `<GeoBlockOverlay />` (full-screen for `GEO_BLOCKED`),
 `<InlineBlockNotice />` (for sign-up form blocks).
 
 **Wireframes must include:**
+
 - The block reason in plain language
 - No CTA that would let the user "try again" (the block is server-enforced; retrying won't change the outcome)
 - A support handoff path for genuine errors (e.g., a Canadian guest on a hotel VPN that geolocates as US)
@@ -149,6 +156,7 @@ as the deadline approaches. Component: `<IdentityReverifyPrompt />`.
 slot: "This account is under legal hold. → [contact compliance]".
 
 **Wireframes must NOT** show:
+
 - Why the hold was triggered (operator-only)
 - Who triggered it
 - The hold's expected duration (if known)
@@ -167,6 +175,7 @@ Alpha. Component: `<TestModeBanner />`. Copy slot: "Alpha test mode —
 no real payment will be charged."
 
 **Surfaces affected:**
+
 - `/tokens`
 - `/diamond/purchase`
 - Cyrano top-up modal

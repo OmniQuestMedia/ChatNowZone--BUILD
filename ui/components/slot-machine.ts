@@ -2,10 +2,7 @@
 
 import { el, RenderElement } from './render-plan';
 import { renderHoldRelease } from './wheel-of-fortune';
-import type {
-  PrizePoolEntryViewModel,
-  PaymentMethod,
-} from '../types/gamification-contracts';
+import type { PrizePoolEntryViewModel, PaymentMethod } from '../types/gamification-contracts';
 
 export interface SlotMachineInputs {
   creator_id: string;
@@ -60,9 +57,7 @@ export function renderSlotMachine(inputs: SlotMachineInputs): RenderElement {
       ),
       renderHoldRelease({
         test_id: 'game-slot-pull-button',
-        label: inputs.ready
-          ? 'Hold to pull'
-          : (inputs.cooldown_message ?? 'Cooling down'),
+        label: inputs.ready ? 'Hold to pull' : (inputs.cooldown_message ?? 'Cooling down'),
         disabled: !inputs.ready,
         on_release: 'slotPullRelease',
         require_shake: false,

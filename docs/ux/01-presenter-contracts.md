@@ -13,13 +13,13 @@ them.
 
 ## Frozen presenter files
 
-| File | Surface(s) | Key interfaces |
-|------|-----------|----------------|
-| `ui/types/admin-diamond-contracts.ts` | `/admin/diamond` Diamond Concierge Command Center, `/admin/recovery` CS Recovery Command Center | `DiamondLiquidityView`, `DiamondVelocityRow`, `RecoveryStageTag`, `DiamondKpiCard`, audit-chain row |
-| `ui/types/creator-control-contracts.ts` | `/creator/control` CreatorControl.Zone, `/creator/cyrano-panel` Cyrano L1 whisper feed | `FfsTier` (`COLD`\|`WARM`\|`HOT`\|`INFERNO`), `CyranoCategory` (8 categories), Broadcast Timing Copilot, Session Monitoring, persona switcher, payout indicator |
-| `ui/types/creator-panel-contracts.ts` | Creator dashboard surfaces beyond the live-control surface | Earnings, payout history, persona library |
-| `ui/types/gamification-contracts.ts` | Game UIs (dice, slot machine, wheel of fortune) | Game session, outcome, payout shape |
-| `ui/types/public-wallet-contracts.ts` | `/wallet`, `/tokens`, `/diamond/purchase` | Three-bucket display, REDBOOK rate-card view, volume + velocity quote, $0.077 platform-floor flag |
+| File                                    | Surface(s)                                                                                      | Key interfaces                                                                                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ui/types/admin-diamond-contracts.ts`   | `/admin/diamond` Diamond Concierge Command Center, `/admin/recovery` CS Recovery Command Center | `DiamondLiquidityView`, `DiamondVelocityRow`, `RecoveryStageTag`, `DiamondKpiCard`, audit-chain row                                                             |
+| `ui/types/creator-control-contracts.ts` | `/creator/control` CreatorControl.Zone, `/creator/cyrano-panel` Cyrano L1 whisper feed          | `FfsTier` (`COLD`\|`WARM`\|`HOT`\|`INFERNO`), `CyranoCategory` (8 categories), Broadcast Timing Copilot, Session Monitoring, persona switcher, payout indicator |
+| `ui/types/creator-panel-contracts.ts`   | Creator dashboard surfaces beyond the live-control surface                                      | Earnings, payout history, persona library                                                                                                                       |
+| `ui/types/gamification-contracts.ts`    | Game UIs (dice, slot machine, wheel of fortune)                                                 | Game session, outcome, payout shape                                                                                                                             |
+| `ui/types/public-wallet-contracts.ts`   | `/wallet`, `/tokens`, `/diamond/purchase`                                                       | Three-bucket display, REDBOOK rate-card view, volume + velocity quote, $0.077 platform-floor flag                                                               |
 
 ---
 
@@ -65,13 +65,13 @@ Each file uses three layers:
 
 ## Open contract gaps (will close before Alpha cutover)
 
-| Gap | Owner | Tracking |
-|-----|-------|----------|
+| Gap                                                          | Owner                                               | Tracking                                         |
+| ------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------ |
 | Cyrano L2 standalone — tier-graduated access policy contract | `services/core-api/src/cyrano/cyrano-auth.types.ts` | Directive `CYRANO-ACCESS-POLICY-001` (in flight) |
-| Pixel Legacy creator type contract | `ui/types/creator-panel-contracts.ts` | Directive `PIXEL-LEGACY-001` (in flight) |
-| Admin Cyrano access-policy editor presenter | New file `ui/types/admin-cyrano-contracts.ts` | Pulled in by `CYRANO-ACCESS-POLICY-001` |
-| Admin Pixel Legacy seat-cap presenter | New file `ui/types/admin-pixel-legacy-contracts.ts` | Pulled in by `PIXEL-LEGACY-001` |
-| Public guest landing + sign-in/up | New file `ui/types/public-onboarding-contracts.ts` | Will be authored alongside Next.js app bootstrap |
+| Pixel Legacy creator type contract                           | `ui/types/creator-panel-contracts.ts`               | Directive `PIXEL-LEGACY-001` (in flight)         |
+| Admin Cyrano access-policy editor presenter                  | New file `ui/types/admin-cyrano-contracts.ts`       | Pulled in by `CYRANO-ACCESS-POLICY-001`          |
+| Admin Pixel Legacy seat-cap presenter                        | New file `ui/types/admin-pixel-legacy-contracts.ts` | Pulled in by `PIXEL-LEGACY-001`                  |
+| Public guest landing + sign-in/up                            | New file `ui/types/public-onboarding-contracts.ts`  | Will be authored alongside Next.js app bootstrap |
 
 These five files are the only presenter additions planned for Alpha.
 Anything beyond these is post-Alpha scope.

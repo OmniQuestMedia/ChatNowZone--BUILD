@@ -197,7 +197,7 @@ export class SynthiMatesAiClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
           'X-CNZ-Request-ID': randomUUID(),
         },
         body: JSON.stringify(payload),

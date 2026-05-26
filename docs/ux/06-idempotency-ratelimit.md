@@ -30,13 +30,14 @@ double-charges, ghost transactions, or stuck retries in production.
 
 The server returns one of three outcomes for any retried mutation:
 
-| HTTP | Meaning | UI behavior |
-|------|---------|-------------|
-| **200** with no `replay` flag | Fresh write succeeded | Render success state. |
-| **200** with `replay: true` and identical payload | Idempotent replay — server returned the original result | Render success state. **Do not show "duplicate" or "already done" copy** — that confuses users. The state is correct; show it. |
+| HTTP                                                 | Meaning                                                 | UI behavior                                                                                                                           |
+| ---------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **200** with no `replay` flag                        | Fresh write succeeded                                   | Render success state.                                                                                                                 |
+| **200** with `replay: true` and identical payload    | Idempotent replay — server returned the original result | Render success state. **Do not show "duplicate" or "already done" copy** — that confuses users. The state is correct; show it.        |
 | **409** `reason_code: IDEMPOTENCY_DIVERGENT_PAYLOAD` | Same `correlation_id` was used with a different payload | Show divergence error: "This request differs from an earlier attempt. → [refresh and try again]" — wireframe must include this state. |
 
 The 409 path commonly fires when:
+
 - The user edits a form mid-retry (e.g. types in the amount, then retries).
 - Two browser tabs share a `correlation_id` from sessionStorage and one tab edited locally.
 - A flaky network caused a partial submit; the user reloaded and re-typed values.
@@ -53,6 +54,7 @@ Returned `reason_code: RATE_LIMITED_PER_SECOND` (or similar). Headers
 include `Retry-After` (seconds).
 
 UI behavior:
+
 - **Auto-retry once** with exponential backoff (1s, then 2s, then 4s — three attempts max).
 - During retry, wireframe shows a non-blocking spinner / "retrying…" state, **not** an error toast (the user didn't fail; the system asked for a moment).
 - After three failures, surface: "We're rate-limited right now. Try again in {Retry-After} seconds."
@@ -68,13 +70,13 @@ exponential backoff on disconnect.
 
 UI behavior:
 
-| Connection state | UX surface |
-|-----------------|-----------|
-| `CONNECTED` | (No banner; live data flows) |
+| Connection state            | UX surface                                                                                     |
+| --------------------------- | ---------------------------------------------------------------------------------------------- |
+| `CONNECTED`                 | (No banner; live data flows)                                                                   |
 | `RECONNECTING` (within 30s) | Subtle indicator near the affected widget — small dot or fade pattern. Do **not** lock the UI. |
-| `RECONNECTING` (> 30s) | Promote to a full banner: "Reconnecting to live updates…" |
-| `DISCONNECTED` (gave up) | Banner: "Live updates paused. → [reload]" |
-| `RECOVERED` | Brief toast: "Reconnected" — auto-dismiss in 2s |
+| `RECONNECTING` (> 30s)      | Promote to a full banner: "Reconnecting to live updates…"                                      |
+| `DISCONNECTED` (gave up)    | Banner: "Live updates paused. → [reload]"                                                      |
+| `RECOVERED`                 | Brief toast: "Reconnected" — auto-dismiss in 2s                                                |
 
 **Forbidden:** silent failure. NATS-driven widgets that go stale
 without a connection-state cue are a P0 wireframe violation.

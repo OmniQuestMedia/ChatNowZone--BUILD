@@ -195,12 +195,8 @@ function renderRecoveryOptions(view: MembershipLifecycleView): RenderElement {
     },
     [
       el('h2', {}, ['Recovery options']),
-      view.token_bridge_offer
-        ? renderTokenBridgeCard(view.token_bridge_offer)
-        : null,
-      view.three_fifths_exit_offer
-        ? renderThreeFifthsCard(view.three_fifths_exit_offer)
-        : null,
+      view.token_bridge_offer ? renderTokenBridgeCard(view.token_bridge_offer) : null,
+      view.three_fifths_exit_offer ? renderThreeFifthsCard(view.three_fifths_exit_offer) : null,
       renderTopUpCard(view.top_up_summary),
     ].filter(Boolean) as RenderElement[],
   );
@@ -305,25 +301,21 @@ function renderTopUpCard(summary: TopUpCztSummary): RenderElement {
         'Purchase additional CZT tokens to renew your membership. ' +
           `Your tier stipend is ${summary.tier_stipend_czt} CZT/month.`,
       ]),
-      el(
-        'dl',
-        { classes: ['cnz-stat-grid', 'cnz-stat-grid--inline'] },
-        [
-          el('dt', {}, ['Total balance']),
-          el('dd', { test_id: 'membership-top-up-total' }, [summary.total_tokens]),
-          ...summary.buckets.flatMap((b) => [
-            el('dt', {}, [`${b.bucket} (priority ${b.spend_priority})`]),
-            el(
-              'dd',
-              {
-                test_id: `membership-top-up-bucket-${b.bucket}`,
-                props: { spend_priority: b.spend_priority },
-              },
-              [b.balance_tokens],
-            ),
-          ]),
-        ],
-      ),
+      el('dl', { classes: ['cnz-stat-grid', 'cnz-stat-grid--inline'] }, [
+        el('dt', {}, ['Total balance']),
+        el('dd', { test_id: 'membership-top-up-total' }, [summary.total_tokens]),
+        ...summary.buckets.flatMap((b) => [
+          el('dt', {}, [`${b.bucket} (priority ${b.spend_priority})`]),
+          el(
+            'dd',
+            {
+              test_id: `membership-top-up-bucket-${b.bucket}`,
+              props: { spend_priority: b.spend_priority },
+            },
+            [b.balance_tokens],
+          ),
+        ]),
+      ]),
       el(
         'button',
         {

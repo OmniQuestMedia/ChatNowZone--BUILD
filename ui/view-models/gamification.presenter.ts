@@ -58,8 +58,8 @@ export function presentCreatorGamificationDashboard(
     const cfg = configs.find((c) => c.game_type === gt);
     const tier_stat = analytics.per_game.find((g) => g.game_type === gt);
     const active_pool = cfg
-      ? pools.find((p) => p.pool_id === cfg.prize_pool_id) ?? null
-      : pools.find((p) => p.scoped_game_type === gt || p.scoped_game_type === null) ?? null;
+      ? (pools.find((p) => p.pool_id === cfg.prize_pool_id) ?? null)
+      : (pools.find((p) => p.scoped_game_type === gt || p.scoped_game_type === null) ?? null);
     return {
       game_type: gt,
       display_name: DISPLAY_NAME[gt],

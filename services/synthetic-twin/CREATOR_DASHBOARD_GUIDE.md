@@ -141,18 +141,21 @@ When a creator enables synthetic twins, fans see:
 ### Feature Descriptions for Fans
 
 **AI Image Generation**
+
 - Cost: 10 ChatZone Tokens (CZT)
 - What you get: Unique AI-generated image using creator's synthetic twin
 - Delivery: ~2-5 seconds via webhook callback
 - Optional: Add text prompt to customize the image
 
 **Voice Messages**
+
 - Cost: 15 ChatZone Tokens (CZT)
 - What you get: AI-powered voice response with TTS (text-to-speech)
 - Delivery: Real-time or within seconds
 - Features: Transcript saved for accessibility
 
 **Group Chat with Synthetic Twin**
+
 - Cost: 5 CZT per synthetic twin message
 - What you get: Participate in group chats that include creator's AI twin
 - Features: Text, voice, and image messages supported
@@ -281,6 +284,7 @@ When a creator enables synthetic twins, fans see:
 ## Integration with Existing Features
 
 ### No Impact on Core Streaming
+
 - OBS integration works identically
 - Live streaming continues unaffected
 - Tipping system unchanged
@@ -288,11 +292,13 @@ When a creator enables synthetic twins, fans see:
 - Performer tools unchanged
 
 ### Additive Revenue Stream
+
 - AI earnings are **in addition to** existing revenue
 - Creators earn from both live streaming AND AI features
 - No cannibalization of existing revenue sources
 
 ### Separate Analytics
+
 - AI earnings tracked separately in dashboard
 - Live streaming analytics unchanged
 - Combined totals available in main dashboard
@@ -300,17 +306,20 @@ When a creator enables synthetic twins, fans see:
 ## Security & Privacy
 
 ### Creator Control
+
 - Only creators can enable/disable AI features
 - Creators can disable at any time (instant effect)
 - No AI content generated when toggle is off
 
 ### Content Moderation
+
 - All AI-generated content goes through moderation queue
 - Admins can flag/remove inappropriate content
 - Automated flagging for policy violations
 - Full audit trail of all AI interactions
 
 ### PII Protection
+
 - No raw PII sent to SynthiMatesAi API
 - Only creator/user IDs and prompts sent
 - Results returned via secure webhook
@@ -319,22 +328,27 @@ When a creator enables synthetic twins, fans see:
 ## Onboarding Flow
 
 ### Step 1: Creator Notification
+
 When synthetic twin features become available:
+
 - In-app notification: "New AI features available!"
 - Email: "Earn more with AI synthetic twins"
 - Dashboard banner: "Enable AI features to increase earnings"
 
 ### Step 2: Feature Explanation
+
 - Video tutorial: "How AI synthetic twins work"
 - FAQ: "Common questions about AI features"
 - Examples: "See what fans will experience"
 
 ### Step 3: Toggle Activation
+
 - Simple one-click toggle in dashboard
 - Confirmation modal: "Are you sure you want to enable AI features?"
 - Success message: "AI features enabled! Fans can now use synthetic twin services."
 
 ### Step 4: First Earnings
+
 - Real-time notification when first AI generation completes
 - Earnings added to dashboard
 - Encouragement: "You just earned $0.63 from your first AI image!"

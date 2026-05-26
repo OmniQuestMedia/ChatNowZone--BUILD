@@ -29,9 +29,9 @@ export const CREATOR_PRESENTER_RULE_ID = 'CREATOR_CONTROL_UI_v1';
 /** Tier-boundary lookup aligned to canonical GovernanceConfig.HEAT_BAND_* constants
  *  (mirror of FFS TIER_THRESHOLDS in services/creator-control/src/ffs.engine.ts). */
 const TIER_BOUNDS: Record<FfsTier, { min: number; max: number }> = {
-  COLD:    { min: 0,  max: 34 },  // GovernanceConfig.HEAT_BAND_COLD_MAX = 33; max exclusive
-  WARM:    { min: 34, max: 61 },  // GovernanceConfig.HEAT_BAND_WARM_MAX = 60
-  HOT:     { min: 61, max: 86 },  // GovernanceConfig.HEAT_BAND_HOT_MAX = 85
+  COLD: { min: 0, max: 34 }, // GovernanceConfig.HEAT_BAND_COLD_MAX = 33; max exclusive
+  WARM: { min: 34, max: 61 }, // GovernanceConfig.HEAT_BAND_WARM_MAX = 60
+  HOT: { min: 61, max: 86 }, // GovernanceConfig.HEAT_BAND_HOT_MAX = 85
   INFERNO: { min: 86, max: 101 }, // 86–100 inclusive; max exclusive = 101
 };
 
@@ -246,9 +246,7 @@ export class CreatorControlPresenter {
     rows: AggregatedChatRow[],
     now: Date,
   ): AggregatedChatFeedPanel {
-    const sorted = [...rows]
-      .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
-      .slice(0, 50);
+    const sorted = [...rows].sort((a, b) => b.timestamp.localeCompare(a.timestamp)).slice(0, 50);
     return {
       creator_id,
       platform_filters: ['ALL', 'CNZ', 'OBS', 'TWITCH', 'YOUTUBE', 'TIKTOK', 'UNKNOWN'],
@@ -336,8 +334,7 @@ export class CreatorControlPresenter {
       .slice()
       .sort((a, b) => b.emitted_at_utc.localeCompare(a.emitted_at_utc))[0];
     const latencyObs = latestSuggestion?.latency_ms ?? null;
-    const withinSla =
-      latencyObs !== null ? latencyObs <= inputs.cyrano_latency_sla_ms : true;
+    const withinSla = latencyObs !== null ? latencyObs <= inputs.cyrano_latency_sla_ms : true;
 
     return {
       creator_id: inputs.creator_id,

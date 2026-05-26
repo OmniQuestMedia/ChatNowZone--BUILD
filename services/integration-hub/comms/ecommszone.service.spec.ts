@@ -15,9 +15,7 @@ import { createHmac } from 'crypto';
 
 // ── Stub client ───────────────────────────────────────────────────────────────
 
-const makeStubClient = (
-  overrides: Partial<IECommsZoneClient> = {},
-): IECommsZoneClient => ({
+const makeStubClient = (overrides: Partial<IECommsZoneClient> = {}): IECommsZoneClient => ({
   async dispatch(req: ECommsDispatchRequest): Promise<ECommsDispatchResult> {
     return {
       success: true,

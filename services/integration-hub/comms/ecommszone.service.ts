@@ -131,7 +131,10 @@ export class ECommsZoneService {
 
     // Constant-time comparison — no timing oracle
     try {
-      return timingSafeEqual(Buffer.from(event.hmac_signature, 'hex'), Buffer.from(expected, 'hex'));
+      return timingSafeEqual(
+        Buffer.from(event.hmac_signature, 'hex'),
+        Buffer.from(expected, 'hex'),
+      );
     } catch {
       // Buffers of different lengths → invalid signature
       return false;
@@ -174,8 +177,7 @@ export class ECommsZoneService {
   private assertNoPii(req: ECommsDispatchRequest): void {
     const ref = req.pii_vault_ref ?? '';
     // Valid vault ref is UUID v4: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-    const uuidV4Pattern =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidV4Pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
     if (!uuidV4Pattern.test(ref)) {
       const err = new Error(

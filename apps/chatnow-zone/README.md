@@ -55,13 +55,13 @@ Next.js:
 
 ## Wired routes (Alpha bootstrap)
 
-| Route | Page builder | Notes |
-|-------|-------------|-------|
-| `/` | (inline placeholder) | Replaced by the marketing landing once Creative ships visual direction. |
-| `/tokens` | `ui/app/tokens/page.ts` | REDBOOK §3 bundles. Public. Self-contained — no API fetch. Query: `?tier=`, `?promoted=`. |
-| `/diamond/purchase` | `ui/app/diamond/purchase/page.ts` | Diamond volume + velocity quote. Public. Self-contained — no API fetch. Query: `?tokens=`, `?velocity_days=`. |
-| `/wallet` | `ui/app/wallet/page.ts` | Three-bucket wallet. **Stub** — synthetic balances + demo banner; wallet read endpoint not yet built (`WALLET-READ-API-001` follow-up). Query: `?user=`, `?tier=`, `?welfare_score=`. |
-| `/creator/pixel-legacy` | `ui/app/creator/pixel-legacy/page.ts` | FCFS gateway status display. Real API fetch. Query: `?creator=`. |
+| Route                   | Page builder                          | Notes                                                                                                                                                                                 |
+| ----------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                     | (inline placeholder)                  | Replaced by the marketing landing once Creative ships visual direction.                                                                                                               |
+| `/tokens`               | `ui/app/tokens/page.ts`               | REDBOOK §3 bundles. Public. Self-contained — no API fetch. Query: `?tier=`, `?promoted=`.                                                                                             |
+| `/diamond/purchase`     | `ui/app/diamond/purchase/page.ts`     | Diamond volume + velocity quote. Public. Self-contained — no API fetch. Query: `?tokens=`, `?velocity_days=`.                                                                         |
+| `/wallet`               | `ui/app/wallet/page.ts`               | Three-bucket wallet. **Stub** — synthetic balances + demo banner; wallet read endpoint not yet built (`WALLET-READ-API-001` follow-up). Query: `?user=`, `?tier=`, `?welfare_score=`. |
+| `/creator/pixel-legacy` | `ui/app/creator/pixel-legacy/page.ts` | FCFS gateway status display. Real API fetch. Query: `?creator=`.                                                                                                                      |
 
 Routes still to wire:
 

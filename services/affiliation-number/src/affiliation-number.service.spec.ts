@@ -58,9 +58,9 @@ describe('AffiliationNumberService', () => {
     });
 
     it.each([5, 10, 0, -1])('rejects length %d outside 6-9 range', async (length) => {
-      await expect(
-        svc.generate({ length, existsCheck: async () => false }),
-      ).rejects.toThrow(/invalid length/);
+      await expect(svc.generate({ length, existsCheck: async () => false })).rejects.toThrow(
+        /invalid length/,
+      );
     });
 
     it('retries on collision and succeeds when probe finally returns false', async () => {

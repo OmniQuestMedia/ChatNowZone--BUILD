@@ -46,7 +46,7 @@ export const OUTBOUND_WEBHOOK_RULE_ID = 'OUTBOUND_WEBHOOK_v1' as const;
  *   OUTBOUND_WEBHOOK_URL_MARKETPLACE_BUILD
  */
 const PARTNER_ENDPOINT_ENV_KEYS: Record<OutboundWebhookPartner, string> = {
-  REDROOM_REWARDS:   'OUTBOUND_WEBHOOK_URL_REDROOM_REWARDS',
+  REDROOM_REWARDS: 'OUTBOUND_WEBHOOK_URL_REDROOM_REWARDS',
   MARKETPLACE_BUILD: 'OUTBOUND_WEBHOOK_URL_MARKETPLACE_BUILD',
 };
 
@@ -190,7 +190,10 @@ export class OutboundWebhookService {
 
     const refs: Array<[string, string | undefined]> = [
       ['pii_vault_ref', (payload as { pii_vault_ref?: string }).pii_vault_ref],
-      ['creator_pii_vault_ref', (payload as { creator_pii_vault_ref?: string }).creator_pii_vault_ref],
+      [
+        'creator_pii_vault_ref',
+        (payload as { creator_pii_vault_ref?: string }).creator_pii_vault_ref,
+      ],
     ];
 
     for (const [field, value] of refs) {

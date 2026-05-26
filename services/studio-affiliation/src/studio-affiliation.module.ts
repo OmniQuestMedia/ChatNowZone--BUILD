@@ -19,11 +19,7 @@ import { StudioService } from './studio.service';
 
 @Module({
   imports: [AffiliationNumberModule],
-  controllers: [
-    StudioController,
-    StudioDashboardController,
-    StudioContractController,
-  ],
+  controllers: [StudioController, StudioDashboardController, StudioContractController],
   providers: [
     StudioService,
     StudioCommissionService,

@@ -71,7 +71,8 @@ export class CyranoWebhookService {
 
     try {
       // Get signing secret from env (should be in AWS Secrets Manager)
-      const signingSecret = process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
+      const signingSecret =
+        process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
 
       // Compute HMAC signature for request
       const webhookPayload: Omit<LedgerEntryAppendedPayload, 'hmac_signature'> = {

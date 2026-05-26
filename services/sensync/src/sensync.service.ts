@@ -225,9 +225,11 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    const scopes = (args.scopes && args.scopes.length > 0
-      ? Array.from(new Set(args.scopes))
-      : [...SENSYNC_DEFAULT_CONSENT_SCOPES]) as SenSyncConsentScope[];
+    const scopes = (
+      args.scopes && args.scopes.length > 0
+        ? Array.from(new Set(args.scopes))
+        : [...SENSYNC_DEFAULT_CONSENT_SCOPES]
+    ) as SenSyncConsentScope[];
 
     const ttl = clampTtlSeconds(args.ttl_seconds);
     const consent_expires_at = new Date(now.getTime() + ttl * 1000);
@@ -350,13 +352,9 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
         where: { id: row.id },
         data: {
           consent_scopes: next,
-          basis: (fullyRevoked
-            ? 'REVOKED'
-            : 'PARTIALLY_REVOKED') satisfies SenSyncConsentBasis,
+          basis: (fullyRevoked ? 'REVOKED' : 'PARTIALLY_REVOKED') satisfies SenSyncConsentBasis,
           consent_revoked_at: fullyRevoked ? now : null,
-          reason_code: fullyRevoked
-            ? 'SENSYNC_CONSENT_REVOKED'
-            : 'SENSYNC_CONSENT_SCOPE_REVOKED',
+          reason_code: fullyRevoked ? 'SENSYNC_CONSENT_REVOKED' : 'SENSYNC_CONSENT_SCOPE_REVOKED',
           correlation_id: args.correlation_id,
         },
       });
@@ -404,9 +402,7 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
       scope: args.scope,
       domain: state?.domain ?? 'ADULT_ENTERTAINMENT',
       correlation_id: args.correlation_id,
-      reason_code: fullyRevokedAny
-        ? 'SENSYNC_CONSENT_REVOKED'
-        : 'SENSYNC_CONSENT_SCOPE_REVOKED',
+      reason_code: fullyRevokedAny ? 'SENSYNC_CONSENT_REVOKED' : 'SENSYNC_CONSENT_SCOPE_REVOKED',
     });
 
     this.logger.log('SenSyncService: scope revoked', {
@@ -599,8 +595,7 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
     // Phase 3 — derive quality_boost_points (10..25) from adapter quality.
     const quality_score = this.deriveQualityScore(sample.bridge);
     const quality_boost_points = Math.round(
-      SENSYNC_FFS_BOOST_MIN +
-        (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN) * quality_score,
+      SENSYNC_FFS_BOOST_MIN + (SENSYNC_FFS_BOOST_MAX - SENSYNC_FFS_BOOST_MIN) * quality_score,
     );
 
     const activeScopes = Array.from(cached.scopes) as SenSyncConsentScope[];
@@ -876,11 +871,7 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
     this.logger.warn('SenSyncService: plausibility rejection', rejection);
   }
 
-  private emitTierDisabled(
-    session_id: string,
-    guest_id: string,
-    tier: MembershipTier,
-  ): void {
+  private emitTierDisabled(session_id: string, guest_id: string, tier: MembershipTier): void {
     const event: SenSyncTierDisabledEvent = {
       event_id: randomUUID(),
       session_id,
@@ -900,7 +891,9 @@ export class SenSyncService implements OnModuleInit, OnModuleDestroy {
    * Phase 5.3 — emit an immutable audit event onto NATS for the platform
    * audit pipeline. Best-effort; never throws.
    */
-  private emitAudit(args: Omit<SenSyncAuditEvent, 'audit_id' | 'occurred_at_utc' | 'rule_applied_id'>): void {
+  private emitAudit(
+    args: Omit<SenSyncAuditEvent, 'audit_id' | 'occurred_at_utc' | 'rule_applied_id'>,
+  ): void {
     try {
       const event: SenSyncAuditEvent = {
         audit_id: randomUUID(),
@@ -980,7 +973,8 @@ function parseScopeArray(raw: unknown): SenSyncConsentScope[] {
   ];
   if (!Array.isArray(raw)) return [];
   const filtered = raw.filter(
-    (s): s is SenSyncConsentScope => typeof s === 'string' && (KNOWN as readonly string[]).includes(s),
+    (s): s is SenSyncConsentScope =>
+      typeof s === 'string' && (KNOWN as readonly string[]).includes(s),
   );
   return filtered;
 }

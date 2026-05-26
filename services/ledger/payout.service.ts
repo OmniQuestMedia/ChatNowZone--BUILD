@@ -15,12 +15,12 @@ import type { RedbookRateCardService } from './redbook-rate-card.service';
 import type { PayoutRateLockService, PayoutRateLockResult } from './payout-rate-lock.service';
 
 export interface SessionCloseInput {
-  sessionId: string;                   // correlation_id root
+  sessionId: string; // correlation_id root
   creatorWalletId: string;
-  grossCzt: number;                    // total CZT earned this session (integer)
-  heatScore: number;                   // 0–100 — from FFS scorer
-  diamondFloorActive: boolean;         // true when creator has Diamond floor guarantee
-  isPixelLegacy?: boolean;             // true when creator is PIXEL_LEGACY type — applies the $0.07 floor
+  grossCzt: number; // total CZT earned this session (integer)
+  heatScore: number; // 0–100 — from FFS scorer
+  diamondFloorActive: boolean; // true when creator has Diamond floor guarantee
+  isPixelLegacy?: boolean; // true when creator is PIXEL_LEGACY type — applies the $0.07 floor
   /**
    * PAY-006 — optional reference to a captured PayoutRateLock. When present
    * the locked rate is honoured verbatim (no re-resolution from live FFS).
@@ -30,14 +30,14 @@ export interface SessionCloseInput {
 }
 
 export interface SessionPayoutResult {
-  ledgerBucket: LedgerBucket;          // always 'bonus' for creator payouts
+  ledgerBucket: LedgerBucket; // always 'bonus' for creator payouts
   heatLevel: HeatLevel;
   ratePerToken: number;
-  payoutUsd: number;                   // for reporting
-  payoutCzt: number;                   // what was credited to the wallet
-  appliedFloor: boolean;               // any floor was raised above live
-  appliedDiamondFloor: boolean;        // Diamond floor specifically
-  appliedPixelLegacyFloor: boolean;    // Pixel Legacy floor specifically
+  payoutUsd: number; // for reporting
+  payoutCzt: number; // what was credited to the wallet
+  appliedFloor: boolean; // any floor was raised above live
+  appliedDiamondFloor: boolean; // Diamond floor specifically
+  appliedPixelLegacyFloor: boolean; // Pixel Legacy floor specifically
   correlationId: string;
 }
 

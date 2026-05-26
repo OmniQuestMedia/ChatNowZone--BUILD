@@ -30,10 +30,7 @@ export function toTorontoISO(date: Date): string {
   }
   // Derive UTC offset by comparing the local date-parts (treated as UTC) against
   // the real epoch, matching the pattern used in AuditService (WO-032).
-  const localAsUtcMs = Date.UTC(
-    +p.year, +p.month - 1, +p.day,
-    +p.hour, +p.minute, +p.second,
-  );
+  const localAsUtcMs = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
   const offsetMin = Math.round((date.getTime() - localAsUtcMs) / 60_000);
   const sign = offsetMin >= 0 ? '-' : '+';
   const absMin = Math.abs(offsetMin);
@@ -57,10 +54,7 @@ export class WatermarkUtility {
    * The resulting fingerprint is injected into the asset delivery stream so that
    * every copy is traceable back to the exact purchase event (Doctrine §2800).
    */
-  public static generateWatermarkMetadata(
-    userId: string,
-    orderId: string,
-  ): WatermarkMetadata {
+  public static generateWatermarkMetadata(userId: string, orderId: string): WatermarkMetadata {
     const now = new Date();
     const platform_time = toTorontoISO(now);
     const raw = `${userId}:${orderId}:${platform_time}`;

@@ -9,15 +9,7 @@
 //   GET    /studios/:id/affiliations       — roster (studio members + admins)
 //   GET    /studios/by-affiliation-number/:n — lookup by number (login flow)
 
-import {
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import {
   ActivateStudioRequestDto,
   AffiliateRequestDto,
@@ -77,9 +69,7 @@ export class StudioController {
   }
 
   @Get('by-affiliation-number/:number')
-  async findByNumber(
-    @Param('number') number: string,
-  ): Promise<StudioPublic | { found: false }> {
+  async findByNumber(@Param('number') number: string): Promise<StudioPublic | { found: false }> {
     const studio = await this.studios.findByAffiliationNumber(number);
     return studio ?? { found: false };
   }

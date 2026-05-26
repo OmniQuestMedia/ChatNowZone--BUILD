@@ -7,9 +7,7 @@ const nextConfig = {
   // deploys without rebuilding.
   async rewrites() {
     const target = process.env.CNZ_CORE_API_URL ?? 'http://localhost:3000';
-    return [
-      { source: '/api/:path*', destination: `${target}/:path*` },
-    ];
+    return [{ source: '/api/:path*', destination: `${target}/:path*` }];
   },
   // ui/ contains TypeScript source consumed via @cnz/ui/* alias. Next 16
   // transpiles it inline with the rest of the app.

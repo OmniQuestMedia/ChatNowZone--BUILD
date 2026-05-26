@@ -24,44 +24,44 @@ This document is a child of `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md
 
 ## 1. Cloud Region and Jurisdiction
 
-| Control | Requirement |
-|---------|-------------|
-| **Primary region** | `ca-central-1` (AWS Canada — Montreal) |
-| **Data residency** | All PII, financial data, and audit records must remain in Canada at rest |
-| **Secondary / DR region** | `ca-west-1` (AWS Canada — Calgary) — passive standby only |
-| **Forbidden regions** | No production workload may execute outside Canadian AWS regions without explicit CEO sign-off |
-| **Jurisdiction** | Ontario, Canada — PIPEDA + Bill C-27 (Digital Charter Implementation Act) |
+| Control                   | Requirement                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------- |
+| **Primary region**        | `ca-central-1` (AWS Canada — Montreal)                                                        |
+| **Data residency**        | All PII, financial data, and audit records must remain in Canada at rest                      |
+| **Secondary / DR region** | `ca-west-1` (AWS Canada — Calgary) — passive standby only                                     |
+| **Forbidden regions**     | No production workload may execute outside Canadian AWS regions without explicit CEO sign-off |
+| **Jurisdiction**          | Ontario, Canada — PIPEDA + Bill C-27 (Digital Charter Implementation Act)                     |
 
 ---
 
 ## 2. Network Isolation
 
-| Control | Requirement |
-|---------|-------------|
-| **VPC** | All compute, database, and cache resources must reside in a private VPC |
-| **Postgres (port 5432)** | NEVER exposed on a public interface; private subnet only |
-| **Redis (port 6379)** | NEVER exposed on a public interface; private subnet only |
-| **NATS (port 4222)** | Private subnet only; no public listener |
-| **Egress** | Outbound traffic routed via NAT Gateway; no public IPs on service instances |
-| **Load balancer** | Application Load Balancer (ALB) is the only public-facing entry point; all traffic terminates TLS at ALB |
-| **Security groups** | Principle of least privilege; intra-service ports only opened between named security groups |
-| **VPN / Bastion** | Admin access via SSM Session Manager only; no SSH port exposed |
+| Control                  | Requirement                                                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **VPC**                  | All compute, database, and cache resources must reside in a private VPC                                  |
+| **Postgres (port 5432)** | NEVER exposed on a public interface; private subnet only                                                 |
+| **Redis (port 6379)**    | NEVER exposed on a public interface; private subnet only                                                 |
+| **NATS (port 4222)**     | Private subnet only; no public listener                                                                  |
+| **Egress**               | Outbound traffic routed via NAT Gateway; no public IPs on service instances                              |
+| **Load balancer**        | Application Load Balancer (ALB) is the only public-facing entry point; all traffic terminates TLS at ALB |
+| **Security groups**      | Principle of least privilege; intra-service ports only opened between named security groups              |
+| **VPN / Bastion**        | Admin access via SSM Session Manager only; no SSH port exposed                                           |
 
 ---
 
 ## 3. Data Storage and Encryption
 
-| Control | Requirement |
-|---------|-------------|
-| **S3 encryption** | SSE-KMS mandatory; SSE-S3 not permitted for any bucket holding PII or financial data |
-| **S3 Object Lock** | Enabled on all buckets holding audit logs, legal holds, and financial ledger exports — COMPLIANCE mode, 7-year retention |
-| **S3 public access** | All public access blocked at bucket and account level; presigned URLs for time-limited delivery only |
-| **Postgres at rest** | AWS RDS with storage encryption via KMS CMK |
-| **Postgres in transit** | TLS 1.2+ required; `ssl_mode=require` enforced |
-| **Redis at rest** | ElastiCache with encryption at rest enabled |
-| **Redis in transit** | TLS 1.2+ required |
-| **KMS keys** | Customer-managed keys (CMK) per service; automatic annual rotation enabled |
-| **Secrets** | All secrets stored in AWS Secrets Manager or Parameter Store (SecureString); NEVER in environment variables baked into images or in source code |
+| Control                 | Requirement                                                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S3 encryption**       | SSE-KMS mandatory; SSE-S3 not permitted for any bucket holding PII or financial data                                                            |
+| **S3 Object Lock**      | Enabled on all buckets holding audit logs, legal holds, and financial ledger exports — COMPLIANCE mode, 7-year retention                        |
+| **S3 public access**    | All public access blocked at bucket and account level; presigned URLs for time-limited delivery only                                            |
+| **Postgres at rest**    | AWS RDS with storage encryption via KMS CMK                                                                                                     |
+| **Postgres in transit** | TLS 1.2+ required; `ssl_mode=require` enforced                                                                                                  |
+| **Redis at rest**       | ElastiCache with encryption at rest enabled                                                                                                     |
+| **Redis in transit**    | TLS 1.2+ required                                                                                                                               |
+| **KMS keys**            | Customer-managed keys (CMK) per service; automatic annual rotation enabled                                                                      |
+| **Secrets**             | All secrets stored in AWS Secrets Manager or Parameter Store (SecureString); NEVER in environment variables baked into images or in source code |
 
 ---
 
@@ -69,16 +69,16 @@ This document is a child of `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md
 
 The FIZ encompasses any system path that reads, writes, or influences monetary values. FIZ controls are a strict superset of general security controls.
 
-| Control | Requirement |
-|---------|-------------|
-| **Append-only ledger** | No UPDATE or DELETE on balance columns; offset-only writes |
-| **Correlation ID** | Every financial record must carry a `correlation_id` (UUID v4) |
-| **Reason code** | Every financial record must carry a `reason_code` |
-| **Idempotency** | All financial writes are idempotent by `correlation_id`; duplicate requests return the original result without re-applying |
-| **Hash chain** | Ledger entries are hash-chained; `prev_hash` must be verified before write |
-| **Schema integrity** | No migration may alter, drop, or nullify a financial column without dual-agent review and CEO sign-off |
-| **Audit trail** | Every FIZ event is written to the immutable audit chain within the same transaction |
-| **FIZ commit format** | All commits touching FIZ paths must include `REASON:`, `IMPACT:`, and `CORRELATION_ID:` fields in the commit message |
+| Control                | Requirement                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Append-only ledger** | No UPDATE or DELETE on balance columns; offset-only writes                                                                 |
+| **Correlation ID**     | Every financial record must carry a `correlation_id` (UUID v4)                                                             |
+| **Reason code**        | Every financial record must carry a `reason_code`                                                                          |
+| **Idempotency**        | All financial writes are idempotent by `correlation_id`; duplicate requests return the original result without re-applying |
+| **Hash chain**         | Ledger entries are hash-chained; `prev_hash` must be verified before write                                                 |
+| **Schema integrity**   | No migration may alter, drop, or nullify a financial column without dual-agent review and CEO sign-off                     |
+| **Audit trail**        | Every FIZ event is written to the immutable audit chain within the same transaction                                        |
+| **FIZ commit format**  | All commits touching FIZ paths must include `REASON:`, `IMPACT:`, and `CORRELATION_ID:` fields in the commit message       |
 
 FIZ-scoped paths (non-exhaustive):
 
@@ -93,102 +93,102 @@ FIZ-scoped paths (non-exhaustive):
 
 ## 5. Secret Management
 
-| Control | Requirement |
-|---------|-------------|
-| **Source tree** | Zero secrets in source code, committed files, or container image layers |
-| **`.env` files** | `.env` and all variants (`*.env.*`) are in `.gitignore`; pre-commit hooks prevent accidental commit |
-| **Runtime injection** | Secrets injected at runtime via AWS Secrets Manager; services fetch on startup |
-| **Rotation** | Secrets rotated on a 90-day cycle minimum; database passwords rotated on a 30-day cycle |
-| **Access** | IAM roles with least-privilege; no long-lived IAM access keys; use instance profiles and IRSA |
-| **CI/CD** | GitHub Actions secrets via GitHub Actions encrypted secrets only; never in workflow YAML as plaintext |
+| Control               | Requirement                                                                                           |
+| --------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Source tree**       | Zero secrets in source code, committed files, or container image layers                               |
+| **`.env` files**      | `.env` and all variants (`*.env.*`) are in `.gitignore`; pre-commit hooks prevent accidental commit   |
+| **Runtime injection** | Secrets injected at runtime via AWS Secrets Manager; services fetch on startup                        |
+| **Rotation**          | Secrets rotated on a 90-day cycle minimum; database passwords rotated on a 30-day cycle               |
+| **Access**            | IAM roles with least-privilege; no long-lived IAM access keys; use instance profiles and IRSA         |
+| **CI/CD**             | GitHub Actions secrets via GitHub Actions encrypted secrets only; never in workflow YAML as plaintext |
 
 ---
 
 ## 6. Identity and Access Management
 
-| Control | Requirement |
-|---------|-------------|
-| **Authentication** | Clerk (or equivalent) with MFA required for all admin and creator accounts |
-| **Age assurance** | Age verification gate required before any restricted content is accessible |
-| **JIT access** | Just-in-time elevated access for restricted data; time-bounded sessions |
-| **RBAC** | Role-based access control enforced at API layer; roles: Admin, Creator/Model, Guest, Agent |
-| **Session tokens** | Short-lived JWTs (15 min); refresh tokens stored in HttpOnly cookies |
-| **Step-up auth** | Required for financial operations, personal data exports, and admin actions |
-| **API keys** | Third-party API keys stored in Secrets Manager; scoped to least-privilege |
+| Control            | Requirement                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| **Authentication** | Clerk (or equivalent) with MFA required for all admin and creator accounts                 |
+| **Age assurance**  | Age verification gate required before any restricted content is accessible                 |
+| **JIT access**     | Just-in-time elevated access for restricted data; time-bounded sessions                    |
+| **RBAC**           | Role-based access control enforced at API layer; roles: Admin, Creator/Model, Guest, Agent |
+| **Session tokens** | Short-lived JWTs (15 min); refresh tokens stored in HttpOnly cookies                       |
+| **Step-up auth**   | Required for financial operations, personal data exports, and admin actions                |
+| **API keys**       | Third-party API keys stored in Secrets Manager; scoped to least-privilege                  |
 
 ---
 
 ## 7. CI/CD and Ship Gates
 
-| Control | Requirement |
-|---------|-------------|
-| **No secrets in CI** | GitHub Actions workflows must not contain plaintext secrets or credentials |
-| **Policy lint** | All PRs must pass policy lint (`.github/workflows/ci.yml`) before merge |
-| **Security scan** | CodeQL security scan runs on every PR; HIGH/CRITICAL findings block merge |
-| **Dependency scan** | Dependabot configured for all ecosystems; HIGH/CRITICAL CVEs block merge |
-| **Image signing** | Container images signed with AWS Signer or Cosign before deployment |
-| **Ship gate** | `PROGRAM_CONTROL/ship-gate-verifier.ts` must pass before any production deployment |
+| Control               | Requirement                                                                        |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| **No secrets in CI**  | GitHub Actions workflows must not contain plaintext secrets or credentials         |
+| **Policy lint**       | All PRs must pass policy lint (`.github/workflows/ci.yml`) before merge            |
+| **Security scan**     | CodeQL security scan runs on every PR; HIGH/CRITICAL findings block merge          |
+| **Dependency scan**   | Dependabot configured for all ecosystems; HIGH/CRITICAL CVEs block merge           |
+| **Image signing**     | Container images signed with AWS Signer or Cosign before deployment                |
+| **Ship gate**         | `PROGRAM_CONTROL/ship-gate-verifier.ts` must pass before any production deployment |
 | **Branch protection** | `main` is protected: linear history, squash-merge only, all status checks required |
 
 ---
 
 ## 8. Observability and Audit
 
-| Control | Requirement |
-|---------|-------------|
+| Control                 | Requirement                                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Centralized logging** | All service logs shipped to a centralized, tamper-resistant log store (CloudWatch Logs with KMS encryption) |
-| **Audit chain** | Every sensitive action (auth, financial, admin, consent change) written to immutable hash-chained audit log |
-| **Log retention** | 7-year minimum for financial and consent logs; 1-year for operational logs |
-| **Metrics** | CloudWatch metrics + alarms for error rates, latency, and financial event throughput |
-| **Tracing** | Distributed tracing via AWS X-Ray for all inter-service calls |
-| **Alerting** | PagerDuty or equivalent; P1 alerts for financial anomalies, auth failures above threshold, and SLA breaches |
+| **Audit chain**         | Every sensitive action (auth, financial, admin, consent change) written to immutable hash-chained audit log |
+| **Log retention**       | 7-year minimum for financial and consent logs; 1-year for operational logs                                  |
+| **Metrics**             | CloudWatch metrics + alarms for error rates, latency, and financial event throughput                        |
+| **Tracing**             | Distributed tracing via AWS X-Ray for all inter-service calls                                               |
+| **Alerting**            | PagerDuty or equivalent; P1 alerts for financial anomalies, auth failures above threshold, and SLA breaches |
 
 ---
 
 ## 9. Real-Time Fabric
 
-| Control | Requirement |
-|---------|-------------|
-| **Transport** | NATS JetStream is the only permitted transport for chat, telemetry, and haptic events |
-| **No REST polling** | REST polling for real-time events is forbidden; use NATS subscriptions |
-| **Topic registry** | All NATS topics must be registered in `services/nats/topics.registry.ts` |
+| Control                 | Requirement                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Transport**           | NATS JetStream is the only permitted transport for chat, telemetry, and haptic events                        |
+| **No REST polling**     | REST polling for real-time events is forbidden; use NATS subscriptions                                       |
+| **Topic registry**      | All NATS topics must be registered in `services/nats/topics.registry.ts`                                     |
 | **Message persistence** | JetStream subjects used for financial and audit events must use `limits` or `interest` retention with replay |
 
 ---
 
 ## 10. Data Residency and Privacy
 
-| Control | Requirement |
-|---------|-------------|
+| Control                | Requirement                                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **PII classification** | All personal data classified before storage; categories: Restricted (biometric, financial), Sensitive (contact, identity), Internal, Public |
-| **Consent** | Consent logs are append-only; every consent change is timestamped and tied to `correlation_id` |
-| **Geo fencing** | Canadian users must have data processed in `ca-central-1`; geo-fence enforced at ALB |
-| **Data minimization** | Collect only what is required; no shadow profiles |
-| **Right to erasure** | Erasure requests processed within 30 days; financial records retained per legal obligation with PII redacted |
-| **No raw PII in logs** | PII must not appear in operational logs; use masked identifiers |
+| **Consent**            | Consent logs are append-only; every consent change is timestamped and tied to `correlation_id`                                              |
+| **Geo fencing**        | Canadian users must have data processed in `ca-central-1`; geo-fence enforced at ALB                                                        |
+| **Data minimization**  | Collect only what is required; no shadow profiles                                                                                           |
+| **Right to erasure**   | Erasure requests processed within 30 days; financial records retained per legal obligation with PII redacted                                |
+| **No raw PII in logs** | PII must not appear in operational logs; use masked identifiers                                                                             |
 
 ---
 
 ## 11. Disaster Recovery
 
-| Control | Requirement |
-|---------|-------------|
-| **RTO** | Recovery Time Objective: 4 hours for Tier 1 services (ledger, auth, streaming) |
-| **RPO** | Recovery Point Objective: 15 minutes (continuous backup to `ca-west-1`) |
-| **Backup testing** | DR drills conducted quarterly; immutable backups tested for restore |
-| **RDS snapshots** | Automated daily snapshots; cross-region copy to `ca-west-1`; 35-day retention |
-| **S3 replication** | Cross-region replication to `ca-west-1` for audit and financial buckets |
+| Control            | Requirement                                                                    |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **RTO**            | Recovery Time Objective: 4 hours for Tier 1 services (ledger, auth, streaming) |
+| **RPO**            | Recovery Point Objective: 15 minutes (continuous backup to `ca-west-1`)        |
+| **Backup testing** | DR drills conducted quarterly; immutable backups tested for restore            |
+| **RDS snapshots**  | Automated daily snapshots; cross-region copy to `ca-west-1`; 35-day retention  |
+| **S3 replication** | Cross-region replication to `ca-west-1` for audit and financial buckets        |
 
 ---
 
 ## 12. Third-Party Integration Security
 
-| Control | Requirement |
-|---------|-------------|
-| **Webhook verification** | All inbound webhooks must verify HMAC signatures |
-| **Outbound TLS** | All outbound HTTP calls use TLS 1.2+; certificate validation enforced |
+| Control                   | Requirement                                                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Webhook verification**  | All inbound webhooks must verify HMAC signatures                                                                                     |
+| **Outbound TLS**          | All outbound HTTP calls use TLS 1.2+; certificate validation enforced                                                                |
 | **Integration contracts** | Webhook contracts with eCommsZone, Cyrano, and RedRoomRewards must be documented in `docs/POLICIES/` before production traffic flows |
-| **Allowlist** | Third-party egress limited to an allowlisted set of domains; no arbitrary outbound |
+| **Allowlist**             | Third-party egress limited to an allowlisted set of domains; no arbitrary outbound                                                   |
 
 ---
 
@@ -219,9 +219,10 @@ Amendments to this policy require:
 
 ## Changelog
 
-| Version | Date | Author | Summary |
-|---------|------|--------|---------|
-| v1.0 | 2026-05-06 | CEO directive (WORK-ORDER v0.1) | Initial policy — Phase 0 |
+| Version | Date       | Author                          | Summary                  |
+| ------- | ---------- | ------------------------------- | ------------------------ |
+| v1.0    | 2026-05-06 | CEO directive (WORK-ORDER v0.1) | Initial policy — Phase 0 |
+
 **Document ID:** INFRA_v1.0
 **Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
 **Effective Date:** 2026-05-06
@@ -427,12 +428,12 @@ Direct EC2/container ports are never exposed to the internet.
 
 ## 9. COMPLIANCE OBLIGATIONS
 
-| Regulation | Scope | Owner |
-|---|---|---|
-| PIPEDA | Canadian subscriber PII | CEO / Legal |
-| Canada Anti-Spam Legislation (CASL) | Email/SMS comms | eCommsZone SLA |
-| PCI-DSS (SAQ A) | Payment card tokenization | Payment processor |
-| OQMI_GOVERNANCE §12 | Banned entity quarantine | All agents |
+| Regulation                          | Scope                     | Owner             |
+| ----------------------------------- | ------------------------- | ----------------- |
+| PIPEDA                              | Canadian subscriber PII   | CEO / Legal       |
+| Canada Anti-Spam Legislation (CASL) | Email/SMS comms           | eCommsZone SLA    |
+| PCI-DSS (SAQ A)                     | Payment card tokenization | Payment processor |
+| OQMI_GOVERNANCE §12                 | Banned entity quarantine  | All agents        |
 
 ---
 
@@ -447,6 +448,7 @@ Prior conflicting or superseded infra policy artifacts are moved to
 ---
 
 _© OmniQuest Media Inc. All rights reserved. Authority: Kevin B. Hartley, CEO._
+
 # OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md
 
 **Document:** OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md  
@@ -522,17 +524,17 @@ All teams and agents must read and comply with OQMI_GOVERNANCE.md before any non
 
 All infrastructure vendors must meet or exceed the following mandatory criteria (evaluated annually by CEO + engineering lead):
 
-| Criterion | Requirement | Rationale |
-| --- | --- | --- |
-| Data Residency | All production data stored in Canadian regions only (e.g., AWS ca-central-1, Azure Canada Central, Google Cloud Toronto/Montreal, OVH Canada, ThinkOn, eStruxture) | PIPEDA, avoids CLOUD Act / foreign government access risks |
-| Compliance Certifications | SOC 2 Type II, ISO 27001, PCI-DSS (for payment paths), PIPEDA-compliant | Mandatory for adult platform handling PII, payments, age/consent data |
-| Encryption & Key Management | Customer-managed KMS, SSE-S3 or equivalent, no vendor default keys for sensitive data | Protects voice samples, consent records, financials |
-| Audit & Logging | Full audit logs exported to immutable SIEM (e.g., AWS CloudTrail + S3 immutable) | Required for [INTEL] reporting and regulatory defense |
-| SLA & Uptime | ≥99.99% availability, <5 min RTO for critical services | "It Just Works" moral obligation |
-| Incident Response | 24/7 SOC, <1 hour initial response for security incidents, contractual obligation to notify OQMInc within 15 min of breach | Ransomware/malware containment |
-| Canadian Legal Entity | Vendor must have Canadian legal presence and data-processing agreement | Sovereignty & enforceability |
-| No Backdoors / Transparency | Vendor publishes transparency report; no known government backdoors | Trust in adult-industry compliance |
-| Exit Strategy | Data export tooling + 90-day migration window guaranteed | Avoid vendor lock-in |
+| Criterion                   | Requirement                                                                                                                                                        | Rationale                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Data Residency              | All production data stored in Canadian regions only (e.g., AWS ca-central-1, Azure Canada Central, Google Cloud Toronto/Montreal, OVH Canada, ThinkOn, eStruxture) | PIPEDA, avoids CLOUD Act / foreign government access risks            |
+| Compliance Certifications   | SOC 2 Type II, ISO 27001, PCI-DSS (for payment paths), PIPEDA-compliant                                                                                            | Mandatory for adult platform handling PII, payments, age/consent data |
+| Encryption & Key Management | Customer-managed KMS, SSE-S3 or equivalent, no vendor default keys for sensitive data                                                                              | Protects voice samples, consent records, financials                   |
+| Audit & Logging             | Full audit logs exported to immutable SIEM (e.g., AWS CloudTrail + S3 immutable)                                                                                   | Required for [INTEL] reporting and regulatory defense                 |
+| SLA & Uptime                | ≥99.99% availability, <5 min RTO for critical services                                                                                                             | "It Just Works" moral obligation                                      |
+| Incident Response           | 24/7 SOC, <1 hour initial response for security incidents, contractual obligation to notify OQMInc within 15 min of breach                                         | Ransomware/malware containment                                        |
+| Canadian Legal Entity       | Vendor must have Canadian legal presence and data-processing agreement                                                                                             | Sovereignty & enforceability                                          |
+| No Backdoors / Transparency | Vendor publishes transparency report; no known government backdoors                                                                                                | Trust in adult-industry compliance                                    |
+| Exit Strategy               | Data export tooling + 90-day migration window guaranteed                                                                                                           | Avoid vendor lock-in                                                  |
 
 **Preferred Tier-1 providers (2026):** AWS ca-central-1, OVHcloud Canada, Azure Canada Central.  
 **Prohibited:** Any U.S.-only or non-sovereign providers for production workloads.
@@ -618,15 +620,15 @@ Follow Human-Review Category process in OQMI_GOVERNANCE.md §2.2. PR modifying t
 
 ## 11. INVARIANTS REGISTER (QUICK REFERENCE)
 
-| # | Invariant | rule_applied_id |
-| --- | --- | --- |
-| 1 | Canada-only data residency for production | INFRA_v1.0-INV-01 |
-| 2 | Raw sensitive media/PII never stored in DB — encrypted references only | INFRA_v1.0-INV-02 |
-| 3 | Immutable, encrypted, tested backups (3-2-1 + WORM) | INFRA_v1.0-INV-03 |
-| 4 | AI advisory-only; never mutates financial/compliance state | INFRA_v1.0-INV-04 |
-| 5 | All infrastructure changes audited with rule_applied_id | INFRA_v1.0-INV-05 |
-| 6 | Least-privilege + zero-trust enforced at every layer | INFRA_v1.0-INV-06 |
-| 7 | Ransomware defense = immutable backups + rapid isolation | INFRA_v1.0-INV-07 |
+| #   | Invariant                                                              | rule_applied_id   |
+| --- | ---------------------------------------------------------------------- | ----------------- |
+| 1   | Canada-only data residency for production                              | INFRA_v1.0-INV-01 |
+| 2   | Raw sensitive media/PII never stored in DB — encrypted references only | INFRA_v1.0-INV-02 |
+| 3   | Immutable, encrypted, tested backups (3-2-1 + WORM)                    | INFRA_v1.0-INV-03 |
+| 4   | AI advisory-only; never mutates financial/compliance state             | INFRA_v1.0-INV-04 |
+| 5   | All infrastructure changes audited with rule_applied_id                | INFRA_v1.0-INV-05 |
+| 6   | Least-privilege + zero-trust enforced at every layer                   | INFRA_v1.0-INV-06 |
+| 7   | Ransomware defense = immutable backups + rapid isolation               | INFRA_v1.0-INV-07 |
 
 This policy is effective immediately. All existing and future infrastructure must conform.
 

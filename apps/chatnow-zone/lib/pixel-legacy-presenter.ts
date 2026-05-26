@@ -76,10 +76,14 @@ export async function fetchPixelLegacyStatus(params: {
     fetch(`${apiBase}/pixel-legacy/seat-meter`, { cache: 'no-store' }),
   ]);
   if (!statusRes.ok) {
-    throw new Error(`pixel-legacy status fetch failed: ${statusRes.status} ${statusRes.statusText}`);
+    throw new Error(
+      `pixel-legacy status fetch failed: ${statusRes.status} ${statusRes.statusText}`,
+    );
   }
   if (!meterRes.ok) {
-    throw new Error(`pixel-legacy seat-meter fetch failed: ${meterRes.status} ${meterRes.statusText}`);
+    throw new Error(
+      `pixel-legacy seat-meter fetch failed: ${meterRes.status} ${meterRes.statusText}`,
+    );
   }
   const status = (await statusRes.json()) as CreatorStatusResponse;
   const seat_meter = (await meterRes.json()) as SeatMeterResponse;

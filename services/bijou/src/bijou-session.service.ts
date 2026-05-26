@@ -29,7 +29,7 @@ export interface BijouSession {
   session_id: string;
   show_id: string;
   creator_id: string;
-  max_participants: number;         // Always BIJOU_PRICING.MAX_PARTICIPANTS (24)
+  max_participants: number; // Always BIJOU_PRICING.MAX_PARTICIPANTS (24)
   participants: BijouParticipant[];
   standby_queue: StandbyEntry[];
   started_at_utc: string;
@@ -49,23 +49,17 @@ export class BijouSessionService {
    * Enforces hard cap of MAX_PARTICIPANTS (24 VIPs + host).
    * Starts the camera grace period timer on entry.
    */
-  admitParticipant(
-    session: BijouSession,
-    user_id: string,
-    is_host: boolean,
-  ): BijouSession {
-    const vipCount = session.participants.filter(p => !p.is_host).length;
+  admitParticipant(session: BijouSession, user_id: string, is_host: boolean): BijouSession {
+    const vipCount = session.participants.filter((p) => !p.is_host).length;
     if (!is_host && vipCount >= BIJOU_PRICING.MAX_PARTICIPANTS) {
       throw new Error(
         `SEAT_CAPACITY_FULL: Bijou session ${session.session_id} is at capacity ` +
-        `(${BIJOU_PRICING.MAX_PARTICIPANTS} VIPs).`
+          `(${BIJOU_PRICING.MAX_PARTICIPANTS} VIPs).`,
       );
     }
 
     const now = new Date();
-    const graceExpiry = new Date(
-      now.getTime() + BIJOU_PRICING.CAMERA_GRACE_PERIOD_SEC * 1000
-    );
+    const graceExpiry = new Date(now.getTime() + BIJOU_PRICING.CAMERA_GRACE_PERIOD_SEC * 1000);
 
     const participant: BijouParticipant = {
       user_id,
@@ -100,24 +94,24 @@ export class BijouSessionService {
     session: BijouSession,
     user_id: string,
   ): { action: 'NONE' | 'WARN' | 'EJECT'; participant: BijouParticipant } {
-    const participant = session.participants.find(p => p.user_id === user_id);
+    const participant = session.participants.find((p) => p.user_id === user_id);
     if (!participant) throw new Error(`PARTICIPANT_NOT_FOUND: ${user_id}`);
     if (participant.camera_active) return { action: 'NONE', participant };
 
     const now = new Date();
     const graceExpiry = participant.camera_grace_expires_at_utc
-      ? new Date(participant.camera_grace_expires_at_utc) : null;
+      ? new Date(participant.camera_grace_expires_at_utc)
+      : null;
     const warningExpiry = participant.camera_warning_expires_at_utc
-      ? new Date(participant.camera_warning_expires_at_utc) : null;
+      ? new Date(participant.camera_warning_expires_at_utc)
+      : null;
 
     // Still within grace period
     if (graceExpiry && now < graceExpiry) return { action: 'NONE', participant };
 
     // Grace expired — issue warning if not already warned
     if (!participant.camera_warning_expires_at_utc) {
-      const warnExpiry = new Date(
-        now.getTime() + BIJOU_PRICING.CAMERA_WARNING_PERIOD_SEC * 1000
-      );
+      const warnExpiry = new Date(now.getTime() + BIJOU_PRICING.CAMERA_WARNING_PERIOD_SEC * 1000);
       this.nats.publish(NATS_TOPICS.BIJOU_CAMERA_VIOLATION, {
         session_id: session.session_id,
         user_id,
@@ -158,7 +152,7 @@ export class BijouSessionService {
    * Published to NATS for DwellService to aggregate for bonus pool calculation.
    */
   recordDwellTick(session: BijouSession, user_id: string): void {
-    const participant = session.participants.find(p => p.user_id === user_id);
+    const participant = session.participants.find((p) => p.user_id === user_id);
     if (!participant) return;
 
     this.nats.publish(NATS_TOPICS.BIJOU_DWELL_TICK, {
@@ -177,7 +171,7 @@ export class BijouSessionService {
    * Queue is FIFO. Returns updated session.
    */
   joinStandby(session: BijouSession, user_id: string): BijouSession {
-    const alreadyQueued = session.standby_queue.some(e => e.user_id === user_id);
+    const alreadyQueued = session.standby_queue.some((e) => e.user_id === user_id);
     if (alreadyQueued) return session;
 
     const entry: StandbyEntry = {
@@ -206,9 +200,7 @@ export class BijouSessionService {
     const next = session.standby_queue[0];
     if (!next) return { session, notified_user_id: null };
 
-    const acceptExpiry = new Date(
-      Date.now() + BIJOU_PRICING.STANDBY_ACCEPT_WINDOW_SEC * 1000
-    );
+    const acceptExpiry = new Date(Date.now() + BIJOU_PRICING.STANDBY_ACCEPT_WINDOW_SEC * 1000);
 
     const updatedEntry: StandbyEntry = {
       ...next,
@@ -216,10 +208,7 @@ export class BijouSessionService {
       accept_expires_at_utc: acceptExpiry.toISOString(),
     };
 
-    const updatedQueue = [
-      updatedEntry,
-      ...session.standby_queue.slice(1),
-    ];
+    const updatedQueue = [updatedEntry, ...session.standby_queue.slice(1)];
 
     this.nats.publish(NATS_TOPICS.BIJOU_STANDBY_ALERT, {
       session_id: session.session_id,

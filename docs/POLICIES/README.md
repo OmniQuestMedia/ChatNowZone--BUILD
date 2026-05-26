@@ -2,9 +2,9 @@
 
 All active policies for the ChatNow.Zone platform.
 
-| Policy | Document | Version | Effective Date | Status |
-|---|---|---|---|---|
-| Infrastructure & Security | [`OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) | INFRA_v1.0 | 2026-05-06 | ACTIVE |
+| Policy                    | Document                                                                                   | Version    | Effective Date | Status |
+| ------------------------- | ------------------------------------------------------------------------------------------ | ---------- | -------------- | ------ |
+| Infrastructure & Security | [`OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) | INFRA_v1.0 | 2026-05-06     | ACTIVE |
 
 ## Governance hierarchy
 

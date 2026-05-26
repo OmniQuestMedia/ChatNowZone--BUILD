@@ -49,8 +49,7 @@ function computeBaseScore(input: FfsInput): number {
   // ── Component: tip volume (max 25) ─────────────────────────────────────────
   const tips_czt = Math.min(
     FFS_WEIGHT_CEILINGS.tips_czt,
-    (input.tips_czt_in_session / FFS_INPUT_MAX.tips_czt_in_session) *
-      FFS_WEIGHT_CEILINGS.tips_czt,
+    (input.tips_czt_in_session / FFS_INPUT_MAX.tips_czt_in_session) * FFS_WEIGHT_CEILINGS.tips_czt,
   );
 
   // ── Component: tip velocity (max 20) ───────────────────────────────────────
@@ -63,8 +62,7 @@ function computeBaseScore(input: FfsInput): number {
   // ── Component: chat engagement — messages + reactions (max 15) ─────────────
   const combined_chat =
     (input.chat_messages_in_session / FFS_INPUT_MAX.chat_messages_in_session +
-      input.heart_reactions_in_session /
-        FFS_INPUT_MAX.heart_reactions_in_session) /
+      input.heart_reactions_in_session / FFS_INPUT_MAX.heart_reactions_in_session) /
     2; // average of the two normalised signals (0..1)
   const chat_engagement = Math.min(
     FFS_WEIGHT_CEILINGS.chat_engagement,
@@ -74,8 +72,7 @@ function computeBaseScore(input: FfsInput): number {
   // ── Component: session dwell (max 5) ───────────────────────────────────────
   const dwell = Math.min(
     FFS_WEIGHT_CEILINGS.dwell,
-    (input.dwell_minutes / FFS_INPUT_MAX.dwell_minutes) *
-      FFS_WEIGHT_CEILINGS.dwell,
+    (input.dwell_minutes / FFS_INPUT_MAX.dwell_minutes) * FFS_WEIGHT_CEILINGS.dwell,
   );
 
   // ── Component: private/exclusive requests (max 10) ─────────────────────────
@@ -93,12 +90,7 @@ function computeBaseScore(input: FfsInput): number {
   );
 
   const raw =
-    tips_czt +
-    tip_velocity +
-    chat_engagement +
-    dwell +
-    private_requests +
-    whale_score_component;
+    tips_czt + tip_velocity + chat_engagement + dwell + private_requests + whale_score_component;
 
   return Math.round(clamp(raw, 0, 100));
 }
@@ -176,14 +168,14 @@ export class FanFervorScoreService {
 
     await this.prisma.fanFervorScore.create({
       data: {
-        guest_id:        input.guest_id,
-        session_id:      input.session_id,
+        guest_id: input.guest_id,
+        session_id: input.session_id,
         ffs_score,
         ffs_tier,
         base_score,
         heartsync_boost,
         heartsync_opted_in: input.heartsync_opted_in,
-        correlation_id:  input.correlation_id,
+        correlation_id: input.correlation_id,
         rule_applied_id: FFS_RULE_ID,
       },
     });
@@ -193,8 +185,8 @@ export class FanFervorScoreService {
     } as unknown as Record<string, unknown>);
 
     this.logger.log('FanFervorScoreService: guest scored', {
-      guest_id:       input.guest_id,
-      session_id:     input.session_id,
+      guest_id: input.guest_id,
+      session_id: input.session_id,
       ffs_score,
       ffs_tier,
       base_score,
@@ -209,23 +201,23 @@ export class FanFervorScoreService {
    */
   async getLatest(guest_id: string): Promise<FfsResult | null> {
     const row = await this.prisma.fanFervorScore.findFirst({
-      where:   { guest_id },
+      where: { guest_id },
       orderBy: { scored_at: 'desc' },
     });
 
     if (!row) return null;
 
     return {
-      ffs_id:          row.id,
-      guest_id:        row.guest_id,
-      session_id:      row.session_id,
-      ffs_score:       Number(row.ffs_score),
-      ffs_tier:        row.ffs_tier as FfsTier,
-      base_score:      Number(row.base_score),
+      ffs_id: row.id,
+      guest_id: row.guest_id,
+      session_id: row.session_id,
+      ffs_score: Number(row.ffs_score),
+      ffs_tier: row.ffs_tier as FfsTier,
+      base_score: Number(row.base_score),
       heartsync_boost: Number(row.heartsync_boost),
-      correlation_id:  row.correlation_id,
+      correlation_id: row.correlation_id,
       rule_applied_id: row.rule_applied_id,
-      scored_at_utc:   row.scored_at.toISOString(),
+      scored_at_utc: row.scored_at.toISOString(),
     };
   }
 }

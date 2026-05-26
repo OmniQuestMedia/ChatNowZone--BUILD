@@ -50,31 +50,31 @@ Per `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md §12`:
 
 ### 2a. eCommsZone
 
-| Field | Status |
-|-------|--------|
-| Webhook endpoint(s) | ⬜ Not confirmed |
-| Payload schema (JSON) | ⬜ Not confirmed |
-| HMAC signature header | ⬜ Not confirmed |
-| Auth method | ⬜ Not confirmed |
+| Field                        | Status           |
+| ---------------------------- | ---------------- |
+| Webhook endpoint(s)          | ⬜ Not confirmed |
+| Payload schema (JSON)        | ⬜ Not confirmed |
+| HMAC signature header        | ⬜ Not confirmed |
+| Auth method                  | ⬜ Not confirmed |
 | Retry / idempotency contract | ⬜ Not confirmed |
 
 ### 2b. Cyrano
 
-| Field | Status |
-|-------|--------|
-| Cyrano API base URL | ⬜ Not confirmed (service lives at `services/cyrano/` in this repo; external API TBD) |
-| Webhook / callback endpoint | ⬜ Not confirmed |
-| Payout-touching contract | ⬜ Not confirmed |
-| Auth method | ⬜ Not confirmed |
+| Field                       | Status                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| Cyrano API base URL         | ⬜ Not confirmed (service lives at `services/cyrano/` in this repo; external API TBD) |
+| Webhook / callback endpoint | ⬜ Not confirmed                                                                      |
+| Payout-touching contract    | ⬜ Not confirmed                                                                      |
+| Auth method                 | ⬜ Not confirmed                                                                      |
 
 ### 2c. RedRoomRewards
 
-| Field | Status |
-|-------|--------|
-| Webhook endpoint(s) | ⬜ Not confirmed |
-| Payload schema (JSON) | ⬜ Not confirmed |
-| HMAC signature header | ⬜ Not confirmed |
-| Auth method | ⬜ Not confirmed |
+| Field                            | Status           |
+| -------------------------------- | ---------------- |
+| Webhook endpoint(s)              | ⬜ Not confirmed |
+| Payload schema (JSON)            | ⬜ Not confirmed |
+| HMAC signature header            | ⬜ Not confirmed |
+| Auth method                      | ⬜ Not confirmed |
 | Settlement / ledger event format | ⬜ Not confirmed |
 
 **Action required (CEO / cross-repo team):**

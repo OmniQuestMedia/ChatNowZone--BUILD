@@ -11,7 +11,7 @@ export interface SendVoiceMessageRequest {
   conversationId: string;
   senderId: string;
   senderType: 'USER' | 'CREATOR' | 'SYNTHETIC_TWIN';
-  voiceUri?: string;  // S3 URI to uploaded voice file
+  voiceUri?: string; // S3 URI to uploaded voice file
   transcript?: string; // Auto-transcription of voice
   voiceDurationMs?: number;
   ttsVoiceId?: string; // For synthetic twin responses
@@ -40,8 +40,8 @@ export interface GenerateTTSRequest {
 export class VoiceChatService {
   // PHASE3-ITEM1: Cost configuration for voice messages
   // TODO: Move to GovernanceConfig
-  private static readonly TOKENS_PER_VOICE_MESSAGE = 5;  // CZT cost per voice message
-  private static readonly TOKENS_PER_TTS_RESPONSE = 8;   // CZT cost for TTS generation
+  private static readonly TOKENS_PER_VOICE_MESSAGE = 5; // CZT cost per voice message
+  private static readonly TOKENS_PER_TTS_RESPONSE = 8; // CZT cost for TTS generation
   private static readonly CREATOR_SHARE_PERCENT = 0.7;
   private static readonly CENTS_PER_TOKEN = 9;
 
@@ -93,7 +93,8 @@ export class VoiceChatService {
           throw new Error(`Wallet not found for user: ${request.senderId}`);
         }
 
-        const totalBalance = wallet.purchased_tokens + wallet.membership_tokens + wallet.bonus_tokens;
+        const totalBalance =
+          wallet.purchased_tokens + wallet.membership_tokens + wallet.bonus_tokens;
 
         if (totalBalance < tokensCharged) {
           throw new Error(
@@ -107,7 +108,11 @@ export class VoiceChatService {
         // Record creator earnings if applicable
         if (conversation.creator_id) {
           const earningsCents = BigInt(
-            Math.floor(tokensCharged * VoiceChatService.CENTS_PER_TOKEN * VoiceChatService.CREATOR_SHARE_PERCENT),
+            Math.floor(
+              tokensCharged *
+                VoiceChatService.CENTS_PER_TOKEN *
+                VoiceChatService.CREATOR_SHARE_PERCENT,
+            ),
           );
           await this.recordCreatorEarnings(
             conversation.creator_id,
@@ -253,7 +258,9 @@ export class VoiceChatService {
 
       // Step 5: Record creator earnings
       const earningsCents = BigInt(
-        Math.floor(tokensCharged * VoiceChatService.CENTS_PER_TOKEN * VoiceChatService.CREATOR_SHARE_PERCENT),
+        Math.floor(
+          tokensCharged * VoiceChatService.CENTS_PER_TOKEN * VoiceChatService.CREATOR_SHARE_PERCENT,
+        ),
       );
       await this.recordCreatorEarnings(
         request.syntheticTwinId,
@@ -407,17 +414,19 @@ export class VoiceChatService {
   async getConversationMessages(
     conversationId: string,
     limit = 100,
-  ): Promise<Array<{
-    id: string;
-    senderId: string;
-    senderType: string;
-    messageType: string;
-    content?: string;
-    voiceUri?: string;
-    voiceDurationMs?: number;
-    tokensCharged: number;
-    createdAt: Date;
-  }>> {
+  ): Promise<
+    Array<{
+      id: string;
+      senderId: string;
+      senderType: string;
+      messageType: string;
+      content?: string;
+      voiceUri?: string;
+      voiceDurationMs?: number;
+      tokensCharged: number;
+      createdAt: Date;
+    }>
+  > {
     const messages = await prisma.chatMessage.findMany({
       where: { conversation_id: conversationId },
       orderBy: { created_at: 'desc' },

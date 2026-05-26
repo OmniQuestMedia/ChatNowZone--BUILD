@@ -16,14 +16,14 @@
 
 /** Supported outbound event types for partner webhook dispatch. */
 export type OutboundWebhookEventType =
-  | 'LEDGER_ENTRY_APPENDED'   // FIZ: append-only ledger write completed
-  | 'CONSENT_UPDATED'         // PII: notification consent change
-  | 'RISK_DECISION_EMITTED'   // Risk Engine decision (PASS/BLOCK/ESCALATE)
-  | 'PAYOUT_COMPLETED';       // Creator payout settled
+  | 'LEDGER_ENTRY_APPENDED' // FIZ: append-only ledger write completed
+  | 'CONSENT_UPDATED' // PII: notification consent change
+  | 'RISK_DECISION_EMITTED' // Risk Engine decision (PASS/BLOCK/ESCALATE)
+  | 'PAYOUT_COMPLETED'; // Creator payout settled
 
 /** Partner endpoints that receive outbound webhook notifications. */
 export type OutboundWebhookPartner =
-  | 'REDROOM_REWARDS'   // Loyalty + marketplace hooks
+  | 'REDROOM_REWARDS' // Loyalty + marketplace hooks
   | 'MARKETPLACE_BUILD'; // Marketplace platform hooks
 
 /** Base fields present on every outbound webhook payload. */

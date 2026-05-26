@@ -1,8 +1,10 @@
 // services/bijou/src/min-seat-gate.service.ts
 // Handles T-1hr auto-cancel gate for supported venues (Bijou and ShowZone).
 import { Injectable, Logger } from '@nestjs/common';
-import { BIJOU_PRICING, SHOWZONE_PRICING } from
-  '../../../services/core-api/src/config/governance.config';
+import {
+  BIJOU_PRICING,
+  SHOWZONE_PRICING,
+} from '../../../services/core-api/src/config/governance.config';
 
 export type VenueType = 'SHOWZONE' | 'BIJOU';
 
@@ -25,9 +27,10 @@ export class MinSeatGateService {
     seats_sold: number;
     creator_override_minimum?: number;
   }): SeatGateResult {
-    const platform_minimum = params.venue === 'BIJOU'
-      ? BIJOU_PRICING.MIN_SEATS_TO_GO_LIVE
-      : SHOWZONE_PRICING.MIN_SEATS_TO_GO_LIVE;
+    const platform_minimum =
+      params.venue === 'BIJOU'
+        ? BIJOU_PRICING.MIN_SEATS_TO_GO_LIVE
+        : SHOWZONE_PRICING.MIN_SEATS_TO_GO_LIVE;
 
     // Creator may set a HIGHER minimum but not lower than platform floor
     const minimum_required = params.creator_override_minimum

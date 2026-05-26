@@ -2,7 +2,13 @@
 // Schedules, opens, closes, and cancels Bijou sessions.
 // Enforces 15-minute boundary alignment and MAX_SESSIONS_PER_HOUR velocity rule.
 // All constants sourced from GovernanceConfig.BIJOU — none hardcoded.
-import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { PrismaService } from '../../core-api/src/prisma.service';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { GovernanceConfig } from '../../core-api/src/governance/governance.config';
@@ -33,7 +39,9 @@ export class BijouSchedulerService {
    *   GovernanceConfig.BIJOU.MAX_SESSIONS_PER_HOUR sessions in any rolling
    *   60-min window containing `scheduledStart`.
    */
-  async createSession(input: CreateBijouSessionInput): Promise<{ id: string; scheduled_start: Date; scheduled_end: Date }> {
+  async createSession(
+    input: CreateBijouSessionInput,
+  ): Promise<{ id: string; scheduled_start: Date; scheduled_end: Date }> {
     const ruleAppliedId = 'BJ-002_CREATE_SESSION_v1';
     const { creatorId, scheduledStart, organizationId, tenantId } = input;
 

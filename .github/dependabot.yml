@@ -1,59 +1,59 @@
 version: 2
 updates:
   # npm / Yarn — monorepo root
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "America/Toronto"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'America/Toronto'
     open-pull-requests-limit: 10
     labels:
-      - "dependencies"
-      - "automated"
+      - 'dependencies'
+      - 'automated'
     commit-message:
-      prefix: "CHORE:"
-      include: "scope"
+      prefix: 'CHORE:'
+      include: 'scope'
     ignore:
       # Ignore major version bumps for runtime-critical packages — review manually
-      - dependency-name: "@prisma/client"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "prisma"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "typescript"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: '@prisma/client'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'prisma'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "America/Toronto"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'America/Toronto'
     open-pull-requests-limit: 10
     labels:
-      - "dependencies"
-      - "github-actions"
-      - "automated"
+      - 'dependencies'
+      - 'github-actions'
+      - 'automated'
     commit-message:
-      prefix: "INFRA:"
-      include: "scope"
+      prefix: 'INFRA:'
+      include: 'scope'
 
   # Docker (root compose)
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: 'docker'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "America/Toronto"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'America/Toronto'
     open-pull-requests-limit: 5
     labels:
-      - "dependencies"
-      - "docker"
-      - "automated"
+      - 'dependencies'
+      - 'docker'
+      - 'automated'
     commit-message:
-      prefix: "INFRA:"
-      include: "scope"
+      prefix: 'INFRA:'
+      include: 'scope'

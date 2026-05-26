@@ -14,12 +14,7 @@
 // patterns in services/notification). Production swaps in a Redis backed
 // store via the same interface.
 
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { randomInt, randomUUID } from 'crypto';
 import type { CreatorOnboarding } from '@prisma/client';
 import { PrismaService } from '../../core-api/src/prisma.service';
@@ -135,13 +130,9 @@ export class CreatorOnboardingService {
     // 2. Resolve target studio (existing via affiliation_number, or new).
     let studio_id: string | undefined;
     if (dto.affiliation_number) {
-      const studio = await this.studios.findByAffiliationNumber(
-        dto.affiliation_number,
-      );
+      const studio = await this.studios.findByAffiliationNumber(dto.affiliation_number);
       if (!studio) {
-        throw new BadRequestException(
-          `ONBOARDING_AFFILIATION_INVALID: ${dto.affiliation_number}`,
-        );
+        throw new BadRequestException(`ONBOARDING_AFFILIATION_INVALID: ${dto.affiliation_number}`);
       }
       studio_id = studio.id;
     }
@@ -337,11 +328,14 @@ export class CreatorOnboardingService {
         correlation_id,
       });
     } catch (err) {
-      this.logger.error('CreatorOnboardingService.complete: Pixel Legacy gateway failed (non-blocking)', {
-        creator_id,
-        correlation_id,
-        error: err instanceof Error ? err.message : String(err),
-      });
+      this.logger.error(
+        'CreatorOnboardingService.complete: Pixel Legacy gateway failed (non-blocking)',
+        {
+          creator_id,
+          correlation_id,
+          error: err instanceof Error ? err.message : String(err),
+        },
+      );
     }
 
     return toOnboardingPublic(updated);

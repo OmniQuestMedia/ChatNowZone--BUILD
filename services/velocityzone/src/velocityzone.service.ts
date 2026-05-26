@@ -62,16 +62,16 @@ export class VelocityZoneService implements OnModuleInit {
     ffs_score: number,
     session_id: string,
   ): Promise<VelocityZoneRateResult> {
-    const now   = new Date();
+    const now = new Date();
     const event = this.findActiveEvent(creator_id, now);
 
     if (!event) {
       // No active event — return base rate from creator_rate_tiers.
       const baseRate = await this.getCreatorBaseRate(creator_id);
       const result: VelocityZoneRateResult = {
-        active:          false,
+        active: false,
         ffs_score,
-        rate_usd:        baseRate.rate_floor_usd,
+        rate_usd: baseRate.rate_floor_usd,
         rule_applied_id: VELOCITYZONE_RULE_ID,
       };
       return result;
@@ -85,8 +85,8 @@ export class VelocityZoneService implements OnModuleInit {
     ).toFixed(6);
 
     const result: VelocityZoneRateResult = {
-      active:          true,
-      event_id:        event.event_id,
+      active: true,
+      event_id: event.event_id,
       ffs_score,
       rate_usd,
       rule_applied_id: VELOCITYZONE_RULE_ID,
@@ -95,10 +95,10 @@ export class VelocityZoneService implements OnModuleInit {
     this.nats.publish(NATS_TOPICS.VELOCITYZONE_RATE_APPLIED, {
       session_id,
       creator_id,
-      event_id:        event.event_id,
+      event_id: event.event_id,
       ffs_score,
       rate_usd,
-      evaluated_at:    now.toISOString(),
+      evaluated_at: now.toISOString(),
       rule_applied_id: VELOCITYZONE_RULE_ID,
     });
 
@@ -114,22 +114,22 @@ export class VelocityZoneService implements OnModuleInit {
     is_founding: boolean,
     correlation_id: string,
   ): Promise<CreatorRateTier> {
-    const tier_name     = is_founding ? 'FOUNDING' : 'STANDARD';
-    const rate_floor    = is_founding ? FOUNDING_RATE_FLOOR_USD : STANDARD_RATE_FLOOR_USD;
-    const rate_ceiling  = is_founding ? FOUNDING_RATE_CEILING_USD : STANDARD_RATE_CEILING_USD;
-    const now           = new Date();
+    const tier_name = is_founding ? 'FOUNDING' : 'STANDARD';
+    const rate_floor = is_founding ? FOUNDING_RATE_FLOOR_USD : STANDARD_RATE_FLOOR_USD;
+    const rate_ceiling = is_founding ? FOUNDING_RATE_CEILING_USD : STANDARD_RATE_CEILING_USD;
+    const now = new Date();
 
     const row = await this.prisma.creatorRateTier.create({
       data: {
-        tier_id:          randomUUID(),
+        tier_id: randomUUID(),
         creator_id,
         tier_name,
-        rate_floor_usd:   rate_floor,
+        rate_floor_usd: rate_floor,
         rate_ceiling_usd: rate_ceiling,
-        effective_from:   now,
+        effective_from: now,
         correlation_id,
-        reason_code:      `CREATOR_RATE_SEED_${tier_name}`,
-        rule_applied_id:  VELOCITYZONE_RULE_ID,
+        reason_code: `CREATOR_RATE_SEED_${tier_name}`,
+        rule_applied_id: VELOCITYZONE_RULE_ID,
       },
     });
 
@@ -140,17 +140,17 @@ export class VelocityZoneService implements OnModuleInit {
     });
 
     return {
-      tier_id:          row.tier_id,
-      creator_id:       row.creator_id,
-      tier_name:        row.tier_name,
-      rate_floor_usd:   Number(row.rate_floor_usd),
+      tier_id: row.tier_id,
+      creator_id: row.creator_id,
+      tier_name: row.tier_name,
+      rate_floor_usd: Number(row.rate_floor_usd),
       rate_ceiling_usd: Number(row.rate_ceiling_usd),
-      effective_from:   row.effective_from.toISOString(),
-      effective_to:     row.effective_to?.toISOString(),
-      correlation_id:   row.correlation_id,
-      reason_code:      row.reason_code,
-      rule_applied_id:  row.rule_applied_id,
-      created_at:       row.created_at.toISOString(),
+      effective_from: row.effective_from.toISOString(),
+      effective_to: row.effective_to?.toISOString(),
+      correlation_id: row.correlation_id,
+      reason_code: row.reason_code,
+      rule_applied_id: row.rule_applied_id,
+      created_at: row.created_at.toISOString(),
     };
   }
 
@@ -159,10 +159,10 @@ export class VelocityZoneService implements OnModuleInit {
    * Called by the scheduler service on Day 61 post-launch.
    */
   async promoteDay61Rates(correlation_id: string): Promise<{ updated: number }> {
-    const now     = new Date();
-    const result  = await this.prisma.creatorRateTier.updateMany({
+    const now = new Date();
+    const result = await this.prisma.creatorRateTier.updateMany({
       where: {
-        tier_name:  'STANDARD',
+        tier_name: 'STANDARD',
         effective_to: null,
       },
       data: {
@@ -173,7 +173,7 @@ export class VelocityZoneService implements OnModuleInit {
     // Insert new POST_DAY_61 rows for all affected creators.
     const expiredRows = await this.prisma.creatorRateTier.findMany({
       where: {
-        tier_name:   'STANDARD',
+        tier_name: 'STANDARD',
         effective_to: now,
       },
     });
@@ -181,15 +181,15 @@ export class VelocityZoneService implements OnModuleInit {
     for (const row of expiredRows) {
       await this.prisma.creatorRateTier.create({
         data: {
-          tier_id:          randomUUID(),
-          creator_id:       row.creator_id,
-          tier_name:        'POST_DAY_61',
-          rate_floor_usd:   POST_DAY61_RATE_FLOOR_USD,
+          tier_id: randomUUID(),
+          creator_id: row.creator_id,
+          tier_name: 'POST_DAY_61',
+          rate_floor_usd: POST_DAY61_RATE_FLOOR_USD,
           rate_ceiling_usd: POST_DAY61_RATE_CEILING_USD,
-          effective_from:   now,
+          effective_from: now,
           correlation_id,
-          reason_code:      'DAY_61_RATE_PROMOTION',
-          rule_applied_id:  VELOCITYZONE_RULE_ID,
+          reason_code: 'DAY_61_RATE_PROMOTION',
+          rule_applied_id: VELOCITYZONE_RULE_ID,
         },
       });
     }
@@ -203,54 +203,49 @@ export class VelocityZoneService implements OnModuleInit {
 
   // ── Private ────────────────────────────────────────────────────────────────
 
-  private findActiveEvent(
-    creator_id: string,
-    now: Date,
-  ): VelocityZoneEvent | undefined {
+  private findActiveEvent(creator_id: string, now: Date): VelocityZoneEvent | undefined {
     return this.activeEvents.find((evt) => {
-      const start  = new Date(evt.starts_at);
-      const end    = new Date(evt.ends_at);
+      const start = new Date(evt.starts_at);
+      const end = new Date(evt.ends_at);
       const inTime = now >= start && now <= end;
-      const creatorMatch =
-        evt.creator_ids.length === 0 ||
-        evt.creator_ids.includes(creator_id);
+      const creatorMatch = evt.creator_ids.length === 0 || evt.creator_ids.includes(creator_id);
       return inTime && creatorMatch;
     });
   }
 
   private async refreshActiveEvents(): Promise<void> {
     try {
-      const now  = new Date();
+      const now = new Date();
       const rows = await this.prisma.velocityZoneEvent.findMany({
         where: {
-          status:    'ACTIVE',
+          status: 'ACTIVE',
           starts_at: { lte: now },
-          ends_at:   { gte: now },
+          ends_at: { gte: now },
         },
       });
 
       this.activeEvents = rows.map((row) => ({
-        event_id:         row.event_id,
-        name:             row.name,
-        starts_at:        row.starts_at.toISOString(),
-        ends_at:          row.ends_at.toISOString(),
-        rate_floor_usd:   Number(row.rate_floor_usd),
+        event_id: row.event_id,
+        name: row.name,
+        starts_at: row.starts_at.toISOString(),
+        ends_at: row.ends_at.toISOString(),
+        rate_floor_usd: Number(row.rate_floor_usd),
         rate_ceiling_usd: Number(row.rate_ceiling_usd),
-        creator_ids:      row.creator_ids,
-        status:           row.status as 'ACTIVE',
-        created_by:       row.created_by,
-        rule_applied_id:  row.rule_applied_id,
-        correlation_id:   row.correlation_id,
-        reason_code:      row.reason_code,
-        created_at:       row.created_at.toISOString(),
+        creator_ids: row.creator_ids,
+        status: row.status as 'ACTIVE',
+        created_by: row.created_by,
+        rule_applied_id: row.rule_applied_id,
+        correlation_id: row.correlation_id,
+        reason_code: row.reason_code,
+        created_at: row.created_at.toISOString(),
       }));
 
       if (this.activeEvents.length > 0) {
         this.nats.publish(NATS_TOPICS.VELOCITYZONE_EVENT_ACTIVE, {
-          active_count:    this.activeEvents.length,
-          event_ids:       this.activeEvents.map((e) => e.event_id),
+          active_count: this.activeEvents.length,
+          event_ids: this.activeEvents.map((e) => e.event_id),
           rule_applied_id: VELOCITYZONE_RULE_ID,
-          refreshed_at:    now.toISOString(),
+          refreshed_at: now.toISOString(),
         });
       }
     } catch (err) {
@@ -274,7 +269,7 @@ export class VelocityZoneService implements OnModuleInit {
 
       if (row) {
         return {
-          rate_floor_usd:   Number(row.rate_floor_usd),
+          rate_floor_usd: Number(row.rate_floor_usd),
           rate_ceiling_usd: Number(row.rate_ceiling_usd),
         };
       }
@@ -287,7 +282,7 @@ export class VelocityZoneService implements OnModuleInit {
 
     // Fallback to founding rates if no DB row found.
     return {
-      rate_floor_usd:   FOUNDING_RATE_FLOOR_USD,
+      rate_floor_usd: FOUNDING_RATE_FLOOR_USD,
       rate_ceiling_usd: FOUNDING_RATE_CEILING_USD,
     };
   }

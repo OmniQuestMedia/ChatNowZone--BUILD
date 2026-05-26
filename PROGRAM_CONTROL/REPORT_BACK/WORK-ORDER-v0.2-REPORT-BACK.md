@@ -3,17 +3,20 @@
 **Task / WorkOrder ID:** WORK-ORDER-v0.2  
 **Date:** 2026-05-06  
 **Rule Applied:** INFRA_v1.0 [rule_applied_id: INFRA_v1.0]  
-**Agent:** GitHub Copilot  
+**Agent:** GitHub Copilot
 
 ---
 
 ## Repo
+
 `OmniQuestMediaInc/ChatNowZone--BUILD`
 
 ## Branch
+
 `copilot/create-work-order-v0-2-md`
 
 ## HEAD
+
 See `git log --oneline -1` at commit time.
 
 ---
@@ -103,7 +106,7 @@ README.md  | 8 ++++++--
 - INFRA-1 / INFRA-2 / INFRA-3 ship-gate checks: ALL PASS.
 - NET-1 (Postgres + Redis not exposed): PASS.
 - SEC-1 / SEC-2 (no secrets in tree): PASS.
-- FIZ-* (append-only finance): ALL PASS.
+- FIZ-\* (append-only finance): ALL PASS.
 
 ---
 

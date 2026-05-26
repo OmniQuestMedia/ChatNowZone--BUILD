@@ -8,17 +8,7 @@ import { PersonaEngineService } from './persona-engine.service';
 import { AudioSignalService } from './audio-signal.service';
 
 @Module({
-  providers: [
-    OBSBridgeService,
-    ChatAggregatorService,
-    PersonaEngineService,
-    AudioSignalService,
-  ],
-  exports: [
-    OBSBridgeService,
-    ChatAggregatorService,
-    PersonaEngineService,
-    AudioSignalService,
-  ],
+  providers: [OBSBridgeService, ChatAggregatorService, PersonaEngineService, AudioSignalService],
+  exports: [OBSBridgeService, ChatAggregatorService, PersonaEngineService, AudioSignalService],
 })
 export class OBSBridgeModule {}

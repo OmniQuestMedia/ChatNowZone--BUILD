@@ -88,9 +88,7 @@ export class LovenseHardwareAdapter extends BaseHardwareAdapter {
       this.resetReconnect();
       this.emitEvent(this.makeEvent(params.session_id, 'CONNECTED', { gateway: this.gatewayUrl }));
     } catch (err) {
-      this.emitEvent(
-        this.makeEvent(params.session_id, 'RECONNECT_FAILED', { error: String(err) }),
-      );
+      this.emitEvent(this.makeEvent(params.session_id, 'RECONNECT_FAILED', { error: String(err) }));
       this.scheduleReconnect(params);
     }
   }
