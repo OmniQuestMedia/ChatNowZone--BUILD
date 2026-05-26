@@ -20,6 +20,7 @@ export class NotificationGateway {
    */
   public static async dispatchPayoutAlert(payload: NotificationPayload): Promise<void> {
     // Audit-Log the dispatch attempt per WO-016
+    // eslint-disable-next-line no-console
     console.log(`[OQMI_EVENT]: DISPATCHING_PAYOUT_ALERT:${payload.batchId}`);
 
     // Integration logic for SendGrid/Twilio/Webhooks to be appended in Scale Phase.

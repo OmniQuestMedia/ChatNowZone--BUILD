@@ -10,9 +10,9 @@ includes one of these, integration review will reject it.
 
 ## Visual / brand
 
-| Item | Status | Reason |
-|------|--------|--------|
-| Light-mode theme | Deferred to v2 | Alpha is dark-mode default per `THEME.default_mode = 'dark'`. |
+| Item                                            | Status                 | Reason                                                                             |
+| ----------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------- |
+| Light-mode theme                                | Deferred to v2         | Alpha is dark-mode default per `THEME.default_mode = 'dark'`.                      |
 | Custom illustrations beyond the empty-state set | Out of scope for Alpha | Empty-state illustrations are in scope (3–5 reusable). Hero illustrations are not. |
 
 > The G101+ "Black-Glass Interface" doctrine that previously appeared
@@ -26,25 +26,25 @@ includes one of these, integration review will reject it.
 
 ## Subsystems with no Alpha UI
 
-| Subsystem | Status | Notes |
-|-----------|--------|-------|
-| **Risk Engine** (D002) | NEEDS_DIRECTIVE — deferred | No `/admin/risk` surface in Alpha. |
-| **OBS Broadcast Kernel hardening** (D004) | NEEDS_DIRECTIVE — deferred | The OBS bridge service ships; the hardened kernel does not. Existing OBS-bridge connection setup on `/creator/control` stays. |
-| **Cyrano Layer 3** (HCZ Whisper Intelligence) | Deferred | Cyrano L1 (creator suggestion panel) and L2 (consumer audio platform) are Alpha-scope. |
-| **Cyrano Layer 4** (Enterprise B2B Whisper API) | Deferred Year 3+ | Per `DOMAIN_GLOSSARY.md`. No Alpha UI. |
-| **Live payment processor flows** (FairPay + NOWPayouts) | **Stubbed for Alpha** | Wireframes show a "test mode" banner on every purchase surface; no real card-entry forms. The three-bucket wallet logic is fully present; only the on/off ramp is stubbed. |
-| **WORM export end-user view** | Operator-only | End users never see WORM export UI. Compliance + Legal sub-roles only. |
-| **Legal hold for non-operators** | Operator-only | Subject accounts see only the consequence (`LEGAL_HOLD_ACTIVE` reason code blocks mutations), never the trigger UI. |
+| Subsystem                                               | Status                     | Notes                                                                                                                                                                      |
+| ------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Risk Engine** (D002)                                  | NEEDS_DIRECTIVE — deferred | No `/admin/risk` surface in Alpha.                                                                                                                                         |
+| **OBS Broadcast Kernel hardening** (D004)               | NEEDS_DIRECTIVE — deferred | The OBS bridge service ships; the hardened kernel does not. Existing OBS-bridge connection setup on `/creator/control` stays.                                              |
+| **Cyrano Layer 3** (HCZ Whisper Intelligence)           | Deferred                   | Cyrano L1 (creator suggestion panel) and L2 (consumer audio platform) are Alpha-scope.                                                                                     |
+| **Cyrano Layer 4** (Enterprise B2B Whisper API)         | Deferred Year 3+           | Per `DOMAIN_GLOSSARY.md`. No Alpha UI.                                                                                                                                     |
+| **Live payment processor flows** (FairPay + NOWPayouts) | **Stubbed for Alpha**      | Wireframes show a "test mode" banner on every purchase surface; no real card-entry forms. The three-bucket wallet logic is fully present; only the on/off ramp is stubbed. |
+| **WORM export end-user view**                           | Operator-only              | End users never see WORM export UI. Compliance + Legal sub-roles only.                                                                                                     |
+| **Legal hold for non-operators**                        | Operator-only              | Subject accounts see only the consequence (`LEGAL_HOLD_ACTIVE` reason code blocks mutations), never the trigger UI.                                                        |
 
 ---
 
 ## Surfaces RRR retired that **CNZ retains**
 
-| Surface | RRR | CNZ | Notes |
-|---------|-----|-----|-------|
-| Slot machine | RETIRED (RRR is not a gaming platform) | **RETAINED** — presenter at `ui/components/slot-machine.ts` | CNZ is a gaming platform; the slot machine ships. Wireframes for game UIs include it. |
-| Dice game | (RRR — TBD) | **RETAINED** — `ui/components/dice-game.ts` | Same reasoning. |
-| Wheel of fortune | (RRR — TBD) | **RETAINED** — `ui/components/wheel-of-fortune.ts` | Same reasoning. |
+| Surface          | RRR                                    | CNZ                                                         | Notes                                                                                 |
+| ---------------- | -------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Slot machine     | RETIRED (RRR is not a gaming platform) | **RETAINED** — presenter at `ui/components/slot-machine.ts` | CNZ is a gaming platform; the slot machine ships. Wireframes for game UIs include it. |
+| Dice game        | (RRR — TBD)                            | **RETAINED** — `ui/components/dice-game.ts`                 | Same reasoning.                                                                       |
+| Wheel of fortune | (RRR — TBD)                            | **RETAINED** — `ui/components/wheel-of-fortune.ts`          | Same reasoning.                                                                       |
 
 If RRR wireframes show no game UIs and CNZ wireframes do, that is **not
 a divergence in error** — it is a divergence by design. Grok should
@@ -54,40 +54,40 @@ not unify these by removing them from CNZ.
 
 ## Sub-surfaces explicitly excluded
 
-| Sub-surface | Reason |
-|-------------|--------|
-| Welcome Credit redemption flow | `WELCOME_CREDIT` is configured but `welcome_credit_active = false` at launch. Wireframe the wallet row treatment, but no claim flow. |
-| `ANNUAL` billing interval UI | Retired as a tier; if surfacing as a `BillingInterval` enum value, it is a billing-cycle label only — not a tier. Most Alpha purchase paths use 90+1-day blocks. |
-| Standalone `DIAMOND` tier badge | Retired form; canonical is `VIP_DIAMOND`. |
-| `DAY_PASS` purchase | Retired concept entirely. |
-| `OMNIPASS_PLUS` tier display | Retired tier; OmniPass+ exists only as a **product** in the Pass / Entitlement domain. |
-| Public-facing audit chain viewer | Operators only. |
-| Public-facing Welfare Guardian dashboard | Operators only. |
-| End-user step-up auth admin | RBAC admin is operator-only. |
+| Sub-surface                              | Reason                                                                                                                                                           |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Welcome Credit redemption flow           | `WELCOME_CREDIT` is configured but `welcome_credit_active = false` at launch. Wireframe the wallet row treatment, but no claim flow.                             |
+| `ANNUAL` billing interval UI             | Retired as a tier; if surfacing as a `BillingInterval` enum value, it is a billing-cycle label only — not a tier. Most Alpha purchase paths use 90+1-day blocks. |
+| Standalone `DIAMOND` tier badge          | Retired form; canonical is `VIP_DIAMOND`.                                                                                                                        |
+| `DAY_PASS` purchase                      | Retired concept entirely.                                                                                                                                        |
+| `OMNIPASS_PLUS` tier display             | Retired tier; OmniPass+ exists only as a **product** in the Pass / Entitlement domain.                                                                           |
+| Public-facing audit chain viewer         | Operators only.                                                                                                                                                  |
+| Public-facing Welfare Guardian dashboard | Operators only.                                                                                                                                                  |
+| End-user step-up auth admin              | RBAC admin is operator-only.                                                                                                                                     |
 
 ---
 
 ## Cyrano L2 — what's NOT in scope for Alpha
 
-(L2 standalone runtime *is* Alpha-scope; these sub-features are not.)
+(L2 standalone runtime _is_ Alpha-scope; these sub-features are not.)
 
-| Sub-feature | Reason |
-|-------------|--------|
-| Voice mode for VIP / VIP_SILVER (default) | Voice mode is a **top-up unlock**; default access is text-mode. May change in `CYRANO-ACCESS-POLICY-001`. |
-| Cross-creator persona library | Creator persona libraries are scoped per-creator. No cross-creator sharing in Alpha. |
-| Per-VIP scripts visible to other VIPs | Per-VIP scripts are private to that creator-VIP relationship by design. |
+| Sub-feature                                                  | Reason                                                                                                      |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Voice mode for VIP / VIP_SILVER (default)                    | Voice mode is a **top-up unlock**; default access is text-mode. May change in `CYRANO-ACCESS-POLICY-001`.   |
+| Cross-creator persona library                                | Creator persona libraries are scoped per-creator. No cross-creator sharing in Alpha.                        |
+| Per-VIP scripts visible to other VIPs                        | Per-VIP scripts are private to that creator-VIP relationship by design.                                     |
 | Cyrano in-app payment for top-ups (separate from CNZ wallet) | Top-ups debit through the **CNZ three-bucket wallet** via `LedgerService.spend`. No separate Cyrano wallet. |
 
 ---
 
 ## Marketing surfaces deferred
 
-| Surface | Status |
-|---------|--------|
-| Mic Drop reveal landing page | In scope (per `LAUNCH_MANIFEST.md`); copy and creative TBD. |
-| Press / about page | Not Alpha-scope (post-launch creative). |
-| Investor / corporate page | Not Alpha-scope. |
-| Multi-language localization | Deferred. Alpha ships English-Canada with Sovereign CaC jurisdictional notices. |
+| Surface                      | Status                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| Mic Drop reveal landing page | In scope (per `LAUNCH_MANIFEST.md`); copy and creative TBD.                     |
+| Press / about page           | Not Alpha-scope (post-launch creative).                                         |
+| Investor / corporate page    | Not Alpha-scope.                                                                |
+| Multi-language localization  | Deferred. Alpha ships English-Canada with Sovereign CaC jurisdictional notices. |
 
 ---
 

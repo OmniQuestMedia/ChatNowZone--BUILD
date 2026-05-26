@@ -279,7 +279,7 @@ MFA_PROMPT
    └─ MFA fail (3) →  STEP_UP_DENIED    →  ACTION_BLOCKED   →  AUDIT_EVENT_WRITTEN
 ```
 
-**Wireframe must show:** the modal *before* the destructive action,
+**Wireframe must show:** the modal _before_ the destructive action,
 attempt counter, post-grant resumption (return to the original action's
 context, not to a generic dashboard).
 

@@ -19,26 +19,26 @@ erasure obligation.
 
 ## NATS Topics
 
-| Topic | Description |
-|-------|-------------|
-| `sensync.consent.granted` | Guest granted biometric consent |
-| `sensync.consent.revoked` | Guest revoked biometric consent |
-| `sensync.biometric.data` | Normalized BPM payload (opt-in only) |
-| `sensync.plausibility.rejected` | BPM outside [30..220] range |
-| `sensync.tier.disabled` | Non-Diamond tier attempted hardware session |
-| `sensync.purge.requested` | Law 25 deletion request received |
-| `sensync.purge.completed` | Purge job completed data minimization |
-| `sensync.hardware.connected` | Hardware bridge connected |
-| `sensync.hardware.disconnected` | Hardware bridge disconnected |
+| Topic                           | Description                                 |
+| ------------------------------- | ------------------------------------------- |
+| `sensync.consent.granted`       | Guest granted biometric consent             |
+| `sensync.consent.revoked`       | Guest revoked biometric consent             |
+| `sensync.biometric.data`        | Normalized BPM payload (opt-in only)        |
+| `sensync.plausibility.rejected` | BPM outside [30..220] range                 |
+| `sensync.tier.disabled`         | Non-Diamond tier attempted hardware session |
+| `sensync.purge.requested`       | Law 25 deletion request received            |
+| `sensync.purge.completed`       | Purge job completed data minimization       |
+| `sensync.hardware.connected`    | Hardware bridge connected                   |
+| `sensync.hardware.disconnected` | Hardware bridge disconnected                |
 
 ## Hardware Bridges
 
-| Bridge | Description |
-|--------|-------------|
-| `LOVENSE` | Lovense SDK (primary partner) |
-| `WEB_USB` | Generic WebUSB HID device |
-| `WEB_BLUETOOTH` | Generic GATT Heart Rate Profile (0x180D) |
-| `PHONE_HAPTIC` | Mobile fallback — no BPM hardware required |
+| Bridge          | Description                                |
+| --------------- | ------------------------------------------ |
+| `LOVENSE`       | Lovense SDK (primary partner)              |
+| `WEB_USB`       | Generic WebUSB HID device                  |
+| `WEB_BLUETOOTH` | Generic GATT Heart Rate Profile (0x180D)   |
+| `PHONE_HAPTIC`  | Mobile fallback — no BPM hardware required |
 
 ## Non-Adult Extension Points
 
@@ -54,14 +54,14 @@ domain-specific Cyrano™ prompt template routing:
 
 ## REST Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/sensync/sessions` | Open a SenSync session |
-| DELETE | `/sensync/sessions/:id` | Close a session |
-| GET | `/sensync/sessions/:id` | Get session state |
-| POST | `/sensync/consent/grant` | Grant biometric consent |
-| POST | `/sensync/consent/revoke` | Revoke biometric consent |
-| POST | `/sensync/samples` | Submit a BPM sample |
-| POST | `/sensync/hardware-events` | Record hardware lifecycle event |
-| POST | `/sensync/purge/request` | Request Law 25 data purge |
-| POST | `/sensync/purge/complete` | Mark purge complete (worker only) |
+| Method | Path                       | Description                       |
+| ------ | -------------------------- | --------------------------------- |
+| POST   | `/sensync/sessions`        | Open a SenSync session            |
+| DELETE | `/sensync/sessions/:id`    | Close a session                   |
+| GET    | `/sensync/sessions/:id`    | Get session state                 |
+| POST   | `/sensync/consent/grant`   | Grant biometric consent           |
+| POST   | `/sensync/consent/revoke`  | Revoke biometric consent          |
+| POST   | `/sensync/samples`         | Submit a BPM sample               |
+| POST   | `/sensync/hardware-events` | Record hardware lifecycle event   |
+| POST   | `/sensync/purge/request`   | Request Law 25 data purge         |
+| POST   | `/sensync/purge/complete`  | Mark purge complete (worker only) |

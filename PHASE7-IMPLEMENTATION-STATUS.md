@@ -128,6 +128,7 @@ Token deduction happens **before** webhook call:
 6. CyranoEngines callbacks with result URI
 
 This ensures:
+
 - No refunds needed if AI generation fails
 - Creator earnings are guaranteed
 - Token transactions are append-only (FIZ compliance)
@@ -143,6 +144,7 @@ const platformShare = totalValueCents × 0.30; // 30% to platform
 ```
 
 Earnings recorded in `ledger_entries` table:
+
 - `entry_type`: `'SYNTHETIC_TWIN_EARNINGS'`
 - `performer_amount_cents`: Creator's 70% share
 - `platform_amount_cents`: Platform's 30% share
@@ -204,9 +206,9 @@ await dashboardController.toggleAiFeature(creatorId, true);
 const generation = await syntheticTwinService.generateImage({
   userId: fanUserId,
   creatorId: creatorId,
-  prompt: "A beautiful sunset over the ocean",
-  organizationId: "test-org",
-  tenantId: "test-tenant"
+  prompt: 'A beautiful sunset over the ocean',
+  organizationId: 'test-org',
+  tenantId: 'test-tenant',
 });
 // Verifies: generation created, tokens deducted from fan wallet
 ```
@@ -223,7 +225,8 @@ const generation = await syntheticTwinService.generateImage({
 ```typescript
 const initialBalance = wallet.purchased_tokens + wallet.membership_tokens + wallet.bonus_tokens;
 // ... after generation ...
-const newBalance = updatedWallet.purchased_tokens + updatedWallet.membership_tokens + updatedWallet.bonus_tokens;
+const newBalance =
+  updatedWallet.purchased_tokens + updatedWallet.membership_tokens + updatedWallet.bonus_tokens;
 expect(newBalance).toBe(initialBalance - 10); // 10 CZT deducted
 ```
 
@@ -234,8 +237,8 @@ const ledgerEntries = await prisma.ledgerEntry.findMany({
   where: {
     performer_id: creatorId,
     entry_type: 'SYNTHETIC_TWIN_EARNINGS',
-    status: 'COMPLETED'
-  }
+    status: 'COMPLETED',
+  },
 });
 expect(ledgerEntries[0].performer_amount_cents).toBeGreaterThan(0);
 ```
@@ -330,6 +333,7 @@ Phase 7 successfully completes the sync of Shared Account-Core, StudioTokens, an
 ### Files Created/Modified
 
 #### Created Files:
+
 ```
 services/synthetic-twin/src/cyrano-webhook.service.ts
 services/core-api/src/creator/dashboard.controller.ts (enhanced)
@@ -339,6 +343,7 @@ docs/PHASE7-IMPLEMENTATION-STATUS.md (this file)
 ```
 
 #### Modified Files:
+
 ```
 services/synthetic-twin/src/synthetic-twin.service.ts
 README.md

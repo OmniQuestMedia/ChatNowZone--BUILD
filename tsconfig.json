@@ -36,11 +36,5 @@
     "ui/**/*.ts",
     "ui/**/*.tsx"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".next",
-    "**/*.spec.ts",
-    "**/*.disabled/**"
-  ]
+  "exclude": ["node_modules", "dist", ".next", "**/*.spec.ts", "**/*.disabled/**"]
 }

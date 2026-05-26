@@ -73,7 +73,12 @@ describe('FlickerNFlameScoringEngine — tier resolution', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const engine = new FlickerNFlameScoringEngine(stub as any);
     const score = engine.computeScore(
-      sample({ tippers_online: 0, tips_per_minute: 0, diamond_guests_present: 0, avg_tip_tokens: 0 }),
+      sample({
+        tippers_online: 0,
+        tips_per_minute: 0,
+        diamond_guests_present: 0,
+        avg_tip_tokens: 0,
+      }),
     );
     expect(score.tier).toBe('COLD');
     expect(score.score).toBe(0);
@@ -85,10 +90,10 @@ describe('FlickerNFlameScoringEngine — tier resolution', () => {
     const engine = new FlickerNFlameScoringEngine(stub as any);
     const score = engine.computeScore(
       sample({
-        tippers_online: 50,          // → 40 (capped)
+        tippers_online: 50, // → 40 (capped)
         tips_per_minute: 20,
-        avg_tip_tokens: 20,          // 20*20/10 = 40 (capped)
-        diamond_guests_present: 4,   // → 20 (capped)
+        avg_tip_tokens: 20, // 20*20/10 = 40 (capped)
+        diamond_guests_present: 4, // → 20 (capped)
       }),
     );
     expect(score.score).toBe(100);
@@ -99,9 +104,30 @@ describe('FlickerNFlameScoringEngine — tier resolution', () => {
     const { stub, published } = natsStub();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const engine = new FlickerNFlameScoringEngine(stub as any);
-    engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // COLD
-    engine.ingest(sample({ tippers_online: 1, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 })); // still COLD
-    engine.ingest(sample({ tippers_online: 40, tips_per_minute: 5, avg_tip_tokens: 4, diamond_guests_present: 1 })); // WARM+
+    engine.ingest(
+      sample({
+        tippers_online: 1,
+        tips_per_minute: 0,
+        avg_tip_tokens: 0,
+        diamond_guests_present: 0,
+      }),
+    ); // COLD
+    engine.ingest(
+      sample({
+        tippers_online: 1,
+        tips_per_minute: 0,
+        avg_tip_tokens: 0,
+        diamond_guests_present: 0,
+      }),
+    ); // still COLD
+    engine.ingest(
+      sample({
+        tippers_online: 40,
+        tips_per_minute: 5,
+        avg_tip_tokens: 4,
+        diamond_guests_present: 1,
+      }),
+    ); // WARM+
     const tierEvents = published.filter((p) => p.topic === NATS_TOPICS.FFS_TIER_CHANGED);
     // One transition COLD→X (initial set), then WARM (or higher) shift. Duplicates suppressed.
     expect(tierEvents.length).toBeGreaterThanOrEqual(1);
@@ -115,9 +141,24 @@ describe('BroadcastTimingCopilot', () => {
     const suggestions = copilot.recommendTopSlots({
       creator_id: 'creator-1',
       history: [
-        { slot_start_utc: '2026-04-25T02:00:00Z', avg_tippers_online: 5,  avg_tips_per_minute: 0.5, sample_count: 20 },
-        { slot_start_utc: '2026-04-25T22:00:00Z', avg_tippers_online: 40, avg_tips_per_minute: 6.0, sample_count: 30 },
-        { slot_start_utc: '2026-04-25T10:00:00Z', avg_tippers_online: 12, avg_tips_per_minute: 1.5, sample_count: 15 },
+        {
+          slot_start_utc: '2026-04-25T02:00:00Z',
+          avg_tippers_online: 5,
+          avg_tips_per_minute: 0.5,
+          sample_count: 20,
+        },
+        {
+          slot_start_utc: '2026-04-25T22:00:00Z',
+          avg_tippers_online: 40,
+          avg_tips_per_minute: 6.0,
+          sample_count: 30,
+        },
+        {
+          slot_start_utc: '2026-04-25T10:00:00Z',
+          avg_tippers_online: 12,
+          avg_tips_per_minute: 1.5,
+          sample_count: 15,
+        },
       ],
       top_n: 2,
     });
@@ -130,7 +171,12 @@ describe('BroadcastTimingCopilot', () => {
     const [low] = copilot.recommendTopSlots({
       creator_id: 'creator-1',
       history: [
-        { slot_start_utc: '2026-04-25T20:00:00Z', avg_tippers_online: 10, avg_tips_per_minute: 1, sample_count: 2 },
+        {
+          slot_start_utc: '2026-04-25T20:00:00Z',
+          avg_tippers_online: 10,
+          avg_tips_per_minute: 1,
+          sample_count: 2,
+        },
       ],
     });
     expect(low.confidence).toBe(0.2);
@@ -210,7 +256,12 @@ describe('CreatorControlService — workstation orchestration', () => {
       new SessionMonitoringCopilot(),
     );
     const { heat, nudge } = svc.ingestSample(
-      sample({ tippers_online: 50, tips_per_minute: 20, avg_tip_tokens: 20, diamond_guests_present: 4 }),
+      sample({
+        tippers_online: 50,
+        tips_per_minute: 20,
+        avg_tip_tokens: 20,
+        diamond_guests_present: 4,
+      }),
     );
     expect(heat.tier).toBe('INFERNO');
     expect(nudge.direction).toBe('RAISE');
@@ -231,8 +282,17 @@ describe('CreatorControlService — workstation orchestration', () => {
       new SessionMonitoringCopilot(),
     );
     // tippers_online: 40 → pressure=40, velocity=0, vip=0 → score=40 → WARM (34–60) → HOLD → no PRICE_NUDGE
-    svc.ingestSample(sample({ tippers_online: 40, tips_per_minute: 0, avg_tip_tokens: 0, diamond_guests_present: 0 }));
-    const nudgeEvents = published.filter((p) => p.topic === NATS_TOPICS.CREATOR_CONTROL_PRICE_NUDGE);
+    svc.ingestSample(
+      sample({
+        tippers_online: 40,
+        tips_per_minute: 0,
+        avg_tip_tokens: 0,
+        diamond_guests_present: 0,
+      }),
+    );
+    const nudgeEvents = published.filter(
+      (p) => p.topic === NATS_TOPICS.CREATOR_CONTROL_PRICE_NUDGE,
+    );
     expect(nudgeEvents).toHaveLength(0);
   });
 
@@ -247,7 +307,14 @@ describe('CreatorControlService — workstation orchestration', () => {
       new BroadcastTimingCopilot(),
       new SessionMonitoringCopilot(),
     );
-    svc.ingestSample(sample({ tippers_online: 40, tips_per_minute: 10, avg_tip_tokens: 8, diamond_guests_present: 2 }));
+    svc.ingestSample(
+      sample({
+        tippers_online: 40,
+        tips_per_minute: 10,
+        avg_tip_tokens: 8,
+        diamond_guests_present: 2,
+      }),
+    );
     const snap = svc.buildWorkstationSnapshot({
       creator_id: 'creator-1',
       active_session_id: 'sess-1',
@@ -275,7 +342,14 @@ describe('CreatorControlService — workstation orchestration', () => {
     );
 
     // High heat marks subsequent chat row as highlighted.
-    svc.ingestSample(sample({ tippers_online: 55, tips_per_minute: 20, avg_tip_tokens: 20, diamond_guests_present: 4 }));
+    svc.ingestSample(
+      sample({
+        tippers_online: 55,
+        tips_per_minute: 20,
+        avg_tip_tokens: 20,
+        diamond_guests_present: 4,
+      }),
+    );
 
     const row = svc.ingestAggregatedChatMessage({
       id: 'msg-1',

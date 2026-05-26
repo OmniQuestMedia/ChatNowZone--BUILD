@@ -197,11 +197,7 @@ export class GuestHeatController {
 
   /** POST /guest-heat/teleprompter/start */
   startTeleprompter(dto: StartTeleprompterDto) {
-    return this.teleprompter.startChain(
-      dto.session_id,
-      dto.creator_id,
-      dto.campaign,
-    );
+    return this.teleprompter.startChain(dto.session_id, dto.creator_id, dto.campaign);
   }
 
   /** GET /guest-heat/teleprompter/:session_id/current */
@@ -254,20 +250,12 @@ export class GuestHeatController {
 
   /** POST /guest-heat/perf-timer/start */
   startTimer(dto: StartTimerDto) {
-    return this.perfTimer.startTimer(
-      dto.session_id,
-      dto.creator_id,
-      dto.correlation_id,
-    );
+    return this.perfTimer.startTimer(dto.session_id, dto.creator_id, dto.correlation_id);
   }
 
   /** POST /guest-heat/perf-timer/tick */
   timerTick(dto: TimerTickDto) {
-    return this.perfTimer.tick(
-      dto.session_id,
-      dto.revenue_czt,
-      dto.correlation_id,
-    );
+    return this.perfTimer.tick(dto.session_id, dto.revenue_czt, dto.correlation_id);
   }
 
   /** GET /guest-heat/perf-timer/:session_id */
@@ -279,11 +267,7 @@ export class GuestHeatController {
 
   /** POST /guest-heat/perf-timer/stop */
   stopTimer(dto: TimerTickDto) {
-    return this.perfTimer.stopTimer(
-      dto.session_id,
-      dto.revenue_czt,
-      dto.correlation_id,
-    );
+    return this.perfTimer.stopTimer(dto.session_id, dto.revenue_czt, dto.correlation_id);
   }
 
   // ── Fan Fervor Score ───────────────────────────────────────────────────────
@@ -296,20 +280,20 @@ export class GuestHeatController {
    */
   async scoreFanFervor(dto: ScoreFanFervorDto): Promise<FfsResult> {
     const input: FfsInput = {
-      guest_id:                   dto.guest_id,
-      session_id:                 dto.session_id,
-      captured_at_utc:            new Date().toISOString(),
-      tips_czt_in_session:        dto.tips_czt_in_session,
-      tip_velocity_per_min:       dto.tip_velocity_per_min,
-      chat_messages_in_session:   dto.chat_messages_in_session,
+      guest_id: dto.guest_id,
+      session_id: dto.session_id,
+      captured_at_utc: new Date().toISOString(),
+      tips_czt_in_session: dto.tips_czt_in_session,
+      tip_velocity_per_min: dto.tip_velocity_per_min,
+      chat_messages_in_session: dto.chat_messages_in_session,
       heart_reactions_in_session: dto.heart_reactions_in_session,
-      dwell_minutes:              dto.dwell_minutes,
-      private_request_count:      dto.private_request_count,
-      whale_score:                dto.whale_score,
-      heartsync_opted_in:         dto.heartsync_opted_in,
-      heartsync_bpm:              dto.heartsync_bpm,
-      heartsync_baseline_bpm:     dto.heartsync_baseline_bpm,
-      correlation_id:             dto.correlation_id ?? randomUUID(),
+      dwell_minutes: dto.dwell_minutes,
+      private_request_count: dto.private_request_count,
+      whale_score: dto.whale_score,
+      heartsync_opted_in: dto.heartsync_opted_in,
+      heartsync_bpm: dto.heartsync_bpm,
+      heartsync_baseline_bpm: dto.heartsync_baseline_bpm,
+      correlation_id: dto.correlation_id ?? randomUUID(),
     };
     return this.fanFervorScore.score(input);
   }
@@ -318,9 +302,7 @@ export class GuestHeatController {
    * GET /guest-heat/ffs/:guest_id
    * Retrieve the latest Fan Fervor Score for a guest.
    */
-  async getLatestFanFervorScore(
-    guest_id: string,
-  ): Promise<FfsResult | { error: string }> {
+  async getLatestFanFervorScore(guest_id: string): Promise<FfsResult | { error: string }> {
     const result = await this.fanFervorScore.getLatest(guest_id);
     if (!result) return { error: 'FFS_NOT_FOUND' };
     return result;

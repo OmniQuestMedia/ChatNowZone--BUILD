@@ -38,8 +38,7 @@ export default async function PixelLegacyPage({
         <h1>Pixel Legacy</h1>
         <p style={{ color: '#a8a8b0' }}>
           Provide a creator id via <code>?creator=&lt;id&gt;</code> to view status. Once the
-          platform auth middleware is wired the creator id will come from the authenticated
-          session.
+          platform auth middleware is wired the creator id will come from the authenticated session.
         </p>
       </main>
     );

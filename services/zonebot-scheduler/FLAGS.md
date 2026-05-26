@@ -1,10 +1,12 @@
 # FLAGS.md — ZoneBot Zoey
+
 **WO-002 — Open Business Decisions Requiring CEO Review**
 **Date:** 2026-04-25
 
 ---
 
 ## FLAG-001: Sick Day Carryover Policy
+
 **Status:** OPEN — awaiting CEO decision
 **Question:** Does unused sick time carry forward to the next calendar year?
 If yes, how many hours maximum may carry over, and does it expire mid-year?
@@ -15,6 +17,7 @@ If yes, how many hours maximum may carry over, and does it expire mid-year?
 ---
 
 ## FLAG-002: Spin-Wheel Incentive Triggers
+
 **Status:** OPEN — partial spec
 **Question:** Exactly when is the $50 spin-wheel incentive triggered?
 Options discussed: (a) every coverage gap filled voluntarily,
@@ -26,6 +29,7 @@ is left to a follow-up directive.
 ---
 
 ## FLAG-003: Budget Forecast Approval Workflow
+
 **Status:** OPEN
 **Question:** Who approves weekly budget forecasts (Finance Manager, GM, or CEO)?
 Does approval flow through GateGuard Sentinel?
@@ -35,6 +39,7 @@ Does approval flow through GateGuard Sentinel?
 ---
 
 ## FLAG-004: Hiring Model Confidence Threshold
+
 **Status:** OPEN
 **Question:** At what confidence score (0.0–1.0) should a hiring recommendation
 auto-escalate vs. remain advisory only?
@@ -44,6 +49,7 @@ auto-escalate vs. remain advisory only?
 ---
 
 ## FLAG-005: Moderation Cooldown — HCZ vs. GuestZone Alignment
+
 **Status:** OPEN
 **Question:** The moderation cooldown (4h/24h) is implemented here for HCZ staff.
 Should it be unified with the GuestZone GZ_SCHEDULING constants, or remain
@@ -54,6 +60,7 @@ a separate HCZ-specific constant?
 ---
 
 ## FLAG-006: Stagger Offset per Department
+
 **Status:** OPEN
 **Question:** Should the 15-minute stagger offset apply uniformly across all
 departments, or be configurable per department?
@@ -62,4 +69,4 @@ departments, or be configurable per department?
 
 ---
 
-*All flags must be resolved before the HCZ scheduling system moves to ACTIVE status.*
+_All flags must be resolved before the HCZ scheduling system moves to ACTIVE status._

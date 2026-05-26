@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable } from '@nestjs/common';
 import { MemoryQueryDto, WebhookResponseDto } from '../dto/cyranoengines.dto';
 import { WebhookCallbackService } from './webhook-callback.service';
@@ -20,10 +21,7 @@ function uuidv4(): string {
 export class MemoryService {
   constructor(private readonly webhookService: WebhookCallbackService) {}
 
-  async query(
-    dto: MemoryQueryDto,
-    correlationId?: string,
-  ): Promise<WebhookResponseDto> {
+  async query(dto: MemoryQueryDto, correlationId?: string): Promise<WebhookResponseDto> {
     const jobId = uuidv4();
     const finalCorrelationId = correlationId || dto.correlation_id || uuidv4();
 

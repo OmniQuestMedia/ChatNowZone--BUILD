@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable } from '@nestjs/common';
 import { GenerateVideoDto, WebhookResponseDto } from '../dto/cyranoengines.dto';
 import { WebhookCallbackService } from './webhook-callback.service';
@@ -24,10 +25,7 @@ export class VideoGenerationService {
     private readonly learningLoopService: LearningLoopCaptureService,
   ) {}
 
-  async generate(
-    dto: GenerateVideoDto,
-    correlationId?: string,
-  ): Promise<WebhookResponseDto> {
+  async generate(dto: GenerateVideoDto, correlationId?: string): Promise<WebhookResponseDto> {
     const jobId = uuidv4();
     const finalCorrelationId = correlationId || dto.correlation_id || uuidv4();
 

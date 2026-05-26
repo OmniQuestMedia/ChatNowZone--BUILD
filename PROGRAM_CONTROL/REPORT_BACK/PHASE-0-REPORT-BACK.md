@@ -29,18 +29,18 @@ PROGRAM_CONTROL/REPORT_BACK/PHASE-0-REPORT-BACK.md          (this file)
 
 ## Phase 0 Task Checklist
 
-| Task | Status | Evidence |
-|---|---|---|
-| Land OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md | ✅ DONE | `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` created (INFRA_v1.0) |
-| Bootstrap `docs/POLICIES/` | ✅ DONE | Directory + `README.md` created |
-| Reference POLICIES in README | ✅ DONE | Added §Authoritative docs entry for INFRA policy + policy index |
-| Reference POLICIES in copilot-instructions | ✅ DONE | Added `**Infrastructure & Security Policy:**` line |
-| eCommsZone client interface stub | ✅ DONE | `ecommszone-client.interface.ts` — `IECommsZoneClient` + `ECommsZoneClientNoop` |
-| eCommsZone integration audit | ✅ DONE | `INTEGRATION_AUDIT.md` — gaps ECZ-GAP-001 through ECZ-GAP-004 documented |
-| Webhook contract audit | ✅ DONE | `WEBHOOK_CONTRACTS.md` — eCommsZone + RRR + Cyrano contracts documented |
-| ship-gate-verifier INFRA_v1.0 checks | ✅ DONE | Checks INFRA-1 (Canada residency), INFRA-2 (WORM/S3 Object Lock), INFRA-3 (PII_REFERENCE_ONLY) |
-| Archive sweep (pre-2026-05-06 infra docs) | ✅ DONE | No conflicting docs found; `archive/INFRA-PRE-2026-05-06/ARCHIVE_MANIFEST.md` filed |
-| Cross-repo webhook contract confirmation | ✅ DONE (partial) | Cyrano CONFIRMED. eCommsZone + RRR PENDING partner confirmation (see blockers) |
+| Task                                            | Status            | Evidence                                                                                       |
+| ----------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| Land OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md | ✅ DONE           | `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` created (INFRA_v1.0)                |
+| Bootstrap `docs/POLICIES/`                      | ✅ DONE           | Directory + `README.md` created                                                                |
+| Reference POLICIES in README                    | ✅ DONE           | Added §Authoritative docs entry for INFRA policy + policy index                                |
+| Reference POLICIES in copilot-instructions      | ✅ DONE           | Added `**Infrastructure & Security Policy:**` line                                             |
+| eCommsZone client interface stub                | ✅ DONE           | `ecommszone-client.interface.ts` — `IECommsZoneClient` + `ECommsZoneClientNoop`                |
+| eCommsZone integration audit                    | ✅ DONE           | `INTEGRATION_AUDIT.md` — gaps ECZ-GAP-001 through ECZ-GAP-004 documented                       |
+| Webhook contract audit                          | ✅ DONE           | `WEBHOOK_CONTRACTS.md` — eCommsZone + RRR + Cyrano contracts documented                        |
+| ship-gate-verifier INFRA_v1.0 checks            | ✅ DONE           | Checks INFRA-1 (Canada residency), INFRA-2 (WORM/S3 Object Lock), INFRA-3 (PII_REFERENCE_ONLY) |
+| Archive sweep (pre-2026-05-06 infra docs)       | ✅ DONE           | No conflicting docs found; `archive/INFRA-PRE-2026-05-06/ARCHIVE_MANIFEST.md` filed            |
+| Cross-repo webhook contract confirmation        | ✅ DONE (partial) | Cyrano CONFIRMED. eCommsZone + RRR PENDING partner confirmation (see blockers)                 |
 
 ---
 
@@ -73,13 +73,13 @@ grep -rn "infra.*policy|infrastructure.*policy|INFRA_v|security.*policy" \
 
 ## Blockers / Open Gaps
 
-| Gap | Description | Owner | Blocking |
-|---|---|---|---|
-| ECZ-GAP-001 | eCommsZone npm client package not yet published | eCommsZone partner | Phase 1 eCommsZone routing |
-| ECZ-GAP-002 | eCommsZone Canadian residency SLA not on file | CEO / Legal | INFRA_v1.0 §8.1 |
-| ECZ-GAP-003 | hub.module.ts not wired for IECommsZoneClient DI token | Copilot/claude-code | Phase 2 mandatory routing |
-| ECZ-GAP-004 | eCommsZone inbound webhook endpoint not implemented | claude-code | Phase 2 |
-| RRR-GAP-001 | RRR webhook endpoint confirmation pending | RedRoomRewards / CEO | Phase 2 |
+| Gap         | Description                                            | Owner                | Blocking                   |
+| ----------- | ------------------------------------------------------ | -------------------- | -------------------------- |
+| ECZ-GAP-001 | eCommsZone npm client package not yet published        | eCommsZone partner   | Phase 1 eCommsZone routing |
+| ECZ-GAP-002 | eCommsZone Canadian residency SLA not on file          | CEO / Legal          | INFRA_v1.0 §8.1            |
+| ECZ-GAP-003 | hub.module.ts not wired for IECommsZoneClient DI token | Copilot/claude-code  | Phase 2 mandatory routing  |
+| ECZ-GAP-004 | eCommsZone inbound webhook endpoint not implemented    | claude-code          | Phase 2                    |
+| RRR-GAP-001 | RRR webhook endpoint confirmation pending              | RedRoomRewards / CEO | Phase 2                    |
 
 ---
 
@@ -90,6 +90,7 @@ grep -rn "infra.*policy|infrastructure.*policy|INFRA_v|security.*policy" \
 ## Next Agent's First Task
 
 Per WORK-ORDER.md Phase 1:
+
 1. IaC (Terraform/AWS CDK): provision ca-central-1 VPC, private Postgres/Redis, KMS, S3 Object Lock (WORM 90-day) — satisfies INFRA-1/INFRA-2 in production
 2. Backup/DR: implement 3-2-1 immutable + quarterly test scripts
 3. Zero-trust + EDR alignment per INFRA_v1.0 §6

@@ -12,12 +12,7 @@
 //   UPLOAD → STUDIO_CONTRACT_UPLOADED
 //   SIGN   → STUDIO_CONTRACT_SIGNED
 
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { createHash, randomUUID } from 'crypto';
 import type { StudioContractDocument, StudioContractStatus } from '@prisma/client';
 import { PrismaService } from '../../core-api/src/prisma.service';
@@ -197,9 +192,7 @@ export class StudioContractService {
         studio_id: existing.studio_id,
         document_hash: existing.document_hash,
         // typed_name redacted — store hash only in audit ledger
-        typed_name_hash: createHash('sha256')
-          .update(params.typed_name.trim())
-          .digest('hex'),
+        typed_name_hash: createHash('sha256').update(params.typed_name.trim()).digest('hex'),
       },
       metadata: { rule: this.RULE_ID },
     });

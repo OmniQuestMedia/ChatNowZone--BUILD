@@ -5,12 +5,7 @@
 export const RISK_ENGINE_RULE_ID = 'RISK_ENGINE_v1';
 
 /** Coarse business intent the evaluator was invoked for. */
-export type RiskIntent =
-  | 'PURCHASE'
-  | 'SPEND'
-  | 'DIAMOND_INTAKE'
-  | 'EXTENSION'
-  | 'RECOVERY';
+export type RiskIntent = 'PURCHASE' | 'SPEND' | 'DIAMOND_INTAKE' | 'EXTENSION' | 'RECOVERY';
 
 /** Final tier — drives downstream UX and step-up requirements. */
 export type RiskTier = 'GREEN' | 'AMBER' | 'RED' | 'CRITICAL';
@@ -28,12 +23,12 @@ export interface RegionSignals {
 
 /** Behavioural slice — captured from the wallet / chat / spend timeline. */
 export interface BehaviouralSignals {
-  spendVelocity24hUsd: number;          // recent spend velocity
-  prevDisputeCount: number;             // historical dispute count
-  failedAuthCount24h: number;           // failed payment auths last 24h
-  accountTenureDays: number;            // age of the account
-  silenceSecondsInSession: number;      // 0 if not in a session
-  highHeatBurstFlag: boolean;           // FFS spike + tip burst
+  spendVelocity24hUsd: number; // recent spend velocity
+  prevDisputeCount: number; // historical dispute count
+  failedAuthCount24h: number; // failed payment auths last 24h
+  accountTenureDays: number; // age of the account
+  silenceSecondsInSession: number; // 0 if not in a session
+  highHeatBurstFlag: boolean; // FFS spike + tip burst
 }
 
 /**
@@ -79,12 +74,12 @@ export interface SignalBreakdown {
 
 /** Result envelope returned to callers (Hub, GateGuard, Diamond Concierge). */
 export interface RiskEvaluationResult {
-  id: string | null;                    // null when persistence is skipped
+  id: string | null; // null when persistence is skipped
   correlationId: string;
-  compositeScore: number;               // 0..100
+  compositeScore: number; // 0..100
   tier: RiskTier;
   decision: RiskDecision;
-  reasonCodes: readonly string[];       // ≤5
+  reasonCodes: readonly string[]; // ≤5
   signalBreakdown: SignalBreakdown;
   ruleAppliedId: string;
   evaluatedAtUtc: string;

@@ -160,9 +160,7 @@ export class StudioService {
           role,
           status: 'ACTIVE',
           correlation_id,
-          reason_code: isNewStudio
-            ? 'STUDIO_OWNER_BOOTSTRAP'
-            : 'CREATOR_JOIN_EXISTING',
+          reason_code: isNewStudio ? 'STUDIO_OWNER_BOOTSTRAP' : 'CREATOR_JOIN_EXISTING',
           rule_applied_id: this.RULE_ID,
           organization_id: req.organization_id,
           tenant_id: req.tenant_id,
@@ -267,14 +265,9 @@ export class StudioService {
     return toStudioPublic(updated);
   }
 
-  async setCommission(
-    studioId: string,
-    req: SetCommissionRequestDto,
-  ): Promise<StudioPublic> {
+  async setCommission(studioId: string, req: SetCommissionRequestDto): Promise<StudioPublic> {
     if (req.commission_rate < 0 || req.commission_rate > 1) {
-      throw new BadRequestException(
-        'STUDIO_COMMISSION_BOUNDS: commission_rate must be in [0, 1]',
-      );
+      throw new BadRequestException('STUDIO_COMMISSION_BOUNDS: commission_rate must be in [0, 1]');
     }
     const correlation_id = req.correlation_id ?? `studio_comm_${randomUUID()}`;
     const before = await this.prisma.studio.findUnique({ where: { id: studioId } });

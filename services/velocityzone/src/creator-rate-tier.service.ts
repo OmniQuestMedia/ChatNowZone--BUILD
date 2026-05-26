@@ -37,12 +37,9 @@ export class CreatorRateTierService {
   async resolveRate(creatorId: string, asOf: Date = new Date()): Promise<CreatorEffectiveRate> {
     const row = await this.prisma.creatorRateTier.findFirst({
       where: {
-        creator_id:      creatorId,
-        effective_from:  { lte: asOf },
-        OR: [
-          { effective_to: null },
-          { effective_to: { gt: asOf } },
-        ],
+        creator_id: creatorId,
+        effective_from: { lte: asOf },
+        OR: [{ effective_to: null }, { effective_to: { gt: asOf } }],
       },
       orderBy: { effective_from: 'desc' },
     });
@@ -54,18 +51,18 @@ export class CreatorRateTierService {
         asOf: asOf.toISOString(),
       });
       return {
-        tier_name:           'FOUNDING',
-        rate_floor_usd:   GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
+        tier_name: 'FOUNDING',
+        rate_floor_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
         rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_CEILING,
-        rule_applied_id:  CREATOR_RATE_RULE_ID,
+        rule_applied_id: CREATOR_RATE_RULE_ID,
       };
     }
 
     return {
-      tier_name:           row.tier_name,
-      rate_floor_usd:   new Decimal(row.rate_floor_usd.toString()),
+      tier_name: row.tier_name,
+      rate_floor_usd: new Decimal(row.rate_floor_usd.toString()),
       rate_ceiling_usd: new Decimal(row.rate_ceiling_usd.toString()),
-      rule_applied_id:  row.rule_applied_id,
+      rule_applied_id: row.rule_applied_id,
     };
   }
 
@@ -88,16 +85,16 @@ export class CreatorRateTierService {
 
     await this.prisma.creatorRateTier.create({
       data: {
-        tier_id:          randomUUID(),
-        creator_id:       creatorId,
-        tier_name:        'FOUNDING',
-        rate_floor_usd:   GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
+        tier_id: randomUUID(),
+        creator_id: creatorId,
+        tier_name: 'FOUNDING',
+        rate_floor_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_FLOOR,
         rate_ceiling_usd: GovernanceConfig.CREATOR_RATE_FOUNDING_CEILING,
-        effective_from:   effectiveFrom,
-        effective_to:  null,
-        correlation_id:   correlationId,
-        reason_code:      'FOUNDING_SEED',
-        rule_applied_id:  CREATOR_RATE_RULE_ID,
+        effective_from: effectiveFrom,
+        effective_to: null,
+        correlation_id: correlationId,
+        reason_code: 'FOUNDING_SEED',
+        rule_applied_id: CREATOR_RATE_RULE_ID,
       },
     });
 

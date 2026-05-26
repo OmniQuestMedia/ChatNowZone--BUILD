@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable } from '@nestjs/common';
 
 /**
@@ -62,10 +63,7 @@ export class StudioTokensChargingService {
         status: 'pending',
       };
     } catch (error) {
-      console.error(
-        `[StudioTokens] Failed to initiate charge ${chargeId}:`,
-        error,
-      );
+      console.error(`[StudioTokens] Failed to initiate charge ${chargeId}:`, error);
       throw new Error(`Charge initiation failed: ${error.message}`);
     }
   }
@@ -96,10 +94,7 @@ export class StudioTokensChargingService {
       //   body: JSON.stringify(confirmPayload),
       // });
     } catch (error) {
-      console.error(
-        `[StudioTokens] Failed to confirm charge ${params.charge_id}:`,
-        error,
-      );
+      console.error(`[StudioTokens] Failed to confirm charge ${params.charge_id}:`, error);
       // Log but don't throw - this is a callback failure
     }
   }
@@ -132,10 +127,7 @@ export class StudioTokensChargingService {
       //   body: JSON.stringify(refundPayload),
       //   });
     } catch (error) {
-      console.error(
-        `[StudioTokens] Failed to refund charge ${params.charge_id}:`,
-        error,
-      );
+      console.error(`[StudioTokens] Failed to refund charge ${params.charge_id}:`, error);
       // Log but don't throw - this is a callback failure
     }
   }

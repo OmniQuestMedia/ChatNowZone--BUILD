@@ -24,11 +24,6 @@ import { WebUsbHardwareAdapter } from './adapters/webusb.adapter';
     WebBluetoothHardwareAdapter,
     PhoneHapticHardwareAdapter,
   ],
-  exports: [
-    SenSyncService,
-    SenSyncRateLimitService,
-    SenSyncMetrics,
-    HardwareAdapterRegistry,
-  ],
+  exports: [SenSyncService, SenSyncRateLimitService, SenSyncMetrics, HardwareAdapterRegistry],
 })
 export class SenSyncModule {}

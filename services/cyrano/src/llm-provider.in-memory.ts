@@ -23,9 +23,7 @@ export class InMemoryCyranoLlmProvider implements CyranoLlmProvider {
     // Deterministic transformation — append tier + persona tone hints without
     // any external dependency. Production providers swap this for a model call.
     const tone = req.context.personaTone ? `[${req.context.personaTone}] ` : '';
-    const memoryHint = req.memorySummary
-      ? ` (recall: ${req.memorySummary.slice(0, 80)})`
-      : '';
+    const memoryHint = req.memorySummary ? ` (recall: ${req.memorySummary.slice(0, 80)})` : '';
     const refined = `${tone}${req.baseCopy}${memoryHint}`.slice(0, 280);
     const elapsed = Date.now() - start;
     return {

@@ -11,7 +11,7 @@
 **CEO_GATE:** YES — canonicalization decisions require CEO input
 **Rule Applied:** OQMI_GOVERNANCE
 
------
+---
 
 ## 1. CONTEXT
 

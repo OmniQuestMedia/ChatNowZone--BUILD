@@ -39,12 +39,11 @@ export interface PixelLegacyPageRender {
 
 export function renderPixelLegacyPage(inputs: PixelLegacyPageInputs): PixelLegacyPageRender {
   const { view } = inputs;
-  const branch: 'GRANTED' | 'GATEWAY_OPEN' | 'GATEWAY_CLOSED' =
-    view.is_pixel_legacy
-      ? 'GRANTED'
-      : view.seat_meter.gateway_open
-        ? 'GATEWAY_OPEN'
-        : 'GATEWAY_CLOSED';
+  const branch: 'GRANTED' | 'GATEWAY_OPEN' | 'GATEWAY_CLOSED' = view.is_pixel_legacy
+    ? 'GRANTED'
+    : view.seat_meter.gateway_open
+      ? 'GATEWAY_OPEN'
+      : 'GATEWAY_CLOSED';
 
   const tree = el(
     'main',
@@ -57,9 +56,7 @@ export function renderPixelLegacyPage(inputs: PixelLegacyPageInputs): PixelLegac
     [
       renderHeader(view, branch),
       renderSeatMeter(view.seat_meter),
-      branch === 'GRANTED'
-        ? renderGrantedPanel(view)
-        : renderUnfilledPanel(view, branch),
+      branch === 'GRANTED' ? renderGrantedPanel(view) : renderUnfilledPanel(view, branch),
       renderBenefitsPanel(view.benefits, branch),
     ],
   );
@@ -124,8 +121,7 @@ function renderHeader(
 // ─── Seat meter ────────────────────────────────────────────────────────────
 
 function renderSeatMeter(meter: PixelLegacySeatMeter): RenderElement {
-  const pct =
-    meter.seats_total > 0 ? Math.round((meter.seats_taken * 100) / meter.seats_total) : 0;
+  const pct = meter.seats_total > 0 ? Math.round((meter.seats_taken * 100) / meter.seats_total) : 0;
   return el(
     'section',
     {
@@ -194,28 +190,18 @@ function renderGrantedPanel(view: PixelLegacyStatusView): RenderElement {
     },
     [
       el('h2', {}, ['Welcome, Pixel Legacy creator']),
-      el(
-        'p',
-        { test_id: 'pixel-legacy-granted-blurb' },
-        [
-          `Congratulations, ${view.display_name}. You are Pixel Legacy creator ` +
-            `#${view.seat_number ?? '—'}. Your profile badge is active and your ` +
-            'Cyrano™ lifetime membership has been unlocked.',
-        ],
-      ),
+      el('p', { test_id: 'pixel-legacy-granted-blurb' }, [
+        `Congratulations, ${view.display_name}. You are Pixel Legacy creator ` +
+          `#${view.seat_number ?? '—'}. Your profile badge is active and your ` +
+          'Cyrano™ lifetime membership has been unlocked.',
+      ]),
       el('dl', { classes: ['cnz-stat-grid'] }, [
         el('dt', {}, ['Seat number']),
-        el(
-          'dd',
-          { test_id: 'pixel-legacy-seat-number' },
-          [String(view.seat_number ?? '—')],
-        ),
+        el('dd', { test_id: 'pixel-legacy-seat-number' }, [String(view.seat_number ?? '—')]),
         el('dt', {}, ['Granted on']),
-        el(
-          'dd',
-          { test_id: 'pixel-legacy-granted-at' },
-          [view.granted_at_utc?.slice(0, 10) ?? '—'],
-        ),
+        el('dd', { test_id: 'pixel-legacy-granted-at' }, [
+          view.granted_at_utc?.slice(0, 10) ?? '—',
+        ]),
       ]),
       view.cyrano_panel_unlocked
         ? el(
@@ -290,25 +276,17 @@ function renderBenefitsPanel(
       ),
       el('dl', { classes: ['cnz-stat-grid'] }, [
         el('dt', {}, ['Payout range']),
-        el(
-          'dd',
-          { test_id: 'pixel-legacy-payout-range' },
-          [
-            `$${benefits.payout_range_min_usd.toFixed(2)}–$${benefits.payout_range_max_usd.toFixed(2)}/CZT`,
-          ],
-        ),
+        el('dd', { test_id: 'pixel-legacy-payout-range' }, [
+          `$${benefits.payout_range_min_usd.toFixed(2)}–$${benefits.payout_range_max_usd.toFixed(2)}/CZT`,
+        ]),
         el('dt', {}, ['Cyrano™ access']),
-        el(
-          'dd',
-          { test_id: 'pixel-legacy-cyrano-benefit' },
-          [benefits.lifetime_cyrano ? 'Lifetime membership (no expiration)' : 'Standard access'],
-        ),
+        el('dd', { test_id: 'pixel-legacy-cyrano-benefit' }, [
+          benefits.lifetime_cyrano ? 'Lifetime membership (no expiration)' : 'Standard access',
+        ]),
         el('dt', {}, ['Signing bonus']),
-        el(
-          'dd',
-          { test_id: 'pixel-legacy-signing-bonus' },
-          [`Month ${benefits.signing_bonus_month} bonus (PIXEL_LEGACY_SIGNING_BONUS)`],
-        ),
+        el('dd', { test_id: 'pixel-legacy-signing-bonus' }, [
+          `Month ${benefits.signing_bonus_month} bonus (PIXEL_LEGACY_SIGNING_BONUS)`,
+        ]),
       ]),
     ],
   );

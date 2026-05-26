@@ -19,9 +19,7 @@ export const SENSYNC_MAX_BPM_DELTA = 50;
 /** Result of a rate-limit decision. */
 export interface RateLimitDecision {
   allowed: boolean;
-  reason_code?:
-    | 'RATE_LIMITED_PER_SECOND'
-    | 'ANOMALY_BPM_DELTA_EXCEEDED';
+  reason_code?: 'RATE_LIMITED_PER_SECOND' | 'ANOMALY_BPM_DELTA_EXCEEDED';
   observed_rate?: number;
   observed_delta?: number;
 }

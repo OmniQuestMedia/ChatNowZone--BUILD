@@ -12,19 +12,19 @@
 
 ## Phase 0: Cleanup & Housekeeping (Immediate — 1-2 days)
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| P0-001 | Add `OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` to `docs/POLICIES/` | ✅ DONE | Filed at `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` |
-| P0-002 | Root `README.md` with architecture overview, tenant diagram, governance links | ✅ DONE | `README.md` present and references `docs/ARCHITECTURE_OVERVIEW.md` and all governance docs |
-| P0-003 | `.github/copilot-instructions.md` (Droid Mode, rule_applied_id, Canada-only) | ✅ DONE | File present at `.github/copilot-instructions.md` |
-| P0-004 | `.github/CODEOWNERS` | ✅ DONE | File present at `.github/CODEOWNERS` |
-| P0-005 | `.github/dependabot.yml` | ✅ DONE | Filed — npm, GitHub Actions, Docker ecosystems; weekly Monday schedule |
-| P0-006 | `.github/workflows/ci.yml` (basic lint + security scan) | ✅ DONE | `ci.yml` + `codeql.yml` + `super-linter.yml` + `ship-gate.yml` present |
-| P0-007 | `PROGRAM_CONTROL/DIRECTIVES/QUEUE/` with initial directive | ✅ DONE | Queue populated: `CNZ-WORK-001.md`, `OQMI_GOVERNANCE.md`, `OQMI_SYSTEM_STATE.md`, `OSS-*` |
-| P0-008 | `.gitignore` (secrets, node_modules, .env, media temp — no raw PII) | ✅ DONE | `.gitignore` present and covers all required patterns |
-| P0-009 | Archive noise | ✅ DONE | No noise found; `archive/` directory exists for future archival |
-| P0-010 | Integrate eCommsZone Node.js client as first dependency | 🔴 BLOCKED | Package name not yet published / provided — see `CROSS-REPO-FLAG-001.md` |
-| P0-011 | Cross-Repo Flag: Confirm webhook contract with eCommsZone, Cyrano, RedRoomRewards | 🟡 FLAGGED | See `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md` |
+| #      | Task                                                                              | Status     | Notes                                                                                      |
+| ------ | --------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| P0-001 | Add `OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` to `docs/POLICIES/`              | ✅ DONE    | Filed at `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`                        |
+| P0-002 | Root `README.md` with architecture overview, tenant diagram, governance links     | ✅ DONE    | `README.md` present and references `docs/ARCHITECTURE_OVERVIEW.md` and all governance docs |
+| P0-003 | `.github/copilot-instructions.md` (Droid Mode, rule_applied_id, Canada-only)      | ✅ DONE    | File present at `.github/copilot-instructions.md`                                          |
+| P0-004 | `.github/CODEOWNERS`                                                              | ✅ DONE    | File present at `.github/CODEOWNERS`                                                       |
+| P0-005 | `.github/dependabot.yml`                                                          | ✅ DONE    | Filed — npm, GitHub Actions, Docker ecosystems; weekly Monday schedule                     |
+| P0-006 | `.github/workflows/ci.yml` (basic lint + security scan)                           | ✅ DONE    | `ci.yml` + `codeql.yml` + `super-linter.yml` + `ship-gate.yml` present                     |
+| P0-007 | `PROGRAM_CONTROL/DIRECTIVES/QUEUE/` with initial directive                        | ✅ DONE    | Queue populated: `CNZ-WORK-001.md`, `OQMI_GOVERNANCE.md`, `OQMI_SYSTEM_STATE.md`, `OSS-*`  |
+| P0-008 | `.gitignore` (secrets, node_modules, .env, media temp — no raw PII)               | ✅ DONE    | `.gitignore` present and covers all required patterns                                      |
+| P0-009 | Archive noise                                                                     | ✅ DONE    | No noise found; `archive/` directory exists for future archival                            |
+| P0-010 | Integrate eCommsZone Node.js client as first dependency                           | 🔴 BLOCKED | Package name not yet published / provided — see `CROSS-REPO-FLAG-001.md`                   |
+| P0-011 | Cross-Repo Flag: Confirm webhook contract with eCommsZone, Cyrano, RedRoomRewards | 🟡 FLAGGED | See `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md`                              |
 
 **Exit Criteria:** Repo passes `git ls-files | wc -l` structure check + policy file present.
 
@@ -78,16 +78,19 @@ After Phase 0 complete — CEO sign-off required before Phase 1 code.
 ## Handoff Block
 
 **Built in this execution:**
+
 - `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` — INFRA_v1.0 policy
 - `.github/dependabot.yml` — npm, GitHub Actions, Docker
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.1.md` — this file
 - `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md` — cross-repo webhook / eCommsZone flag
 
 **Intentionally left incomplete:**
+
 - P0-010 eCommsZone npm integration — requires CEO/team to supply npm package name
 - P0-011 webhook contracts — requires cross-repo coordination (see CROSS-REPO-FLAG-001.md)
 
 **Next agent's first task:**
+
 1. CEO to confirm npm package name for eCommsZone Node.js client
 2. Once confirmed, run `yarn add <package-name>` and update `CROSS-REPO-FLAG-001.md` status to RESOLVED
 3. Confirm webhook contracts per CROSS-REPO-FLAG-001.md §2, then update this file P0-011 to DONE

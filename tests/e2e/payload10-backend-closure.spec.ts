@@ -191,9 +191,7 @@ class FakeRegionSignalService {
 // ── Risk Engine harness ──────────────────────────────────────────────────
 
 async function buildRiskEngine() {
-  const { RiskEngineService } = await import(
-    '../../services/risk-engine/src/risk-engine.service'
-  );
+  const { RiskEngineService } = await import('../../services/risk-engine/src/risk-engine.service');
   const prisma = new FakeRiskEnginePrisma();
   const nats = new FakeNats();
   const region = new FakeRegionSignalService();
@@ -210,9 +208,7 @@ async function buildRiskEngine() {
 // ── PayoutRateLock harness ───────────────────────────────────────────────
 
 async function buildPayoutRateLock() {
-  const { PayoutRateLockService } = await import(
-    '../../services/ledger/payout-rate-lock.service'
-  );
+  const { PayoutRateLockService } = await import('../../services/ledger/payout-rate-lock.service');
   const prisma = new FakePayoutLockPrisma();
   const nats = new FakeNats();
   const rateCards = new FakeRedbookRateCardService();
@@ -252,9 +248,7 @@ describe('PAYLOAD 10 — backend closure', () => {
       const result = await engine.evaluate(input);
       expect(result.tier).toBe('GREEN');
       expect(result.decision).toBe('PASS');
-      expect(result.compositeScore).toBeLessThanOrEqual(
-        RISK_TIER_THRESHOLDS.GREEN_MAX,
-      );
+      expect(result.compositeScore).toBeLessThanOrEqual(RISK_TIER_THRESHOLDS.GREEN_MAX);
     });
 
     test('Diamond Concierge coercion flag escalates to CRITICAL', async () => {
@@ -304,9 +298,7 @@ describe('PAYLOAD 10 — backend closure', () => {
       });
       expect(result.allowed).toBe(false);
       expect(result.reasonCode).toBe('AUDIO_SIGNAL_ABSENT');
-      expect(
-        nats.published.some((p) => p.topic.includes('escalation.blocked')),
-      ).toBe(true);
+      expect(nats.published.some((p) => p.topic.includes('escalation.blocked'))).toBe(true);
     });
 
     test('positive sample within window unblocks escalation', () => {

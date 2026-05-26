@@ -219,7 +219,7 @@ export class AIAnalyticsService {
     });
 
     // Get creator IDs (names not available in current Creator model)
-    const creatorIds = generationsByCreator.map((g) => g.creator_id);
+    const _creatorIds = generationsByCreator.map((g) => g.creator_id);
 
     return generationsByCreator.map((gen, index) => ({
       creatorId: gen.creator_id,

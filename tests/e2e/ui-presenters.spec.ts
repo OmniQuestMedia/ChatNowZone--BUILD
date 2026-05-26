@@ -21,10 +21,7 @@ import {
   heatTierAriaLabel,
   resolveBreakpoint,
 } from '../../ui/config/accessibility';
-import {
-  MembershipPresenter,
-  DEFAULT_MEMBERSHIP_GOVERNANCE,
-} from '../../ui/view-models/membership.presenter';
+import { MembershipPresenter } from '../../ui/view-models/membership.presenter';
 import { renderMembershipPage } from '../../ui/app/vip/membership/page';
 import { renderPixelLegacyPage } from '../../ui/app/creator/pixel-legacy/page';
 import type { PixelLegacyStatusView } from '../../ui/types/creator-panel-contracts';
@@ -527,9 +524,13 @@ describe('Surface 02 — Creator Cyrano Control Panel — new features', () => {
     expect(findByTestId(render.tree, 'creator-control-aggregated-chat-feed')).toBeDefined();
     expect(findByTestId(render.tree, 'creator-control-chat-filters')).toBeDefined();
     expect(findByTestId(render.tree, 'creator-control-chat-row-msg-1')).toBeDefined();
-    expect(findByTestId(render.tree, 'creator-control-chat-badge-msg-1')?.children).toEqual(['OBS']);
+    expect(findByTestId(render.tree, 'creator-control-chat-badge-msg-1')?.children).toEqual([
+      'OBS',
+    ]);
     expect(findByTestId(render.tree, 'creator-control-chat-cyrano-context-msg-1')).toBeDefined();
-    expect(findByTestId(render.tree, 'creator-control-chat-moderation-tools-msg-1')?.children).toEqual(['HIDE']);
+    expect(
+      findByTestId(render.tree, 'creator-control-chat-moderation-tools-msg-1')?.children,
+    ).toEqual(['HIDE']);
   });
 
   it('renders CyranoSessionSummary widget on the command pane', () => {

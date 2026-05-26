@@ -118,10 +118,7 @@ export class GemstoneService {
   /**
    * Toggle gemstone visibility (PUBLIC ↔ PRIVATE).
    */
-  async updateVisibility(
-    gem_id: string,
-    visibility: GemVisibility,
-  ): Promise<GemstoneAwardRecord> {
+  async updateVisibility(gem_id: string, visibility: GemVisibility): Promise<GemstoneAwardRecord> {
     const row = await this.prisma.gemstoneAward.update({
       where: { id: gem_id },
       data: { visibility },
@@ -137,7 +134,7 @@ export class GemstoneService {
       where: { guest_id, status: 'QUEUED' },
       orderBy: { created_at: 'asc' },
     });
-    return rows.map(r => this.mapRow(r));
+    return rows.map((r) => this.mapRow(r));
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
@@ -145,14 +142,16 @@ export class GemstoneService {
   private scheduleSend(gem: GemstoneAwardRecord): void {
     if (gem.send_delay_sec <= 0) {
       // Fire immediately (next tick).
-      setImmediate(() => this.sendGemstone(gem.gem_id).catch(err =>
-        this.logger.error('GemstoneService: immediate send failed', err),
-      ));
+      setImmediate(() =>
+        this.sendGemstone(gem.gem_id).catch((err) =>
+          this.logger.error('GemstoneService: immediate send failed', err),
+        ),
+      );
       return;
     }
 
     const timer = setTimeout(() => {
-      this.sendGemstone(gem.gem_id).catch(err =>
+      this.sendGemstone(gem.gem_id).catch((err) =>
         this.logger.error('GemstoneService: delayed send failed', err, {
           gem_id: gem.gem_id,
         }),

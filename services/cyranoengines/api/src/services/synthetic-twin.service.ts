@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable } from '@nestjs/common';
 import { GenerateSyntheticTwinDto, WebhookResponseDto } from '../dto/cyranoengines.dto';
 import { WebhookCallbackService } from './webhook-callback.service';

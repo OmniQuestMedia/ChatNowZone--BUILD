@@ -49,9 +49,7 @@ export class ContainmentHoldService {
     action: ContainmentAction = 'wallet_hold',
   ): ContainmentResult {
     if (!userId || !disputeId) {
-      throw new Error(
-        'ContainmentHoldService: userId and disputeId are required.',
-      );
+      throw new Error('ContainmentHoldService: userId and disputeId are required.');
     }
 
     const issuedAt = new Date().toISOString();
@@ -74,6 +72,7 @@ export class ContainmentHoldService {
 
     // Emit Audit_Event via structured output so the calling layer can
     // persist a corresponding audit_events INSERT for durable audit trail.
+    // eslint-disable-next-line no-console
     console.log('[Audit_Event]', JSON.stringify(auditEvent));
 
     return {

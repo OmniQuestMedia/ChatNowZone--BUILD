@@ -1,14 +1,5 @@
 // HZ: SenSync™ REST controller — session lifecycle, consent, samples, purge
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Logger,
-  Optional,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Optional, Param, Post } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { SenSyncService } from './sensync.service';
 import { SenSyncMetrics, type SenSyncMetricsSnapshot } from './sensync.metrics';
@@ -192,9 +183,7 @@ export class SenSyncController {
    * reconnect lifecycle (RECONNECT_ATTEMPT then RECONNECT_FAILED on exhaust).
    */
   @Post('hardware/disconnect')
-  notifyRendererDisconnect(
-    @Body() dto: RendererDisconnectDto,
-  ): { ok: true } | { error: string } {
+  notifyRendererDisconnect(@Body() dto: RendererDisconnectDto): { ok: true } | { error: string } {
     if (!this.adapters) return { error: 'HARDWARE_REGISTRY_DISABLED' };
     const adapter = this.adapters.resolve(dto.bridge);
     if (!isRendererBridgeAdapter(adapter)) {
@@ -302,9 +291,7 @@ export class SenSyncController {
 
   /** GET /sensync/sessions/:session_id */
   @Get('sessions/:session_id')
-  getSession(
-    @Param('session_id') session_id: string,
-  ): SenSyncSessionState | { error: string } {
+  getSession(@Param('session_id') session_id: string): SenSyncSessionState | { error: string } {
     const state = this.senSync.getSessionState(session_id);
     if (!state) return { error: 'SESSION_NOT_FOUND' };
     return state;

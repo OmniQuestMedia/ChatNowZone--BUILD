@@ -21,10 +21,10 @@ export type SenSyncDomain =
 
 /** Hardware bridge backends. */
 export type SenSyncHardwareBridge =
-  | 'LOVENSE'        // Lovense SDK
-  | 'WEB_USB'        // Generic WebUSB device
-  | 'WEB_BLUETOOTH'  // Generic Web Bluetooth / GATT 0x180D
-  | 'PHONE_HAPTIC';  // Mobile fallback (no hardware BPM; phone only)
+  | 'LOVENSE' // Lovense SDK
+  | 'WEB_USB' // Generic WebUSB device
+  | 'WEB_BLUETOOTH' // Generic Web Bluetooth / GATT 0x180D
+  | 'PHONE_HAPTIC'; // Mobile fallback (no hardware BPM; phone only)
 
 /** Membership tiers (canonical six-value enum per DOMAIN_GLOSSARY.md). */
 export type MembershipTier =
@@ -37,9 +37,9 @@ export type MembershipTier =
 
 /** Consent basis codes — Law 25 / GDPR / PIPEDA. */
 export type SenSyncConsentBasis =
-  | 'EXPLICIT_OPT_IN'  // guest explicitly accepted via one-tap UI
+  | 'EXPLICIT_OPT_IN' // guest explicitly accepted via one-tap UI
   | 'PARTIALLY_REVOKED' // at least one scope revoked but at least one remains
-  | 'REVOKED';         // guest withdrew consent (all scopes)
+  | 'REVOKED'; // guest withdrew consent (all scopes)
 
 /**
  * Phase 5.3 — granular consent scopes.
@@ -189,7 +189,7 @@ export interface SenSyncConsentRecord {
   consent_scopes: SenSyncConsentScope[];
   /** Phase 5.3 — UTC timestamp at which the row auto-expires (ephemerality). */
   consent_expires_at?: string;
-  ip_hash?: string;             // SHA-256 of guest IP — never raw IP
+  ip_hash?: string; // SHA-256 of guest IP — never raw IP
   device_fingerprint?: string;
   domain: SenSyncDomain;
   correlation_id: string;
@@ -223,7 +223,7 @@ export interface SenSyncTierDisabledEvent {
 export interface SenSyncPurgeRequest {
   purge_id: string;
   guest_id: string;
-  requested_by: string;          // actor_id initiating the purge
+  requested_by: string; // actor_id initiating the purge
   requested_at_utc: string;
   correlation_id: string;
   reason_code: string;
@@ -273,9 +273,7 @@ export const SENSYNC_BPM_MIN = 30;
 export const SENSYNC_BPM_MAX = 220;
 
 /** Tiers permitted to use hardware biometric features. */
-export const SENSYNC_HARDWARE_TIERS: readonly MembershipTier[] = [
-  'VIP_DIAMOND',
-] as const;
+export const SENSYNC_HARDWARE_TIERS: readonly MembershipTier[] = ['VIP_DIAMOND'] as const;
 
 /** Current consent version string (bumped when consent language changes). */
 export const SENSYNC_CONSENT_VERSION = 'SENSYNC_CONSENT_v1';

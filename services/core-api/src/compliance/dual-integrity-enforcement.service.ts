@@ -67,6 +67,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
 
   onModuleInit(): void {
     // Subscribe to GateGuard bypass attempts (should never happen)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- External NATS message payload
     this.nats.subscribe('gateguard.bypass.attempted', (payload: any) => {
       this.recordViolation({
         violation_type: 'GATEGUARD_BYPASS',
@@ -83,6 +84,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to Welfare Guard bypass attempts
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- External NATS message payload
     this.nats.subscribe('welfare.cooldown.bypassed', (payload: any) => {
       this.recordViolation({
         violation_type: 'WELFARE_BYPASS',
@@ -99,6 +101,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to audit chain integrity failures
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- External NATS message payload
     this.nats.subscribe(NATS_TOPICS.AUDIT_CHAIN_INTEGRITY_FAILURE, (payload: any) => {
       this.recordViolation({
         violation_type: 'AUDIT_CHAIN_BREAK',
@@ -115,11 +118,17 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to legal hold bypass attempts
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- External NATS message payload
     this.nats.subscribe('legal.hold.bypassed', (payload: any) => {
       this.recordViolation({
         violation_type: 'LEGAL_HOLD_BYPASS',
         entity_id: payload.subject_id || 'unknown',
-        entity_type: (payload.subject_type as 'TRANSACTION' | 'PAYOUT' | 'WALLET_MUTATION' | 'CONTENT_ACTION') || 'TRANSACTION',
+        entity_type:
+          (payload.subject_type as
+            | 'TRANSACTION'
+            | 'PAYOUT'
+            | 'WALLET_MUTATION'
+            | 'CONTENT_ACTION') || 'TRANSACTION',
         detected_at_utc: new Date().toISOString(),
         correlation_id: payload.correlation_id || `violation-${Date.now()}`,
         reason_code: 'LEGAL_HOLD_BYPASS_ATTEMPTED',
@@ -131,6 +140,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to FIZ-scoped events and validate correlation_id presence
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- External NATS message payload
     this.nats.subscribe('ledger.entry.appended', (payload: any) => {
       if (!payload.correlation_id || !payload.reason_code) {
         this.recordViolation({

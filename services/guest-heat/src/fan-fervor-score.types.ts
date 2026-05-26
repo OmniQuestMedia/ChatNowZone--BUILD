@@ -82,35 +82,35 @@ export interface FfsResult {
 
 export const FFS_WEIGHT_CEILINGS = {
   /** Cumulative session tip volume (CZT). Max 25 pts. */
-  tips_czt:         25,
+  tips_czt: 25,
   /** Rolling tip velocity (tips/min). Max 20 pts. */
-  tip_velocity:     20,
+  tip_velocity: 20,
   /** Chat messages + heart reactions combined. Max 15 pts. */
-  chat_engagement:  15,
+  chat_engagement: 15,
   /** Session dwell depth. Max 5 pts. */
-  dwell:             5,
+  dwell: 5,
   /** Private/exclusive request count. Max 10 pts. */
   private_requests: 10,
   /** Long-term whale score baseline. Max 25 pts. */
-  whale_score:      25,
-} as const;  // intentional: sum = 100
+  whale_score: 25,
+} as const; // intentional: sum = 100
 
 // ── Normalisation reference maxima (linear: value / max × ceiling) ────────────
 
 export const FFS_INPUT_MAX = {
-  tips_czt_in_session:       500,   // 500 CZT = full tip pressure
-  tip_velocity_per_min:        2,   // ≥2 tips/min = full velocity
-  chat_messages_in_session:   30,   // ≥30 messages = full chat signal
-  heart_reactions_in_session:  10,  // ≥10 reactions = full engagement
-  dwell_minutes:               60,  // ≥60 min = full dwell
-  private_request_count:        5,  // ≥5 requests = full private signal
-  heartsync_bpm_delta:         40,  // ≥40 BPM above baseline = max boost
+  tips_czt_in_session: 500, // 500 CZT = full tip pressure
+  tip_velocity_per_min: 2, // ≥2 tips/min = full velocity
+  chat_messages_in_session: 30, // ≥30 messages = full chat signal
+  heart_reactions_in_session: 10, // ≥10 reactions = full engagement
+  dwell_minutes: 60, // ≥60 min = full dwell
+  private_request_count: 5, // ≥5 requests = full private signal
+  heartsync_bpm_delta: 40, // ≥40 BPM above baseline = max boost
 } as const;
 
 // ── SenSync™ / HeartSync boost bounds ────────────────────────────────────────
 
-export const FFS_HEARTSYNC_BOOST_MIN =  10;  // pts — any elevation when opted in
-export const FFS_HEARTSYNC_BOOST_MAX =  25;  // pts — maximum at full BPM elevation
+export const FFS_HEARTSYNC_BOOST_MIN = 10; // pts — any elevation when opted in
+export const FFS_HEARTSYNC_BOOST_MAX = 25; // pts — maximum at full BPM elevation
 
 // ── Tier thresholds (canonical — mirrors room-heat DOMAIN_GLOSSARY.md) ────────
 
@@ -118,7 +118,7 @@ export const FFS_TIER_THRESHOLDS: ReadonlyArray<{ min: number; tier: FfsTier }> 
   { min: 86, tier: 'INFERNO' },
   { min: 61, tier: 'HOT' },
   { min: 34, tier: 'WARM' },
-  { min:  0, tier: 'COLD' },
+  { min: 0, tier: 'COLD' },
 ];
 
 // ── Rule ID ───────────────────────────────────────────────────────────────────

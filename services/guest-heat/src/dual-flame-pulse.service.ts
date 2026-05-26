@@ -119,9 +119,7 @@ export class DualFlamePulseService {
   ): DualFlamePulseEvent | null {
     if (!QUALIFYING_HEAT.has(heat)) return null;
 
-    const eligibleGuests = Array.from(room.values()).filter(
-      e => ELIGIBLE_TIERS.has(e.tier),
-    );
+    const eligibleGuests = Array.from(room.values()).filter((e) => ELIGIBLE_TIERS.has(e.tier));
 
     if (eligibleGuests.length < 2) return null;
 

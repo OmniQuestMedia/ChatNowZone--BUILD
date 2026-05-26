@@ -19,11 +19,11 @@ is authoritative.
 Displays the Guest's membership tier and redemption cap, with an optional
 Diamond Concierge mode indicator.
 
-| Prop | Type | Required | Notes |
-|------|------|:--------:|-------|
-| `tierName` | `MembershipTier` | ✅ | Canonical six-value enum — see [`05-tier-entitlements.md`](05-tier-entitlements.md) |
-| `capPercent` | `number` | ✅ | Redemption cap percentage (0–100). Sourced from governance config; never hardcoded in UI. |
-| `isDiamondConcierge` | `boolean` | ✅ | When `true`, renders the Diamond Concierge indicator mark alongside the badge. |
+| Prop                 | Type             | Required | Notes                                                                                     |
+| -------------------- | ---------------- | :------: | ----------------------------------------------------------------------------------------- |
+| `tierName`           | `MembershipTier` |    ✅    | Canonical six-value enum — see [`05-tier-entitlements.md`](05-tier-entitlements.md)       |
+| `capPercent`         | `number`         |    ✅    | Redemption cap percentage (0–100). Sourced from governance config; never hardcoded in UI. |
+| `isDiamondConcierge` | `boolean`        |    ✅    | When `true`, renders the Diamond Concierge indicator mark alongside the badge.            |
 
 **Copy slot:** `{tier} • {cap}% redemption`
 
@@ -41,13 +41,13 @@ the same.
 
 Presenter source: `ui/types/public-wallet-contracts.ts` — three-bucket display.
 
-| Prop | Type | Required | Notes |
-|------|------|:--------:|-------|
-| `spendable` | `string` (bigint as string) | ✅ | Available ChatZoneTokens (CZT). Locale-formatted per `ui/config/theme.ts`. |
-| `escrowed` | `string` (bigint as string) | ✅ | CZT held in active escrow. |
-| `pending` | `string` (bigint as string) | ✅ | CZT pending settlement or release. |
-| `currencyLabel` | `string` | ✅ | `"CZT"` on ChatNow.Zone; RRR/Cyrano use their canonical label. |
-| `showEscrowDetail` | `boolean` | — | When `true`, expands inline EscrowView detail rows. |
+| Prop               | Type                        | Required | Notes                                                                      |
+| ------------------ | --------------------------- | :------: | -------------------------------------------------------------------------- |
+| `spendable`        | `string` (bigint as string) |    ✅    | Available ChatZoneTokens (CZT). Locale-formatted per `ui/config/theme.ts`. |
+| `escrowed`         | `string` (bigint as string) |    ✅    | CZT held in active escrow.                                                 |
+| `pending`          | `string` (bigint as string) |    ✅    | CZT pending settlement or release.                                         |
+| `currencyLabel`    | `string`                    |    ✅    | `"CZT"` on ChatNow.Zone; RRR/Cyrano use their canonical label.             |
+| `showEscrowDetail` | `boolean`                   |    —     | When `true`, expands inline EscrowView detail rows.                        |
 
 **Wireframe note:** All three buckets must always be visible (not hidden when
 zero). A zero balance renders as `0`, never as an empty cell.
@@ -59,14 +59,14 @@ zero). A zero balance renders as `0`, never as an empty cell.
 Cross-cutting overlay that surfaces compliance state. Covers four distinct
 trigger modes; each must be independently designable.
 
-| Prop | Type | Required | Notes |
-|------|------|:--------:|-------|
-| `mode` | `'bill149' \| 'gateguard' \| 'welfare' \| 'stepup'` | ✅ | Determines overlay variant. Only one mode is active at a time. |
-| `disclosureText` | `string` | ✅ (bill149) | Token-resolved string; wireframes do not override. See `BILL_149_DISCLOSURE_PREFIX`. |
-| `gateState` | `GateGuardDecision` | ✅ (gateguard) | `'PASS' \| 'SOFT_BLOCK' \| 'HARD_BLOCK'`. Drives CTA label and icon. |
-| `welfareBand` | `string` | ✅ (welfare) | Welfare Guardian band label. **Copy slot:** `Welfare Guardian: {band}`. |
-| `stepUpChallenge` | `StepUpChallenge` | ✅ (stepup) | Shape defined in StepUpModal section below. |
-| `onDismiss` | `() => void` | — | Not available in `'gateguard'` hard-block or `'stepup'` pending-MFA states. |
+| Prop              | Type                                                |    Required    | Notes                                                                                |
+| ----------------- | --------------------------------------------------- | :------------: | ------------------------------------------------------------------------------------ |
+| `mode`            | `'bill149' \| 'gateguard' \| 'welfare' \| 'stepup'` |       ✅       | Determines overlay variant. Only one mode is active at a time.                       |
+| `disclosureText`  | `string`                                            |  ✅ (bill149)  | Token-resolved string; wireframes do not override. See `BILL_149_DISCLOSURE_PREFIX`. |
+| `gateState`       | `GateGuardDecision`                                 | ✅ (gateguard) | `'PASS' \| 'SOFT_BLOCK' \| 'HARD_BLOCK'`. Drives CTA label and icon.                 |
+| `welfareBand`     | `string`                                            |  ✅ (welfare)  | Welfare Guardian band label. **Copy slot:** `Welfare Guardian: {band}`.              |
+| `stepUpChallenge` | `StepUpChallenge`                                   |  ✅ (stepup)   | Shape defined in StepUpModal section below.                                          |
+| `onDismiss`       | `() => void`                                        |       —        | Not available in `'gateguard'` hard-block or `'stepup'` pending-MFA states.          |
 
 **Full-screen modal trigger:** When any mode is active, the overlay renders
 as a full-screen modal. Background interaction is blocked. This is a
@@ -83,15 +83,15 @@ Renders a single row in an audit trail. Must always include `reason_code`.
 Used in Diamond Concierge Command Center, CS Recovery, and any surface that
 exposes ledger or decision history.
 
-| Prop | Type | Required | Notes |
-|------|------|:--------:|-------|
-| `timestamp` | `string` (ISO 8601) | ✅ | Displayed in local timezone per theme config. |
-| `actorId` | `string` | ✅ | `guest_id`, `creator_id`, `agent_id`, or `'SYSTEM'`. |
-| `actorRole` | `'GUEST' \| 'CREATOR' \| 'AGENT' \| 'SYSTEM'` | ✅ | |
-| `action` | `string` | ✅ | Human-readable action label; sourced from reason-code catalog. |
-| `reasonCode` | `string` | ✅ | Canonical reason code — see [`04-reason-code-catalog.md`](04-reason-code-catalog.md). Required on every row; omission is a schema-integrity violation. |
-| `correlationId` | `string` | ✅ | UUID linking this event to the originating transaction or decision. |
-| `amount` | `string \| null` | — | CZT amount (bigint as string) if the row represents a ledger event. |
+| Prop            | Type                                          | Required | Notes                                                                                                                                                  |
+| --------------- | --------------------------------------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `timestamp`     | `string` (ISO 8601)                           |    ✅    | Displayed in local timezone per theme config.                                                                                                          |
+| `actorId`       | `string`                                      |    ✅    | `guest_id`, `creator_id`, `agent_id`, or `'SYSTEM'`.                                                                                                   |
+| `actorRole`     | `'GUEST' \| 'CREATOR' \| 'AGENT' \| 'SYSTEM'` |    ✅    |                                                                                                                                                        |
+| `action`        | `string`                                      |    ✅    | Human-readable action label; sourced from reason-code catalog.                                                                                         |
+| `reasonCode`    | `string`                                      |    ✅    | Canonical reason code — see [`04-reason-code-catalog.md`](04-reason-code-catalog.md). Required on every row; omission is a schema-integrity violation. |
+| `correlationId` | `string`                                      |    ✅    | UUID linking this event to the originating transaction or decision.                                                                                    |
+| `amount`        | `string \| null`                              |    —     | CZT amount (bigint as string) if the row represents a ledger event.                                                                                    |
 
 **Wireframe note:** `reason_code` and `correlation_id` must always be
 rendered, even if in a secondary/collapsed state. They may not be omitted
@@ -150,12 +150,12 @@ Challenge prompt
 
 The `StepUpChallenge` shape passed to `ComplianceOverlay[mode='stepup']`:
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `challengeId` | `string` | Unique ID for this challenge instance. |
-| `actionLabel` | `string` | Human-readable description of the action being challenged. |
-| `mfaMethod` | `'TOTP' \| 'SMS' \| 'EMAIL'` | Method offered for this challenge. |
-| `expiresAt` | `string` (ISO 8601) | Challenge expiry; UI must show countdown or expired state. |
+| Field         | Type                         | Notes                                                      |
+| ------------- | ---------------------------- | ---------------------------------------------------------- |
+| `challengeId` | `string`                     | Unique ID for this challenge instance.                     |
+| `actionLabel` | `string`                     | Human-readable description of the action being challenged. |
+| `mfaMethod`   | `'TOTP' \| 'SMS' \| 'EMAIL'` | Method offered for this challenge.                         |
+| `expiresAt`   | `string` (ISO 8601)          | Challenge expiry; UI must show countdown or expired state. |
 
 **Dismiss is not available** while MFA input is pending. The modal can only
 close via GRANT or DENY.
@@ -186,11 +186,11 @@ exclude it from the layout when the entitlement is absent.
 The following tokens are authoritative. Wireframes use placeholder syntax;
 final copy resolves at runtime from the presenter or governance config.
 
-| Slot | Template | Context |
-|------|----------|---------|
-| Tier badge | `{tier} • {cap}% redemption` | Header `TierBadge` |
-| Inferno meter | `Inferno ×{multiplier}` | Header FFS meter (INFERNO state only) |
-| Welfare Guardian | `Welfare Guardian: {band}` | ComplianceOverlay welfare mode |
+| Slot             | Template                                                                        | Context                                                                 |
+| ---------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Tier badge       | `{tier} • {cap}% redemption`                                                    | Header `TierBadge`                                                      |
+| Inferno meter    | `Inferno ×{multiplier}`                                                         | Header FFS meter (INFERNO state only)                                   |
+| Welfare Guardian | `Welfare Guardian: {band}`                                                      | ComplianceOverlay welfare mode                                          |
 | Full header line | `{tier} • {cap}% redemption • Inferno ×{multiplier} • Welfare Guardian: {band}` | Collapsed single-line variant when all states are active simultaneously |
 
 **Wireframes must design both the expanded (multi-element) and collapsed

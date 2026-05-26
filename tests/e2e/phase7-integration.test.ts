@@ -179,9 +179,7 @@ async function testCreatorEarningsCredited(ctx: TestContext): Promise<void> {
     throw new Error('❌ FAIL: Creator earnings amount is zero or negative');
   }
 
-  console.log(
-    `✅ PASS: Creator earnings credited: ${latestEarning.performer_amount_cents} cents`,
-  );
+  console.log(`✅ PASS: Creator earnings credited: ${latestEarning.performer_amount_cents} cents`);
 }
 
 async function testDashboardShowsAiEarnings(ctx: TestContext): Promise<void> {

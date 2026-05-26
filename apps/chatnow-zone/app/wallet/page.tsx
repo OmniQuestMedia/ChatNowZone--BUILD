@@ -86,8 +86,8 @@ export default async function WalletPage({
           borderBottom: '1px solid #5a4200',
         }}
       >
-        Demo data — wallet read endpoint not yet wired (WALLET-READ-API-001 follow-up).
-        Balances shown are synthetic.
+        Demo data — wallet read endpoint not yet wired (WALLET-READ-API-001 follow-up). Balances
+        shown are synthetic.
       </div>
       {renderPlanToReact(render.tree)}
     </>

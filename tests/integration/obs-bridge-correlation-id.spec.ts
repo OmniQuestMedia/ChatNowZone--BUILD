@@ -3,6 +3,7 @@
 // reason_code so the immutable audit chain can pair start/stop transitions.
 import { OBSBridgeService } from '../../services/obs-bridge/src/obs-bridge.service';
 import { NATS_TOPICS } from '../../services/nats/topics.registry';
+import { createHash } from 'crypto';
 
 class StubNats {
   public readonly published: Array<{ topic: string; payload: Record<string, unknown> }> = [];
@@ -37,8 +38,6 @@ class StubPrisma {
 }
 
 function sha256Hex(input: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createHash } = require('crypto');
   return createHash('sha256').update(input).digest('hex');
 }
 

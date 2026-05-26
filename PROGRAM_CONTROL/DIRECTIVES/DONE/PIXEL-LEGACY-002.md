@@ -10,9 +10,9 @@
 
 ## Why
 
-CEO directive 2026-05-02 collapsed the model: *"It's not really an application
+CEO directive 2026-05-02 collapsed the model: _"It's not really an application
 process. It's a first come first served. There will be an automatic gateway
-shut down of the pixel membership."*
+shut down of the pixel membership."_
 
 The v1 application/review workflow (DRAFT → APPLIED → REVIEWED → GRANTED/DENIED,
 portfolio entries, proof statement, operator review with RBAC) is removed. The
@@ -116,18 +116,18 @@ post-grant panel) to a ~280-line status display with three branches:
 
 ## How this resolves the outstanding -001 review comments
 
-| -001 Comment | Resolution under -002 |
-|--------------|-----------------------|
-| Apply path missing creator existence check | Apply path removed |
-| Apply event publishes pre-upsert ID (race) | Apply path removed |
-| Apply terminal-state guard race | Apply path removed |
-| Review state-check race | Review path removed |
-| Cap-reached should fall back to STANDARD | Native — gateway-closed path returns silently and creator stays STANDARD by default |
-| `REVIEWED` enum value never written | Enum removed entirely |
-| Review endpoint trusts body `reviewer_id` / `caller_role` | Review endpoint removed |
-| `RbacGuard.check()` vs canonical `RbacService.authorize()` | No RBAC-gated mutation under FCFS |
-| Step-up mapping missing for `pixel_legacy:seat:allocate` | Permission removed |
-| `getViewByCreator` PII enumeration | Status payload is much less sensitive (just `is_pixel_legacy` + seat number); auth tightening is still tracked but no longer urgent |
+| -001 Comment                                               | Resolution under -002                                                                                                               |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Apply path missing creator existence check                 | Apply path removed                                                                                                                  |
+| Apply event publishes pre-upsert ID (race)                 | Apply path removed                                                                                                                  |
+| Apply terminal-state guard race                            | Apply path removed                                                                                                                  |
+| Review state-check race                                    | Review path removed                                                                                                                 |
+| Cap-reached should fall back to STANDARD                   | Native — gateway-closed path returns silently and creator stays STANDARD by default                                                 |
+| `REVIEWED` enum value never written                        | Enum removed entirely                                                                                                               |
+| Review endpoint trusts body `reviewer_id` / `caller_role`  | Review endpoint removed                                                                                                             |
+| `RbacGuard.check()` vs canonical `RbacService.authorize()` | No RBAC-gated mutation under FCFS                                                                                                   |
+| Step-up mapping missing for `pixel_legacy:seat:allocate`   | Permission removed                                                                                                                  |
+| `getViewByCreator` PII enumeration                         | Status payload is much less sensitive (just `is_pixel_legacy` + seat number); auth tightening is still tracked but no longer urgent |
 
 ## Tests
 

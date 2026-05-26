@@ -35,15 +35,15 @@ export type StudioPermission =
 export type StudioScopedRole = 'STUDIO_OWNER' | 'STUDIO_ADMIN' | 'CREATOR';
 
 const STUDIO_PERMISSION_MATRIX: Record<StudioPermission, StudioScopedRole[]> = {
-  'studio:manage':            ['STUDIO_OWNER'],
-  'studio:invite-creator':    ['STUDIO_OWNER', 'STUDIO_ADMIN'],
+  'studio:manage': ['STUDIO_OWNER'],
+  'studio:invite-creator': ['STUDIO_OWNER', 'STUDIO_ADMIN'],
   'studio:view-affiliations': ['STUDIO_OWNER', 'STUDIO_ADMIN', 'CREATOR'],
-  'studio:upload-contract':   ['STUDIO_OWNER', 'STUDIO_ADMIN'],
-  'studio:view-commission':   ['STUDIO_OWNER', 'STUDIO_ADMIN'],
+  'studio:upload-contract': ['STUDIO_OWNER', 'STUDIO_ADMIN'],
+  'studio:view-commission': ['STUDIO_OWNER', 'STUDIO_ADMIN'],
 };
 
 export interface StudioCheckParams {
-  actor_id: string;        // creator_id of the acting user
+  actor_id: string; // creator_id of the acting user
   studio_id: string;
   permission: StudioPermission;
   correlation_id?: string;
@@ -152,10 +152,7 @@ export class StudioRbacGuard {
     };
   }
 
-  private async emitAudit(
-    result: StudioCheckResult,
-    params: StudioCheckParams,
-  ): Promise<void> {
+  private async emitAudit(result: StudioCheckResult, params: StudioCheckParams): Promise<void> {
     await this.audit.emit({
       eventType: 'RBAC_DECISION',
       correlationId: result.correlation_id,

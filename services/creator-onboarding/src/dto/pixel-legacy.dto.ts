@@ -42,7 +42,9 @@ export interface PixelLegacySeatAllocationPublic {
   rule_applied_id: string;
 }
 
-export function toSeatAllocationPublic(row: PixelLegacySeatAllocation): PixelLegacySeatAllocationPublic {
+export function toSeatAllocationPublic(
+  row: PixelLegacySeatAllocation,
+): PixelLegacySeatAllocationPublic {
   return {
     seat_number: row.seat_number,
     creator_id: row.creator_id,

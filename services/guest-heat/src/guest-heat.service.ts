@@ -32,7 +32,7 @@ const LOYALTY_THRESHOLDS: Array<{ min: number; tier: LoyaltyTier }> = [
   { min: 50, tier: 'HOT' },
   { min: 30, tier: 'WARM' },
   { min: 15, tier: 'RISING' },
-  { min: 0,  tier: 'STANDARD' },
+  { min: 0, tier: 'STANDARD' },
 ];
 
 // ── Whale score computation ──────────────────────────────────────────────────
@@ -44,11 +44,11 @@ const LOYALTY_THRESHOLDS: Array<{ min: number; tier: LoyaltyTier }> = [
 function computeWhaleScore(spend: SpendWindows): number {
   // Weighted sum — coefficients tuned to business plan B.4 §3.
   const raw =
-    spend.spend_24h  * 0.35 +
-    spend.spend_72h  * 0.25 +
-    spend.spend_7d   * 0.20 +
-    spend.spend_14d  * 0.12 +
-    spend.spend_30d  * 0.08;
+    spend.spend_24h * 0.35 +
+    spend.spend_72h * 0.25 +
+    spend.spend_7d * 0.2 +
+    spend.spend_14d * 0.12 +
+    spend.spend_30d * 0.08;
 
   // Normalise against a reference ceiling of 5 000 CZT/30d.
   const CEILING = 5_000;
@@ -113,11 +113,11 @@ export class WhaleProfileService {
         guest_id,
         loyalty_tier,
         whale_score,
-        spend_24h:  spend.spend_24h,
-        spend_72h:  spend.spend_72h,
-        spend_7d:   spend.spend_7d,
-        spend_14d:  spend.spend_14d,
-        spend_30d:  spend.spend_30d,
+        spend_24h: spend.spend_24h,
+        spend_72h: spend.spend_72h,
+        spend_7d: spend.spend_7d,
+        spend_14d: spend.spend_14d,
+        spend_30d: spend.spend_30d,
         preference_vector: preference_vector as unknown as object,
         geo_region,
         correlation_id,
@@ -156,11 +156,11 @@ export class WhaleProfileService {
       loyalty_tier: row.loyalty_tier as LoyaltyTier,
       whale_score: Number(row.whale_score),
       spend: {
-        spend_24h:  Number(row.spend_24h),
-        spend_72h:  Number(row.spend_72h),
-        spend_7d:   Number(row.spend_7d),
-        spend_14d:  Number(row.spend_14d),
-        spend_30d:  Number(row.spend_30d),
+        spend_24h: Number(row.spend_24h),
+        spend_72h: Number(row.spend_72h),
+        spend_7d: Number(row.spend_7d),
+        spend_14d: Number(row.spend_14d),
+        spend_30d: Number(row.spend_30d),
       },
       preference_vector: (row.preference_vector ?? {}) as unknown as PreferenceVector,
       geo_region: row.geo_region ?? undefined,
@@ -279,11 +279,15 @@ export class OfferEngine {
     // Offer value scales with whale tier — WHALE+ gets premium offers.
     const base = profile.preference_vector.avg_tip_size_czt;
     const multiplier =
-      profile.loyalty_tier === 'ULTRA_WHALE' ? 3.0 :
-      profile.loyalty_tier === 'WHALE'       ? 2.0 :
-      profile.loyalty_tier === 'HOT'         ? 1.5 :
-      profile.loyalty_tier === 'WARM'        ? 1.2 :
-      1.0;
+      profile.loyalty_tier === 'ULTRA_WHALE'
+        ? 3.0
+        : profile.loyalty_tier === 'WHALE'
+          ? 2.0
+          : profile.loyalty_tier === 'HOT'
+            ? 1.5
+            : profile.loyalty_tier === 'WARM'
+              ? 1.2
+              : 1.0;
     return Math.max(1, Math.round(base * multiplier));
   }
 
@@ -298,10 +302,7 @@ export class OfferEngine {
     return { adjusted, display };
   }
 
-  private buildSpendingPatternText(
-    profile: WhaleProfileRecord,
-    display: string,
-  ): string {
+  private buildSpendingPatternText(profile: WhaleProfileRecord, display: string): string {
     return (
       `Based on your activity, here's an exclusive ${display} CZT offer ` +
       `for you, ${profile.loyalty_tier} member.`

@@ -104,11 +104,7 @@ export const HARDWARE_RECONNECT_MAX_ATTEMPTS = 10;
  * accept those frames via `ingestRendererFrame`.
  */
 export interface SenSyncRendererBridgeAdapter extends SenSyncHardwareAdapter {
-  ingestRendererFrame(args: {
-    session_id: string;
-    bpm: number;
-    captured_device_ms: number;
-  }): void;
+  ingestRendererFrame(args: { session_id: string; bpm: number; captured_device_ms: number }): void;
   notifyRendererDisconnect(args: { session_id: string; reason: string }): void;
 }
 

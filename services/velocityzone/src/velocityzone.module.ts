@@ -5,7 +5,7 @@ import { VelocityZoneService } from './velocityzone.service';
 
 @Module({
   controllers: [VelocityZoneController],
-  providers:   [VelocityZoneService],
-  exports:     [VelocityZoneService],
+  providers: [VelocityZoneService],
+  exports: [VelocityZoneService],
 })
 export class VelocityZoneModule {}

@@ -14,13 +14,7 @@ export type MembershipTier =
   | 'VIP_PLATINUM'
   | 'VIP_DIAMOND';
 
-export type LoyaltyTier =
-  | 'STANDARD'
-  | 'RISING'
-  | 'WARM'
-  | 'HOT'
-  | 'WHALE'
-  | 'ULTRA_WHALE';
+export type LoyaltyTier = 'STANDARD' | 'RISING' | 'WARM' | 'HOT' | 'WHALE' | 'ULTRA_WHALE';
 
 // ── Whale profile ───────────────────────────────────────────────────────────
 
@@ -69,10 +63,10 @@ export interface WhaleProfileRecord {
 // ── Offer engine ────────────────────────────────────────────────────────────
 
 export type OfferType =
-  | 'SPENDING_PATTERN'  // triggered by spend velocity analysis
-  | 'GEO_PRICE'         // regional pricing shown to guest
-  | 'LOYALTY_REWARD'    // loyalty tier milestone
-  | 'SEASONAL';         // tied to a seasonal event
+  | 'SPENDING_PATTERN' // triggered by spend velocity analysis
+  | 'GEO_PRICE' // regional pricing shown to guest
+  | 'LOYALTY_REWARD' // loyalty tier milestone
+  | 'SEASONAL'; // tied to a seasonal event
 
 /** A personalised offer presented to a guest. */
 export interface GuestOffer {
@@ -180,9 +174,9 @@ export interface DualFlamePulseEvent {
 // ── Predictive forecasting ──────────────────────────────────────────────────
 
 export type ForecastSignal =
-  | 'WEATHER_HOT'   // regional temperature spike
+  | 'WEATHER_HOT' // regional temperature spike
   | 'WEATHER_COLD'
-  | 'HOLIDAY'       // statutory / cultural holiday
+  | 'HOLIDAY' // statutory / cultural holiday
   | 'SEASONAL_PEAK' // season-wide uplift
   | 'WEEKEND';
 
@@ -232,31 +226,31 @@ export const GUEST_HEAT_RULE_ID = 'GUEST_HEAT_v1';
 
 /** Session duration thresholds for performance timer state transitions. */
 export const PERF_TIMER = {
-  YELLOW_THRESHOLD_MIN: 20,  // GREEN → YELLOW after 20 minutes
-  RED_THRESHOLD_MIN:    40,  // YELLOW → RED after 40 minutes
+  YELLOW_THRESHOLD_MIN: 20, // GREEN → YELLOW after 20 minutes
+  RED_THRESHOLD_MIN: 40, // YELLOW → RED after 40 minutes
 } as const;
 
 // ── Gemstone default symbolisms ──────────────────────────────────────────────
 
 export const DEFAULT_SYMBOLISM: Record<GemType, string> = {
-  RUBY:     'A ruby — symbol of passion and desire.',
+  RUBY: 'A ruby — symbol of passion and desire.',
   SAPPHIRE: 'A sapphire — symbol of trust and devotion.',
-  EMERALD:  'An emerald — symbol of growth and intimacy.',
-  DIAMOND:  'A diamond — symbol of ultimate connection.',
+  EMERALD: 'An emerald — symbol of growth and intimacy.',
+  DIAMOND: 'A diamond — symbol of ultimate connection.',
   AMETHYST: 'An amethyst — symbol of sensual mystery.',
-  TOPAZ:    'A golden topaz — symbol of warmth and surrender.',
+  TOPAZ: 'A golden topaz — symbol of warmth and surrender.',
 };
 
 // ── Geo-pricing ──────────────────────────────────────────────────────────────
 
 /** Regional price multiplier by CNZ region code. */
 export const GEO_PRICE_MULTIPLIERS: Record<string, number> = {
-  NA:  1.00, // North America — base rate
-  EU:  0.92, // Europe
-  UK:  0.95, // United Kingdom
-  AU:  0.88, // Australia / Oceania
-  LA:  0.72, // Latin America
-  IN:  0.55, // India
+  NA: 1.0, // North America — base rate
+  EU: 0.92, // Europe
+  UK: 0.95, // United Kingdom
+  AU: 0.88, // Australia / Oceania
+  LA: 0.72, // Latin America
+  IN: 0.55, // India
   SEA: 0.65, // South-East Asia
-  MEA: 0.70, // Middle East / Africa
+  MEA: 0.7, // Middle East / Africa
 };

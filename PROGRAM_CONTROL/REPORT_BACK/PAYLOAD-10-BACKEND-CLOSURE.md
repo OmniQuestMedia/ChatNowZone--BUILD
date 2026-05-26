@@ -7,17 +7,17 @@
 
 ## Items closed (REQUIREMENTS_MASTER.md)
 
-| ID | Status before | Status after | Evidence |
-|----|---------------|--------------|----------|
-| PAY-006 | NEEDS_DIRECTIVE | DONE | `services/ledger/payout-rate-lock.service.ts`, `transactions.payout_rate_lock_id`, `payout_rate_locks` table |
-| PAY-008 | NEEDS_DIRECTIVE | DONE | `services/obs-bridge/src/audio-signal.service.ts` — silent-room gate above COLD |
-| PAY-011 | NEEDS_DIRECTIVE | DONE | `transactions.heat_score_at_tip` + `payout_rate_applied` (migration 20260503000000) |
-| TOK-009 | NEEDS_DIRECTIVE | DONE | `payout_rate_locks.diamond_floor_active` + `transactions.diamond_floor_active` |
-| DIA-003 | NEEDS_DIRECTIVE | DONE | `risk_assessments` Diamond Concierge intake columns + go_no_go_decision check constraint |
-| DIA-004 | NEEDS_DIRECTIVE | DONE | `risk_assessments.account_signal_snapshot` JSONB + agent_id + assessment_timestamp |
-| CYR-006 | NEEDS_DIRECTIVE | DONE | `services/cyrano/src/llm-provider.interface.ts` + `llm-provider.in-memory.ts` |
-| CYR-007 | NEEDS_DIRECTIVE | DONE | Verified existing `services/cyrano/src/session-memory.store.ts` Prisma persistence |
-| D002 (Risk Engine) | NEEDS_DIRECTIVE | DONE | `services/risk-engine/src/risk-engine.service.ts` + `risk_engine_decisions` table |
+| ID                 | Status before   | Status after | Evidence                                                                                                     |
+| ------------------ | --------------- | ------------ | ------------------------------------------------------------------------------------------------------------ |
+| PAY-006            | NEEDS_DIRECTIVE | DONE         | `services/ledger/payout-rate-lock.service.ts`, `transactions.payout_rate_lock_id`, `payout_rate_locks` table |
+| PAY-008            | NEEDS_DIRECTIVE | DONE         | `services/obs-bridge/src/audio-signal.service.ts` — silent-room gate above COLD                              |
+| PAY-011            | NEEDS_DIRECTIVE | DONE         | `transactions.heat_score_at_tip` + `payout_rate_applied` (migration 20260503000000)                          |
+| TOK-009            | NEEDS_DIRECTIVE | DONE         | `payout_rate_locks.diamond_floor_active` + `transactions.diamond_floor_active`                               |
+| DIA-003            | NEEDS_DIRECTIVE | DONE         | `risk_assessments` Diamond Concierge intake columns + go_no_go_decision check constraint                     |
+| DIA-004            | NEEDS_DIRECTIVE | DONE         | `risk_assessments.account_signal_snapshot` JSONB + agent_id + assessment_timestamp                           |
+| CYR-006            | NEEDS_DIRECTIVE | DONE         | `services/cyrano/src/llm-provider.interface.ts` + `llm-provider.in-memory.ts`                                |
+| CYR-007            | NEEDS_DIRECTIVE | DONE         | Verified existing `services/cyrano/src/session-memory.store.ts` Prisma persistence                           |
+| D002 (Risk Engine) | NEEDS_DIRECTIVE | DONE         | `services/risk-engine/src/risk-engine.service.ts` + `risk_engine_decisions` table                            |
 
 ## New artefacts
 
@@ -40,7 +40,7 @@
 - `services/obs-bridge/src/obs-bridge.module.ts` — registers `AudioSignalService`
 - `services/cyrano/src/cyrano.module.ts` — registers `InMemoryCyranoLlmProvider`
 - `services/risk-engine/src/risk.module.ts` — registers `RiskEngineService`
-- `services/nats/topics.registry.ts` — Payload-10 topics (RISK_ENGINE_*, PAYOUT_RATE_LOCKED, OBS_AUDIO_*, OBS_HEAT_ESCALATION_BLOCKED, AUDIT_IMMUTABLE_RISK_ENGINE, AUDIT_IMMUTABLE_PAYOUT_LOCK)
+- `services/nats/topics.registry.ts` — Payload-10 topics (RISK*ENGINE*_, PAYOUT*RATE_LOCKED, OBS_AUDIO*_, OBS_HEAT_ESCALATION_BLOCKED, AUDIT_IMMUTABLE_RISK_ENGINE, AUDIT_IMMUTABLE_PAYOUT_LOCK)
 - `services/ledger/index.ts` — re-exports payout-rate-lock service
 - `services/ffs/src/ffs.service.ts` — fixed pre-existing brace mismatch revealed by typecheck (no behavioural change)
 - `tsconfig.json` — `ignoreDeprecations: "5.0"` for TS 5.9 compatibility
@@ -67,14 +67,14 @@ from FAIL to PASS, recovering 5 additional tests that were broken on main.
 ## Invariants verified
 
 - ✅ Append-only finance: `risk_engine_decisions` and `payout_rate_locks` carry
-      Postgres triggers that refuse UPDATE/DELETE.
+  Postgres triggers that refuse UPDATE/DELETE.
 - ✅ `correlation_id` + `reason_code` + `rule_applied_id` on every new
-      financial / audit write.
+  financial / audit write.
 - ✅ Network isolation, no secrets, multi-tenant scoping preserved.
 - ✅ CZT-only economy preserved.
 - ✅ Banned-entity §12 quarantine intact.
 - ✅ `legal_holds.correlation_id` confirmed already migrated
-      (20260428130000_legal_hold_correlation_id).
+  (20260428130000_legal_hold_correlation_id).
 
 ## Remaining NEEDS_DIRECTIVE (post-Payload 10)
 
@@ -89,6 +89,7 @@ RETIRED:          9
 ```
 
 The 64 remaining NEEDS_DIRECTIVE items split across:
+
 - TOK-007/008 — premium environment pricing + bundle ladder rebuild (CEO-CLARIFY blocked)
 - MIC-001..009 — Mic Drop / Day-91 parity job + signing bonus path
 - GWC-001..005 — Welcome credit (build-inactive — Ontario consumer protection legal review)
@@ -118,6 +119,7 @@ NEEDS_DIRECTIVE.
 ## Recommended next payload
 
 **Payload 11 — Frontend & Launch Polish** (proposed):
+
 1. Black-Glass visual treatment across `/admin/*`, `/creator/*`, public surfaces.
 2. Anthropic Claude provider implementation (CYR-006 production swap).
 3. Diamond Concierge classification work (DIA-001/DIA-002/DIA-005).
@@ -131,9 +133,9 @@ Cyrano; CEO clearance required for any GOV/FIZ gate.
 
 ## Sign-off
 
-| Role | Authority | Required action |
-|------|-----------|-----------------|
-| CEO | Kevin B. Hartley | Counter-sign `PROGRAM_CONTROL/CLEARANCES/` for the Payload-10 GOV/FIZ gate prior to merge |
-| Tech Lead | Claude Code | Verifier output 22/22 GREEN — attached above |
+| Role      | Authority        | Required action                                                                           |
+| --------- | ---------------- | ----------------------------------------------------------------------------------------- |
+| CEO       | Kevin B. Hartley | Counter-sign `PROGRAM_CONTROL/CLEARANCES/` for the Payload-10 GOV/FIZ gate prior to merge |
+| Tech Lead | Claude Code      | Verifier output 22/22 GREEN — attached above                                              |
 
 Filed by: Claude Code under directive PAYLOAD-10-BACKEND-CLOSURE.

@@ -83,7 +83,10 @@ export class VoiceChatController {
    * - limit?: number (default 100)
    */
   @Get('messages/:conversationId')
-  async getMessages(@Param('conversationId') conversationId: string, @Query('limit') limit?: number) {
+  async getMessages(
+    @Param('conversationId') conversationId: string,
+    @Query('limit') limit?: number,
+  ) {
     return await voiceChatService.getConversationMessages(conversationId, limit);
   }
 }

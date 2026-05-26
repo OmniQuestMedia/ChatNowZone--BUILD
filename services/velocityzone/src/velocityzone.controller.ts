@@ -1,13 +1,6 @@
 // VelocityZone — REST controller
 // Admin-gated event management + tip-time rate evaluation endpoint.
-import {
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { VelocityZoneService } from './velocityzone.service';
 
 @Controller('velocityzone')
@@ -31,13 +24,9 @@ export class VelocityZoneController {
   ) {
     this.logger.log('VelocityZoneController.evaluateRate', {
       creator_id: body.creator_id,
-      ffs_score:  body.ffs_score,
+      ffs_score: body.ffs_score,
     });
-    return this.velocityZoneService.evaluateRate(
-      body.creator_id,
-      body.ffs_score,
-      body.session_id,
-    );
+    return this.velocityZoneService.evaluateRate(body.creator_id, body.ffs_score, body.session_id);
   }
 
   /**
@@ -50,7 +39,7 @@ export class VelocityZoneController {
     @Body() body: { is_founding: boolean; correlation_id: string },
   ) {
     this.logger.log('VelocityZoneController.seedCreatorRate', {
-      creator_id:  creatorId,
+      creator_id: creatorId,
       is_founding: body.is_founding,
     });
     return this.velocityZoneService.seedCreatorRateTier(

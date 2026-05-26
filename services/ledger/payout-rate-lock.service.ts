@@ -38,10 +38,10 @@ export interface CapturePayoutRateLockInput {
   walletId: string;
   creatorId: string;
   transactionId?: string | null;
-  heatScore: number;             // 0..100 — sampled at tx_initiated
-  amountCzt: number;             // CZT volume the lock covers
-  diamondFloorActive: boolean;   // 10K+ bulk Diamond floor opt-in
-  isPixelLegacy?: boolean;       // PIXEL_LEGACY creator flag
+  heatScore: number; // 0..100 — sampled at tx_initiated
+  amountCzt: number; // CZT volume the lock covers
+  diamondFloorActive: boolean; // 10K+ bulk Diamond floor opt-in
+  isPixelLegacy?: boolean; // PIXEL_LEGACY creator flag
   organizationId: string;
   tenantId: string;
 }
@@ -94,7 +94,9 @@ export class PayoutRateLockService {
       throw new Error(`PayoutRateLock.capture: heatScore out of range (got ${input.heatScore})`);
     }
     if (!Number.isInteger(input.amountCzt) || input.amountCzt < 0) {
-      throw new Error(`PayoutRateLock.capture: amountCzt must be a non-negative integer (got ${input.amountCzt})`);
+      throw new Error(
+        `PayoutRateLock.capture: amountCzt must be a non-negative integer (got ${input.amountCzt})`,
+      );
     }
 
     const existing = await this.prisma.payoutRateLock.findUnique({

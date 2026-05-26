@@ -30,5 +30,14 @@ module.exports = {
     'no-console': 'warn',
     semi: ['error', 'always'],
   },
+  overrides: [
+    {
+      files: ['scripts/**/*.ts', 'prisma/seed*.ts', 'tests/**/*.ts', 'PROGRAM_CONTROL/**/*.ts'],
+      rules: {
+        'no-console': 'off',
+        '@typescript-eslint/no-explicit-any': 'off', // Allow any in tests for mocks/stubs
+      },
+    },
+  ],
   ignorePatterns: ['dist/', 'node_modules/', '.next/', 'LEGACY_CONFIGS/'],
 };

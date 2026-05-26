@@ -60,13 +60,13 @@ export interface CreatorRateTier {
 export const VELOCITYZONE_RULE_ID = 'VELOCITYZONE_v1';
 
 /** Founding creator rate (Day 1 – Day 60). */
-export const FOUNDING_RATE_FLOOR_USD   = 0.075;
-export const FOUNDING_RATE_CEILING_USD = 0.090;
+export const FOUNDING_RATE_FLOOR_USD = 0.075;
+export const FOUNDING_RATE_CEILING_USD = 0.09;
 
 /** Standard creator rate (Day 1 – Day 60 for non-founding). */
-export const STANDARD_RATE_FLOOR_USD   = 0.065;
-export const STANDARD_RATE_CEILING_USD = 0.080;
+export const STANDARD_RATE_FLOOR_USD = 0.065;
+export const STANDARD_RATE_CEILING_USD = 0.08;
 
 /** Post-Day 61 rate floor (all creators). */
-export const POST_DAY61_RATE_FLOOR_USD   = 0.075;
-export const POST_DAY61_RATE_CEILING_USD = 0.090;
+export const POST_DAY61_RATE_FLOOR_USD = 0.075;
+export const POST_DAY61_RATE_CEILING_USD = 0.09;

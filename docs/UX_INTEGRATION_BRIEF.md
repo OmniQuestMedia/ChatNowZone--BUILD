@@ -44,18 +44,18 @@ ui/types/public-wallet-contracts.ts
 
 ## Packet contents (read in order)
 
-| File | Purpose |
-|------|---------|
-| [`ux/01-presenter-contracts.md`](ux/01-presenter-contracts.md) | Frozen presenter list with `@alpha-frozen` markers and consumption notes |
-| [`ux/02-endpoint-inventory.md`](ux/02-endpoint-inventory.md) | Role × surface matrix; which user role sees which screen and which actions trigger step-up |
-| [`ux/03-state-machines.md`](ux/03-state-machines.md) | All UI-relevant state machines (token purchase, membership, recovery, Cyrano session, FFS tiers, WGS bands, step-up, Pixel Legacy onboarding, Diamond Concierge handoff, idempotency replay) |
-| [`ux/04-reason-code-catalog.md`](ux/04-reason-code-catalog.md) | `reason_code` enumeration with recommended user-facing copy slots |
-| [`ux/05-tier-entitlements.md`](ux/05-tier-entitlements.md) | 6-tier `MembershipTier` × entitlement matrix; Pixel Legacy vs Standard creator; Cyrano access policy; Diamond Concierge zero-earn; inferno multiplier visibility |
-| [`ux/06-idempotency-ratelimit.md`](ux/06-idempotency-ratelimit.md) | `correlation_id` envelope, replay semantics, 429 handling, NATS reconnect UX |
-| [`ux/07-cross-stack-vocabulary.md`](ux/07-cross-stack-vocabulary.md) | CNZ canonical terms cross-walked to RRR + Cyrano; "never alias" list; component ontology |
-| [`ux/08-not-in-alpha.md`](ux/08-not-in-alpha.md) | Explicit non-scope so wireframes don't design dead screens |
-| [`ux/09-realtime-topology.md`](ux/09-realtime-topology.md) | NATS-driven surfaces vs request/response; reconnect/backoff UX |
-| [`ux/10-compliance-overlays.md`](ux/10-compliance-overlays.md) | Cross-cutting overlays (Bill 149, Sovereign CaC, KYC, step-up, WGS interventions, geo-block) — shared visual language across all three OQMI entities |
+| File                                                                 | Purpose                                                                                                                                                                                      |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`ux/01-presenter-contracts.md`](ux/01-presenter-contracts.md)       | Frozen presenter list with `@alpha-frozen` markers and consumption notes                                                                                                                     |
+| [`ux/02-endpoint-inventory.md`](ux/02-endpoint-inventory.md)         | Role × surface matrix; which user role sees which screen and which actions trigger step-up                                                                                                   |
+| [`ux/03-state-machines.md`](ux/03-state-machines.md)                 | All UI-relevant state machines (token purchase, membership, recovery, Cyrano session, FFS tiers, WGS bands, step-up, Pixel Legacy onboarding, Diamond Concierge handoff, idempotency replay) |
+| [`ux/04-reason-code-catalog.md`](ux/04-reason-code-catalog.md)       | `reason_code` enumeration with recommended user-facing copy slots                                                                                                                            |
+| [`ux/05-tier-entitlements.md`](ux/05-tier-entitlements.md)           | 6-tier `MembershipTier` × entitlement matrix; Pixel Legacy vs Standard creator; Cyrano access policy; Diamond Concierge zero-earn; inferno multiplier visibility                             |
+| [`ux/06-idempotency-ratelimit.md`](ux/06-idempotency-ratelimit.md)   | `correlation_id` envelope, replay semantics, 429 handling, NATS reconnect UX                                                                                                                 |
+| [`ux/07-cross-stack-vocabulary.md`](ux/07-cross-stack-vocabulary.md) | CNZ canonical terms cross-walked to RRR + Cyrano; "never alias" list; component ontology                                                                                                     |
+| [`ux/08-not-in-alpha.md`](ux/08-not-in-alpha.md)                     | Explicit non-scope so wireframes don't design dead screens                                                                                                                                   |
+| [`ux/09-realtime-topology.md`](ux/09-realtime-topology.md)           | NATS-driven surfaces vs request/response; reconnect/backoff UX                                                                                                                               |
+| [`ux/10-compliance-overlays.md`](ux/10-compliance-overlays.md)       | Cross-cutting overlays (Bill 149, Sovereign CaC, KYC, step-up, WGS interventions, geo-block) — shared visual language across all three OQMI entities                                         |
 
 ---
 
@@ -64,17 +64,17 @@ ui/types/public-wallet-contracts.ts
 When this packet and a canonical source disagree, **the canonical source
 wins** and this packet is corrected via directive.
 
-| Concept | Canonical source |
-|---------|-----------------|
-| Naming, terminology, retired terms | [`docs/DOMAIN_GLOSSARY.md`](DOMAIN_GLOSSARY.md) |
-| Membership policy, age re-verify cadence, paid blocks | [`docs/MEMBERSHIP_LIFECYCLE_POLICY.md`](MEMBERSHIP_LIFECYCLE_POLICY.md) |
-| Architecture map, cross-payload wiring | [`docs/ARCHITECTURE_OVERVIEW.md`](ARCHITECTURE_OVERVIEW.md) |
-| Pre-launch ship gates | [`docs/PRE_LAUNCH_CHECKLIST.md`](PRE_LAUNCH_CHECKLIST.md) |
-| Live requirements matrix | [`docs/REQUIREMENTS_MASTER.md`](REQUIREMENTS_MASTER.md) |
-| Governance, invariants, commit prefixes | [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`](../PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) |
-| NATS topic registry | [`services/nats/topics.registry.ts`](../services/nats/topics.registry.ts) |
-| Spend order, three-bucket | `LEDGER_SPEND_ORDER` constant in `services/ledger/` |
-| REDBOOK rate cards | `REDBOOK_RATE_CARDS` constants in `services/ledger/` |
+| Concept                                               | Canonical source                                                                                                |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Naming, terminology, retired terms                    | [`docs/DOMAIN_GLOSSARY.md`](DOMAIN_GLOSSARY.md)                                                                 |
+| Membership policy, age re-verify cadence, paid blocks | [`docs/MEMBERSHIP_LIFECYCLE_POLICY.md`](MEMBERSHIP_LIFECYCLE_POLICY.md)                                         |
+| Architecture map, cross-payload wiring                | [`docs/ARCHITECTURE_OVERVIEW.md`](ARCHITECTURE_OVERVIEW.md)                                                     |
+| Pre-launch ship gates                                 | [`docs/PRE_LAUNCH_CHECKLIST.md`](PRE_LAUNCH_CHECKLIST.md)                                                       |
+| Live requirements matrix                              | [`docs/REQUIREMENTS_MASTER.md`](REQUIREMENTS_MASTER.md)                                                         |
+| Governance, invariants, commit prefixes               | [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`](../PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md) |
+| NATS topic registry                                   | [`services/nats/topics.registry.ts`](../services/nats/topics.registry.ts)                                       |
+| Spend order, three-bucket                             | `LEDGER_SPEND_ORDER` constant in `services/ledger/`                                                             |
+| REDBOOK rate cards                                    | `REDBOOK_RATE_CARDS` constants in `services/ledger/`                                                            |
 
 ---
 

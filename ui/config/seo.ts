@@ -85,7 +85,14 @@ export const SEO: Record<string, SeoMetadata> = {
     og_image: `https://${PRIMARY_DOMAIN}/og/creator-gamification.png`,
     twitter_card: 'summary',
     robots: 'noindex,nofollow',
-    keywords: [...COMMON_KEYWORDS, 'gamification', 'prize pool', 'wheel of fortune', 'slots', 'dice'],
+    keywords: [
+      ...COMMON_KEYWORDS,
+      'gamification',
+      'prize pool',
+      'wheel of fortune',
+      'slots',
+      'dice',
+    ],
   },
   admin_diamond: {
     title: 'Diamond Concierge · Admin · ChatNow.Zone',

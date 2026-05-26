@@ -58,8 +58,8 @@ export default async function DiamondPurchasePage({
       <main style={{ padding: 32, maxWidth: 640, margin: '0 auto' }}>
         <h1>Diamond Tier Purchase</h1>
         <p style={{ color: '#ff6b6b' }}>
-          Could not generate Diamond quote for tokens=<code>{tokens}</code>{' '}
-          velocity_days=<code>{velocity_days}</code>.
+          Could not generate Diamond quote for tokens=<code>{tokens}</code> velocity_days=
+          <code>{velocity_days}</code>.
         </p>
         <pre style={{ color: '#a8a8b0', fontSize: 12, whiteSpace: 'pre-wrap' }}>
           {err instanceof Error ? err.message : String(err)}

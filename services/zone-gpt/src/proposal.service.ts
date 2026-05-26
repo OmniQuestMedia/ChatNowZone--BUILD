@@ -20,20 +20,20 @@ export type ProposalStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'MODIFIED' | 
 export interface Proposal {
   proposal_id: string;
   proposal_type: ProposalType;
-  reference_object_id: string;   // ID of the entity this proposal concerns
+  reference_object_id: string; // ID of the entity this proposal concerns
   rationale: string;
-  canonical_basis: string;       // Corpus section or rule that grounds this proposal
+  canonical_basis: string; // Corpus section or rule that grounds this proposal
   suggested_action: string;
-  confidence_score: number;      // 0.00–1.00
+  confidence_score: number; // 0.00–1.00
   status: ProposalStatus;
   created_at_utc: string;
-  expires_at_utc: string;        // Proposals auto-expire — no indefinite pending states
+  expires_at_utc: string; // Proposals auto-expire — no indefinite pending states
   decision?: {
     decision: ProposalDecision;
     decision_actor_id: string;
     decided_at_utc: string;
     reason_code: string;
-    modified_action?: string;    // Populated when decision = MODIFY
+    modified_action?: string; // Populated when decision = MODIFY
   };
 }
 
@@ -44,7 +44,7 @@ export interface CreateProposalInput {
   canonical_basis: string;
   suggested_action: string;
   confidence_score: number;
-  ttl_hours?: number;            // Default 24h
+  ttl_hours?: number; // Default 24h
 }
 
 export interface RecordDecisionInput {
@@ -122,7 +122,7 @@ export class ProposalService {
     if (proposal.status !== 'PENDING') {
       throw new Error(
         `PROPOSAL_ALREADY_DECIDED: proposal ${input.proposal_id} ` +
-        `is already in status ${proposal.status}`
+          `is already in status ${proposal.status}`,
       );
     }
 
@@ -135,12 +135,17 @@ export class ProposalService {
     }
 
     if (input.decision === 'MODIFY' && !input.modified_action) {
-      throw new Error('MODIFIED_ACTION_REQUIRED: modified_action must be provided when decision = MODIFY.');
+      throw new Error(
+        'MODIFIED_ACTION_REQUIRED: modified_action must be provided when decision = MODIFY.',
+      );
     }
 
     const new_status: ProposalStatus =
-      input.decision === 'ACCEPT' ? 'ACCEPTED' :
-      input.decision === 'REJECT' ? 'REJECTED' : 'MODIFIED';
+      input.decision === 'ACCEPT'
+        ? 'ACCEPTED'
+        : input.decision === 'REJECT'
+          ? 'REJECTED'
+          : 'MODIFIED';
 
     proposal.status = new_status;
     proposal.decision = {
@@ -170,7 +175,7 @@ export class ProposalService {
 
   getPendingProposals(): Proposal[] {
     const now = new Date();
-    return Array.from(this.proposals.values()).filter(p => {
+    return Array.from(this.proposals.values()).filter((p) => {
       if (p.status !== 'PENDING') return false;
       if (new Date(p.expires_at_utc) < now) {
         p.status = 'EXPIRED';

@@ -14,20 +14,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { NatsService } from '../../core-api/src/nats/nats.service';
 import { NATS_TOPICS } from '../../nats/topics.registry';
-import {
-  FlickerNFlameScoringEngine,
-  type FfsScore,
-  type FfsSample,
-} from './ffs.engine';
+import { FlickerNFlameScoringEngine, type FfsScore, type FfsSample } from './ffs.engine';
 import {
   BroadcastTimingCopilot,
   type BroadcastWindowSuggestion,
   type TipperAvailabilityBucket,
 } from './broadcast-timing.copilot';
-import {
-  SessionMonitoringCopilot,
-  type PriceNudge,
-} from './session-monitoring.copilot';
+import { SessionMonitoringCopilot, type PriceNudge } from './session-monitoring.copilot';
 
 export const CREATOR_CONTROL_RULE_ID = 'CREATOR_CONTROL_ZONE_v1';
 export const CREATOR_CHAT_FEED_RULE_ID = 'CREATOR-UI_v1.0';
@@ -94,14 +87,17 @@ export class CreatorControlService implements OnModuleInit {
   private readonly logger = new Logger(CreatorControlService.name);
   // Per-creator cache of the most recent FfsScore / nudge — supports the
   // single-pane snapshot without forcing recomputation on every read.
-  private readonly latestByCreator = new Map<
-    string,
-    { heat: FfsScore; nudge: PriceNudge }
-  >();
+  private readonly latestByCreator = new Map<string, { heat: FfsScore; nudge: PriceNudge }>();
   private readonly aggregatedChatByCreator = new Map<string, AggregatedChatFeedEntry[]>();
-  private readonly latestCyranoBySession = new Map<string, { copy: string; emitted_at_utc: string }>();
+  private readonly latestCyranoBySession = new Map<
+    string,
+    { copy: string; emitted_at_utc: string }
+  >();
   private readonly REDBOOK_SAFETY_BLOCKLIST: Array<{ pattern: RegExp; reason_code: string }> = [
-    { pattern: /(?:^|\W)(cashapp|venmo|paypal|crypto|btc|eth)(?:$|\W)/i, reason_code: 'REDBOOK_OFF_PLATFORM_PAYMENT' },
+    {
+      pattern: /(?:^|\W)(cashapp|venmo|paypal|crypto|btc|eth)(?:$|\W)/i,
+      reason_code: 'REDBOOK_OFF_PLATFORM_PAYMENT',
+    },
     { pattern: /\b(refund|chargeback)\b/i, reason_code: 'REDBOOK_REFUND_BYPASS' },
     { pattern: /\b(telegram|whatsapp|signal)\b/i, reason_code: 'REDBOOK_OFF_PLATFORM_CONTACT' },
   ];
@@ -119,7 +115,12 @@ export class CreatorControlService implements OnModuleInit {
   onModuleInit(): void {
     this.nats.subscribe(NATS_TOPICS.CHAT_MESSAGE_INGESTED, (payload) => {
       const message = payload as Partial<AggregatedChatFeedMessageInput>;
-      if (!message.id || !message.creator_id || !message.user_id || typeof message.content !== 'string') {
+      if (
+        !message.id ||
+        !message.creator_id ||
+        !message.user_id ||
+        typeof message.content !== 'string'
+      ) {
         return;
       }
       this.ingestAggregatedChatMessage({
@@ -130,7 +131,8 @@ export class CreatorControlService implements OnModuleInit {
         session_id: message.session_id ?? null,
         timestamp: typeof message.timestamp === 'string' ? message.timestamp : undefined,
         source: typeof message.source === 'string' ? message.source : undefined,
-        cyrano_context: typeof message.cyrano_context === 'string' ? message.cyrano_context : undefined,
+        cyrano_context:
+          typeof message.cyrano_context === 'string' ? message.cyrano_context : undefined,
       });
     });
 
@@ -245,11 +247,7 @@ export class CreatorControlService implements OnModuleInit {
   ingestAggregatedChatMessage(input: AggregatedChatFeedMessageInput): AggregatedChatFeedEntry {
     const sessionTier = this.latestByCreator.get(input.creator_id)?.heat.tier;
     const highlight_state: ChatFeedHighlightState =
-      sessionTier === 'INFERNO'
-        ? 'INFERNO'
-        : sessionTier === 'HOT'
-          ? 'HOT'
-          : 'NONE';
+      sessionTier === 'INFERNO' ? 'INFERNO' : sessionTier === 'HOT' ? 'HOT' : 'NONE';
 
     const moderation = this.evaluateRedbookSafety(input.content);
     const cyranoSuggestion = input.session_id
@@ -312,7 +310,9 @@ export class CreatorControlService implements OnModuleInit {
 
     return creatorRows
       .filter((row) => (platformFilter === 'ALL' ? true : row.platform_badge === platformFilter))
-      .filter((row) => (moderationFilter === 'ALL' ? true : row.moderation_state === moderationFilter))
+      .filter((row) =>
+        moderationFilter === 'ALL' ? true : row.moderation_state === moderationFilter,
+      )
       .filter((row) => (highlightsOnly ? row.highlight_state !== 'NONE' : true))
       .slice(0, Math.max(limit, 0));
   }

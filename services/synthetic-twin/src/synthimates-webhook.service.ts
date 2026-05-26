@@ -5,10 +5,7 @@
 // Updates CNZ database with results and ensures proper revenue tracking.
 
 import { PrismaClient } from '@prisma/client';
-import type {
-  SynthiMatesWebhookPayload,
-  SynthiMatesAiClient,
-} from './synthimates-api-client';
+import type { SynthiMatesWebhookPayload, SynthiMatesAiClient } from './synthimates-api-client';
 
 const prisma = new PrismaClient();
 

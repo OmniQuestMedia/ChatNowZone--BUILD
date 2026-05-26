@@ -21,7 +21,7 @@ export interface BundleQuote {
 
 export interface DiamondQuote {
   tokens: number;
-  baseRate: number;       // USD/token from volume bracket
+  baseRate: number; // USD/token from volume bracket
   velocityMultiplier: number;
   effectivePayoutPerToken: number;
   totalUsd: number;
@@ -156,7 +156,11 @@ export class RedbookRateCardService {
    * pricing now resolves through services/bijou/PassPricingService against
    * the venue-pricing constant (still denominated in CZT).
    */
-  listTeaseRegularBundles(): ReadonlyArray<{ tokens: number; guest_usd: number; member_usd: number }> {
+  listTeaseRegularBundles(): ReadonlyArray<{
+    tokens: number;
+    guest_usd: number;
+    member_usd: number;
+  }> {
     return REDBOOK_RATE_CARDS.TEASE_REGULAR;
   }
 

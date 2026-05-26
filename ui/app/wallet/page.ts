@@ -105,9 +105,7 @@ export function renderWalletPage(args: {
         [
           el('header', { classes: ['cnz-public__header'] }, [
             el('h1', {}, ['Wallet']),
-            el('p', { test_id: 'wallet-empty-message' }, [
-              'Welcome! Add tokens to get started.',
-            ]),
+            el('p', { test_id: 'wallet-empty-message' }, ['Welcome! Add tokens to get started.']),
           ]),
           renderCtaRow(),
         ],
@@ -383,9 +381,7 @@ function renderWelfareGuardianBand(band: WelfareGuardianBand): RenderElement {
       },
       props: { band },
     },
-    [
-      el('span', { classes: ['cnz-welfare-band__label'] }, [`Welfare: ${band}`]),
-    ],
+    [el('span', { classes: ['cnz-welfare-band__label'] }, [`Welfare: ${band}`])],
   );
 }
 

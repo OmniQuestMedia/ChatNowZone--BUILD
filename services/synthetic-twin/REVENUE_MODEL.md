@@ -1,4 +1,5 @@
 // services/synthetic-twin/REVENUE_MODEL.md
+
 # Synthetic Twin Revenue Sharing Model
 
 **PHASE5-ITEM2**: Revenue sharing logic for CNZ creators consuming SynthiMatesAi services
@@ -6,6 +7,7 @@
 ## Overview
 
 ChatNowZone operates a **resell model** with SynthiMatesAi:
+
 - CNZ consumers purchase synthetic twin services on the CNZ platform
 - CNZ calls SynthiMatesAi APIs to fulfill the service
 - Revenue from services purchased on CNZ is credited to CNZ creators
@@ -29,6 +31,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
 ## Pricing Configuration
 
 ### Image Generation
+
 - **Cost**: 10 CZT (ChatZone Tokens)
 - **Token Value**: $0.09 USD (9¢) per token
 - **Total Value**: $0.90 USD (90¢)
@@ -38,6 +41,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
   - CNZ Net: $0.12
 
 ### Voice Messages (Phase 3)
+
 - **Cost**: 15 CZT
 - **Token Value**: $0.09 USD per token
 - **Total Value**: $1.35 USD
@@ -47,6 +51,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
   - CNZ Net: $0.16
 
 ### Group Chat Messages (Phase 3)
+
 - **Cost**: 5 CZT per synthetic twin message
 - **Token Value**: $0.09 USD per token
 - **Total Value**: $0.45 USD
@@ -58,15 +63,16 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
 ### Token Deduction (Three-Bucket Wallet)
 
 Fan tokens are deducted in this priority order:
+
 1. **Bonus Tokens** (promotional/welcome credits)
 2. **Membership Tokens** (recurring allocations)
 3. **Purchased Tokens** (direct purchases)
 
 ```typescript
 // Priority deduction example
-wallet.bonus_tokens -= 5      // Use bonus first
-wallet.membership_tokens -= 3 // Then membership
-wallet.purchased_tokens -= 2  // Finally purchased
+wallet.bonus_tokens -= 5; // Use bonus first
+wallet.membership_tokens -= 3; // Then membership
+wallet.purchased_tokens -= 2; // Finally purchased
 // Total deducted: 10 CZT
 ```
 
@@ -83,11 +89,11 @@ await prisma.ledgerEntry.create({
     performer_id: creatorId,
     entry_type: 'SYNTHETIC_TWIN_EARNINGS',
     status: 'COMPLETED',
-    gross_amount_cents: earningsCents,        // e.g., 63¢
-    fee_amount_cents: BigInt(0),              // No additional fee
-    net_amount_cents: earningsCents,          // Creator receives full 70%
-    performer_amount_cents: earningsCents,    // Same as net
-    platform_amount_cents: BigInt(0),         // Platform share tracked separately
+    gross_amount_cents: earningsCents, // e.g., 63¢
+    fee_amount_cents: BigInt(0), // No additional fee
+    net_amount_cents: earningsCents, // Creator receives full 70%
+    performer_amount_cents: earningsCents, // Same as net
+    platform_amount_cents: BigInt(0), // Platform share tracked separately
     description: 'Creator earnings from Safe Synthetic Twin AI image generation',
     metadata: {
       correlation_id: correlationId,
@@ -106,8 +112,8 @@ The platform's 30% share is tracked in `SyntheticTwinGeneration.platform_share_c
 const generation = await prisma.syntheticTwinGeneration.create({
   data: {
     // ... other fields
-    creator_earnings_cents: BigInt(63),  // 70% of 90¢
-    platform_share_cents: BigInt(27),    // 30% of 90¢
+    creator_earnings_cents: BigInt(63), // 70% of 90¢
+    platform_share_cents: BigInt(27), // 30% of 90¢
     // Platform share includes:
     // - SynthiMatesAi API fee: 15¢
     // - CNZ net: 12¢
@@ -137,23 +143,30 @@ cnzNet = platformShare - apiFeeCents        // 27¢ - 15¢ = 12¢
 All synthetic twin transactions follow OQMI Financial Integrity Zone rules:
 
 ### Append-Only Ledger
+
 - **No UPDATE/DELETE** on ledger tables
 - All changes are additive (new entries only)
 - Enforced via Postgres triggers
 
 ### Required Fields
+
 Every financial record includes:
+
 - `correlation_id` - Unique transaction identifier
 - `reason_code` - Business reason for the transaction
 - `rule_applied_id` - Governance rule version
 
 ### Multi-Tenant Isolation
+
 All records include:
+
 - `organization_id` - Organization scope
 - `tenant_id` - Tenant scope
 
 ### Audit Trail
+
 All transactions emit immutable NATS events:
+
 - `SYNTHETIC_TWIN_GENERATION_STARTED`
 - `SYNTHETIC_TWIN_GENERATION_COMPLETED`
 - `SYNTHETIC_TWIN_GENERATION_FAILED`
@@ -191,11 +204,13 @@ Response:
 ## Payout Settlement
 
 Creator earnings accumulate in the canonical ledger and are settled via:
+
 1. **Diamond Concierge** - High-value creators get priority settlement
 2. **FairPay / NOWPayouts** - Regular settlement cycles (bi-weekly or monthly)
 3. **Token Bridge** - Optional conversion to external wallets
 
 Settlement frequency and thresholds are governed by:
+
 - Creator tier (Diamond, Platinum, Gold, etc.)
 - Total earnings threshold
 - Manual payout requests
@@ -203,6 +218,7 @@ Settlement frequency and thresholds are governed by:
 ## Future Enhancements
 
 ### Move to GovernanceConfig
+
 Currently hardcoded constants should migrate to `governance.config.ts`:
 
 ```typescript
@@ -218,14 +234,18 @@ export const SYNTHETIC_TWIN_CONFIG = {
 ```
 
 ### Dynamic Pricing
+
 Future phases may introduce:
+
 - Variable pricing based on generation quality
 - Premium features (HD images, longer videos)
 - Creator-set markup percentages
 - Promotional discounts
 
 ### Revenue Analytics
+
 Enhanced analytics features:
+
 - Revenue trends over time
 - Comparison with other creators
 - Forecasting and projections
@@ -234,6 +254,7 @@ Enhanced analytics features:
 ## Compliance & Governance
 
 All revenue operations comply with:
+
 - **OQMI Governance Doctrine v2.0** - Append-only finance, correlation IDs
 - **FIZ Rules** - No UPDATE on balance columns, offsets only
 - **PIPEDA** - Canada-only data residency for financial records

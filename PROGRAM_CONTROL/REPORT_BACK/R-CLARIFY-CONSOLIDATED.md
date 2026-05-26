@@ -16,6 +16,7 @@ BLOCKED directives in Waves D–G. No answers are assumed or filled in below.
 ## HOW TO USE THIS DOCUMENT
 
 For each item below:
+
 1. Read the **Question** and the **Options**.
 2. Write your decision in the `CEO ANSWER:` field (e.g., `(a)`, `(b)`, or free text).
 3. Once all items are answered, Grok will execute the downstream task conversions
@@ -33,6 +34,7 @@ those downstream tasks as BLOCKED.
 of each?
 
 **Options:**
+
 - **(a)** Single surface — adopt `CreatorControl.Zone™` as canonical name; retire
   `My Zone Manager™` terminology.
 - **(b)** Single surface — adopt `My Zone Manager™` as canonical name; retire
@@ -51,6 +53,7 @@ of each?
 it integrate with the Twenty CRM open-source platform, or a hybrid of both?
 
 **Options:**
+
 - **(a)** Custom in-repo CRM service (BUILD-NEW at `services/mycrewzone/`).
 - **(b)** Twenty CRM integration layer (define which Twenty objects/schemas are
   required; build integration service).
@@ -69,6 +72,7 @@ microservice, or as a feature embedded within HeartZone, Bijou, or another
 existing service?
 
 **Options:**
+
 - **(a)** Standalone microservice (`services/ffs/` — already scaffolded in Payload 11).
 - **(b)** Feature of HeartZone.
 - **(c)** Feature of Bijou.
@@ -91,6 +95,7 @@ plan §B.5.3 F1 precision/recall claim (C007).
 `services/wallet/` or as a separate `services/fairpay/` service?
 
 **Options:**
+
 - **(a)** Inside `services/wallet/` — rate engine is a Wallet extension.
 - **(b)** Separate service — `services/fairpay/` (or `services/fairplay/`).
 - **(c)** FairPay is inside Wallet; FairPlay is a separate surface.
@@ -107,6 +112,7 @@ plan §B.5.3 F1 precision/recall claim (C007).
 Welfare Guardian Score (WGS)?
 
 **Options:**
+
 - **(a)** Define acronym expansion + scope (free-text answer required; agent will
   create `services/dfsp/` BUILD-NEW directive after CEO defines scope).
 - **(b)** DFSP™ is the same as Welfare Guardian Score — retire one name; adopt the
@@ -127,6 +133,7 @@ two separate domains? The prefix resolution was partially resolved in A012
 half.
 
 **Options:**
+
 - **(a)** Confirmed separate — HZ = HeartZone IoT/biometric; HCZ = Human Contact
   Zone (human moderator/concierge/support layer). Prefixes HZ and HCZ are both
   in canonical enum (per A012).
@@ -148,12 +155,14 @@ decision.
 for the 2026-10-01 hard launch?
 
 Documented layers (from `services/cyrano/` and prior directives):
+
 1. **L1** — Twin narrative scaffolding / prompt orchestration
 2. **L2** — LLM provider abstraction (already scaffolded — CYR-006 / Payload 10)
 3. **L3** — Age + consent engine integration
 4. **L4** — Real-time stream response (live voice/video narrative)
 
 **Options:**
+
 - **(a)** L2 only (current scaffold is launch scope; L1/L3/L4 are post-launch).
 - **(b)** L1 + L2 (narrative + provider abstraction).
 - **(c)** L2 + L3 (provider abstraction + consent engine).
@@ -172,6 +181,7 @@ Documented layers (from `services/cyrano/` and prior directives):
 Engine (`services/risk/`) or a standalone service?
 
 **Options:**
+
 - **(a)** Sub-component of Risk Engine — WGS is an output metric of the Risk
   Assessment Toolkit (non-gating, advisory only, per Corpus Ch.4 §6.3).
 - **(b)** Standalone service (`services/welfare-guardian/`) — separate lifecycle
@@ -191,6 +201,7 @@ unblocks D002 extension (Risk Engine — confirm WGS interface).
 (`OmniQuestMediaInc/RedRoomRewards`) or inside `ChatNowZone--BUILD`?
 
 **Options:**
+
 - **(a)** Separate repo — this charter row retires from `CNZ-WORK-001`; webhook
   contract is tracked in `CROSS-REPO-FLAG-001.md`.
 - **(b)** Inside this repo — convert to BUILD-NEW task(s) in this charter; define
@@ -209,6 +220,7 @@ unblocks D002 extension (Risk Engine — confirm WGS interface).
 HeartZone data?
 
 **Options:**
+
 - **(a)** Same surface — HPE is the product name; HeartZone IoT Loop is the
   implementation name. One service.
 - **(b)** HPE is a consumer/presentation layer above the HeartZone IoT Loop service.
@@ -236,6 +248,7 @@ Theatre?
 can scope the SFU (LiveKit/Mediasoup) and Dwell-Credit algorithm.
 
 **Options:**
+
 - **(a)** Free-text: list which Park(s) are launch-scoped.
 - **(b)** Single Park only (default "Main Stage" or equivalent) — all others are
   post-launch.
@@ -254,6 +267,7 @@ EXTEND — currently BLOCKED)
 currently has `ui/types/` only (TypeScript interfaces). No `apps/` directory exists.
 
 **Options:**
+
 - **(a)** Frontend is in a separate repo — name the repo; this charter row retires
   from `CNZ-WORK-001`; add cross-repo flag.
 - **(b)** Frontend will be added to this repo under `apps/` — confirm and Grok will
@@ -270,20 +284,20 @@ the frontend lives).
 
 ## Summary — Downstream Task Map
 
-| R-CLARIFY ID | Blocks | Wave |
-|---|---|---|
-| R-CLARIFY-001 | E001 (CreatorControl.Zone BUILD-NEW) | E |
-| R-CLARIFY-002 | F001 (MyCrew.Zone BUILD-NEW) | F |
-| R-CLARIFY-003 | F002 (FFS BUILD-NEW — scaffold exists) | F |
-| R-CLARIFY-004 | D006 (FairPay EXTEND) | D |
-| R-CLARIFY-005 | F003 (DFSP™ BUILD-NEW) | F |
-| R-CLARIFY-006 | F004 (HCZ BUILD-NEW) | F |
-| R-CLARIFY-007 | B002, G001+ (Cyrano layers) | B / G |
-| R-CLARIFY-008 | F005 (WGS), D002 extension | D / F |
-| R-CLARIFY-009 | F006 (RedRoomRewards) | F |
-| R-CLARIFY-010 | D005 (HeartZone IoT EXTEND) | D |
-| R-CLARIFY-011 | D007 (Bijou Theatre EXTEND) | D |
-| R-CLARIFY-012 | H-series (frontend tasks) | H |
+| R-CLARIFY ID  | Blocks                                 | Wave  |
+| ------------- | -------------------------------------- | ----- |
+| R-CLARIFY-001 | E001 (CreatorControl.Zone BUILD-NEW)   | E     |
+| R-CLARIFY-002 | F001 (MyCrew.Zone BUILD-NEW)           | F     |
+| R-CLARIFY-003 | F002 (FFS BUILD-NEW — scaffold exists) | F     |
+| R-CLARIFY-004 | D006 (FairPay EXTEND)                  | D     |
+| R-CLARIFY-005 | F003 (DFSP™ BUILD-NEW)                 | F     |
+| R-CLARIFY-006 | F004 (HCZ BUILD-NEW)                   | F     |
+| R-CLARIFY-007 | B002, G001+ (Cyrano layers)            | B / G |
+| R-CLARIFY-008 | F005 (WGS), D002 extension             | D / F |
+| R-CLARIFY-009 | F006 (RedRoomRewards)                  | F     |
+| R-CLARIFY-010 | D005 (HeartZone IoT EXTEND)            | D     |
+| R-CLARIFY-011 | D007 (Bijou Theatre EXTEND)            | D     |
+| R-CLARIFY-012 | H-series (frontend tasks)              | H     |
 
 ---
 
