@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `c3393808ffcea0ae3a60a00eab5a525177938b11`
-**Generated:** 2026-05-26T21:18:12Z
+**Branch:** `claude/cleanup-linter-code-quality-pass`
+**Commit:** `def49805ef20face33bbe61a6c0cc7399fa9883d`
+**Generated:** 2026-05-26T21:52:57Z
 
 ## All Files
 
@@ -45,6 +45,7 @@ Auto-generated on every push. Do not edit manually.
 - `CONTRIBUTING.md`
 - `CYRANO_LAYER_1_PR_SUMMARY.md`
 - `HYGIENE_SWEEP_REPORT.md`
+- `LINT_CLEANUP_SUMMARY.md`
 - `MASTER_PROJECT_FOLDER.md`
 - `OQMI_SYSTEM_STATE.md`
 - `PHASE2-440-IMPLEMENTATION-STATUS.md`
