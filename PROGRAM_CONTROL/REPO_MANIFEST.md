@@ -3,8 +3,8 @@
 Auto-generated on every push. Do not edit manually.
 
 **Branch:** `copilot/add-motion-library-infrastructure`
-**Commit:** `90c0cb9471768fec8ea1ae07a8739601ecc0856a`
-**Generated:** 2026-05-26T18:50:58Z
+**Commit:** `29f0f4b3397a01bb1346800e6bd0d356a38accc3`
+**Generated:** 2026-05-26T18:53:46Z
 
 ## All Files
 
@@ -800,6 +800,7 @@ Auto-generated on every push. Do not edit manually.
 - `services/synthetic-twin/src/group-chat.service.ts`
 - `services/synthetic-twin/src/moderation.service.ts`
 - `services/synthetic-twin/src/phase27-guardrails.spec.ts`
+- `services/synthetic-twin/src/phase27-zkp-consent.spec.ts`
 - `services/synthetic-twin/src/synthetic-twin.service.ts`
 - `services/synthetic-twin/src/synthimates-api-client.ts`
 - `services/synthetic-twin/src/synthimates-webhook.service.ts`
@@ -832,6 +833,8 @@ Auto-generated on every push. Do not edit manually.
 - `src/domain/motion/motion-profile.types.ts`
 - `src/infra/motion/expression-retargeter.ts`
 - `src/infra/motion/motion-extractor.service.ts`
+- `src/services/consent/accountszone-consent-recorder.service.ts`
+- `src/services/consent/zkp-consent.service.ts`
 - `tests/e2e/audit-chain-replay.spec.ts`
 - `tests/e2e/diamond-recovery-flows.spec.ts`
 - `tests/e2e/full-token-purchase-flow.spec.ts`
@@ -906,6 +909,7 @@ Auto-generated on every push. Do not edit manually.
 - `ui/components/send-gift-panel.spec.ts`
 - `ui/components/send-gift-panel.ts`
 - `ui/components/slot-machine.ts`
+- `ui/components/synthetic-twin-consent-modals.ts`
 - `ui/components/wheel-of-fortune.ts`
 - `ui/config/accessibility.ts`
 - `ui/config/build-config.ts`
