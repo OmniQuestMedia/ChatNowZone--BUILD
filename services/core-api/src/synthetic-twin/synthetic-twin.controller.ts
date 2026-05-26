@@ -9,6 +9,7 @@ import { groupChatService } from '../../../synthetic-twin/src/group-chat.service
 import { analyticsService } from '../../../synthetic-twin/src/analytics.service';
 import { moderationService } from '../../../synthetic-twin/src/moderation.service';
 import { synthiMatesWebhookService } from '../../../synthetic-twin/src/synthimates-webhook.service';
+import { zkpConsentService } from '../../../src/services/consent/zkp-consent.service';
 
 /**
  * Safe Synthetic Twin API Controller
@@ -59,11 +60,38 @@ export class SyntheticTwinController {
       prompt?: string;
       motionProfileId?: string;
       characterReference?: string;
+      generationMode?: 'twin' | 'fantasy';
+      zkpConsentProof?: {
+        proof: unknown;
+        publicSignals: unknown[];
+      };
       organizationId: string;
       tenantId: string;
     },
   ) {
     return await syntheticTwinService.generateImage(body);
+  }
+
+  @Post('consent/prove')
+  async recordAndProveConsent(
+    @Body()
+    body: {
+      accountId: string;
+      characterId: string;
+      consentType: 'twin' | 'fantasy';
+      consentText: string;
+      userSignature?: string;
+      ip?: string;
+    },
+  ) {
+    return await zkpConsentService.recordAndProveConsent(
+      body.accountId,
+      body.characterId,
+      body.consentType,
+      body.consentText,
+      body.userSignature,
+      body.ip,
+    );
   }
 
   /**

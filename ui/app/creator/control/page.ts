@@ -14,7 +14,12 @@ import { heatColorFor } from '../../../config/theme';
 import { heatTierAriaLabel } from '../../../config/accessibility';
 import { el, RenderElement } from '../../../components/render-plan';
 import { renderSendGiftPanel } from '../../../components/send-gift-panel';
-import type { CreatorCommandCenterView, CyranoSessionSummary, DiamondHandoffCta } from '../../../types/creator-panel-contracts';
+import { renderSyntheticTwinConsentModals } from '../../../components/synthetic-twin-consent-modals';
+import type {
+  CreatorCommandCenterView,
+  CyranoSessionSummary,
+  DiamondHandoffCta,
+} from '../../../types/creator-panel-contracts';
 
 export const CREATOR_CONTROL_PAGE_RULE_ID = 'CREATOR_CONTROL_PAGE_v1';
 
@@ -82,15 +87,14 @@ export function renderCreatorControlPage(
         ]),
       ]),
       renderCyranoSessionSummary(cyrano_summary),
-      handoff_cta
-        ? renderHandoffCta(handoff_cta, inputs.handoff_modal_open ?? false)
-        : null,
+      handoff_cta ? renderHandoffCta(handoff_cta, inputs.handoff_modal_open ?? false) : null,
       renderHeatMeter(view),
       renderSessionMonitoring(view),
       renderAggregatedChatFeed(view),
       renderBroadcastTiming(view),
       renderCyranoPanel(view),
       renderPersonaSwitcher(view),
+      renderSyntheticTwinConsentModals(null),
       renderSendGiftPanel({ creator_id: view.creator_id }).tree,
     ],
   );
@@ -235,14 +239,10 @@ function renderAggregatedChatFeed(view: CreatorCommandCenterView): RenderElement
     [
       el('header', {}, [
         el('h2', {}, ['Unified Chat Feed']),
-        el(
-          'div',
-          { test_id: 'creator-control-chat-filters', classes: ['cnz-chip-row'] },
-          [
-            el('span', {}, [`Platforms: ${feed.platform_filters.join(', ')}`]),
-            el('span', {}, [`Moderation: ${feed.moderation_filters.join(', ')}`]),
-          ],
-        ),
+        el('div', { test_id: 'creator-control-chat-filters', classes: ['cnz-chip-row'] }, [
+          el('span', {}, [`Platforms: ${feed.platform_filters.join(', ')}`]),
+          el('span', {}, [`Moderation: ${feed.moderation_filters.join(', ')}`]),
+        ]),
       ]),
       ...feed.rows.map((row) =>
         el(
@@ -262,7 +262,9 @@ function renderAggregatedChatFeed(view: CreatorCommandCenterView): RenderElement
           },
           [
             el('header', {}, [
-              el('strong', { test_id: `creator-control-chat-badge-${row.message_id}` }, [row.platform_badge]),
+              el('strong', { test_id: `creator-control-chat-badge-${row.message_id}` }, [
+                row.platform_badge,
+              ]),
               el('span', {}, [row.timestamp]),
               el('span', {}, [row.highlight_state]),
             ]),
@@ -275,19 +277,15 @@ function renderAggregatedChatFeed(view: CreatorCommandCenterView): RenderElement
             el('footer', {}, [
               el('span', {}, [`Moderation: ${row.moderation_state}`]),
               el('span', {}, [row.moderation_reason_code]),
-              el(
-                'span',
-                { test_id: `creator-control-chat-moderation-tools-${row.message_id}` },
+              el('span', { test_id: `creator-control-chat-moderation-tools-${row.message_id}` }, [
                 [
-                  [
-                    row.moderation_tools.can_hide ? 'HIDE' : null,
-                    row.moderation_tools.can_warn ? 'WARN' : null,
-                    row.moderation_tools.can_escalate ? 'ESCALATE' : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · '),
-                ],
-              ),
+                  row.moderation_tools.can_hide ? 'HIDE' : null,
+                  row.moderation_tools.can_warn ? 'WARN' : null,
+                  row.moderation_tools.can_escalate ? 'ESCALATE' : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · '),
+              ]),
             ]),
           ],
         ),
@@ -446,9 +444,7 @@ function renderPersonaSwitcher(view: CreatorCommandCenterView): RenderElement {
 function renderCyranoSessionSummary(summary: CyranoSessionSummary): RenderElement {
   const latencyOk = summary.latency_within_sla;
   const latencyDisplay =
-    summary.latency_last_observed_ms !== null
-      ? `${summary.latency_last_observed_ms}ms`
-      : '—';
+    summary.latency_last_observed_ms !== null ? `${summary.latency_last_observed_ms}ms` : '—';
 
   return el(
     'section',
@@ -475,17 +471,13 @@ function renderCyranoSessionSummary(summary: CyranoSessionSummary): RenderElemen
       ]),
       el('dl', { classes: ['cnz-stat-grid', 'cnz-stat-grid--inline'] }, [
         el('dt', {}, ['Persona']),
-        el(
-          'dd',
-          { test_id: 'creator-control-cyrano-summary-persona' },
-          [summary.active_persona_display_name ?? 'None active'],
-        ),
+        el('dd', { test_id: 'creator-control-cyrano-summary-persona' }, [
+          summary.active_persona_display_name ?? 'None active',
+        ]),
         el('dt', {}, ['Suggestions']),
-        el(
-          'dd',
-          { test_id: 'creator-control-cyrano-summary-count' },
-          [String(summary.suggestion_count)],
-        ),
+        el('dd', { test_id: 'creator-control-cyrano-summary-count' }, [
+          String(summary.suggestion_count),
+        ]),
         el('dt', {}, ['Heat tier']),
         el('dd', {}, [summary.tier_context]),
       ]),

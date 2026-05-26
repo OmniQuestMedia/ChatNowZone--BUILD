@@ -1,4 +1,5 @@
 import { FaceEmbeddingService } from './face-embedding.service';
+import { zkpConsentService } from '../services/consent/zkp-consent.service';
 
 const DEFAULT_CELEBRITY_BLOCKLIST = [
   'scarlett johansson',
@@ -63,6 +64,37 @@ export class AntiLookalikeGuard {
     };
   }
 
+  async validateGenerationWithContext(
+    generatedFrame: Buffer,
+    context: GenerationContext,
+  ): Promise<{ safe: boolean; issues: string[] }> {
+    if (
+      !context.zkpConsentProof ||
+      !(await zkpConsentService.verifyConsentProof(
+        context.zkpConsentProof.proof,
+        context.zkpConsentProof.publicSignals,
+      ))
+    ) {
+      throw new Error('Valid zero-knowledge consent proof required');
+    }
+
+    const baseResult = await this.validateGeneration(
+      generatedFrame,
+      context.prompt,
+      context.characterId,
+    );
+    const contextIssues = [...baseResult.issues];
+
+    if (context.mode === 'twin' && !context.characterId) {
+      contextIssues.push('Twin mode requires character identity binding');
+    }
+    if (context.mode === 'fantasy' && context.prompt.toLowerCase().includes('real person')) {
+      contextIssues.push('Fantasy mode cannot reference real-person likeness');
+    }
+
+    return { safe: contextIssues.length === 0, issues: contextIssues };
+  }
+
   enforcePromptPolicy(prompt?: string): {
     safe: boolean;
     sanitizedPrompt: string;
@@ -123,4 +155,14 @@ export class AntiLookalikeGuard {
 
     return dot / (Math.sqrt(magA) * Math.sqrt(magB) || 1);
   }
+}
+
+export interface GenerationContext {
+  mode: 'twin' | 'fantasy';
+  prompt: string;
+  characterId: string;
+  zkpConsentProof?: {
+    proof: unknown;
+    publicSignals: unknown[];
+  };
 }

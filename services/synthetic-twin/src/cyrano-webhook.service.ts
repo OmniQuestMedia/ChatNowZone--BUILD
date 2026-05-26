@@ -15,6 +15,8 @@ export interface CyranoWebhookRequest {
   inputTranscript?: string;
   motionProfileId?: string;
   characterReference?: string;
+  consentProofSignals?: unknown[];
+  generationMode?: 'twin' | 'fantasy';
   organizationId: string;
   tenantId: string;
 }
@@ -67,6 +69,8 @@ export class CyranoWebhookService {
       input_transcript: request.inputTranscript,
       motion_profile_id: request.motionProfileId,
       character_reference: request.characterReference,
+      consent_proof_signals: request.consentProofSignals,
+      generation_mode: request.generationMode ?? 'fantasy',
       organization_id: request.organizationId,
       tenant_id: request.tenantId,
       // Metadata for CyranoEngines to callback CNZ
@@ -76,8 +80,13 @@ export class CyranoWebhookService {
 
     try {
       // Get signing secret from env (should be in AWS Secrets Manager)
-      const signingSecret =
-        process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
+      const signingSecret = process.env.CYRANO_WEBHOOK_SIGNING_SECRET;
+      if (!signingSecret && process.env.NODE_ENV === 'production') {
+        throw new Error(
+          'CYRANO_WEBHOOK_SIGNING_SECRET is required in production for webhook signing',
+        );
+      }
+      const effectiveSigningSecret = signingSecret || 'dev-secret-change-in-prod';
 
       // Compute HMAC signature for request
       const signature = this.webhookService.computeSignature(
@@ -93,7 +102,7 @@ export class CyranoWebhookService {
           amount_tokens: 0,
           bucket: 'purchased',
         },
-        signingSecret,
+        effectiveSigningSecret,
       );
 
       // Call CyranoEngines webhook

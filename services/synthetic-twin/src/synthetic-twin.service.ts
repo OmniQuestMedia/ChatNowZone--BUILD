@@ -10,6 +10,7 @@ import { cyranoWebhookService } from './cyrano-webhook.service';
 import { AntiLookalikeGuard } from '../../../src/domain/anti-lookalike.guard';
 import { motionLibraryRepository } from '../../../src/domain/motion/motion-library.repository';
 import type { SynthiMatesAiClient } from './synthimates-api-client';
+import type { ConsentProof } from '../../../src/services/consent/zkp-consent.service';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,8 @@ export interface GenerateImageRequest {
   prompt?: string;
   motionProfileId?: string;
   characterReference?: string;
+  generationMode?: 'twin' | 'fantasy';
+  zkpConsentProof?: Pick<ConsentProof, 'proof' | 'publicSignals'>;
   organizationId: string;
   tenantId: string;
 }
@@ -78,8 +81,19 @@ export class SyntheticTwinService {
   async generateImage(request: GenerateImageRequest): Promise<GenerateImageResponse> {
     const correlationId = `SYNTWIN-${randomUUID()}`;
     const promptPolicy = this.antiLookalikeGuard.enforcePromptPolicy(request.prompt);
+    const generationMode = request.generationMode ?? 'fantasy';
 
     try {
+      await this.antiLookalikeGuard.validateGenerationWithContext(
+        Buffer.from(promptPolicy.sanitizedPrompt),
+        {
+          mode: generationMode,
+          prompt: promptPolicy.sanitizedPrompt,
+          characterId: request.characterReference || request.creatorId,
+          zkpConsentProof: request.zkpConsentProof,
+        },
+      );
+
       // Step 1: Verify creator has synthetic twin enabled
       const creator = await prisma.creator.findUnique({
         where: { id: request.creatorId },
@@ -167,6 +181,7 @@ export class SyntheticTwinService {
       // Step 7: PHASE7-ITEM2: Call CyranoEngines via webhook for actual AI generation
       // CyranoEngines will handle the ML pipeline and callback when complete
       await this.requestCyranoGeneration(generation.id, correlationId, request, promptPolicy);
+      await this.recordConsentProofAudit(generation.id, correlationId, request);
 
       return {
         id: generation.id,
@@ -335,6 +350,8 @@ export class SyntheticTwinService {
         negativePrompt: promptPolicy.negativePrompt,
         motionProfileId: request.motionProfileId,
         characterReference: request.characterReference,
+        consentProofSignals: request.zkpConsentProof?.publicSignals,
+        generationMode: request.generationMode ?? 'fantasy',
         organizationId: request.organizationId,
         tenantId: request.tenantId,
       });
@@ -389,6 +406,31 @@ export class SyntheticTwinService {
         image_uri: imageUri || null,
         error_message: errorMessage || null,
         updated_at: new Date(),
+      },
+    });
+  }
+
+  private async recordConsentProofAudit(
+    generationId: string,
+    correlationId: string,
+    request: GenerateImageRequest,
+  ): Promise<void> {
+    await prisma.auditEvent.create({
+      data: {
+        event_type: 'SYNTHETIC_TWIN_GENERATION_CONSENT_PROOF',
+        actor_id: request.userId,
+        performer_id: request.creatorId,
+        purpose_code: 'SYNTHETIC_TWIN_GENERATION',
+        outcome: 'ACCEPTED',
+        reason_code: 'CONSENT_PROOF_VERIFIED',
+        consent_basis_id: correlationId,
+        metadata: {
+          generation_id: generationId,
+          generation_mode: request.generationMode ?? 'fantasy',
+          zkp_public_signals: request.zkpConsentProof?.publicSignals ?? [],
+          motion_profile_id: request.motionProfileId ?? null,
+          character_reference: request.characterReference ?? null,
+        },
       },
     });
   }
