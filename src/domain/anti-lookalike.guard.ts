@@ -20,6 +20,10 @@ export class AntiLookalikeGuard {
   private celebrityEmbeddings = new Map<string, Float32Array>();
   private similarityThreshold = 0.83;
 
+  constructor(similarityThreshold = 0.83) {
+    this.similarityThreshold = similarityThreshold;
+  }
+
   async initialize(): Promise<void> {
     return;
   }
@@ -40,6 +44,11 @@ export class AntiLookalikeGuard {
     }
 
     const embedding = await this.generateFaceEmbedding(generatedFrame);
+
+    if (this.celebrityEmbeddings.size === 0) {
+      issues.push('Celebrity embedding blacklist not initialized');
+      return { safe: false, issues };
+    }
 
     for (const [name, celebEmb] of this.celebrityEmbeddings.entries()) {
       const similarity = this.cosineSimilarity(embedding, celebEmb);

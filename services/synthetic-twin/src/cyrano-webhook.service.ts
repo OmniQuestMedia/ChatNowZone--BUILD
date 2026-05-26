@@ -2,7 +2,7 @@
 // Handles outbound webhook calls from ChatNowZone to CyranoEngines for AI generation
 // All AI processing happens in CyranoEngines, CNZ only manages tokens and earnings
 
-import { randomUUID } from 'crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'crypto';
 import { OutboundWebhookService } from '../../integration-hub/comms/outbound-webhook.service';
 
 export interface CyranoWebhookRequest {
@@ -144,10 +144,15 @@ export class CyranoWebhookService {
    * - result_uri (S3 path to generated content)
    * - status (COMPLETED | FAILED)
    */
-  verifyCallback(_signature: string, _payload: unknown, _signingSecret: string): boolean {
-    // TODO: Implement signature verification
-    // For now, accept all callbacks in dev
-    return true;
+  verifyCallback(signature: string, payload: unknown, signingSecret: string): boolean {
+    const serializedPayload = JSON.stringify(payload);
+    const expected = createHmac('sha256', signingSecret).update(serializedPayload).digest('hex');
+
+    try {
+      return timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'));
+    } catch {
+      return false;
+    }
   }
 }
 

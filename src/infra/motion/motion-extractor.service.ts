@@ -1,4 +1,5 @@
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+import { randomUUID } from 'crypto';
 import { MotionProfile } from '../../domain/motion/motion-profile.types';
 
 interface BlendshapeCategory {
@@ -42,6 +43,7 @@ export class MotionExtractorService {
   async extractAnonymizedMotion(
     videoFrames: Buffer[],
     profileName = 'extracted_motion',
+    frameDurationMs = 33,
   ): Promise<AnonymizedMotionProfile[]> {
     if (!this.landmarker) {
       throw new Error('MotionExtractorService is not initialized');
@@ -50,7 +52,7 @@ export class MotionExtractorService {
     const motionData: AnonymizedMotionProfile[] = [];
 
     for (let i = 0; i < videoFrames.length; i += 1) {
-      const timestamp = i * 33;
+      const timestamp = i * frameDurationMs;
       const frame = videoFrames[i];
       const results = (await this.landmarker.detectForVideo(
         frame as unknown as ImageSource,
@@ -59,7 +61,7 @@ export class MotionExtractorService {
 
       if (results.faceLandmarks?.[0] && results.faceBlendshapes?.[0]?.categories) {
         motionData.push({
-          id: `motion_${Date.now()}_${i}`,
+          id: `motion_${randomUUID()}_${i}`,
           name: profileName,
           category: this.categorizeExpression(results.faceBlendshapes[0].categories),
           blendshapes: this.extractBlendshapes(results.faceBlendshapes[0].categories),
