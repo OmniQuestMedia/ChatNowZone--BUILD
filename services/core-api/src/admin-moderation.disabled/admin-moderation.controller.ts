@@ -3,7 +3,9 @@
 // Protected routes - should be behind RBAC/admin-only middleware
 
 import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
-import { adminModerationService } from '../../../admin-moderation/src/admin-moderation.service';
+import { AdminModerationService } from '../../../admin-moderation/src/admin-moderation.service';
+
+const adminModerationService = new AdminModerationService();
 
 /**
  * PHASE3-ITEM4: Admin Moderation API Controller

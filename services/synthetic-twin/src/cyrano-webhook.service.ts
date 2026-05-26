@@ -4,6 +4,7 @@
 
 import { randomUUID } from 'crypto';
 import { OutboundWebhookService } from '../../integration-hub/comms/outbound-webhook.service';
+import type { LedgerEntryAppendedPayload } from '../../integration-hub/comms/outbound-webhook.types';
 
 export interface CyranoWebhookRequest {
   correlationId: string;
@@ -73,21 +74,19 @@ export class CyranoWebhookService {
       const signingSecret = process.env.CYRANO_WEBHOOK_SIGNING_SECRET || 'dev-secret-change-in-prod';
 
       // Compute HMAC signature for request
-      const signature = this.webhookService.computeSignature(
-        {
-          event_type: 'LEDGER_ENTRY_APPENDED', // Reuse existing type for now
-          event_id: randomUUID(),
-          occurred_at_utc: new Date().toISOString(),
-          correlation_id: request.correlationId,
-          reason_code: 'AI_GENERATION_REQUEST',
-          rule_applied_id: 'OUTBOUND_WEBHOOK_v1',
-          wallet_id: request.userId,
-          intent: 'SPEND',
-          amount_tokens: 0,
-          bucket: 'purchased',
-        },
-        signingSecret,
-      );
+      const webhookPayload: Omit<LedgerEntryAppendedPayload, 'hmac_signature'> = {
+        event_type: 'LEDGER_ENTRY_APPENDED', // Reuse existing type for now
+        event_id: randomUUID(),
+        occurred_at_utc: new Date().toISOString(),
+        correlation_id: request.correlationId,
+        reason_code: 'AI_GENERATION_REQUEST',
+        rule_applied_id: 'OUTBOUND_WEBHOOK_v1',
+        wallet_id: request.userId,
+        intent: 'SPEND',
+        amount_tokens: 0,
+        bucket: 'purchased',
+      };
+      const signature = this.webhookService.computeSignature(webhookPayload, signingSecret);
 
       // Call CyranoEngines webhook
       const response = await fetch(this.cyranoEndpoint, {
@@ -137,7 +136,7 @@ export class CyranoWebhookService {
    * - result_uri (S3 path to generated content)
    * - status (COMPLETED | FAILED)
    */
-  verifyCallback(signature: string, payload: unknown, signingSecret: string): boolean {
+  verifyCallback(_signature: string, _payload: unknown, _signingSecret: string): boolean {
     // TODO: Implement signature verification
     // For now, accept all callbacks in dev
     return true;

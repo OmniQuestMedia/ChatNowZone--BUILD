@@ -36,10 +36,11 @@ import { StudioAffiliationModule } from '../../studio-affiliation/src/studio-aff
 import { CreatorOnboardingModule } from '../../creator-onboarding/src/creator-onboarding.module';
 import { CyranoAuthModule } from './cyrano/cyrano-auth.module';
 import { SyntheticTwinModule } from './synthetic-twin/synthetic-twin.module';
-import { VoiceChatModule } from './voice-chat/voice-chat.module';
-import { GroupChatModule } from './group-chat/group-chat.module';
-import { AIAnalyticsModule } from './ai-analytics/ai-analytics.module';
-import { AdminModerationModule } from './admin-moderation/admin-moderation.module';
+// NOTE: The following modules are disabled pending Prisma schema updates
+// import { VoiceChatModule } from './voice-chat/voice-chat.module';
+// import { GroupChatModule } from './group-chat/group-chat.module';
+// import { AIAnalyticsModule } from './ai-analytics/ai-analytics.module';
+// import { AdminModerationModule } from './admin-moderation/admin-moderation.module';
 
 @Module({
   imports: [
@@ -80,14 +81,15 @@ import { AdminModerationModule } from './admin-moderation/admin-moderation.modul
     CyranoAuthModule,
     // PHASE2-440 — Safe Synthetic Twin AI image generation
     SyntheticTwinModule,
+    // NOTE: PHASE3 modules disabled pending Prisma schema updates
     // PHASE3-ITEM1 — Voice Chat with TTS support
-    VoiceChatModule,
+    // VoiceChatModule,
     // PHASE3-ITEM2 — Group Chat with Synthetic Twins
-    GroupChatModule,
+    // GroupChatModule,
     // PHASE3-ITEM3 — Creator Analytics for AI Features
-    AIAnalyticsModule,
+    // AIAnalyticsModule,
     // PHASE3-ITEM4 — Admin Moderation Tools for Synthetic Content
-    AdminModerationModule,
+    // AdminModerationModule,
   ],
 })
 export class AppModule implements NestModule {
