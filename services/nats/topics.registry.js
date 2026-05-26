@@ -82,14 +82,5 @@ exports.NATS_TOPICS = {
     SCHEDULE_COVERAGE_GAP_DETECTED: 'gz.schedule.coverage.gap_detected',
     SCHEDULE_STAT_HOLIDAY_ALERT: 'gz.schedule.stat_holiday.alert',
     SCHEDULE_REMINDER_BLOCK_CUTOFF: 'gz.schedule.reminder.block_cutoff',
-    FFS_SCORE_SAMPLE: 'ffs.score.sample',
-    FFS_SCORE_TIER_CHANGED: 'ffs.score.tier.changed',
-    FFS_SCORE_PEAK: 'ffs.score.peak',
-    FFS_SCORE_LEADERBOARD_UPDATED: 'ffs.score.leaderboard.updated',
-    FFS_SCORE_HOT_AND_READY: 'ffs.score.hot_and_ready',
-    FFS_SCORE_DUAL_FLAME_PEAK: 'ffs.score.dual_flame.peak',
-    FFS_SCORE_SESSION_STARTED: 'ffs.score.session.started',
-    FFS_SCORE_SESSION_ENDED: 'ffs.score.session.ended',
-    FFS_SCORE_ADAPTIVE_UPDATED: 'ffs.score.adaptive.updated',
 };
 //# sourceMappingURL=topics.registry.js.map

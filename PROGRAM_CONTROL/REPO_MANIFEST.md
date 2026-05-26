@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `a39a14710bba9898b4c8e17f57483a0fea7f1cd1`
-**Generated:** 2026-05-25T13:24:05Z
+**Branch:** `claude/testing-cleanup-pass-chatnowzone`
+**Commit:** `0a023915a09b644b1164663441d8ef1adddaf369`
+**Generated:** 2026-05-26T21:17:28Z
 
 ## All Files
 
@@ -292,6 +292,7 @@ Auto-generated on every push. Do not edit manually.
 - `REFERENCE_LIBRARY/TEMPLATES/OQMInc_REFERENCE_LIBRARY_MASTER_TEMPLATE.md`
 - `REFERENCE_LIBRARY/TEMPLATES/README.md`
 - `ROADMAP.md`
+- `TESTING_CLEANUP_REPORT.md`
 - `apps/chatnow-zone/README.md`
 - `apps/chatnow-zone/app/creator/pixel-legacy/page.tsx`
 - `apps/chatnow-zone/app/diamond/purchase/page.tsx`
@@ -450,13 +451,13 @@ Auto-generated on every push. Do not edit manually.
 - `scripts/seed-scheduling.ts`
 - `scripts/verify-gov-gate.sh`
 - `scripts/verify-vault-delivery.ts`
-- `services/admin-moderation/package.json`
-- `services/admin-moderation/src/admin-moderation.service.ts`
+- `services/admin-moderation.disabled/package.json`
+- `services/admin-moderation.disabled/src/admin-moderation.service.ts`
 - `services/affiliation-number/src/affiliation-number.module.ts`
 - `services/affiliation-number/src/affiliation-number.service.spec.ts`
 - `services/affiliation-number/src/affiliation-number.service.ts`
-- `services/ai-analytics/package.json`
-- `services/ai-analytics/src/ai-analytics.service.ts`
+- `services/ai-analytics.disabled/package.json`
+- `services/ai-analytics.disabled/src/ai-analytics.service.ts`
 - `services/assets/DigitalVaultService.ts`
 - `services/assets/WatermarkUtility.ts`
 - `services/bijou/src/bijou-admission.service.ts`
@@ -466,10 +467,10 @@ Auto-generated on every push. Do not edit manually.
 - `services/bijou/src/bijou.module.ts`
 - `services/bijou/src/min-seat-gate.service.ts`
 - `services/bijou/src/pass-pricing.service.ts`
-- `services/core-api/src/admin-moderation/admin-moderation.controller.ts`
-- `services/core-api/src/admin-moderation/admin-moderation.module.ts`
-- `services/core-api/src/ai-analytics/ai-analytics.controller.ts`
-- `services/core-api/src/ai-analytics/ai-analytics.module.ts`
+- `services/core-api/src/admin-moderation.disabled/admin-moderation.controller.ts`
+- `services/core-api/src/admin-moderation.disabled/admin-moderation.module.ts`
+- `services/core-api/src/ai-analytics.disabled/ai-analytics.controller.ts`
+- `services/core-api/src/ai-analytics.disabled/ai-analytics.module.ts`
 - `services/core-api/src/analytics/analytics.module.ts`
 - `services/core-api/src/analytics/ffs-score.service.ts`
 - `services/core-api/src/app.module.ts`
@@ -537,8 +538,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/gifts/rrr-client.service.spec.ts`
 - `services/core-api/src/gifts/rrr-client.service.ts`
 - `services/core-api/src/governance/governance.config.ts`
-- `services/core-api/src/group-chat/group-chat.controller.ts`
-- `services/core-api/src/group-chat/group-chat.module.ts`
+- `services/core-api/src/group-chat.disabled/group-chat.controller.ts`
+- `services/core-api/src/group-chat.disabled/group-chat.module.ts`
 - `services/core-api/src/growth/growth.module.ts`
 - `services/core-api/src/growth/guarded-notification.service.ts`
 - `services/core-api/src/growth/gwp.service.ts`
@@ -587,8 +588,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/core-api/src/synthetic-twin/synthetic-twin.controller.ts`
 - `services/core-api/src/synthetic-twin/synthetic-twin.module.ts`
 - `services/core-api/src/test/helpers/setTestEnv.ts`
-- `services/core-api/src/voice-chat/voice-chat.controller.ts`
-- `services/core-api/src/voice-chat/voice-chat.module.ts`
+- `services/core-api/src/voice-chat.disabled/voice-chat.controller.ts`
+- `services/core-api/src/voice-chat.disabled/voice-chat.module.ts`
 - `services/core-api/src/zone-access/zone-access.guard.ts`
 - `services/core-api/src/zone-access/zone-access.module.ts`
 - `services/core-api/src/zone-access/zone-access.service.ts`
@@ -688,8 +689,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/gamification/src/services/redroom-rewards-burn.service.ts`
 - `services/gamification/src/services/security.service.ts`
 - `services/gamification/src/types/gamification.types.ts`
-- `services/group-chat/package.json`
-- `services/group-chat/src/group-chat.service.ts`
+- `services/group-chat.disabled/package.json`
+- `services/group-chat.disabled/src/group-chat.service.ts`
 - `services/guest-heat/.env.example`
 - `services/guest-heat/ASSUMPTIONS.md`
 - `services/guest-heat/FLAGS.md`
@@ -811,8 +812,8 @@ Auto-generated on every push. Do not edit manually.
 - `services/velocityzone/src/velocityzone.types.ts`
 - `services/vision-monitor/package.json`
 - `services/vision-monitor/src/human-counter.worker.ts`
-- `services/voice-chat/package.json`
-- `services/voice-chat/src/voice-chat.service.ts`
+- `services/voice-chat.disabled/package.json`
+- `services/voice-chat.disabled/src/voice-chat.service.ts`
 - `services/zone-gpt/src/proposal.service.ts`
 - `services/zone-gpt/src/zone-gpt.module.ts`
 - `services/zonebot-scheduler/.env.example`

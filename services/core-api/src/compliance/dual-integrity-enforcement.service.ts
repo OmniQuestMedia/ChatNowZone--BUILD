@@ -11,8 +11,8 @@
 //   5. All FIZ-scoped changes carry proper correlation IDs and reason codes
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { NatsService } from '../../core-api/src/nats/nats.service';
-import { NATS_TOPICS } from '../../nats/topics.registry';
+import { NatsService } from '../nats/nats.service';
+import { NATS_TOPICS } from '../../../nats/topics.registry';
 
 export const DUAL_INTEGRITY_RULE_ID = 'DUAL_INTEGRITY_v1.0';
 
@@ -67,7 +67,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
 
   onModuleInit(): void {
     // Subscribe to GateGuard bypass attempts (should never happen)
-    this.nats.subscribe('gateguard.bypass.attempted', (payload) => {
+    this.nats.subscribe('gateguard.bypass.attempted', (payload: any) => {
       this.recordViolation({
         violation_type: 'GATEGUARD_BYPASS',
         entity_id: payload.transaction_id || 'unknown',
@@ -83,7 +83,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to Welfare Guard bypass attempts
-    this.nats.subscribe('welfare.cooldown.bypassed', (payload) => {
+    this.nats.subscribe('welfare.cooldown.bypassed', (payload: any) => {
       this.recordViolation({
         violation_type: 'WELFARE_BYPASS',
         entity_id: payload.user_id || 'unknown',
@@ -99,7 +99,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to audit chain integrity failures
-    this.nats.subscribe(NATS_TOPICS.AUDIT_CHAIN_INTEGRITY_FAILURE, (payload) => {
+    this.nats.subscribe(NATS_TOPICS.AUDIT_CHAIN_INTEGRITY_FAILURE, (payload: any) => {
       this.recordViolation({
         violation_type: 'AUDIT_CHAIN_BREAK',
         entity_id: payload.event_id || 'unknown',
@@ -115,11 +115,11 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to legal hold bypass attempts
-    this.nats.subscribe('legal.hold.bypassed', (payload) => {
+    this.nats.subscribe('legal.hold.bypassed', (payload: any) => {
       this.recordViolation({
         violation_type: 'LEGAL_HOLD_BYPASS',
         entity_id: payload.subject_id || 'unknown',
-        entity_type: payload.subject_type || 'TRANSACTION',
+        entity_type: (payload.subject_type as 'TRANSACTION' | 'PAYOUT' | 'WALLET_MUTATION' | 'CONTENT_ACTION') || 'TRANSACTION',
         detected_at_utc: new Date().toISOString(),
         correlation_id: payload.correlation_id || `violation-${Date.now()}`,
         reason_code: 'LEGAL_HOLD_BYPASS_ATTEMPTED',
@@ -131,7 +131,7 @@ export class DualIntegrityEnforcementService implements OnModuleInit {
     });
 
     // Subscribe to FIZ-scoped events and validate correlation_id presence
-    this.nats.subscribe('ledger.entry.appended', (payload) => {
+    this.nats.subscribe('ledger.entry.appended', (payload: any) => {
       if (!payload.correlation_id || !payload.reason_code) {
         this.recordViolation({
           violation_type: 'FIZ_CORRELATION_MISSING',

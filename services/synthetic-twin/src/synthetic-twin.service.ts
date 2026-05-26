@@ -47,9 +47,11 @@ export class SyntheticTwinService {
   private static readonly SYNTHIMATES_API_FEE_CENTS = 15; // $0.15 per generation
 
   // PHASE5-ITEM1: Optional SynthiMatesAi API client for external integration
-  private synthiMatesClient?: SynthiMatesAiClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private synthiMatesClient?: any;
 
-  constructor(synthiMatesClient?: SynthiMatesAiClient) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(synthiMatesClient?: any) {
     this.synthiMatesClient = synthiMatesClient;
   }
 
