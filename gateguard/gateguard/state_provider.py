@@ -14,7 +14,9 @@ class StateProvider:
         )
 
     def set_cooling_period(self, user_id: str, hours: int = 24):
-        self.cooling_periods[user_id] = datetime.now(timezone.utc) + timedelta(hours=hours)
+        self.cooling_periods[user_id] = datetime.now(timezone.utc) + timedelta(
+            hours=hours
+        )
 
     def record_welfare_score(self, user_id: str, score: float):
         if user_id not in self.welfare_history:

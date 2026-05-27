@@ -1,4 +1,3 @@
-import pytest
 from gateguard.federation.participant_sim import run_federation_simulation
 
 

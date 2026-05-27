@@ -1,4 +1,3 @@
-import numpy as np
 from typing import Dict, Any
 
 
@@ -28,7 +27,10 @@ class WelfareGuardianScore:
             "cross_session_trend": (
                 0.0
                 if not state_provider
-                else (100 - state_provider.get_welfare_trend(telemetry.get("user_id", ""))) / 100.0
+                else (
+                    100 - state_provider.get_welfare_trend(telemetry.get("user_id", ""))
+                )
+                / 100.0
             ),
         }
 
