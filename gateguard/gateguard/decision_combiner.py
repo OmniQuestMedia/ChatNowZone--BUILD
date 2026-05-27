@@ -36,7 +36,9 @@ class GateGuardDecision:
         else:
             action = "APPROVE"
 
-        self.state.record_welfare_score(telemetry["user_id"], welfare_result["welfare_score"])
+        self.state.record_welfare_score(
+            telemetry["user_id"], welfare_result["welfare_score"]
+        )
 
         return {
             "action": action,
