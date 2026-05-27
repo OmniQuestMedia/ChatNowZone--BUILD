@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `8c4e71c1eb85aa9b8ebe4269f05e22d52cb6a12f`
-**Generated:** 2026-05-27T00:29:09Z
+**Branch:** `claude/final-homestretch-cleanup`
+**Commit:** `90bb24026a621e029f86ca26a58b3b9b580a2e1c`
+**Generated:** 2026-05-27T01:26:09Z
 
 ## All Files
 
