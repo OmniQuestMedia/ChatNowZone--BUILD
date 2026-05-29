@@ -1,6 +1,6 @@
 # OQMInc Domain Taxonomy
 
-Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+Authority: OQMInc Engineering Team
 Last updated: Thread 14 — 2026-04-18
 Repo: OmniQuestMediaInc/ChatNowZone--BUILD
 

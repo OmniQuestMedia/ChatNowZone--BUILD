@@ -1,5 +1,5 @@
 -- PAYLOAD 10 — Backend Closure (FIZ + GOV)
--- Authority: Kevin B. Hartley (CEO) — pending sign-off in PROGRAM_CONTROL/CLEARANCES/.
+-- Authority: OQMInc Engineering Team — pending sign-off in PROGRAM_CONTROL/CLEARANCES/.
 -- Scope:
 --   1. transactions: heat_score_at_tip, payout_rate_applied, diamond_floor_active,
 --      payout_rate_lock_id, risk_decision_id, correlation_id, reason_code (PAY-006/011)

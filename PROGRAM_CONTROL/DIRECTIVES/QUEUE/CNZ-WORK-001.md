@@ -2,7 +2,7 @@
 
 **Type:** Persistent task list (does NOT move to DONE/ as a whole; individual tasks complete and amend in-place)
 **Status:** ACTIVE — source of truth for ChatNow.Zone architecture and coding tasks
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
 **Path:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md`
 **Date opened:** 2026-04-21 (Thread 19)
@@ -429,7 +429,7 @@ CEO_GATE: YES
 FIZ: NO
 Source: Deficit doc R-P0-001
 Status: QUEUED
-Directive: Plan §B.4.5 declares CZT the only token type; §B.4.7 lists SZT as a revenue pillar. Corpus v10 Ch.1 §3 affirms single-token economy. CEO chooses: (a) rename SZT line in §B.4.7 to a CZT-equivalent revenue stream, OR (b) amend architecture statement to permit named token classes. Implement chosen amendment.
+Directive: Plan §B.4.5 declares CZT the only token type; §B.4.7 lists SZT as a revenue pillar. Corpus v11 Ch.1 §3 affirms single-token economy. CEO chooses: (a) rename SZT line in §B.4.7 to a CZT-equivalent revenue stream, OR (b) amend architecture statement to permit named token classes. Implement chosen amendment.
 ```
 
 ```
@@ -993,7 +993,7 @@ CEO_GATE: NO
 FIZ: NO
 Source: Thread 18 handoff §6.D
 Status: QUEUED
-Directive: Read Canonical Corpus v10 Chapters 8 §3 onward + Chapters 9–10 + appendices (Master Glossary, Escalation Matrix, Funds Flow Diagram, Audit Chain Diagram, RBAC Permission Ladder, Incident Lifecycle Flow, Data Retention Matrix, AI Advisory Boundary Diagram, Evidence Packet Schema, L0 Ship Gate Visual, Version Log). File any new requirements as additional CNZ-WORK-001 tasks. Master Glossary and RBAC Permission Ladder may pre-resolve open clarifies.
+Directive: Read Canonical Corpus v11 Chapters 8 §3 onward + Chapters 9–10 + appendices (Master Glossary, Escalation Matrix, Funds Flow Diagram, Audit Chain Diagram, RBAC Permission Ladder, Incident Lifecycle Flow, Data Retention Matrix, AI Advisory Boundary Diagram, Evidence Packet Schema, L0 Ship Gate Visual, Version Log). File any new requirements as additional CNZ-WORK-001 tasks. Master Glossary and RBAC Permission Ladder may pre-resolve open clarifies.
 ```
 
 ```
@@ -1185,6 +1185,6 @@ Then amend the task’s `Status:` line in §6 of this charter from `QUEUED` (or 
 
 This is the active work charter for ChatNow.Zone. It is a list of tasks, not a governance document. Governance lives in OQMI_GOVERNANCE.md. State lives in OQMI_SYSTEM_STATE.md. Tasks live here.
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Charter ID:** CNZ-WORK-001
 **Total tasks at open:** 14 (Wave A) + 3 (Wave B) + 8 (Wave C) + 8 (Wave D) + 3 (Wave E) + 9 (Wave F) + 2 (Wave G placeholders) + 7 (Wave H) + 8 cleanup = **62 tasks**, of which Wave G will expand significantly post-decomposition.

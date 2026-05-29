@@ -1,6 +1,6 @@
 # DOMAIN GLOSSARY — ChatNow.Zone
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Source:** Tech Debt Delta 2026-04-16 + OQMI Coding Doctrine v2.0
 **Repo:** OmniQuestMediaInc/ChatNowZone--BUILD
 **Last updated:** 2026-04-23
@@ -180,13 +180,13 @@ distinct from tiers and must never be added to the `MembershipTier` enum.
 
 ## CYRANO
 
-| Term      | Definition                                                   | Code identifier                                    |
-| --------- | ------------------------------------------------------------ | -------------------------------------------------- |
-| Cyrano    | Four-layer AI whisper architecture (CNZ subsystem at launch) | Cyrano, cyrano (service dir), CYR: (commit prefix) |
-| Cyrano L1 | CNZ Creator Feature — real-time suggestion panel             | CyranoCreatorFeature                               |
-| Cyrano L2 | Consumer Audio Platform                                      | CyranoConsumerAudio                                |
-| Cyrano L3 | HCZ Whisper Intelligence                                     | CyranoHCZWhisper                                   |
-| Cyrano L4 | Enterprise B2B Whisper API (deferred, Year 3+)               | CyranoEnterpriseAPI                                |
+| Term      | Definition                                                      | Code identifier                                    |
+| --------- | --------------------------------------------------------------- | -------------------------------------------------- |
+| Cyrano    | Four-layer AI whisper architecture (CNZ subsystem at launch)    | Cyrano, cyrano (service dir), CYR: (commit prefix) |
+| Cyrano L1 | CNZ Creator Feature — real-time suggestion panel                | CyranoCreatorFeature                               |
+| Cyrano L2 | Creator Audio Platform (enterprise layer — not consumer-facing) | CyranoConsumerAudio                                |
+| Cyrano L3 | HCZ Whisper Intelligence                                        | CyranoHCZWhisper                                   |
+| Cyrano L4 | Enterprise B2B Whisper API (deferred, Year 3+)                  | CyranoEnterpriseAPI                                |
 
 ---
 

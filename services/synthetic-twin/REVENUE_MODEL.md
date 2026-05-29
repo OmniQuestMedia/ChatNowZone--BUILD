@@ -2,17 +2,17 @@
 
 # Synthetic Twin Revenue Sharing Model
 
-**PHASE5-ITEM2**: Revenue sharing logic for CNZ creators consuming SynthiMatesAi services
+**PHASE5-ITEM2**: Revenue sharing logic for CNZ creators consuming Synthimate services
 
 ## Overview
 
-ChatNowZone operates a **resell model** with SynthiMatesAi:
+ChatNowZone operates a **resell model** with Synthimate:
 
 - CNZ consumers purchase synthetic twin services on the CNZ platform
-- CNZ calls SynthiMatesAi APIs to fulfill the service
+- CNZ calls Synthimate APIs to fulfill the service
 - Revenue from services purchased on CNZ is credited to CNZ creators
-- CNZ pays SynthiMatesAi an API fee for each generation
-- Platform fee covers CNZ operations and SynthiMatesAi API costs
+- CNZ pays Synthimate an API fee for each generation
+- Platform fee covers CNZ operations and Synthimate API costs
 
 ## Revenue Flow
 
@@ -24,7 +24,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
 │       entry_type: SYNTHETIC_TWIN_EARNINGS
 │
 └─> Platform Share (30%) = $0.27
-    ├─> SynthiMatesAi API Fee = $0.15
+    ├─> Synthimate API Fee = $0.15
     └─> CNZ Platform Fee = $0.12
 ```
 
@@ -37,7 +37,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
 - **Total Value**: $0.90 USD (90¢)
 - **Creator Share**: 70% → $0.63
 - **Platform Share**: 30% → $0.27
-  - SynthiMatesAi API Fee: $0.15
+  - Synthimate API Fee: $0.15
   - CNZ Net: $0.12
 
 ### Voice Messages (Phase 3)
@@ -47,7 +47,7 @@ Fan Purchase (10 CZT × $0.09 = $0.90)
 - **Total Value**: $1.35 USD
 - **Creator Share**: 70% → $0.95
 - **Platform Share**: 30% → $0.41
-  - SynthiMatesAi TTS Fee: $0.25 (estimated)
+  - Synthimate TTS Fee: $0.25 (estimated)
   - CNZ Net: $0.16
 
 ### Group Chat Messages (Phase 3)
@@ -115,15 +115,15 @@ const generation = await prisma.syntheticTwinGeneration.create({
     creator_earnings_cents: BigInt(63), // 70% of 90¢
     platform_share_cents: BigInt(27), // 30% of 90¢
     // Platform share includes:
-    // - SynthiMatesAi API fee: 15¢
+    // - Synthimate API fee: 15¢
     // - CNZ net: 12¢
   },
 });
 ```
 
-### SynthiMatesAi API Fee
+### Synthimate API Fee
 
-The API fee paid to SynthiMatesAi is deducted from the platform share:
+The API fee paid to Synthimate is deducted from the platform share:
 
 ```typescript
 // Constants (should be moved to GovernanceConfig)

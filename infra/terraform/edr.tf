@@ -1,6 +1,6 @@
 # INFRA: EDR + Ransomware Defense Stack — ChatNow.Zone IaC Bootstrap
 # rule_applied_id: INFRA_v1.0_CANADA_RESIDENCY
-# Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+# Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 #
 # §6.2 Endpoint Detection and Response (EDR):
 #   - All developer workstations and CI runners that access production secrets

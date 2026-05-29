@@ -1,6 +1,6 @@
 # REQUIREMENTS MASTER — ChatNow.Zone
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Source:** Tech Debt Delta 2026-04-16 + CEO corrections 2026-04-16
 **Repo:** OmniQuestMediaInc/ChatNowZone--BUILD
 **Hard launch deadline:** 1 October 2026
@@ -278,4 +278,4 @@ Supersedes per-call Yoti/Veriff/Onfido model.**
 
 Maintained by: Claude Chat (architecture) + Copilot/Claude Code (execution)
 Update this file as part of every directive report-back commit.
-CEO authority: Kevin B. Hartley — OmniQuest Media Inc.
+CEO authority: OQMInc Engineering Team — OmniQuest Media Inc.

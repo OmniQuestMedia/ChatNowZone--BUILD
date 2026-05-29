@@ -1,6 +1,6 @@
 # ChatNow.Zone — UX Cross-Stack Alignment
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Status:** ALPHA-FROZEN 2026-04-28 — content changes require a `GOV:` directive.
 **Audience:** Grok (wireframe coordination across OQMI entities), engineering leads, and any agent authoring UX for CNZ, RRR, or Cyrano.
 **Relationship to UX packet:** This is the cross-stack reconciliation companion to [`docs/UX_INTEGRATION_BRIEF.md`](UX_INTEGRATION_BRIEF.md). The brief is CNZ-internal; this document covers the three-stack surface explicitly.

@@ -5,7 +5,7 @@
 **Scope:** Generic, repo-portable. Drops into every OmniQuest Media Inc. repository unchanged.
 **Version:** v1.0
 **Effective Date:** 2026-04-21
-**Authority of Record:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority of Record:** OQMInc Engineering Team
 **Platform Time Standard:** America/Toronto
 
 ---

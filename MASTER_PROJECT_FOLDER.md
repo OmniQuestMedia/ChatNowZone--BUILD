@@ -1,6 +1,6 @@
 # MASTER PROJECT FOLDER — ChatNow.Zone
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Repo:** OmniQuestMediaInc/ChatNowZone--BUILD
 **Hard launch target:** 2026-10-01
 **Last updated:** 2026-05-25
@@ -111,7 +111,7 @@ The homestretch build phase is complete. The following pre-launch sequences are 
 
 ### 3. CEO Launch Clearance Sign-Off
 
-**Owner:** Kevin B. Hartley, CEO
+**Owner:** OQMInc Engineering Team
 **Status:** PENDING — awaiting CEO action
 **Key deliverables:**
 
@@ -143,11 +143,11 @@ The homestretch build phase is complete. The following pre-launch sequences are 
 
 ## Agent Routing
 
-| Agent                      | Role                                                                 |
-| -------------------------- | -------------------------------------------------------------------- |
-| **Copilot**                | Primary build agent — directive execution, PR authoring              |
-| **Grok**                   | Directive authoring (Claude Chat) — CEO-authorized                   |
-| **CEO (Kevin B. Hartley)** | Final authority on all GOV gates, FIZ changes, and launch clearances |
+| Agent                          | Role                                                                 |
+| ------------------------------ | -------------------------------------------------------------------- |
+| **Copilot**                    | Primary build agent — directive execution, PR authoring              |
+| **Grok**                       | Directive authoring (Claude Chat) — CEO-authorized                   |
+| **CEO (OmniQuest Media Inc.)** | Final authority on all GOV gates, FIZ changes, and launch clearances |
 
 Directive queue: `PROGRAM_CONTROL/DIRECTIVES/QUEUE/`
 Active directives: `PROGRAM_CONTROL/DIRECTIVES/IN_PROGRESS/`

@@ -3,7 +3,7 @@
 | Field           | Value                                                               |
 | --------------- | ------------------------------------------------------------------- |
 | **Document ID** | `REF-LIB-OSS-REG-01`                                                |
-| **Authority**   | Kevin B. Hartley, CEO — OmniQuest Media Inc.                        |
+| **Authority**   | OQMInc Engineering Team                                             |
 | **Authored**    | Thread 15 — 2026-04-19                                              |
 | **Revised**     | 2026-04-21 (migrated to flat `QUEUE/` path; licensing column added) |
 | **Repo**        | `OmniQuestMediaInc/ChatNowZone--BUILD`                              |

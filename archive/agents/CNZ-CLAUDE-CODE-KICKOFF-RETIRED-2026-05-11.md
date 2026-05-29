@@ -5,7 +5,7 @@
 
 # CNZ-CLAUDE-CODE-KICKOFF.md
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
 **Path (repo):** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-CLAUDE-CODE-KICKOFF.md`
 **Version:** 1.0.0

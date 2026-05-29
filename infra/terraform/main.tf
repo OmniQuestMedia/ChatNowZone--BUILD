@@ -1,6 +1,6 @@
 # INFRA: Phase 1 — ChatNow.Zone IaC Bootstrap
 # rule_applied_id: INFRA_v1.0
-# Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+# Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 #
 # Canada-only data residency (PIPEDA invariant — INFRA_v1.0-INV-01).
 # Primary region: ca-central-1 (Montreal).

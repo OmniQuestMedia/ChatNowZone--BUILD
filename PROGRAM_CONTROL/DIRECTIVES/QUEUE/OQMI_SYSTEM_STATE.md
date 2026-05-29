@@ -4,7 +4,7 @@
 **Repo:** OmniQuestMediaInc/ChatNowZone--BUILD
 **Version:** v1.0
 **Last Updated:** 2026-04-23
-**Owner:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Owner:** OQMInc Engineering Team
 **Governing Document:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`
 
 ---
@@ -191,4 +191,4 @@ Failure to update this document on relevant PRs is a §4.4 violation under `OQMI
 
 This document tracks the state of `OmniQuestMediaInc/ChatNowZone--BUILD`. It does not declare doctrine. For doctrine, see `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md`. For product-specific operational and compliance doctrine, see this repo's program charter `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-WORK-001.md` and the project doctrine document `PROGRAM_CONTROL/DIRECTIVES/QUEUE/RRR-GOV-002`.
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team

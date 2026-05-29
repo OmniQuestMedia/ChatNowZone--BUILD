@@ -2,7 +2,7 @@
 
 **Document ID:** GOV-CNZ-CHARTER-CONSOLIDATE-001
 **Type:** Governance cleanup (judgment-heavy)
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc. (commissioned via Cowork orchestrator session, 2026-05-19)
+**Authority:** OQMInc Engineering Team (commissioned via Cowork orchestrator session, 2026-05-19)
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
 **Path:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/GOV-CNZ-CHARTER-CONSOLIDATE-001.md`
 **Date opened:** 2026-05-19

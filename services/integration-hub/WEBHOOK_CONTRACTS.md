@@ -2,7 +2,7 @@
 
 **Document:** `services/integration-hub/WEBHOOK_CONTRACTS.md`
 **Date:** 2026-05-06 (Phase 1 update: 2026-05-11)
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Status:** PHASE 1 — outbound contracts added; inbound partner confirmations pending
 
 ---

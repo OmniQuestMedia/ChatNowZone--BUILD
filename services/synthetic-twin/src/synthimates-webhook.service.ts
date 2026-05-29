@@ -1,7 +1,7 @@
 // services/synthetic-twin/src/synthimates-webhook.service.ts
-// PHASE5-ITEM1: SynthiMatesAi Webhook Handler
+// PHASE5-ITEM1: Synthimate Webhook Handler
 //
-// Receives and processes webhook callbacks from SynthiMatesAi when generation jobs complete.
+// Receives and processes webhook callbacks from Synthimate when generation jobs complete.
 // Updates CNZ database with results and ensures proper revenue tracking.
 
 import { PrismaClient } from '@prisma/client';
@@ -19,14 +19,14 @@ export interface WebhookProcessResult {
 /**
  * SynthiMates Webhook Service
  *
- * Handles incoming webhook callbacks from SynthiMatesAi platform.
+ * Handles incoming webhook callbacks from Synthimate platform.
  * Updates generation records with results and triggers necessary follow-up actions.
  */
 export class SynthiMatesWebhookService {
   constructor(private readonly apiClient: SynthiMatesAiClient) {}
 
   /**
-   * Process incoming webhook from SynthiMatesAi
+   * Process incoming webhook from Synthimate
    *
    * Flow:
    * 1. Verify HMAC signature to ensure authenticity
@@ -35,7 +35,7 @@ export class SynthiMatesWebhookService {
    * 4. Update status to COMPLETED or FAILED
    * 5. Emit NATS event for real-time UI updates (optional)
    *
-   * @param payload Webhook payload from SynthiMatesAi
+   * @param payload Webhook payload from Synthimate
    * @returns Process result with success status
    */
   async processWebhook(payload: SynthiMatesWebhookPayload): Promise<WebhookProcessResult> {
@@ -94,7 +94,7 @@ export class SynthiMatesWebhookService {
           generationId: generation.id,
         };
       } else {
-        // Generation failed on SynthiMatesAi side
+        // Generation failed on Synthimate side
         await prisma.syntheticTwinGeneration.update({
           where: { id: generation.id },
           data: {

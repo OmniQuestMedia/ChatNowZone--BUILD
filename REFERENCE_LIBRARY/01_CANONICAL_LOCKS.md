@@ -1,6 +1,6 @@
 # OQMInc Canonical Locks
 
-Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+Authority: OQMInc Engineering Team
 Last updated: 2026-04-26
 Status: IMMUTABLE — changes require explicit CEO authorization
 

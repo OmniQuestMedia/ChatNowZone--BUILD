@@ -1,6 +1,6 @@
 // INFRA: Phase 1 — eCommsZone Inbound Webhook Controller
 // rule_applied_id: INFRA_v1.0
-// Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+// Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 //
 // §12: "All inbound webhooks must verify HMAC signatures"
 // This controller receives delivery status events from eCommsZone and

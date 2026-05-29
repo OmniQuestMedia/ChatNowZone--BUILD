@@ -1,6 +1,6 @@
 # ChatNow.Zone — LAUNCH MANIFEST
 
-> **Authority:** Kevin B. Hartley (CEO, OmniQuest Media Inc.)
+> **Authority:** OQMInc Engineering Team
 > **Issued:** 2026-04-24 (Payload 9 — Build Complete)
 > **Hard launch target:** 2026-10-01
 > **Reference:** Business Plan §G.6 (AWS launch), REDBOOK §3 (rate cards), §5 (Recovery)

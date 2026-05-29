@@ -1,7 +1,7 @@
 # CNZ Membership Lifecycle Policy
 
 **Status:** v1.0 — CEO-approved working draft
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Adopted:** 2026-04-17
 **Repo path:** `docs/MEMBERSHIP_LIFECYCLE_POLICY.md`
 **Supersedes:** Any prior tier definitions in `docs/REQUIREMENTS_MASTER.md`, `docs/DOMAIN_GLOSSARY.md`, handoff docs, governance configuration, or service code. On conflict, **this document wins**; diverging code is the bug.
@@ -282,7 +282,7 @@ The following items are **not** settled and must be resolved before their named 
 
 ## 10. Authority & Change Control
 
-- This document is authored and owned by Kevin B. Hartley, CEO — OmniQuest Media Inc.
+- This document is authored and owned by OQMInc Engineering Team
 - Changes require CEO approval and a commit to `docs/MEMBERSHIP_LIFECYCLE_POLICY.md` on the main branch
 - Any directive (Claude Chat / Copilot / Claude Code) that touches tier, membership, age-verification, card-on-file, or token-expiry semantics **must cite the specific section of this document it implements or derives from**
 - When a directive resolves a TBD from §9, the policy doc is updated in the same PR that delivers the implementation — doc and code change together, not separately

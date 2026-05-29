@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
  * callback to the calling platform's ledger.
  *
  * IMPORTANT: This service does NOT maintain its own ledger.
- * It calls back to SynthiMatesAi or ChatNowZone--BUILD ledger services.
+ * It calls back to Synthimate or ChatNowZone--BUILD ledger services.
  */
 @Injectable()
 export class StudioTokensChargingService {

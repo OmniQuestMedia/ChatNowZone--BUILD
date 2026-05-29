@@ -1,6 +1,6 @@
 # ChatNow.Zone — UX Integration Brief
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Status:** **ALPHA-FROZEN 2026-04-28** — content changes require a `GOV:` or `FIZ:` directive.
 **Audience:** Grok (wireframe coordination across OQMI entities), and any front-end design or engineering thread that binds to the ChatNow.Zone codebase.
 **Cross-stack role:** This packet is the **CNZ source-of-truth**. RedRoomRewards and Cyrano packets reconcile against it (per CEO instruction 2026-04-28).

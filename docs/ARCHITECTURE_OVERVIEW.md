@@ -1,6 +1,6 @@
 # Architecture Overview — ChatNow.Zone (Payloads 1 → 10)
 
-**Authority:** OmniQuest Media Inc. — Canonical Corpus v10
+**Authority:** OmniQuest Media Inc. — Canonical Corpus v11
 **Status at 2026-05-06:** Functionally complete for alpha launch
 (PAYLOAD 7 frontend polish + PAYLOAD 8 ship-gate verification +
 PAYLOAD 9 deployment pipeline + PAYLOAD 10 backend closure landed).

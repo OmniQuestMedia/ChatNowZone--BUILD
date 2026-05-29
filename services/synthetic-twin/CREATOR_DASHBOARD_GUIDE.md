@@ -320,7 +320,7 @@ When a creator enables synthetic twins, fans see:
 
 ### PII Protection
 
-- No raw PII sent to SynthiMatesAi API
+- No raw PII sent to Synthimate API
 - Only creator/user IDs and prompts sent
 - Results returned via secure webhook
 - All data stored in Canada (PIPEDA compliance)

@@ -1,6 +1,6 @@
 # WORK-ORDER-v0.2.md — ChatNowZone--BUILD
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.  
+**Authority:** OQMInc Engineering Team  
 **Version:** v0.2 (2026-05-06) — Post-INFRA_v1.0 + Payload 10  
 **Status:** ACTIVE — Phase 0 COMPLETE / Phase 1 START  
 **Rule Applied:** INFRA_v1.0 + OQMI_GOVERNANCE (all tasks)  

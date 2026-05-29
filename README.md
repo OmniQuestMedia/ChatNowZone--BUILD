@@ -1,10 +1,10 @@
 # ChatNow.Zone
 
 > **✅ BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)**
-> Payloads 1–10 executed and verified. All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
+> Payloads 1–10 executed and verified. All L0 ship-gates closed per Canonical Corpus v11 + REDBOOK + Business Plan v2.8.
 > **Date:** May 6, 2026 · **Next steps:** Phase 1 IaC Bootstrap (ca-central-1), eCommsZone Node.js client integration, ship-gate-verifier INFRA_v1.0 full matrix — see [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) + [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) (INFRA_v1.0).
 
-> **ChatNow.Zone — Canonical Corpus v10 governed monorepo (TypeScript + Prisma + Postgres).**
+> **ChatNow.Zone — Canonical Corpus v11 governed monorepo (TypeScript + Prisma + Postgres).**
 > **Status: BUILD COMPLETE (Payload 9, 2026-04-24) — Alpha Launch Ready (September 2026 target).**
 
 > **✅ Safe Synthetic Twin and Shared Account-Core features are now fully integrated and optional for creators via CyranoEngines**
@@ -171,7 +171,7 @@ Snapshot at 2026-05-06 (Payload 10 + WORK-ORDER-v0.2 / INFRA_v1.0):
 - **PAYLOAD 10 (WORK-ORDER-v0.2 + ship-gate INFRA_v1.0 checks)** — DONE. All L0 INFRA checks GREEN. Active directive: [`WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md).
 - **PHASE 2 (Safe Synthetic Twin - Image Generation)** — DONE. Backend foundation complete. See [`PHASE2-440-IMPLEMENTATION-STATUS.md`](PHASE2-440-IMPLEMENTATION-STATUS.md).
 - **PHASE 3 (Safe Synthetic Twin - Voice, Group Chat, Analytics, Moderation)** — DONE. All 5 items complete. See [`PHASE3-IMPLEMENTATION-STATUS.md`](PHASE3-IMPLEMENTATION-STATUS.md).
-- **PHASE 5 (SynthiMatesAi Integration & Production Readiness)** — DONE. API/webhook integration, revenue sharing, creator dashboard, testing, and documentation complete. See [`services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md`](services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md).
+- **PHASE 5 (Synthimate Integration & Production Readiness)** — DONE. API/webhook integration, revenue sharing, creator dashboard, testing, and documentation complete. See [`services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md`](services/synthetic-twin/PHASE5_COMPLETION_SUMMARY.md).
 
 **Phase 1 OPEN (WORK-ORDER-v0.2):** IaC Bootstrap (ca-central-1), eCommsZone integration, INFRA_v1.0 full matrix in ship-gate-verifier, zero-trust + EDR alignment. See [`WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) for full task list.
 
@@ -219,6 +219,6 @@ Do not push directly to `main`. Branch naming: `claude/<id>-<suffix>`,
 
 ## License & authority
 
-All content © OmniQuest Media Inc. Final authority: Kevin B. Hartley
+All content © OmniQuest Media Inc. Final authority: OQMInc Engineering Team
 (CEO). No agent clears a GOV gate without CEO-signed clearance in
 `PROGRAM_CONTROL/CLEARANCES/`.
