@@ -1,7 +1,7 @@
 # Retirement Note — G101+ "Black-Glass Interface"
 
 **Date retired:** 2026-05-06
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Scope:** All `G101..G199` placeholder rows in `CNZ-WORK-001`, every
 `Black-Glass Interface` reference in live docs / code / launch manifests,
 and the `BG:` directive prefix in the domain glossary.

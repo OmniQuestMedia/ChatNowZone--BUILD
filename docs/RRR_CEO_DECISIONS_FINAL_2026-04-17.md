@@ -1,7 +1,7 @@
 # RedRoomRewards — CEO Decisions Final Record
 
 **Date:** 2026-04-17
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Status:** ALL DECISIONS LOCKED — full engineering ground truth
 
 ---
@@ -129,4 +129,4 @@ as minimum standard for governance, safety, and security.
 
 ---
 
-_Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc. — 2026-04-17_
+_Authority: OQMInc Engineering Team — 2026-04-17_

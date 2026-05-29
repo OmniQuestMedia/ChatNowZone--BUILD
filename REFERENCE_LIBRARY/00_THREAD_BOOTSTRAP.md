@@ -1,7 +1,7 @@
 # OQMInc Thread Bootstrap
 
 **Always-current master orientation document**
-Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+Authority: OQMInc Engineering Team
 Last updated: Thread 14 — 2026-04-18
 Repo: OmniQuestMediaInc/ChatNowZone--BUILD
 
@@ -23,7 +23,7 @@ Everything else lives here and in the sibling REFERENCE_LIBRARY files.
 | Field              | Value                                                                                                          |
 | ------------------ | -------------------------------------------------------------------------------------------------------------- |
 | Company            | OmniQuest Media Inc. (OQMInc™)                                                                                 |
-| CEO / CD / LD      | Kevin B. Hartley                                                                                               |
+| CEO / CD / LD      | OQMInc Engineering Team                                                                                        |
 | Platform           | ChatNow.Zone (chatnow.zone) — CANONICAL NAME                                                                   |
 | Secondary platform | Cyrano — 60–120 days post-CNZ stabilization                                                                    |
 | Repo               | OmniQuestMediaInc/ChatNowZone--BUILD                                                                           |

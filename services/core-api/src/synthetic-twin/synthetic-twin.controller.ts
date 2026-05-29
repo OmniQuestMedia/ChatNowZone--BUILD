@@ -1,6 +1,6 @@
 // services/core-api/src/synthetic-twin/synthetic-twin.controller.ts
 // PHASE2-440 + PHASE3: REST API controller for Safe Synthetic Twin features
-// PHASE5-ITEM1: Added SynthiMatesAi webhook endpoint
+// PHASE5-ITEM1: Added Synthimate webhook endpoint
 
 import { Controller, Post, Get, Put, Body, Param, Query } from '@nestjs/common';
 import { syntheticTwinService } from '../../../synthetic-twin/src/synthetic-twin.service';
@@ -271,7 +271,7 @@ export class SyntheticTwinController {
     return await moderationService.getUsageLogs(creatorId, userId, limit);
   }
 
-  // ─── PHASE5-ITEM1: SynthiMatesAi Webhook Endpoint ─────────────────────────
+  // ─── PHASE5-ITEM1: Synthimate Webhook Endpoint ─────────────────────────
 
   /**
    * PHASE5-ITEM1: Receive webhook callbacks from SynthiMatesAi

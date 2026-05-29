@@ -1,6 +1,6 @@
 // INFRA: Phase 1 — Outbound Signed Webhook Dispatcher
 // rule_applied_id: INFRA_v1.0
-// Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+// Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 //
 // §8 (Partner Ecosystem Contracts): ChatNow.Zone dispatches HMAC-SHA256 signed
 // outbound webhook notifications to partner systems (RedRoomRewards,

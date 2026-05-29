@@ -1,6 +1,6 @@
 # ChatNow.Zone — MASTER PROJECT FOLDER
 
-> **Authority:** Kevin B. Hartley (CEO, OmniQuest Media Inc.)
+> **Authority:** OQMInc Engineering Team
 > **Last Updated:** 2026-05-25
 > **Reference:** Business Plan v3.1, Canonical Corpus v11, Revenue Assembly v2.2, TechSpec v1.0
 

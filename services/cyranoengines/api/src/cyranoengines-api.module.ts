@@ -11,7 +11,7 @@ import { HealthController } from './health.controller';
  * CyranoEngines API Module
  *
  * This module provides webhook-based API access to AI engine capabilities
- * for both SynthiMatesAi and ChatNowZone--BUILD platforms.
+ * for both Synthimate and ChatNowZone--BUILD platforms.
  *
  * All requests accept correlation_id and return results asynchronously
  * via webhook callback when possible.

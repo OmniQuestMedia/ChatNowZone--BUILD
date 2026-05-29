@@ -1,7 +1,7 @@
 # CROSS-REPO-FLAG-001 — Webhook Contract & eCommsZone Client Dependency Flag
 
 **Document ID:** CROSS-REPO-FLAG-001  
-**Authority:** OmniQuest Media Inc. — Kevin B. Hartley, CEO  
+**Authority:** OmniQuest Media Inc. — OQMInc Engineering Team  
 **Date:** 2026-05-06  
 **Status:** OPEN — awaiting CEO / cross-repo team input  
 **Path:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CROSS-REPO-FLAG-001.md`  

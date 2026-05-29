@@ -28,7 +28,7 @@ Complete a full hygiene verification pass on ChatNowZone--BUILD and confirm it m
 ## Constraints & Guardrails
 
 - This is a **hygiene and verification task only**.
-- Do **not** modify code, architecture, integration points, or any files related to CNZ ↔ SynthiMatesAi work.
+- Do **not** modify code, architecture, integration points, or any files related to CNZ ↔ Synthimate work.
 - Do not create new features or change existing functionality.
 - Follow OQMI_GOVERNANCE and current hygiene process standards.
 

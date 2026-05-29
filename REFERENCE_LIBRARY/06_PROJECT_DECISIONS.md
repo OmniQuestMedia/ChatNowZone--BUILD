@@ -1,6 +1,6 @@
 # OQMInc Project Decisions Log
 
-Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+Authority: OQMInc Engineering Team
 Repo: OmniQuestMediaInc/ChatNowZone--BUILD
 
 ---

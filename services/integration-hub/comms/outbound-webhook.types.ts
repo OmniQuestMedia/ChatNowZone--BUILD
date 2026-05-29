@@ -1,6 +1,6 @@
 // INFRA: Phase 1 — Outbound Webhook Types
 // rule_applied_id: INFRA_v1.0
-// Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+// Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 //
 // Typed payloads for signed outbound webhook notifications dispatched by
 // ChatNow.Zone to partner systems (RedRoomRewards, Marketplace-Build) when

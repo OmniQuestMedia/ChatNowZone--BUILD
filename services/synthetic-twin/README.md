@@ -16,7 +16,7 @@ This service implements the Safe Synthetic Twin system that allows fans to gener
 
 ### Current Implementation (MVP Stub)
 
-This is a **minimal viable stub** that implements the financial and business logic flows but uses placeholder ML generation. The actual SafeSyntheticWizard ML pipeline from SynthiMatesAi needs to be integrated.
+This is a **minimal viable stub** that implements the financial and business logic flows but uses placeholder ML generation. The actual SafeSyntheticWizard ML pipeline from Synthimate needs to be integrated.
 
 **Implemented:**
 
@@ -27,7 +27,7 @@ This is a **minimal viable stub** that implements the financial and business log
 - ✅ Balance checking
 - ✅ Audit trail with correlation IDs
 
-**TODO (SynthiMatesAi Integration):**
+**TODO (Synthimate Integration):**
 
 - 🔄 Actual ML image generation pipeline
 - 🔄 Multi-image upload and celebrity weighting
@@ -120,7 +120,7 @@ All operations follow OQMI governance standards:
 
 ### Required for Full Implementation
 
-1. **SynthiMatesAi ML Pipeline** - Replace `simulateImageGeneration()` stub
+1. **Synthimate ML Pipeline** - Replace `simulateImageGeneration()` stub
 2. **Storage Service** - S3/assets-service for image storage
 3. **GovernanceConfig** - Centralized pricing configuration
 4. **NATS Events** - Real-time notifications for generation status
@@ -129,7 +129,7 @@ All operations follow OQMI governance standards:
 
 ## Next Steps
 
-1. Integrate actual SafeSyntheticWizard ML pipeline from SynthiMatesAi
+1. Integrate actual SafeSyntheticWizard ML pipeline from Synthimate
 2. Add NATS event publishing for real-time updates
 3. Implement S3/storage integration
 4. Add GovernanceConfig constants for pricing

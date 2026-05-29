@@ -31,7 +31,7 @@
 - May 6, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready).
 - May 3, 2026 — BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready) — Wave H+ hygiene applied.
 
-All L0 ship-gates closed per Canonical Corpus v10 + REDBOOK + Business Plan v2.8.
+All L0 ship-gates closed per Canonical Corpus v11 + REDBOOK + Business Plan v2.8.
 Payloads 1–10 executed and verified.
 
 **Phase 0.5 — Ecosystem Lint Parity (2026-05-11):**
@@ -64,7 +64,7 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 
 **Snapshot date:** 2026-05-03 (Post-Payload-9 hygiene — legal_holds trigger + Risk/OBS hardening)
 **Branch of record:** `claude/post-payload9-hygiene-YCgdU`
-**Authority:** OmniQuest Media Inc. — OQMI_GOVERNANCE.md (Canonical Corpus v10)
+**Authority:** OmniQuest Media Inc. — OQMI_GOVERNANCE.md (Canonical Corpus v11)
 **Launch posture:** **ChatNow.Zone Core — Launch Ready (Alpha)**
 
 > This file is a **periodic snapshot** of program state. It is generated
@@ -84,7 +84,7 @@ across `ZONE_MAP`, `ZONE_ACCESS_TIERS`, `MEMBERSHIP.STIPEND_CZT`, `MembershipSer
 | Field                | Value                                                                     |
 | -------------------- | ------------------------------------------------------------------------- |
 | Company              | OmniQuest Media Inc. (OQMInc™)                                            |
-| CEO / CD / LD        | Kevin B. Hartley                                                          |
+| CEO / CD / LD        | OQMInc Engineering Team                                                   |
 | Platform (primary)   | ChatNow.Zone — `chatnow.zone`                                             |
 | Secondary platform   | Cyrano (60–120 days post-CNZ stabilization)                               |
 | Repo                 | `OmniQuestMediaInc/ChatNowZone--BUILD`                                    |
@@ -337,7 +337,7 @@ report-back files. `grep -rni "Navigator\|Jaime Watt"` outside the
 
 ## 9. Contact / Authority
 
-All content authority flows through Kevin B. Hartley (CEO). Directive
+All content authority flows through OQMInc Engineering Team. Directive
 authoring happens via CEO + Grok; execution happens in Grok and
 GitHub Copilot via the `PROGRAM_CONTROL/DIRECTIVES/` pipeline. No agent
 may clear a GOV gate without CEO-signed clearance in

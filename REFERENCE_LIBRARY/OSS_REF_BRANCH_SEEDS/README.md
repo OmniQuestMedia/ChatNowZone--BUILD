@@ -1,7 +1,7 @@
 # OSS Reference Branch Seeds
 
 **Directive:** THREAD15-OSS-HARVEST
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Date:** 2026-04-19
 
 ---

@@ -2,7 +2,7 @@
 
 **Status:** BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)
 **Date:** April 24, 2026
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 
 ---
 

@@ -1,7 +1,7 @@
 # OQMI Infrastructure and Security Policy
 
 **Document ID:** INFRA_v1.0  
-**Authority:** OmniQuest Media Inc. — Kevin B. Hartley, CEO  
+**Authority:** OmniQuest Media Inc. — OQMInc Engineering Team  
 **Scope:** All OmniQuest Media Inc. production infrastructure and services  
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`  
 **Path:** `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`  
@@ -224,7 +224,7 @@ Amendments to this policy require:
 | v1.0    | 2026-05-06 | CEO directive (WORK-ORDER v0.1) | Initial policy — Phase 0 |
 
 **Document ID:** INFRA_v1.0
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Effective Date:** 2026-05-06
 **Status:** ACTIVE
 **Scope:** All OmniQuest Media Inc. production environments — primary: ChatNow.Zone
@@ -447,7 +447,7 @@ Prior conflicting or superseded infra policy artifacts are moved to
 
 ---
 
-_© OmniQuest Media Inc. All rights reserved. Authority: Kevin B. Hartley, CEO._
+_© OmniQuest Media Inc. All rights reserved. Authority: OQMInc Engineering Team._
 
 # OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md
 
@@ -457,7 +457,7 @@ _© OmniQuest Media Inc. All rights reserved. Authority: Kevin B. Hartley, CEO._
 **Version:** v1.0  
 **Effective Date:** 2026-05-06  
 **Platform Time Standard:** America/Toronto  
-**Authority of Record:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority of Record:** OQMInc Engineering Team
 
 ---
 
@@ -634,6 +634,6 @@ This policy is effective immediately. All existing and future infrastructure mus
 
 ---
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.  
+**Authority:** OQMInc Engineering Team  
 **Effective:** 2026-05-06  
 **rule_applied_id:** INFRA_v1.0

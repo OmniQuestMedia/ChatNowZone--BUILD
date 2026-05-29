@@ -2,7 +2,7 @@
 
 **Created:** 2026-05-06
 **Author:** Copilot (Phase 0 — per WORK-ORDER.md)
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 
 ## Purpose
 

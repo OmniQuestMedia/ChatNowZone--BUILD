@@ -1,6 +1,6 @@
 # OQMInc Feature Briefs
 
-Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+Authority: OQMInc Engineering Team
 Last updated: Thread 15 — 2026-04-19
 Repo: OmniQuestMediaInc/ChatNowZone--BUILD
 Status: STUB — to be populated during Thread 15

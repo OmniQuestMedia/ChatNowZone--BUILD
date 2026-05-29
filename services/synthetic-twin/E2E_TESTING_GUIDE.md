@@ -12,7 +12,7 @@
 
 - Database with test creator and fan accounts
 - Test wallet with sufficient CZT balance for fan
-- SynthiMatesAi API client configured (or mock enabled)
+- Synthimate API client configured (or mock enabled)
 
 #### Test Steps
 
@@ -100,7 +100,7 @@ GET /synthetic-twin/analytics/test-creator-uuid
 - ✅ Fan's tokens deducted correctly (10 CZT)
 - ✅ Creator earnings recorded in ledger (63¢)
 - ✅ Generation record created with PENDING status
-- ✅ SynthiMatesAi API called (or simulation completed)
+- ✅ Synthimate API called (or simulation completed)
 - ✅ Webhook updates generation to COMPLETED
 - ✅ Image URI stored in database
 - ✅ Analytics reflect new earnings
@@ -199,7 +199,7 @@ GET /creator-control/analytics/test-creator-uuid
 - ✅ Performer tools unchanged
 - ✅ Analytics separated correctly
 
-### Scenario 4: SynthiMatesAi Webhook Integration
+### Scenario 4: Synthimate Webhook Integration
 
 **Objective**: Verify webhook callback processing
 
@@ -219,7 +219,7 @@ POST /synthetic-twin/generate
 # Capture correlation ID from response
 CORRELATION_ID="SYNTWIN-..."
 
-# 2. Simulate SynthiMatesAi webhook callback
+# 2. Simulate Synthimate webhook callback
 POST /synthetic-twin/webhooks/synthimates/generation-complete
 {
   "jobId": "synthimates-job-123",
@@ -344,7 +344,7 @@ describe('Revenue Sharing Calculations', () => {
   });
 });
 
-describe('SynthiMatesAi Webhook Verification', () => {
+describe('Synthimate Webhook Verification', () => {
   it('should accept valid HMAC signatures', () => {
     const client = createSynthiMatesAiClient({
       apiBaseUrl: 'https://test.api',
@@ -439,7 +439,7 @@ ab -n 1000 -c 100 -p generation-payload.json \
 **These errors do NOT affect**:
 
 - Core synthetic-twin service (image generation) ✅
-- SynthiMatesAi API client integration ✅
+- Synthimate API client integration ✅
 - Revenue sharing logic ✅
 - Webhook handling ✅
 - Analytics service ✅
@@ -448,7 +448,7 @@ ab -n 1000 -c 100 -p generation-payload.json \
 
 ## Summary Checklist
 
-- ✅ Item 1: SynthiMatesAi API/webhook integration created
+- ✅ Item 1: Synthimate API/webhook integration created
 - ✅ Item 2: Revenue sharing logic verified and documented
 - ✅ Item 3: Creator dashboard documented
 - ✅ Item 4: Testing protocols defined (this document)

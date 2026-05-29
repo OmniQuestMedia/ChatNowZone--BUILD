@@ -1,12 +1,12 @@
 // services/synthetic-twin/src/synthimates-api-client.ts
-// PHASE5-ITEM1: SynthiMatesAi API/Webhook Integration Client
+// PHASE5-ITEM1: Synthimate API/Webhook Integration Client
 //
-// This service handles API calls from ChatNowZone to SynthiMatesAi for synthetic twin services.
+// This service handles API calls from ChatNowZone to Synthimate for synthetic twin services.
 // Implements resell model where CNZ consumes synthetic twin services via API.
 //
 // Architecture:
-// - CNZ triggers image/video generation via SynthiMatesAi API
-// - Passes creator ID and fan context to SynthiMatesAi
+// - CNZ triggers image/video generation via Synthimate API
+// - Passes creator ID and fan context to Synthimate
 // - Receives results (image/video URLs) via webhook callbacks
 // - Revenue from services purchased on CNZ is credited to CNZ creators
 
@@ -87,8 +87,8 @@ export interface SynthiMatesWebhookPayload {
 /**
  * SynthiMatesAi API Client
  *
- * Handles all communication with SynthiMatesAi platform for synthetic twin services.
- * Follows resell model where CNZ is a consumer of SynthiMatesAi services.
+ * Handles all communication with Synthimate platform for synthetic twin services.
+ * Follows resell model where CNZ is a consumer of Synthimate services.
  */
 export class SynthiMatesAiClient {
   constructor(private readonly config: SynthiMatesAiConfig) {}

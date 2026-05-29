@@ -1,6 +1,6 @@
 // INFRA: Phase 1 — eCommsZone NestJS Module
 // rule_applied_id: INFRA_v1.0
-// Authority: OmniQuest Media Inc. — Kevin B. Hartley, CEO
+// Authority: OmniQuest Media Inc. — OQMInc Engineering Team
 //
 // §8.1 — Mandatory routing: wires IECommsZoneClient into the NestJS DI
 // container. The concrete client (ECommsZoneClientNoop for dev/test, future

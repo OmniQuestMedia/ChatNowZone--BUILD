@@ -1,6 +1,6 @@
 # Pre-Launch Checklist — Canonical Corpus L0 Ship-Gate
 
-**Authority:** OmniQuest Media Inc. — `OQMI_GOVERNANCE.md` (Canonical Corpus v10)
+**Authority:** OmniQuest Media Inc. — `OQMI_GOVERNANCE.md` (Canonical Corpus v11)
 **Branch of record:** `claude/payload10-backend-closure-JpiXh` (Payload 10)
 **Hard launch deadline:** 2026-10-01
 
@@ -178,9 +178,9 @@ invariant is violated.
 
 ## Sign-off
 
-| Role             | Name               | Date               | Signature          |
-| ---------------- | ------------------ | ------------------ | ------------------ |
-| CEO              | Kevin B. Hartley   | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
-| Engineering Lead | **\*\***\_**\*\*** | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
-| Compliance       | **\*\***\_**\*\*** | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
-| Customer Success | **\*\***\_**\*\*** | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
+| Role             | Name                    | Date               | Signature          |
+| ---------------- | ----------------------- | ------------------ | ------------------ |
+| CEO              | OQMInc Engineering Team | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
+| Engineering Lead | **\*\***\_**\*\***      | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
+| Compliance       | **\*\***\_**\*\***      | **\*\***\_**\*\*** | **\*\***\_**\*\*** |
+| Customer Success | **\*\***\_**\*\***      | **\*\***\_**\*\*** | **\*\***\_**\*\*** |

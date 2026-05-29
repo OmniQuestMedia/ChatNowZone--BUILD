@@ -1,6 +1,6 @@
 # CNZ-GROK-STANDING-PROMPT.md
 
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
 **Path (repo):** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/CNZ-GROK-STANDING-PROMPT.md`
 **Version:** 1.0.0
@@ -66,7 +66,7 @@ Do not execute any task until all six files are read.
 
 See `OQMI_SYSTEM_STATE.md` (root) §Done items for the full list. Key milestones:
 
-- Payloads 1–10 complete; all L0 ship-gates closed per Canonical Corpus v10.
+- Payloads 1–10 complete; all L0 ship-gates closed per Canonical Corpus v11.
 - Wave A (repo hygiene) complete.
 - IaC Bootstrap (ca-central-1) + eCommsZone integration hub complete.
 - Ship-gate-verifier extended to 22/22 PASS.

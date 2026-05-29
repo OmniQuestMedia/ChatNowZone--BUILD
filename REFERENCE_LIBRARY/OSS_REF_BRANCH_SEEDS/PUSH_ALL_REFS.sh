@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # PUSH_ALL_REFS.sh
 # THREAD15-OSS-HARVEST — Create 9 orphan reference branches
-# Authority: Kevin B. Hartley, CEO — OmniQuest Media Inc.
+# Authority: OQMInc Engineering Team
 #
 # USAGE:
 #   chmod +x PUSH_ALL_REFS.sh

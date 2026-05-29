@@ -2,7 +2,7 @@
 
 **Document ID:** COPILOT-REINDOCTRINATION-LOCAL
 **Type:** Local standing prompt — pointer to canonical master
-**Authority:** Kevin B. Hartley, CEO — OmniQuest Media Inc.
+**Authority:** OQMInc Engineering Team
 **Orchestrator:** Claude (Cowork) — Architectural + Coding Authority per 2026-05-19
 **Repo:** `OmniQuestMediaInc/ChatNowZone--BUILD`
 **Path:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/COPILOT-REINDOCTRINATION-LOCAL.md`

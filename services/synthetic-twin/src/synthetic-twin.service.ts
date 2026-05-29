@@ -42,11 +42,11 @@ export class SyntheticTwinService {
   // TODO: Integrate with actual token pricing from Diamond Concierge
   private static readonly CENTS_PER_TOKEN = 9;
 
-  // PHASE5-ITEM1: SynthiMatesAi API fee (deducted from platform share)
-  // This represents the cost CNZ pays to SynthiMatesAi per generation
+  // PHASE5-ITEM1: Synthimate API fee (deducted from platform share)
+  // This represents the cost CNZ pays to Synthimate per generation
   private static readonly SYNTHIMATES_API_FEE_CENTS = 15; // $0.15 per generation
 
-  // PHASE5-ITEM1: Optional SynthiMatesAi API client for external integration
+  // PHASE5-ITEM1: Optional Synthimate API client for external integration
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private synthiMatesClient?: any;
 
