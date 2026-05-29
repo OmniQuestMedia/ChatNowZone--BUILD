@@ -2,9 +2,9 @@
 
 Auto-generated on every push. Do not edit manually.
 
-**Branch:** `main`
-**Commit:** `94486bd7ff1caff7ba338eac4bf99d2205432f7e`
-**Generated:** 2026-05-29T01:47:58Z
+**Branch:** `copilot/pre-cross-test-maintenance`
+**Commit:** `f4699e83ecca06bac432ef2ec5dd7d675defa4dd`
+**Generated:** 2026-05-29T01:53:59Z
 
 ## All Files
 
@@ -43,7 +43,6 @@ Auto-generated on every push. Do not edit manually.
 - `.prettierrc`
 - `ARCHIVE/governance-pre-MaxZoneGPT-2026-05-24/PROGRAM_CONTROL/DIRECTIVES/QUEUE/.gitkeep`
 - `CONTRIBUTING.md`
-- `CYRANO_LAYER_1_PR_SUMMARY.md`
 - `HYGIENE_SWEEP_REPORT.md`
 - `LINT_CLEANUP_SUMMARY.md`
 - `MASTER_PROJECT_FOLDER.md`
@@ -322,6 +321,7 @@ Auto-generated on every push. Do not edit manually.
 - `apps/cyrano-standalone/package.json`
 - `apps/cyrano-standalone/tsconfig.json`
 - `architecture.md`
+- `archive/CYRANO_LAYER_1_PR_SUMMARY-ARCHIVED-2026-05-26.md`
 - `archive/G101-BLACK-GLASS-RETIRED-2026-05-06/RETIREMENT-NOTE.md`
 - `archive/INFRA-PRE-2026-05-06/ARCHIVE_MANIFEST.md`
 - `archive/LEGACY_CONFIGS_2026-04/.eslintrc.js`
