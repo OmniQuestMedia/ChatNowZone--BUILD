@@ -1,6 +1,7 @@
 # ChatNow.Zone Architecture Inventory (Governance Equalization)
 
-**Date:** 2026-05-12  
+**Date:** 2026-05-26
+**Status:** Post-SxF Integration — Clean
 **Authority:** `PROGRAM_CONTROL/DIRECTIVES/QUEUE/OQMI_GOVERNANCE.md` + `docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md` (INFRA_v1.0)
 
 ## Platform profile

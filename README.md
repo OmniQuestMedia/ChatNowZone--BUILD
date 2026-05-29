@@ -2,10 +2,10 @@
 
 > **✅ BUILD COMPLETE — CANONICAL COMPLIANT (Alpha Launch Ready)**
 > Payloads 1–10 executed and verified. All L0 ship-gates closed per Canonical Corpus v11 + REDBOOK + Business Plan v2.8.
-> **Date:** May 6, 2026 · **Next steps:** Phase 1 IaC Bootstrap (ca-central-1), eCommsZone Node.js client integration, ship-gate-verifier INFRA_v1.0 full matrix — see [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) + [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) (INFRA_v1.0).
+> **Date:** 2026-05-26 · **Status:** Post-SxF Integration — Clean · **Next steps:** Phase 1 IaC Bootstrap (ca-central-1), eCommsZone Node.js client integration, ship-gate-verifier INFRA_v1.0 full matrix — see [`PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md`](PROGRAM_CONTROL/DIRECTIVES/QUEUE/WORK-ORDER-v0.2.md) + [`docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md`](docs/POLICIES/OQMI_INFRASTRUCTURE_AND_SECURITY_POLICY.md) (INFRA_v1.0).
 
 > **ChatNow.Zone — Canonical Corpus v11 governed monorepo (TypeScript + Prisma + Postgres).**
-> **Status: BUILD COMPLETE (Payload 9, 2026-04-24) — Alpha Launch Ready (September 2026 target).**
+> **Status: POST-SxF INTEGRATION — CLEAN (2026-05-26) — Alpha Launch Ready (September 2026 target).**
 
 > **✅ Safe Synthetic Twin and Shared Account-Core features are now fully integrated and optional for creators via CyranoEngines**
 > **Phase 7 Complete (2026-05-25)**: All AI-powered synthetic twin features (image generation, voice chat, group chat) are production-ready with webhook integration to CyranoEngines. Creators can enable/disable AI features independently. StudioTokens (CZT) charging and 70/30 revenue sharing fully implemented. See [`docs/CREATOR_AI_GUIDE.md`](docs/CREATOR_AI_GUIDE.md) for creator documentation.
@@ -157,7 +157,7 @@ The HCZ escalation bootstrap for current RedBook-linked flows lives in
 
 ## Ship-gate status (vs Canonical Corpus L0)
 
-Snapshot at 2026-05-06 (Payload 10 + WORK-ORDER-v0.2 / INFRA_v1.0):
+Snapshot at 2026-05-26 (Post-SxF Integration — Clean):
 
 - **PAYLOAD 1 (Canonical Ledger)** — DONE. Three-bucket wallet + hash chain.
 - **PAYLOAD 2 (Recovery Engine)** — DONE. REDBOOK §5 pillars wired.
